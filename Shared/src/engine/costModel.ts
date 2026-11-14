@@ -60,6 +60,19 @@ export function etaFromThermalInertia(ti: number): number {
 
 const SQRT2 = Math.SQRT2;
 
+/** tan(slope_max_deg) for a rules array (cached per array identity; 20° default per xEVA ConOps). */
+const tanCache = new WeakMap<object, number>();
+function tanSlopeMax(ctx: CostCtx): number {
+  const rules = ctx.rules as unknown as object;
+  let t = rules ? tanCache.get(rules) : undefined;
+  if (t === undefined) {
+    const r = ctx.rules?.find((x) => x.id === 'slope_max_deg' && x.enabled);
+    t = Math.tan(((r ? r.value : 20) * Math.PI) / 180);
+    if (rules) tanCache.set(rules, t);
+  }
+  return t;
+}
+
 /** Horizontal distance (m) between two cells of a grid. */
 export function horizDistM(g: CostGrid, a: number, b: number): number {
   const w = g.w;
@@ -80,6 +93,10 @@ export const pandolfSanteeMars: CostModel = {
     const dz = g.elev[to] - g.elev[from];
     if (!(dz === dz)) return Infinity;
     const d = horizDistM(g, from, to);
+    // Edge-grade check: a Horn cell slope (3×3 smoothed) can miss a step between two passable cells,
+    // so the step itself must also respect slope_max_deg (idea from the team's routing research,
+    // Research/docs/architecture/ROUTING_ALGORITHM.md on origin/main).
+    if (Math.abs(dz) > d * tanSlopeMax(ctx)) return Infinity;
     const v = ctx.crew.v0 * ctx.speedFactor;
     if (!(v > 0)) return Infinity;
     return Math.sqrt(d * d + dz * dz) / v;

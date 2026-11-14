@@ -110,7 +110,10 @@ export function pathMetrics(g: CostGrid, judge: CostModel, p: ArrayLike<number>,
       const [r0, c0] = rowCol(g, a), [r1, c1] = rowCol(g, c);
       if (Math.max(Math.abs(r1 - r0), Math.abs(c1 - c0)) !== 1) { m.violations++; continue; } // non-adjacent jump
       m.lengthM += g.cellM * Math.hypot(r1 - r0, c1 - c0);
-      m.judgeCost += judge.edgeCost(g, a, c, benchCtx);
+      const ec = judge.edgeCost(g, a, c, benchCtx);
+      // A step the judge model forbids (e.g. edge grade > slope limit) is a hard-constraint violation.
+      if (!(ec < Infinity)) { m.violations++; continue; }
+      m.judgeCost += ec;
       const dz = g.elev[c] - g.elev[a];
       if (dz > 0) m.gainM += dz; else m.lossM -= dz;
       const hd = Math.atan2(c1 - c0, -(r1 - r0)) * 180 / Math.PI;
