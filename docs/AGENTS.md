@@ -71,11 +71,17 @@ export function createMemoryLinkPair(): [Link, Link]; // for the static public d
 | POST | `/api/confirm` | `{ reqHash }` → `{ id, seq, bytes }` and pushes `ROUTE_PUSH` to the visor |
 | GET | `/api/state` | `{ route: PlanPackage \| null, routeAcked: boolean, visorLink: LinkStatus, lastTelem: Telem \| null, events: EventLogEntry[] }` |
 | POST | `/api/events` | `{ type: 'SEP_NOWCAST', leadMin } \| { type: 'EVA_CUT', min } \| { type: 'HAZARD', cells }` → new `PlanResult` (replan from current position) |
-| POST | `/api/sim` | `{ action: 'start' \| 'pause' \| 'reset' \| 'speed', speed? }`: sim walker moves the astronaut along the confirmed route and emits TELEM |
+| POST/GET | `/api/sim` | POST `{ running: boolean, speed: number, reset?: boolean }` stores the desired astronaut-simulator state; GET returns it (the visor polls and runs the simulator) |
 | POST | `/api/link` | `{ latencyMs?, lossPct?, drop?: boolean }`: link degrade controls (demo) |
 | WS | `/link?role=console\|visor` | binary CBOR `LinkMsg` frames; the server relays visor↔hab and sends HEARTBEAT |
 
 Env: `PORT` (8787), `SITEPACK` (default `gale-v1`; falls back to the in-memory `mockSitePack()` if the pack is missing), `MARSWALK_PATH_SEARCH`, `MARSWALK_COST_MODEL`.
+
+## Fixed area of interest (gale-v1)
+- **AOI**: 5 km × 5 km centred on **137.388°E, −4.805°N** (planetocentric). Covers Curiosity's 2025–2026 boxwork-era traverse (sols ~4400–5073). Curiosity at sol 5073: 137.388886°E, −4.82602331°N, −3472 m (`MSL_waypoints_current.json`).
+- **Projection** (all agents): `+proj=eqc +lat_ts=-4.8 +lat_0=0 +lon_0=137.39 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs`.
+- **Engine grid**: 1000 × 1000 cells at 5 m.
+- **Who simulates the astronaut**: the **visor** (UserView) runs the astronaut simulator. It walks the confirmed route with dead-reckoning drift and sends `TELEM` to the hab. When the link drops, the visor keeps walking and guiding autonomously, and the hab just stops receiving telemetry. That's the realistic architecture. The Backend stores the desired sim state (`POST /api/sim {running, speed}`; `GET /api/sim`), and the visor polls `GET /api/sim` while the link is up. The Backend replans "from current position" using the last received `TELEM`.
 
 ## Site pack layout (B1 produces; served at `/sitepacks/<id>/`)
 `SitePacks/<id>/manifest.json` (validates against `SitePackManifestSchema`) + raw little-endian rasters on the engine grid (`dem.bin` f32, `slope.bin` u16×0.01, `rough.bin`, `ti.bin`, `normals.bin` 2-band, `skyview.bin` optional) + `ortho.webp` or `ortho_cog.tif` + `images/*.jpg`. Total <100 MB; each file <50 MB.
