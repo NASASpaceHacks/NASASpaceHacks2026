@@ -44,7 +44,7 @@ import { headingCue, pickLandmark } from './cues';
 import { buildMockScenario, MockHabLink, nextVersion } from './mock';
 import { Checkpoint, type DynState } from './persist';
 import { crewTasks, galeStation, objectivesFor, type CrewTask } from './science';
-import { RouteModel, shelterAt, shelterLabel } from './route';
+import { RouteModel, routeShelter, shelterLabel } from './route';
 import { departNow, estimatedXY, newSim, rebaseSim, simTick, type SimState } from './sim';
 
 export interface MapLayers {
@@ -403,8 +403,12 @@ export class VisorController {
       return;
     }
     if (m.level === 'warning') {
-      this.alert = { level: m.level, code: m.code, text: m.text, t: m.t };
-    } else this.toast(m.level === 'caution' ? 'caution' : 'info', m.text);
+      this.alert = { level: m.level, code: m.code, text: m.text, t: m.t, ...(m.from ? { from: m.from } : {}) };
+    } else {
+      // Say who raised it (ALERT.from): the hab's EVA officer, or this visor's own monitors.
+      const who = m.from === 'visor' ? 'ONBOARD' : m.from === 'hab' ? 'HAB' : null;
+      this.toast(m.level === 'caution' ? 'caution' : 'info', who && !m.text.toUpperCase().startsWith(who) ? `${who} · ${m.text}` : m.text);
+    }
   }
 
   private send(m: LinkMsg) {
@@ -803,8 +807,9 @@ export class VisorController {
     const first = p.stops[0];
     const firstBingo = p.bingo.find((b) => b.id === first?.id);
     const g = this.grid;
-    const endSh = g && p.route.length ? shelterAt(this.manifest, g, p.route[p.route.length - 1]) : null;
-    const startSh = g && p.route.length ? shelterAt(this.manifest, g, p.route[0]) : null;
+    // Endpoints resolve against the package's own EVA base (pkg.base), so a dragged rover is named correctly.
+    const endSh = g && p.route.length ? routeShelter(p, this.manifest, g, p.route[p.route.length - 1]) : null;
+    const startSh = g && p.route.length ? routeShelter(p, this.manifest, g, p.route[0]) : null;
     const toLabel = endSh ? shelterLabel(endSh) : 'HAB';
     // A mid-EVA replan starts where the crew is ('HERE'); a fresh route starts at a shelter.
     const [sx, sy] = g && p.route.length ? cellToXY(g, p.route[0]) : [NaN, NaN];
@@ -949,6 +954,7 @@ export class VisorController {
               : 'ONBOARD SAFETY CORE: RETURN NOW';
         ret = {
           source: this.alert ? 'alert' : 'safety',
+          from: this.alert ? (this.alert.from ?? 'hab') : 'visor',
           level: 'warning',
           code: this.alert?.code ?? 'SAFETY_CORE',
           reason,

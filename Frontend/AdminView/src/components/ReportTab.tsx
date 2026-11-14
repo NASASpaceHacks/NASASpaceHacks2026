@@ -5,6 +5,7 @@ import { fmt } from '../lib/format';
 import { fmtLtst } from '../lib/marsclock';
 import { dropConsequence, objectiveCoverage } from '../lib/science';
 import { Badge, Button, Empty, MarginBar, SectionHead, Stat, Tip, cx } from './ui';
+import { RuleEvidence } from './Evidence';
 import { endpointLabel, relabel, useBaseInfo } from '../lib/base';
 
 const UNIT: Partial<Record<RuleId, string>> = {
@@ -107,9 +108,12 @@ export function ReportTab() {
             return (
               <div key={id}>
                 <div className="flex items-baseline justify-between gap-2">
-                  <Tip content={r?.citation ?? id} side="left" width={300}>
-                    <span className="text-[11.5px] text-ink-2">{r?.label ?? id}</span>
-                  </Tip>
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    {r && <RuleEvidence r={r} />}
+                    <Tip content={r?.citation ?? id} side="left" width={300}>
+                      <span className="text-[11.5px] text-ink-2">{r?.label ?? id}</span>
+                    </Tip>
+                  </span>
                   <span className="num text-[11px] text-ink">
                     {fmt.signed(m.min, Math.abs(m.min) < 10 ? 1 : 0)} <span className="text-dim">{UNIT[id] ?? ''}</span>
                     <span className="ml-2 text-dim">@ +{Math.round(m.atMin)}m</span>

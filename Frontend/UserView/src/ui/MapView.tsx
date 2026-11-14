@@ -57,41 +57,76 @@ const ownIcon =
     `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><path d="M32 4 L54 56 L32 44 L10 56 Z" fill="#f2fff7" stroke="#000" stroke-width="4" stroke-linejoin="round"/></svg>`,
   );
 
-const textStyle = (text: string, color: string, px: number, offsetY = 0, offsetX = 0) =>
-  new Text({ text, font: FONT(px), fill: new Fill({ color }), stroke: new Stroke({ color: '#000', width: 6 }), offsetY, offsetX });
+const textStyle = (text: string, color: string, px: number, offsetY = 0, offsetX = 0, textAlign?: CanvasTextAlign) =>
+  new Text({ text, font: FONT(px), fill: new Fill({ color }), stroke: new Stroke({ color: '#000', width: 6 }), offsetY, offsetX, textAlign });
+
+/** Label side around a point symbol. Close stops (ST02/ST03 are ~11 m = 14 px apart) get different sides. */
+type LabelSide = 'up' | 'down' | 'right' | 'left';
+const LABEL_SIDES: LabelSide[] = ['up', 'down', 'right', 'left'];
+/** Points closer than this (m) compete for label space (a 22–28 px label is ~60 px wide at 0.8 m/px). */
+const LABEL_CLEAR_M = 48;
+
+/** Text at a side of a symbol of radius r (px); `gap` is the default vertical offset for that kind. */
+function sideText(text: string, color: string, px: number, side: LabelSide, gap: number, r: number) {
+  if (side === 'up') return textStyle(text, color, px, -gap);
+  if (side === 'down') return textStyle(text, color, px, gap);
+  return textStyle(text, color, px, 0, side === 'right' ? r + 10 : -(r + 10), side === 'right' ? 'left' : 'right');
+}
 
 function stopStyle(f: FeatureLike): Style | Style[] {
   const kind = f.get('kind') as string;
   const id = f.get('id') as string;
+  const side = (f.get('side') as LabelSide | undefined) ?? (kind === 'home' || kind === 'shelter' ? 'down' : 'up');
   if (kind === 'next')
     return new Style({
       image: new RegularShape({ points: 4, radius: 20, angle: 0, fill: new Fill({ color: A }), stroke: new Stroke({ color: '#000', width: 3 }) }),
-      text: textStyle(id, A, 28, -40),
+      text: sideText(id, A, 28, side, 40, 20),
       zIndex: 10,
     });
   if (kind === 'upcoming')
     return new Style({
       image: new RegularShape({ points: 4, radius: 14, angle: 0, stroke: new Stroke({ color: A, width: 3 }), fill: new Fill({ color: 'rgba(0,0,0,0.6)' }) }),
-      text: textStyle(id, A, 22, -32),
+      text: sideText(id, A, 22, side, 32, 14),
       zIndex: 8,
     });
   if (kind === 'visited')
     return new Style({
       image: new RegularShape({ points: 4, radius: 11, angle: 0, stroke: new Stroke({ color: G3, width: 3 }) }),
-      text: textStyle(id, G3, 20, -28),
+      text: sideText(id, G3, 20, side, 28, 11),
       zIndex: 6,
     });
   if (kind === 'home')
     return new Style({
       image: new RegularShape({ points: 4, radius: 20, angle: Math.PI / 4, stroke: new Stroke({ color: C, width: 4 }), fill: new Fill({ color: 'rgba(78,230,255,0.15)' }) }),
-      text: textStyle(id, C, 24, 36),
+      text: sideText(id, C, 24, side, 36, 20),
       zIndex: 9,
     });
   return new Style({
     image: new CircleStyle({ radius: 13, stroke: new Stroke({ color: C, width: 3 }), fill: new Fill({ color: 'rgba(78,230,255,0.10)' }) }),
-    text: textStyle(id, C, 20, 32),
+    text: sideText(id, C, 20, side, 32, 13),
     zIndex: 7,
   });
+}
+
+/**
+ * Declutter point labels without hiding any: features are placed in priority order (next stop first) and
+ * each takes its preferred side unless a neighbour within LABEL_CLEAR_M already holds it; then the
+ * opposite side, then right, then left. Sides are in screen space, so two labels on opposite sides of
+ * points 14 px apart never collide whatever the heading-up map rotation.
+ */
+const LABEL_PRIORITY: Record<string, number> = { next: 0, home: 1, upcoming: 2, visited: 3, shelter: 4 };
+function assignLabelSides(feats: Feature[]) {
+  const placed: { x: number; y: number; side: LabelSide }[] = [];
+  const order = [...feats].sort((a, b) => (LABEL_PRIORITY[a.get('kind')] ?? 9) - (LABEL_PRIORITY[b.get('kind')] ?? 9));
+  for (const f of order) {
+    const [x, y] = (f.getGeometry() as Point).getCoordinates();
+    const kind = f.get('kind') as string;
+    const pref: LabelSide = kind === 'home' || kind === 'shelter' ? 'down' : 'up';
+    const taken = new Set(placed.filter((p) => Math.hypot(p.x - x, p.y - y) < LABEL_CLEAR_M).map((p) => p.side));
+    const side = [pref, pref === 'up' ? 'down' : 'up', ...LABEL_SIDES].find((sd) => !taken.has(sd as LabelSide)) as LabelSide | undefined;
+    f.set('side', side ?? pref);
+    placed.push({ x, y, side: side ?? pref });
+  }
 }
 
 interface MapCtx {
@@ -238,6 +273,7 @@ function syncDynamic(m: MapCtx, ctl: VisorController, s: Snapshot) {
     f.set('kind', sh.kind === 'hab' ? 'home' : 'shelter');
     feats.push(f);
   }
+  assignLabelSides(feats);
   m.src.stops.addFeatures(feats);
 
   if (route && sim) {

@@ -360,7 +360,8 @@ export function handleLinkMsg(m: LinkMsg) {
       break;
     }
     case 'ALERT':
-      log(`${m.code}: ${m.text}`, m.level === 'warning' ? 'warning' : m.level === 'caution' ? 'caution' : 'info', 'visor', m.t);
+      // ALERT.from: the hab's own alerts are echoed to the console; the rest come from the visor.
+      log(`${m.code}: ${m.text}`, m.level === 'warning' ? 'warning' : m.level === 'caution' ? 'caution' : 'info', m.from === 'hab' ? 'hab' : 'visor', m.t);
       break;
     case 'ROUTE_PUSH':
     case 'HEARTBEAT':
@@ -378,6 +379,13 @@ async function pollServer() {
     handleLinkMsg({ type: 'ACK', id: st.route.id, seq: st.route.seq, accepted: true });
   }
   if (st.lastTelem) handleLinkMsg({ type: 'TELEM', telem: st.lastTelem });
+  if (st.earth && Number.isFinite(st.earth.oneWayLightMin)) {
+    const e = st.earth;
+    const prev = get().earth;
+    if (!prev || Math.abs(prev.oneWayLightMin - e.oneWayLightMin) > 0.005) {
+      set({ earth: { oneWayLightMin: e.oneWayLightMin, distanceAu: e.distanceAu, computedUtc: e.computedUtc, method: e.method, source: e.source } });
+    }
+  }
 }
 
 function toPlanEvent(e: ConsoleEvent): PlanEvent {

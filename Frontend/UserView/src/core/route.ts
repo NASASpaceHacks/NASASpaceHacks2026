@@ -14,8 +14,9 @@ export function shelterLabel(s: Pick<Shelter, 'id' | 'name'>): string {
 }
 
 /**
- * The shelter a route ends at. Exact cell, else within 25 m, else — the hab is fixed, so a route that
+ * The manifest shelter at a cell. Exact cell, else within 25 m, else — the hab is fixed, so a route that
  * ends elsewhere ends at a pressurized rover the EVA officer dragged — the nearest movable shelter.
+ * Prefer `routeShelter`, which uses the package's own EVA base before falling back to this guess.
  */
 export function shelterAt(manifest: SitePackManifest | null, grid: GridSpec, cell: number): Shelter | null {
   const sh = manifest?.shelters ?? [];
@@ -27,6 +28,29 @@ export function shelterAt(manifest: SitePackManifest | null, grid: GridSpec, cel
   const near = [...sh].sort((a, b) => d(a) - d(b));
   if (d(near[0]) < 25) return near[0];
   return near.find((s) => s.movable) ?? null;
+}
+
+/**
+ * The shelter at a route endpoint, using the package's EVA base (`pkg.base`: the hab or the pressurized
+ * rover, at the cell it was staged from — the rover may sit far from its manifest position after the
+ * EVA officer dragged it). An endpoint within 25 m of the base IS the base (manifest name, staged
+ * position). Otherwise (e.g. a SEP return to a nearer shelter) the manifest shelter at that cell; the
+ * nearest-movable-shelter guess remains only for packages without `base`.
+ */
+export function routeShelter(pkg: Pick<PlanPackage, 'base'>, manifest: SitePackManifest | null, grid: GridSpec, cell: number): Shelter | null {
+  const b = pkg.base;
+  if (b && b.cell >= 0 && b.cell < grid.w * grid.h) {
+    const [bx, by] = cellToXY(grid, b.cell);
+    const [x, y] = cellToXY(grid, cell);
+    if (b.cell === cell || Math.hypot(bx - x, by - y) < 25) {
+      const m = manifest?.shelters.find((s) => s.id === b.id);
+      return { id: b.id, kind: b.kind, name: m?.name ?? b.id, movable: m?.movable ?? b.kind !== 'hab', cell: b.cell, x: bx, y: by };
+    }
+    const sh = manifest?.shelters ?? [];
+    const exact = sh.find((s) => s.cell === cell) ?? sh.find((s) => Math.hypot(s.x - x, s.y - y) < 25 && s.id !== b.id);
+    if (exact) return exact;
+  }
+  return shelterAt(manifest, grid, cell);
 }
 
 /** Terrain the visor needs to time and cost the route like the planner (engine cost grid subset). */
@@ -153,7 +177,7 @@ export class RouteModel {
     });
 
     const endCell = cells[n - 1];
-    const shelter = shelterAt(manifest, grid, endCell);
+    const shelter = routeShelter(pkg, manifest, grid, endCell);
     this.home = {
       x: xs[n - 1], y: ys[n - 1], cell: endCell,
       name: shelter ? shelterLabel(shelter) : 'HAB', id: shelter?.id ?? 'HAB', full: shelter?.name ?? 'Habitat', kind: shelter?.kind ?? null,

@@ -9,7 +9,7 @@ Put the **Habitat Console** and the **EVA Visor** side by side (two browser wind
 | EVA Visor | http://localhost:5174/?reset=1 | Astronaut (helmet navigation) |
 | Hab server health | http://localhost:8787/api/health | — |
 
-**Start it yourself** (from the repo root): `pnpm install`, then in three terminals:
+**Start it yourself** (from the repo root): `pnpm install && pnpm demo` (one command; Ctrl+C stops all). Or in three terminals:
 ```sh
 PORT=8787 SITEPACK=gale-v1 pnpm --filter ./Backend start
 HAB_URL=http://localhost:8787 pnpm --filter ./Frontend/AdminView exec vite --port 5173 --strictPort
@@ -57,6 +57,14 @@ MW_HAB=http://localhost:8787 pnpm --filter ./Frontend/UserView exec vite --port 
 
 ### 9. Crash recovery
 - Reload the visor tab: **WARM RESTART**, state restored in well under a second.
+
+### Console keys
+**G** plan · **S** explain safe zone · **C** confirm · **E** evidence panel · **Z** zoom to route · **1–4** presets · **?** all keys
+
+### New panels
+- **Live → Space weather**: three tiers. *Forecast* = real WSA-ENLIL CME runs predicting Mars arrivals (CCMC DONKI) → GO / CAUTION for the EVA date; *Alert* = flare notices light-delayed by today's one-way light time; *Nowcast* = onboard dose rate +25 % → the only return-now trigger.
+- **Evidence** (key **E**): V1 radiation-shielding reproduction, V2 metabolic calibration, planner benchmark, live timings, limitations & assumptions.
+- **Rules**: each flight rule has an evidence chip (M measured / A analog / D NASA requirement / S simulated / E team assumption).
 
 ### Visor keys
 **A** accept route · **N** next/tick task · **H** report hazard here · **R** request reroute · **M** mirror (for beam-splitter HUDs) · **D** demo panel

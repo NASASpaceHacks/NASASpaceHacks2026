@@ -124,7 +124,7 @@ export class MockVisor {
     this.t += dt;
     if (this.t > plan.totals.durationMin) {
       this.setSim({ running: false, speed: this.sim.speed });
-      this.deliver({ type: 'ALERT', level: 'info', code: 'EVA_COMPLETE', text: 'EV1 back at the hab — ingress started', t: this.t });
+      this.deliver({ type: 'ALERT', level: 'info', code: 'EVA_COMPLETE', text: 'EV1 back at the hab — ingress started', t: this.t, from: 'visor' });
       return;
     }
     const { cell, next, dwelling } = this.cellAt(plan, this.t);

@@ -5,6 +5,7 @@ import { fmt } from '../lib/format';
 import { fmtLtst } from '../lib/marsclock';
 import { Badge, Button, Kbd, SectionHead, Stat, cx } from './ui';
 import { useBaseInfo } from '../lib/base';
+import { SpaceWeatherPanel } from './SpaceWeather';
 
 function Telemetry() {
   const telem = useConsole((s) => s.telem);
@@ -75,18 +76,15 @@ function EventButtons() {
   return (
     <div className="flex flex-col gap-2">
       <div className="grid grid-cols-2 gap-1.5">
-        <Button variant="danger" onClick={() => void fireEvent({ type: 'SEP_NOWCAST', leadMin: 30 }, 'SEP nowcast, 30 min lead')} disabled={!!busy}>
-          {busy === 'SEP_NOWCAST' ? 'Replanning…' : 'SEP nowcast'}
-        </Button>
         <Button onClick={() => void fireEvent({ type: 'EVA_CUT', min: 45 }, 'EVA cut 45 min')} disabled={!!busy}>
           {busy === 'EVA_CUT' ? 'Replanning…' : 'Cut EVA 45 min'}
         </Button>
         <Button onClick={startHazardPick} disabled={!!busy} className={cx(hazardPick && '!border-red/60 !text-red')}>
           {hazardPick ? 'Click map…' : 'Report hazard'}
         </Button>
-        <Button variant="ghost" onClick={clearEvents} disabled={!events.length || !!busy}>Clear events ({events.length})</Button>
+        <Button variant="ghost" className="col-span-2" onClick={clearEvents} disabled={!events.length || !!busy}>Clear events ({events.length})</Button>
       </div>
-      <div className="text-[10.5px] leading-snug text-dim">Each event replans from EV1's current position. The new route still needs CONFIRM before it reaches the visor.</div>
+      <div className="text-[10.5px] leading-snug text-dim">Each event replans from EV1's current position. The new route still needs CONFIRM before it reaches the visor. The SEP nowcast lives under Space weather.</div>
     </div>
   );
 }
@@ -164,6 +162,10 @@ export function LiveTab() {
       <section>
         <SectionHead>Telemetry</SectionHead>
         <div className="mt-2.5"><Telemetry /></div>
+      </section>
+      <section>
+        <SectionHead right={<span className="text-[10px] text-dim">forecast · alert · nowcast</span>}>Space weather</SectionHead>
+        <div className="mt-2.5"><SpaceWeatherPanel /></div>
       </section>
       <section>
         <SectionHead>Requests from EV1</SectionHead>

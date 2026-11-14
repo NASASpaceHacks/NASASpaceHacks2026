@@ -9,6 +9,7 @@ import { fmtLtst, sunAtLtst } from '../lib/marsclock';
 import { fmtRule } from '../lib/format';
 import { STM, goalById, objectiveById, objectiveCoverage, stationImage, whyItMatters, type Coverage } from '../lib/science';
 import { Badge, Button, Kbd, SectionHead, Switch, Tip, cx } from './ui';
+import { EvidenceLegend, RuleEvidence, openEvidence } from './Evidence';
 
 const T0 = 5 * 60, T1 = 19 * 60;
 
@@ -294,11 +295,12 @@ function RuleRow({ r }: { r: Rule }) {
     <div className={cx('flex items-center gap-2.5 border-b border-line/60 py-2 last:border-0', !r.enabled && 'opacity-50')}>
       <Switch size="sm" on={r.enabled} onChange={(v) => updateRule(r.id, { enabled: v })} label={`Enable ${r.label}`} />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          <Tip content={<><div className="text-ink">{r.label}</div><div className="mt-1.5">{r.citation}</div></>} side="left" width={320}>
-            <span className="truncate text-[11.5px] text-ink-2 underline decoration-line-2 decoration-dotted underline-offset-[3px]">{r.label}</span>
+        <div className="flex min-w-0 items-center gap-1.5">
+          <RuleEvidence r={r} />
+          <Tip className="min-w-0" content={<><div className="text-ink">{r.label}</div><div className="mt-1.5">{r.citation}</div></>} side="left" width={320}>
+            <span className="block truncate text-[11.5px] text-ink-2 underline decoration-line-2 decoration-dotted underline-offset-[3px]">{r.label}</span>
           </Tip>
-          {r.assumption && <Badge tone="ochre">Assumption</Badge>}
+          {r.assumption && !r.evidence && <Badge tone="ochre">Assumption</Badge>}
         </div>
       </div>
       <button
@@ -381,9 +383,16 @@ export function PlanTab() {
 
       <section>
         <SectionHead right={<span className="num text-[10px] text-dim">{rules.filter((r) => r.enabled && r.hard).length} hard</span>}>Flight rules</SectionHead>
-        <div className="mt-1.5">
+        <div className="mt-2.5 rounded-[2px] border border-line/70 bg-sunk/40 px-2.5 py-2">
+          <div className="label mb-1.5 !text-[9px]">Evidence class · hover a chip for the source</div>
+          <EvidenceLegend compact />
+        </div>
+        <div data-testid="rules" className="mt-1">
           {rules.map((r) => <RuleRow key={r.id} r={r} />)}
         </div>
+        <button data-testid="open-limitations" onClick={() => openEvidence('limitations')} className="mt-2 text-[11px] text-cyan hover:underline">
+          Limitations &amp; assumptions →
+        </button>
       </section>
     </div>
   );

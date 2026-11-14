@@ -37,12 +37,22 @@ export interface ServerEvent {
   [k: string]: unknown;
 }
 
+/** Hab server Earth relay (GET /api/state → earth): light time computed from JPL approximate positions. */
+export interface EarthView {
+  oneWayLightMin: number;
+  distanceAu: number;
+  computedUtc: string;
+  method: string;
+  source: string;
+}
+
 export interface ServerState {
   route: PlanPackage | null;
   routeAcked: boolean;
   visorLink: LinkStatus;
   lastTelem: Telem | null;
   events: ServerEvent[];
+  earth?: EarthView;
 }
 
 export type ConsoleEvent =

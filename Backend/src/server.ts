@@ -222,7 +222,7 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
       onConsoleMsg(m) {
         if (m.type !== 'ALERT') return;
         evlog.append('alert', { from: 'console', level: m.level, code: m.code, text: m.text, t: m.t });
-        hub.sendToVisors(m);
+        hub.sendToVisors({ ...m, from: m.from ?? 'hab' }); // the habitat console speaks for the hab
       },
       onVisorStatus(s, prev) {
         evlog.append('link_status', { visorLink: s, prev });
@@ -471,6 +471,7 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
         code: 'SEP_NOWCAST',
         text: `SEP NOWCAST — REACH SHELTER WITHIN ${ev.leadMin} MIN`,
         t: lastTelem?.t ?? 0,
+        from: 'hab',
       };
       evlog.append('alert', { from: 'hab', level: alert.level, code: alert.code, text: alert.text, t: alert.t });
       hub.sendToVisors(alert);

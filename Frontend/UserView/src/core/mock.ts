@@ -69,7 +69,7 @@ export class MockHabLink implements Link {
     this.deliver({ type: 'ROUTE_PUSH', pkg }, delayMs);
   }
   alert(level: 'info' | 'caution' | 'warning', code: string, text: string, t: number) {
-    this.deliver({ type: 'ALERT', level, code, text, t });
+    this.deliver({ type: 'ALERT', level, code, text, t, from: 'hab' });
   }
   send(m: LinkMsg) {
     if (m.type === 'HEARTBEAT') return;

@@ -8,6 +8,7 @@ The habitat EVA officer plans a constraint-safe Marswalk on a correct Mars map b
 
 - **Design doc**: [`docs/designs/marswalk.md`](docs/designs/marswalk.md)
 - **Build agents + API specs**: [`docs/AGENTS.md`](docs/AGENTS.md)
+- **Product walkthrough**: [`docs/WALKTHROUGH.md`](docs/WALKTHROUGH.md)
 - **Research tracks for humans**: [`Research/tracks/README.md`](Research/tracks/README.md)
 
 ## Layout
@@ -25,8 +26,10 @@ The habitat EVA officer plans a constraint-safe Marswalk on a correct Mars map b
 ## Quick start
 ```sh
 pnpm install
-pnpm ci            # typecheck + tests
-pnpm dev           # Backend :8787, Habitat Console :5173, Visor :5174
+pnpm demo          # hab server (gale-v1) + Habitat Console :5173 + Visor :5174, fresh state; prints URLs
+pnpm ci            # typecheck + unit tests
+pnpm e2e           # full demo flow end-to-end (Playwright, real engine, real Gale data)
+pnpm bench         # planner benchmark (see Research/planners/README.md)
 ```
 
 ## Data & credits

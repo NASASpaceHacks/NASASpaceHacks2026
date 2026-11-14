@@ -65,6 +65,8 @@ export interface StationInfo {
 
 export interface ReturnInfo {
   source: 'alert' | 'safety';
+  /** Who ordered the return (ALERT.from): the hab, or the visor's own safety core. */
+  from: 'hab' | 'visor';
   level: 'caution' | 'warning';
   code: string;
   reason: string;

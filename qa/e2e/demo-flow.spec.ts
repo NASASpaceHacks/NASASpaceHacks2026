@@ -7,7 +7,8 @@ import { expect, test, type Page } from '@playwright/test';
  *   1 plan (rover-staged, OK) · 1b Hab-1 STAY IN explained → stage from PR-1 · 2 explain safe zone on
  *   the engine LOS field · 3 CONFIRM v1 (package size) · 4 visor verifies Ed25519, A → ACK · 5 sim walks,
  *   TELEM + plan vs actual · 6 ST04 station card with Curiosity photo · 7 SEP nowcast → replan → v2 →
- *   RETURN guidance · 8 drop link → AUTONOMOUS → restore → TELEM resync · 9 visor reload restores state.
+ *   RETURN guidance · 8 drop link → AUTONOMOUS → restore → TELEM resync · 9 visor reload restores state ·
+ *   10 credibility surfaces: space-weather tiers, rule evidence chips, Evidence panel + limitations.
  * Screenshots of each demo moment go to qa/screens/ (committed); timings to qa/screens/timings.json.
  */
 
@@ -207,6 +208,25 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     await shot(vis, '05-visor-nav');
   });
 
+  await test.step('5b. space weather in three labelled tiers: ENLIL forecast go/no-go, light-delayed alert, onboard nowcast', async () => {
+    const forecast = con.getByTestId('tier-forecast');
+    await forecast.scrollIntoViewIfNeeded();
+    await expect(forecast).toContainText(/WSA-ENLIL/);
+    await expect(con.getByTestId('forecast-status')).toHaveText(/^(Go|Caution)$/i);
+    await expect(con.getByTestId('forecast-verdict')).toContainText(/±24 h of the EVA start/);
+    expect(await forecast.locator('a[href*="ccmc.gsfc.nasa.gov/DONKI"]').count()).toBeGreaterThanOrEqual(3);
+    // Alert tier: one-way light time from the hab server Earth relay (JPL approximate positions).
+    await expect(con.getByTestId('light-time')).toHaveText(/^\d{1,2}\.\d{2}\s*min$/, { timeout: 10_000 });
+    const lt = Number((await con.getByTestId('light-time').textContent())!.replace(/[^\d.]/g, ''));
+    expect(lt).toBeGreaterThan(3);
+    expect(lt).toBeLessThan(23); // Earth–Mars one-way light time is 3–22 min
+    await expect(con.getByTestId('tier-nowcast')).toContainText(/only tier that orders return now/i);
+    timings.lightTimeMin = lt;
+    console.log(`[5b] forecast ${await con.getByTestId('forecast-status').textContent()} · light time ${lt} min`);
+    await con.waitForTimeout(300);
+    await shot(con, '10-space-weather');
+  });
+
   // ── 6 ────────────────────────────────────────────────────────────────────────────────────────────
   await test.step('6. arrival at the first station: science + Curiosity photo; plan vs actual on the burndowns', async () => {
     await expect.poll(() => vis$(vis, (s) => s.display), { timeout: 90_000, intervals: [200] }).toBe('STATION');
@@ -253,7 +273,7 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
   await test.step('7. SEP nowcast → replan from the crew position in < 1 s → v2 → visor RETURN guidance', async () => {
     await con.getByRole('tab', { name: /Live/ }).click();
     const t0 = Date.now();
-    await con.getByRole('button', { name: 'SEP nowcast' }).click();
+    await con.getByTestId('sep-nowcast').click(); // nowcast tier: onboard dose rate +25 %
     await con.waitForFunction(`(() => { const s = window.marswalk.state(); return !s.busyEvent && s.planStatus === 'ready' && s.plan && /SEP/.test(s.plan.binding ? s.plan.binding.text : ''); })()`, null, { timeout: 15_000 });
     timings.sepReplanWallMs = Date.now() - t0;
     const p = await con$(con, (s) => ({ status: s.plan.status, solveMs: s.plan.solveMs, from: s.plan.segments[0]?.from, to: s.plan.segments[s.plan.segments.length - 1]?.to, binding: s.plan.binding.text }));
@@ -263,8 +283,9 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     expect(p.from).toBe('HERE');
     expect(p.solveMs).toBeLessThan(1000);
     expect(timings.sepReplanWallMs as number).toBeLessThan(1500);
-    // The hab warns the crew at once (ALERT), before v2 is even confirmed.
+    // The hab warns the crew at once (ALERT, from: 'hab'), before v2 is even confirmed.
     await expect(vis.getByText('RETURN NOW', { exact: true }).first()).toBeVisible();
+    await expect(vis.getByText(/HAB ALERT · SEP NOWCAST/)).toBeVisible();
 
     await con.getByRole('button', { name: /Review v2/ }).click();
     await expect(con.getByTestId('review-route')).toHaveText(/^EV1 → (PR-1|Hab-1)$/);
@@ -331,6 +352,43 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     expect(after.display).toBe(before.display);
     timings.visorRestoreMs = Math.round(after.ms);
     await shot(vis, '09-warm-restart');
+  });
+
+  // ── 10 ───────────────────────────────────────────────────────────────────────────────────────────
+  await test.step('10. credibility: rule evidence chips, Evidence panel (V1, V2, V7, live timings) and limitations', async () => {
+    await con.getByRole('tab', { name: /Plan/ }).click();
+    const rules = con.getByTestId('rules');
+    await rules.scrollIntoViewIfNeeded();
+    const chips = await rules.locator('[data-evidence]').evaluateAll((els) => els.map((e) => e.getAttribute('data-evidence')));
+    const expected = await con$(con, (s) => s.rules.filter((r: { evidence?: string }) => r.evidence).map((r: { evidence: string }) => r.evidence));
+    expect(chips).toEqual(expected);
+    expect(new Set(chips).size).toBeGreaterThanOrEqual(3);
+    await expect(con.getByTestId('evidence-legend').first()).toContainText(/Measured.*Analog.*NASA requirement.*Simulated.*Team assumption/);
+    await con.waitForTimeout(300);
+    await shot(con, '11-rules-evidence');
+
+    await con.keyboard.press('e');
+    const panel = con.getByTestId('evidence-panel');
+    await expect(panel).toBeVisible();
+    await expect(con.getByTestId('evidence-v1')).toContainText('2.0');
+    await expect(con.getByTestId('evidence-v1')).toContainText(/r = 0\.94 · n = 15/);
+    await expect(con.getByTestId('evidence-v1')).toContainText('4.3');
+    await expect(con.getByTestId('evidence-v2')).toContainText('10.6');
+    await expect(con.getByTestId('evidence-v7')).toContainText('0.000');
+    await expect(con.getByTestId('evidence-v7')).toContainText(/140–166/);
+    await expect(con.getByTestId('evidence-live')).toContainText(/KB of 28 KB/);
+    const fig = con.locator('[data-testid="evidence-v1"] img');
+    await expect.poll(() => fig.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth)).toBeGreaterThan(500);
+    expect(await panel.textContent()).not.toMatch(/\bvalidated?\b/i); // wording: reproduces / calibrated
+    await con.waitForTimeout(400);
+    await shot(con, '12-evidence');
+    await con.getByTestId('evidence-limitations').scrollIntoViewIfNeeded();
+    await expect(con.getByTestId('limitations').locator('li')).toHaveCount(7);
+    await expect(con.getByTestId('limitations')).toContainText(/fail closed/);
+    await con.waitForTimeout(300);
+    await shot(con, '13-limitations');
+    await con.keyboard.press('Escape');
+    await expect(panel).toBeHidden();
   });
 
   timings.runUtc = new Date().toISOString();

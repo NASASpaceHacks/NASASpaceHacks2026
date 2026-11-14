@@ -7,6 +7,7 @@ import { LeftRail } from './components/LeftRail';
 import { RightPanel } from './components/RightPanel';
 import { MapView } from './map/MapView';
 import { Button, Kbd } from './components/ui';
+import { EvidencePanel } from './components/EvidencePanel';
 
 const SHORTCUTS: [string, string][] = [
   ['G', 'Generate plan'],
@@ -15,6 +16,7 @@ const SHORTCUTS: [string, string][] = [
   ['1–4', 'Layer presets: Plan · Safety · Science · Comms'],
   ['P R B L', 'Tabs: Plan · Report · Burndowns · Live'],
   ['H', 'Report hazard (click map)'],
+  ['E', 'Evidence: validation, benchmark, limitations'],
   ['F', 'Fit map to AOI'],
   ['Z', 'Zoom to route'],
   ['Esc', 'Cancel / close'],
@@ -30,13 +32,16 @@ function useShortcuts() {
       if (!s.pack) return;
       const k = e.key.toLowerCase();
       if (k === 'escape') {
-        if (s.showHelp) set({ showHelp: false });
+        if (s.evidence !== 'closed') set({ evidence: 'closed' });
+        else if (s.showHelp) set({ showHelp: false });
         else if (s.hazardPick) startHazardPick();
         else if (s.explain.running) void explainSafeZone();
         else if (s.confirm.stage === 'review') set({ confirm: { stage: 'idle' } });
         return;
       }
       if (k === '?') return set({ showHelp: !s.showHelp });
+      if (k === 'e') return set({ evidence: s.evidence === 'closed' ? 'open' : 'closed' });
+      if (s.evidence !== 'closed') return; // the evidence dialog is modal
       if (k === 'g') return void generatePlan();
       if (k === 's') return void explainSafeZone();
       if (k === 'f') return getMap()?.fit();
@@ -129,6 +134,7 @@ export function App() {
         <RightPanel />
       </div>
       <Help />
+      <EvidencePanel />
     </div>
   );
 }

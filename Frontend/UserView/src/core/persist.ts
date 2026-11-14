@@ -10,7 +10,7 @@ export interface DynState {
   savedAt: number;
   siteId: string | null;
   sim: SimState | null;
-  alert: { level: 'info' | 'caution' | 'warning'; code: string; text: string; t: number } | null;
+  alert: { level: 'info' | 'caution' | 'warning'; code: string; text: string; t: number; from?: 'hab' | 'visor' } | null;
   safetyLatched: boolean;
   mirror: boolean;
   lastResetSeen: unknown;

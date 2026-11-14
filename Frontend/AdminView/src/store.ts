@@ -4,6 +4,7 @@ import type { Cell, FieldSet, LoadedSitePack, PlanEvent, PlanRequest, PlanResult
 import { DEFAULT_RULES } from '@mw/shared/contracts';
 import type { SafeZoneInputs, SafeZoneLimits } from '@mw/shared/map';
 import type {
+  EarthView,
   FieldsSource,
   LinkCtl,
   LinkStatus,
@@ -74,6 +75,8 @@ export interface ConsoleState {
   selectedStation: string | null;
   hoverStation: { id: string; x: number; y: number } | null;
   showHelp: boolean;
+  /** Evidence panel (Validity): closed, open, or open scrolled to the limitations list. */
+  evidence: 'closed' | 'open' | 'limitations';
 
   // Confirm / link / live
   confirm: { stage: ConfirmStage; seq?: number; id?: string; bytes?: number; estimated?: boolean; error?: string };
@@ -85,6 +88,8 @@ export interface ConsoleState {
   requests: RequestMsg[];
   sim: { running: boolean; speed: number };
   busyEvent: string | null;
+  /** Earth relay view from the hab server (light time); null in mock mode / before the first poll. */
+  earth: EarthView | null;
 }
 
 export const OVERLAY_LIMIT = 3;
@@ -141,6 +146,7 @@ export const useConsole = create<ConsoleState>()(
     selectedStation: null,
     hoverStation: null,
     showHelp: false,
+    evidence: 'closed',
 
     confirm: { stage: 'idle' },
     route: null,
@@ -151,6 +157,7 @@ export const useConsole = create<ConsoleState>()(
     requests: [],
     sim: { running: false, speed: 60 },
     busyEvent: null,
+    earth: null,
   }) as ConsoleState),
 );
 

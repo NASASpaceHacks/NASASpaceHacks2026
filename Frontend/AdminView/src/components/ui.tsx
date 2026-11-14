@@ -69,7 +69,7 @@ export function Kbd({ children }: { children: ReactNode }) {
 }
 
 /** Hover/focus tooltip rendered in a portal so scroll containers never clip it. */
-export function Tip({ content, children, side = 'top', width = 280 }: { content: ReactNode; children: ReactNode; side?: 'top' | 'bottom' | 'left' | 'right'; width?: number }) {
+export function Tip({ content, children, side = 'top', width = 280, className }: { content: ReactNode; children: ReactNode; side?: 'top' | 'bottom' | 'left' | 'right'; width?: number; className?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
@@ -85,7 +85,7 @@ export function Tip({ content, children, side = 'top', width = 280 }: { content:
     setPos({ x, y });
   }, [open, side, width]);
   return (
-    <span ref={ref} className="inline-flex" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
+    <span ref={ref} className={cx('inline-flex', className)} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
       {children}
       {open && pos &&
         createPortal(

@@ -311,7 +311,7 @@ export function ReturnNow({ s }: { s: Snapshot }) {
               RETURN NOW
             </span>
             <span style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 26, letterSpacing: '0.1em', color: '#000' }}>
-              {r.source === 'alert' ? `HAB ALERT · ${r.code}` : 'ONBOARD SAFETY CORE'}
+              {r.source === 'alert' ? `${r.from === 'visor' ? 'ONBOARD' : 'HAB'} ALERT · ${r.code.replace(/_/g, ' ')}` : 'ONBOARD SAFETY CORE'}
             </span>
           </div>
           <div className="absolute" style={{ left: 40, top: 128, width: 1800, fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 40, color: 'var(--a)', letterSpacing: '0.03em' }}>

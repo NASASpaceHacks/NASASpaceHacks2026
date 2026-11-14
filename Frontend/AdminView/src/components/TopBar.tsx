@@ -93,6 +93,19 @@ export function TopBar() {
             </button>
           )}
 
+          <button
+            data-testid="open-evidence"
+            onClick={() => set({ evidence: 'open' })}
+            className="group flex h-7 items-center gap-2 rounded-[3px] border border-line-2 px-2.5 hover:border-cyan/60"
+            title="Evidence: what we reproduce, calibrate and measure (E)"
+          >
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden className="text-cyan">
+              <path d="M6 1 L10.5 2.8 V6.2 C10.5 8.6 8.6 10.4 6 11 C3.4 10.4 1.5 8.6 1.5 6.2 V2.8 Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+              <path d="M4 6.1 L5.5 7.6 L8.2 4.7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="label !text-[9px] text-ink-2 group-hover:text-cyan">Evidence</span>
+          </button>
+
           <Tip content={<>Surface link to the visor (EV1). When it drops, the visor keeps guiding autonomously from its onboard safety core.</>} side="bottom" width={260}>
             <div className={cx('flex h-7 items-center gap-2 rounded-[3px] border px-2.5', linkTone)}>
               <span className={cx('h-1.5 w-1.5 rounded-full', linkDot, link !== 'up' && 'mw-pulse')} />
