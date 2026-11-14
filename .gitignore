@@ -30,3 +30,6 @@ Backend/var/
 qa/test-results/
 qa/playwright-report/
 Research/bench/results/*.tmp
+
+# Benchmark: keep only results/latest in git
+Research/bench/results/2*/

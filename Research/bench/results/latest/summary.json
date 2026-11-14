@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "site": "mock-412",
+    "scenarios": 50,
+    "seed": 1,
+    "judge": "ref-slope",
+    "baseline": {
+      "search": "ref-dijkstra",
+      "cost": "ref-slope"
+    },
+    "engineGrid": false,
+    "createdUtc": "2026-11-14T18:33:20.868Z"
+  },
+  "summary": [
+    {
+      "planner": "wastar-1.5",
+      "costModel": "ref-slope",
+      "star": false,
+      "fast": false,
+      "static": {
+        "n": 50,
+        "success": 1,
+        "meanCost": 4698.012720265619,
+        "meanGapPct": 4.5828900397166,
+        "maxGapPct": 10.248114448642477,
+        "meanLengthM": 1946.3051285797796,
+        "meanMaxSlope": 5.068067946434021,
+        "roughPct": 0.036266017027031715,
+        "meanTurns": 18.26,
+        "expanded": 3158.34,
+        "msP50": 6.256124999999884,
+        "msP95": 10.087041000000681,
+        "memMB": 25.49014663696289,
+        "violations": 0
+      },
+      "hazard": {
+        "n": 50,
+        "success": 1,
+        "meanCost": 4794.595924344395,
+        "meanExtraDistM": 7.324473272818771,
+        "meanReplans": 1.48,
+        "meanExtraCostPct": 4.179647213937159,
+        "msP50": 6.652042000001529,
+        "msP95": 12.837000000003172,
+        "violations": 0
+      }
+    },
+    {
+      "planner": "ref-dijkstra",
+      "costModel": "ref-slope",
+      "star": false,
+      "fast": false,
+      "static": {
+        "n": 50,
+        "success": 1,
+        "meanCost": 4486.497539676762,
+        "meanGapPct": 0,
+        "maxGapPct": 0,
+        "meanLengthM": 1942.63507089469,
+        "meanMaxSlope": 4.449247403144836,
+        "roughPct": 0.029999914012273313,
+        "meanTurns": 67.92,
+        "expanded": 298930.26,
+        "msP50": 96.64187500000116,
+        "msP95": 201.59316699999908,
+        "memMB": 26.179080963134766,
+        "violations": 0
+      },
+      "hazard": {
+        "n": 50,
+        "success": 1,
+        "meanCost": 4619.279746833576,
+        "meanExtraDistM": 8.866904755831081,
+        "meanReplans": 6.86,
+        "meanExtraCostPct": 0.6584164832469575,
+        "msP50": 327.35441600000195,
+        "msP95": 861.5924589999995,
+        "violations": 0
+      }
+    }
+  ]
+}
