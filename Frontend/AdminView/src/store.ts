@@ -94,6 +94,7 @@ export interface ConsoleState {
   hazardPick: boolean;
   selectedStation: string | null;
   hoverStation: { id: string; x: number; y: number } | null;
+  hoverShelter: { id: string; x: number; y: number } | null;
   showHelp: boolean;
   /** Evidence panel (Validity): closed, open, or open scrolled to the limitations list. */
   evidence: 'closed' | 'open' | 'limitations';
@@ -181,6 +182,7 @@ export const useConsole = create<ConsoleState>()(
     hazardPick: false,
     selectedStation: null,
     hoverStation: null,
+    hoverShelter: null,
     showHelp: false,
     evidence: 'closed',
 

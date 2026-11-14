@@ -37,6 +37,18 @@
 }
 
 html,
+body {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  inset: 0;
+}
+#root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+html,
 body,
 #root {
   height: 100%;
@@ -48,6 +60,7 @@ body,
   letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
+  overflow: clip;
 }
 
 .num {

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { closeSheet, explainSafeZone, getMap, startHazardPick } from '../actions';
 import { PRESETS, set, useConsole } from '../store';
 import { objectiveById, stationImage, whyItMatters } from '../lib/science';
+import { shortName } from '../lib/base';
 import { LayersPanel } from './Layers';
 import { Kbd, Popover, cx } from './ui';
 
@@ -80,6 +81,20 @@ function ExplainCard() {
   );
 }
 
+const SHELTER_TIP: Record<string, string> = { hab: 'planned habitat site (scenario)', rover: 'pressurized rover (scenario position)' };
+function ShelterTip() {
+  const hover = useConsole((s) => s.hoverShelter);
+  const pack = useConsole((s) => s.pack);
+  const sh = hover && pack ? pack.manifest.shelters.find((x) => x.id === hover.id) : null;
+  if (!hover || !sh || !SHELTER_TIP[sh.kind]) return null;
+  return (
+    <div role="tooltip" className="pointer-events-none absolute z-30 border border-line-2 bg-black px-2.5 py-1.5" style={{ left: Math.max(8, hover.x + 14), top: Math.max(8, hover.y - 44) }} data-testid="shelter-tip">
+      <div className="num text-[12px] text-ink">{shortName(sh)}</div>
+      <div className="text-[13px] leading-tight text-ink-2">{SHELTER_TIP[sh.kind]}</div>
+    </div>
+  );
+}
+
 function StationTip() {
   const hover = useConsole((s) => s.hoverStation);
   const pack = useConsole((s) => s.pack);
@@ -152,6 +167,16 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
   const follow = useConsole((s) => s.follow);
   const sheet = useConsole((s) => s.sheet);
   const [hover, setHover] = useState(false);
+  const pack = useConsole((s) => s.pack);
+  const caption = (() => {
+    const g = pack?.manifest.grid;
+    const km = g ? `${+((g.w * g.cellM) / 1000).toFixed(1)} × ${+((g.h * g.cellM) / 1000).toFixed(1)} km` : '';
+    const im = pack?.manifest.imagery?.[0];
+    const inst = im?.provenance?.[0]?.instrument?.split(/\s*\(/)[0] ?? 'HiRISE';
+    const mission = im?.provenance?.[0]?.mission === 'Mars Reconnaissance Orbiter' ? 'MRO' : im?.provenance?.[0]?.mission;
+    const site = pack?.manifest.name.replace(/\s*[—-].*$/, '').replace(/ Crater$/, ' crater') ?? 'Mars';
+    return `Study area ${km} · ${site}, Mars · ${im ? `${inst} colour imagery${mission ? ` (${mission})` : ''}` : 'terrain model'}`;
+  })();
   useEffect(() => {
     const el = readoutRef.current?.parentElement?.parentElement;
     if (!el) return;
@@ -203,7 +228,10 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
         )}
       </AnimatePresence>
 
-      <div className="pointer-events-none absolute bottom-3 left-4 z-10 flex items-end gap-3">
+      <ShelterTip />
+      <div className="pointer-events-none absolute bottom-3 left-3 right-[72px] z-10 flex flex-col items-start gap-1">
+        <div className="max-w-full bg-black/80 px-2 py-0.5 text-[11px] leading-snug text-mute" data-testid="map-caption">{caption}</div>
+        <div className="flex max-w-full flex-wrap items-end gap-3">
         <div className="pointer-events-auto rounded-[8px] bg-black px-2.5 pb-1.5 pt-1.5">
           <div ref={scaleRef} className="num pr-3 text-[9.5px] text-ink-2 [&_.mw-sb-bar]:text-ink" />
         </div>
@@ -212,6 +240,7 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
           <span><span className="text-dim">lon </span><span data-v className="num text-ink-2">—</span></span>
           <span><span className="text-dim">elev </span><span data-v className="num text-ink-2">—</span></span>
           <span><span className="text-dim">slope </span><span data-v className="num text-ink-2">—</span></span>
+        </div>
         </div>
       </div>
 

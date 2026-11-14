@@ -68,6 +68,7 @@ export interface MapCallbacks {
   onClick(cell: Cell, stationId: string | null, extra?: { shelterId: string | null; pixel: [number, number] }): void;
   onReadout(r: CursorReadout | null): void;
   onHoverStation(id: string | null, pixel: [number, number] | null): void;
+  onHoverShelter?(id: string | null, pixel: [number, number] | null): void;
 }
 
 const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
@@ -158,7 +159,7 @@ export class MapController {
     });
 
     const span = Math.max(ext[2] - ext[0], ext[3] - ext[1]);
-    const pad = span * 0.35;
+    const pad = span * 0.1;
     this.map = new OlMap({
       target,
       controls: [],
@@ -182,10 +183,9 @@ export class MapController {
         projection: this.proj,
         center: [(ext[0] + ext[2]) / 2, (ext[1] + ext[3]) / 2],
         resolution: g.cellM,
-        maxResolution: g.cellM * 6,
         minResolution: 0.2,
         extent: [ext[0] - pad, ext[1] - pad, ext[2] + pad, ext[3] + pad],
-        constrainOnlyCenter: true,
+        constrainOnlyCenter: false,
         enableRotation: false,
       }),
     });
@@ -209,10 +209,12 @@ export class MapController {
       if (cell >= 0) this.cb.onClick(cell, stationId, { shelterId, pixel: e.pixel as [number, number] });
     });
     let hovered: string | null = null;
+    let hoveredShelter: string | null = null;
     this.map.on('pointermove', (e) => {
       if (e.dragging) return;
       let station: string | null = null;
       let stationXY: number[] | null = null;
+      let shelter: string | null = null;
       const hit = this.map.forEachFeatureAtPixel(
         e.pixel,
         (f, layer) => {
@@ -220,12 +222,17 @@ export class MapController {
             station = f.get('id') as string;
             stationXY = (f.getGeometry() as unknown as { getCoordinates(): number[] }).getCoordinates();
           }
+          if (layer === this.shelters.layer) shelter = (f.get('id') as string) ?? null;
           return f.get('movable') ? 'grab' : f.get('id') ? 'pointer' : null;
         },
         { layerFilter: (l) => l === this.shelters.layer || l === this.stationsLayer, hitTolerance: 6 },
       );
       const vp = this.map.getViewport();
       if (vp) vp.style.cursor = hit ?? '';
+      if (shelter !== hoveredShelter) {
+        hoveredShelter = shelter;
+        this.cb.onHoverShelter?.(shelter, shelter ? (e.pixel as [number, number]) : null);
+      }
       if (station !== hovered) {
         hovered = station;
         const px = stationXY ? (this.map.getPixelFromCoordinate(stationXY) as [number, number]) : null;
@@ -233,6 +240,10 @@ export class MapController {
       }
     });
     this.map.on('movestart', () => {
+      if (hoveredShelter) {
+        hoveredShelter = null;
+        this.cb.onHoverShelter?.(null, null);
+      }
       if (hovered) {
         hovered = null;
         this.cb.onHoverStation(null, null);
@@ -249,7 +260,7 @@ export class MapController {
     const g = this.pack.manifest.grid;
     const size = this.map.getSize();
     if (!size) return;
-    this.map.getView().fit(gridExtent(g), { padding: [72, 36, 64, 36], duration });
+    this.map.getView().fit(gridExtent(g), { padding: [16, 16, 16, 16], duration });
   }
 
   zoomBy(d: number) {
@@ -468,7 +479,7 @@ export class MapController {
       if (y > y1) y1 = y;
     }
     const pad = Math.max(250, 0.35 * Math.max(x1 - x0, y1 - y0));
-    this.map.getView().fit([x0 - pad, y0 - pad, x1 + pad, y1 + pad], { padding: [72, 36, 64, 36], duration });
+    this.map.getView().fit([x0 - pad, y0 - pad, x1 + pad, y1 + pad], { padding: [16, 16, 16, 16], duration });
   }
 
   setPlan(plan: PlanResult | null, stateOf: (id: string) => { state: StationState; order?: number }) {

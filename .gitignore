@@ -46,3 +46,5 @@ qa/screens/*.png
 qa/screens/ux/*.png
 qa/screens/ux2/*.png
 qa/screens/ux3/*.png
+qa/screens/ux4/*.png
+!SitePacks/*/context/

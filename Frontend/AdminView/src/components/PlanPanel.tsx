@@ -56,10 +56,10 @@ function VerdictCard() {
         <span className="eyebrow">{nogo ? `From ${base.short}` : `Route check · from ${base.short}`}</span>
         {status === 'planning' && <span className="mw-pulse text-[11px] text-caution">Re-planning…</span>}
       </div>
-      <div className={cx('mt-2 inline-block border px-4 pt-1 font-display text-[64px] font-bold leading-[1.02] tracking-[0.06em]', st.ink, st.glow, status === 'planning' && 'opacity-60')} data-testid="verdict-word">
+      <div className={cx('mt-2 inline-block max-w-full break-words border px-3 pt-1 font-display text-[clamp(34px,3.6vw,60px)] font-bold leading-[1.02] tracking-[0.04em]', st.ink, st.glow, status === 'planning' && 'opacity-60')} data-testid="verdict-word">
         {st.word}
       </div>
-      <div className="mt-0.5 text-[16px] font-medium text-ink" data-testid="verdict-headline">{v.headline}</div>
+      <div className="mt-0.5 break-words text-[clamp(14px,1.2vw,16px)] font-medium text-ink" data-testid="verdict-headline">{v.headline}</div>
 
       {nogo ? (
         <>

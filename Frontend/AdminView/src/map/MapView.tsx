@@ -6,6 +6,7 @@ import { STM, whyItMatters } from '../lib/science';
 import { get, set, useConsole } from '../store';
 import { sunAtLtst } from '../lib/marsclock';
 import { MapController } from './MapController';
+import { Locator } from '../components/Locator';
 import { MapHud } from '../components/MapHud';
 import { DirectionsCard } from '../components/Directions';
 import { previewCell } from '../lib/places';
@@ -58,6 +59,7 @@ export function MapView() {
       onShelterMoved: moveShelter,
       onClick: handleMapClick,
       onReadout: writeReadout,
+      onHoverShelter: (id, px) => set({ hoverShelter: id && px ? { id, x: px[0], y: px[1] } : null }),
       onHoverStation: (id, px) => set({ hoverStation: id && px ? { id, x: px[0], y: px[1] } : null }),
     });
     attachMap(ctrl);
@@ -122,6 +124,7 @@ export function MapView() {
       <DirectionsHost />
       <MapPopover />
       <MapHud readoutRef={readoutRef} scaleRef={scaleRef} />
+      <Locator />
     </div>
   );
 }
@@ -142,7 +145,7 @@ function MapPopover() {
   const left = Math.max(8, pop.px[0] - 130);
   const top = pop.px[1] + 16;
   return (
-    <div style={{ left, top }} className="absolute z-20 w-[300px] border border-line-2 bg-black p-3.5" data-testid="map-popover" onClick={(e) => e.stopPropagation()}>
+    <div style={{ left, top }} className="absolute z-[35] w-[300px] border border-line-2 bg-black p-3.5" data-testid="map-popover" onClick={(e) => e.stopPropagation()}>
       <button aria-label="Close" onClick={() => set({ mapPopover: null })} className="absolute right-2 top-1.5 h-7 w-7 rounded-md text-mute hover:text-ink">✕</button>
       {st ? (
         <>

@@ -149,20 +149,20 @@ export function App() {
   }, [uiMode]);
   if (!pack) return <Boot />;
   return (
-    <div className="flex h-full flex-col">
+    <div className="grid h-full w-full min-w-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden">
       <TopBar />
-      <div className="relative flex min-h-0 flex-1">
-        <div className="flex min-w-0 flex-1 flex-col">
-          <div className="relative min-h-0 flex-1">
+      <div className="relative grid min-h-0 min-w-0 grid-cols-[minmax(0,1fr)] min-[900px]:grid-cols-[minmax(0,1fr)_clamp(320px,28vw,420px)]">
+        <div className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_clamp(96px,15vh,128px)]">
+          <div className="relative min-h-0 min-w-0 overflow-hidden">
             <MapView />
             <AlertBanner />
             <ActionSheet />
           </div>
-          <div className="h-[128px] shrink-0 bg-panel">
+          <div className="min-h-0 overflow-hidden bg-panel">
             <Timeline />
           </div>
         </div>
-        <aside className="relative w-[372px] shrink-0 bg-panel min-[1440px]:w-[404px]" data-testid="side-panel" data-mode={uiMode}>
+        <aside className="absolute inset-x-0 bottom-0 z-40 h-[46%] min-h-0 min-w-0 overflow-hidden border-t border-line-2 bg-panel min-[900px]:static min-[900px]:z-auto min-[900px]:h-auto min-[900px]:border-t-0" data-testid="side-panel" data-mode={uiMode}>
           {uiMode === 'live' ? <LivePanel /> : <PlanPanel />}
         </aside>
         <SendSheet />

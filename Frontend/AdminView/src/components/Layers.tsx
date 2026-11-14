@@ -216,6 +216,10 @@ export function SourcesSection() {
   }, [rows]);
   return (
     <div className="flex flex-col gap-5">
+      <div className="grid gap-2 text-[11.5px] leading-relaxed text-mute" data-testid="real-vs-scenario">
+        <div className="border border-line-2 p-2.5"><span className="label !text-ok">Real NASA data</span><div className="mt-1 text-ink-2">Terrain (USGS/HiRISE DEM), imagery (HiRISE), thermal inertia (THEMIS), Curiosity traverse and photos, science targets (real Curiosity sites), REMS weather, DONKI space weather.</div></div>
+        <div className="border border-line-2 p-2.5"><span className="label !text-ink">Scenario</span><div className="mt-1 text-ink-2">Habitat, rover and landing-pad placements, the sol number, and crew parameters.</div></div>
+      </div>
       <p className="text-[11.5px] leading-relaxed text-mute">
         Every layer on this map, with the mission, instrument, native resolution and citation it comes from. All layers share one Mars 2000 equidistant-cylindrical grid.
       </p>

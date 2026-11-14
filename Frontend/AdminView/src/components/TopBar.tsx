@@ -44,7 +44,7 @@ function Stepper() {
             disabled={!enabled}
             onClick={() => setMode(st.id)}
             className={cx(
-              'flex h-11 items-center gap-2 rounded-[7px] px-3.5 font-display text-[13px] uppercase tracking-[0.1em] transition-colors disabled:cursor-not-allowed',
+              'flex h-11 items-center gap-1.5 whitespace-nowrap rounded-[7px] px-2 font-display text-[12px] min-[1100px]:gap-2 min-[1100px]:px-3.5 min-[1100px]:text-[13px] uppercase tracking-[0.1em] transition-colors disabled:cursor-not-allowed',
               active ? 'bg-raised text-ink' : enabled ? 'text-ink-2 hover:text-ink' : 'text-dim/70',
             )}
           >
@@ -112,7 +112,7 @@ export function TopBar() {
   const site = m?.name.replace(/\s*—.*$/, '') ?? 'Loading site…';
 
   return (
-    <header className="relative z-30 flex h-[60px] shrink-0 items-center gap-4 bg-panel px-4">
+    <header className="relative z-30 flex h-[60px] min-w-0 shrink-0 items-center gap-3 overflow-hidden bg-panel px-3 min-[1100px]:gap-4 min-[1100px]:px-4">
       <div className="flex items-center gap-3">
         <Mark />
         <div className="flex flex-col leading-none">
@@ -134,17 +134,18 @@ export function TopBar() {
         <div tabIndex={0} className="flex min-w-0 items-baseline gap-2 whitespace-nowrap text-[13px] text-ink-2">
           <span className="hidden truncate text-ink min-[1440px]:inline">{site}</span>
           <span className="hidden text-dim min-[1440px]:inline">·</span>
+          <span className="border border-line-2 px-1 font-display text-[10px] font-semibold uppercase tracking-[0.14em] text-mute">Scenario</span>
           <span className="num">Sol {m?.scenario.sol ?? '—'}</span>
           <span className="text-dim">·</span>
           <span><span className="text-mute">Mars local </span><span className="num text-ink">{fmtLtst(missionLtst)}</span></span>
         </div>
       </Tip>
 
-      <div className="flex flex-1 justify-center">
+      <div className="flex min-w-0 flex-1 justify-center">
         <Stepper />
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1 min-[1100px]:gap-2">
         <Tip side="bottom" width={280} content={link === 'down' ? 'Link to the visor is down. The visor keeps guiding the crew on board on the last accepted route.' : 'Surface radio link to the crew visor (EV1).'}>
           {link === 'down' && !route ? (
             <div data-testid="crew-link" data-link={link} className="flex h-10 items-center gap-2 rounded-[8px] px-3 text-[12.5px] text-mute">

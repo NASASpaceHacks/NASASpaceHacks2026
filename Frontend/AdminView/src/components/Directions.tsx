@@ -53,7 +53,7 @@ export function DirectionsCard() {
 
   const rows = dests.map((id) => all.find((x) => x.id === id)).filter((x): x is NonNullable<typeof x> => !!x);
   return (
-    <div data-testid="directions" className="absolute left-4 top-4 z-30 w-[336px] border border-line-2 bg-black" onClick={(e) => e.stopPropagation()}>
+    <div data-testid="directions" className="absolute left-3 top-3 z-30 w-[380px] max-w-[min(380px,calc(100%-32px))] max-h-[calc(100%-96px)] overflow-y-auto overflow-x-hidden border border-line-2 bg-black" onClick={(e) => e.stopPropagation()}>
       <div className="flex items-center gap-2 border-b border-line px-3 py-2">
         <span className="num flex h-[22px] w-[22px] items-center justify-center border border-cyan text-[11px] text-cyan">A</span>
         <span className="eyebrow !text-[11px]">From</span>
@@ -86,7 +86,7 @@ export function DirectionsCard() {
       })}
 
       {showInput && (
-        <div className="relative px-3 py-2">
+        <div className="px-3 py-2">
           <div className="flex items-center gap-2">
             <span className="num flex h-[22px] w-[22px] shrink-0 items-center justify-center border border-line-2 text-[11px] text-mute">{String.fromCharCode(66 + rows.length)}</span>
             <span className="eyebrow !text-[11px]">To</span>
@@ -101,7 +101,7 @@ export function DirectionsCard() {
             />
           </div>
           {focus && hits.length > 0 && (
-            <ul data-testid="to-results" className="absolute left-3 right-3 top-[46px] z-40 max-h-[300px] overflow-y-auto border border-line-2 bg-black">
+            <ul data-testid="to-results" className="mt-2 max-h-[240px] overflow-y-auto border border-line-2 bg-black">
               {hits.map((h) => (
                 <li key={h.key}>
                   <button onMouseDown={(e) => e.preventDefault()} onClick={h.pick} className="flex w-full items-start gap-2 border-b border-line px-2.5 py-1.5 text-left hover:bg-cyan/10">
