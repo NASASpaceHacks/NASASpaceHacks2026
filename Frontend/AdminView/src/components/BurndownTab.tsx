@@ -58,9 +58,9 @@ function Chart({ def, plan, telem, nowT }: { def: ChartDef; plan: BurndownPoint[
       ],
       series: [
         {},
-        { label: 'Plan', stroke: '#F2B544', width: 1.5, spanGaps: true, points: { show: false } },
-        { label: 'Actual', stroke: '#4FD1E0', width: 2, spanGaps: true, points: { show: false } },
-        { label: def.limitLabel ?? 'Limit', stroke: '#FF5A4E', width: 1, dash: [4, 4], points: { show: false } },
+        { label: 'Plan', stroke: '#ff2bd6', width: 1.5, spanGaps: true, points: { show: false } },
+        { label: 'Actual', stroke: '#00e5ff', width: 2, spanGaps: true, points: { show: false } },
+        { label: def.limitLabel ?? 'Limit', stroke: '#ff3b30', width: 1, dash: [4, 4], points: { show: false } },
       ],
       hooks: {
         draw: [
@@ -109,7 +109,7 @@ function Chart({ def, plan, telem, nowT }: { def: ChartDef; plan: BurndownPoint[
           {lastAct !== null && lastAct !== undefined && Number.isFinite(lastAct) && (
             <>
               <span className="text-dim">now </span>
-              <span className="text-cyan">{lastAct.toFixed(1)}</span>
+              <span className="text-ok">{lastAct.toFixed(1)}</span>
               <span className="mx-1.5 text-line-2">|</span>
             </>
           )}
@@ -172,8 +172,8 @@ export function BurndownTab() {
       <SectionHead
         right={
           <div className="flex items-center gap-3 text-[10px] text-mute">
-            <span className="flex items-center gap-1.5"><span className="h-[2px] w-3.5 bg-amber" />Plan</span>
-            <span className="flex items-center gap-1.5"><span className="h-[2px] w-3.5 bg-cyan" />Actual</span>
+            <span className="flex items-center gap-1.5"><span className="h-[2px] w-3.5 bg-magenta" />Plan</span>
+            <span className="flex items-center gap-1.5"><span className="h-[2px] w-3.5 bg-ok" />Actual</span>
             <span className="flex items-center gap-1.5"><span className="h-0 w-3.5 border-t border-dashed border-red" />Limit</span>
           </div>
         }

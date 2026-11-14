@@ -1,12 +1,15 @@
 import { useEffect, useRef } from 'react';
 import type { CursorReadout } from '@mw/shared/map';
 import type { StationState } from '@mw/shared/map';
-import { addCustomStop, addDestination, attachMap, handleMapClick, moveShelter, removeDestination } from '../actions';
-import { whyItMatters } from '../lib/science';
+import { addDestination, addPlace, goHere, attachMap, handleMapClick, moveShelter, removeDestination } from '../actions';
+import { STM, whyItMatters } from '../lib/science';
 import { get, set, useConsole } from '../store';
 import { sunAtLtst } from '../lib/marsclock';
 import { MapController } from './MapController';
 import { MapHud } from '../components/MapHud';
+import { DirectionsCard } from '../components/Directions';
+import { previewCell } from '../lib/places';
+import { cellToXY } from '@mw/shared/contracts';
 
 function stationStateFn(): (id: string) => { state: StationState; order?: number } {
   const s = get();
@@ -49,7 +52,7 @@ export function MapView() {
       b.textContent = `${r.lon.toFixed(5)}°E`;
       c.textContent = Number.isFinite(r.elevM) ? `${r.elevM.toFixed(1)} m` : '—';
       d.textContent = Number.isFinite(r.slopeDeg) ? `${r.slopeDeg.toFixed(1)}°` : '—';
-      d.style.color = r.slopeDeg > 20 ? '#FF5A4E' : r.slopeDeg > 16.7 ? '#F2B544' : '';
+      d.style.color = r.slopeDeg > 20 ? '#ff3b30' : r.slopeDeg > 16.7 ? '#e9edf2' : '';
     };
     const ctrl = new MapController(el.current, pack, {
       onShelterMoved: moveShelter,
@@ -83,8 +86,10 @@ export function MapView() {
       useConsole.subscribe((s) => [s.overlays, s.opacity] as const, ([o, op]) => ctrl.setOverlays(o, op), { equalityFn: (a, b) => a[0] === b[0] && a[1] === b[1] }),
       useConsole.subscribe((s) => s.vectors, (v) => ctrl.setVectors(v)),
       useConsole.subscribe((s) => s.plan, () => ctrl.setPlan(get().plan, stationStateFn())),
-      useConsole.subscribe((s) => [s.stationOn, s.destinations, s.customStops, s.uiMode] as const, () => {
-        ctrl.setExtraStations(get().customStops);
+      useConsole.subscribe((s) => [s.stationOn, s.destinations, s.customStops, s.uiMode, s.mapPopover] as const, () => {
+        const sx = get();
+        const pin = sx.mapPopover?.kind === 'terrain' ? cellToXY(sx.pack!.manifest.grid, sx.mapPopover.cell) : null;
+        ctrl.setExtraStations([...sx.customStops, ...(pin ? [{ id: 'PIN', name: 'Dropped pin', x: pin[0], y: pin[1], value: 0 }] : [])]);
         ctrl.refreshStations(stationStateFn());
       }),
       useConsole.subscribe((s) => s.evaBase, (id) => ctrl.setBaseA(id)),
@@ -114,21 +119,16 @@ export function MapView() {
   return (
     <div className="absolute inset-0">
       <div ref={el} className="mw-map absolute inset-0" />
-      <RouteHint />
+      <DirectionsHost />
       <MapPopover />
       <MapHud readoutRef={readoutRef} scaleRef={scaleRef} />
     </div>
   );
 }
 
-function RouteHint() {
-  const empty = useConsole((s) => s.destinations.length === 0 && s.uiMode === 'plan');
-  if (!empty) return null;
-  return (
-    <div className="pointer-events-none absolute left-1/2 top-5 z-10 w-[min(560px,80%)] -translate-x-1/2 rounded-[12px] bg-panel/90 px-5 py-3.5 text-center text-[15px] leading-snug text-ink shadow-xl ring-1 ring-white/[0.08] backdrop-blur" data-testid="route-hint">
-      Choose where to start, then click targets to add them to today&rsquo;s walk &mdash; or let the planner suggest the best stops.
-    </div>
-  );
+function DirectionsHost() {
+  const uiMode = useConsole((s) => s.uiMode);
+  return uiMode === 'plan' ? <DirectionsCard /> : null;
 }
 
 function MapPopover() {
@@ -142,29 +142,57 @@ function MapPopover() {
   const left = Math.max(8, pop.px[0] - 130);
   const top = pop.px[1] + 16;
   return (
-    <div style={{ left, top }} className="absolute z-20 w-[260px] rounded-[12px] bg-panel p-3.5 shadow-2xl ring-1 ring-white/[0.1]" data-testid="map-popover" onClick={(e) => e.stopPropagation()}>
+    <div style={{ left, top }} className="absolute z-20 w-[300px] border border-line-2 bg-black p-3.5" data-testid="map-popover" onClick={(e) => e.stopPropagation()}>
       <button aria-label="Close" onClick={() => set({ mapPopover: null })} className="absolute right-2 top-1.5 h-7 w-7 rounded-md text-mute hover:text-ink">✕</button>
       {st ? (
         <>
           <div className="pr-6 text-[14.5px] font-semibold leading-tight text-ink">{st.name.replace(/\s*\([^)]*\)\s*$/, '')}</div>
           <div className="mt-1 text-[12px] text-mute">Science value {Math.round(st.value)} of 100 · {st.dwellMin} min at the stop</div>
-          <div className="mt-2 line-clamp-4 text-[12.5px] leading-snug text-ink-2">{whyItMatters(st as never)}</div>
+          <div className="mt-2 line-clamp-4 text-[13px] leading-snug text-ink-2">{whyItMatters(st as never)}</div>
+          {(() => {
+            const obj = STM.objectives.find((o) => o.stations?.includes(st.id));
+            return obj ? (
+              <div className="mt-2 border-t border-line pt-2 text-[12.5px] leading-snug text-ink-2" data-testid="popover-objective">
+                <span className="label !text-[11px]">Science objective </span>
+                <span className="num text-[11px] text-mute">{obj.id}</span>
+                <div className="line-clamp-4">{obj.statement}</div>
+              </div>
+            ) : null;
+          })()}
           <button
             data-testid="popover-toggle"
             onClick={() => (added ? removeDestination(st.id) : addDestination(st.id))}
-            className={`mt-3 h-11 w-full rounded-[8px] text-[14px] font-semibold ${added ? 'bg-raised text-ink ring-1 ring-line-2' : 'bg-amber text-[#16110a] hover:bg-[#ffc65c]'}`}
+            className={`mt-3 h-11 w-full text-[16px] font-bold uppercase tracking-[0.14em] ${added ? 'border border-cyan bg-black text-cyan' : 'bg-cyan text-black hover:bg-white'}`}
           >
             {added ? 'Remove from walk' : 'Add to walk'}
           </button>
         </>
       ) : (
-        <>
-          <div className="pr-6 text-[13.5px] text-ink">Nothing here yet.</div>
-          <button data-testid="add-custom-stop" onClick={() => { const c = pop.cell; set({ mapPopover: null }); addCustomStop(c); }} className="mt-2.5 h-11 w-full rounded-[8px] bg-amber text-[14px] font-semibold text-[#16110a] hover:bg-[#ffc65c]">
-            Add custom stop here
-          </button>
-        </>
+        <PinCard cell={pop.cell} />
       )}
+    </div>
+  );
+}
+
+function PinCard({ cell }: { cell: number }) {
+  const pv = previewCell(get(), cell);
+  const base = useConsole((s) => s.evaBase);
+  if (!pv) return null;
+  const sh = get().pack!.manifest.shelters.find((x) => x.id === base);
+  const from = sh ? sh.name.replace(/^.*\(([^)]+)\)\s*$/, '$1') : 'start';
+  return (
+    <div data-testid="pin-card">
+      <div className="pr-6 text-[17px] font-semibold leading-tight text-ink">Dropped pin</div>
+      <div className="num mt-1 text-[12px] leading-snug text-ink-2">
+        {pv.lon.toFixed(4)}°E {pv.lat.toFixed(4)}°N · elev {Number.isFinite(pv.elevM) ? Math.round(pv.elevM) : '—'} m · slope {Number.isFinite(pv.slopeDeg) ? Math.round(pv.slopeDeg) : '—'}°
+      </div>
+      <div data-testid="pin-safety" className={`mt-2 text-[14px] leading-snug ${pv.ok ? 'text-ok' : 'text-red'}`}>
+        {pv.ok ? `${pv.minutes !== null ? `~${Math.round(pv.minutes)} min walk from ${from} · ` : ''}safe to stand` : `Can't go here safely: ${pv.reason}`}
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button data-testid="pin-go" onClick={() => goHere(cell)} className="h-10 bg-cyan text-[15px] font-bold uppercase tracking-[0.14em] text-black hover:bg-white">Go here</button>
+        <button data-testid="pin-add" onClick={() => addPlace(cell)} className="h-10 border border-cyan bg-black text-[15px] font-bold uppercase tracking-[0.1em] text-cyan hover:bg-cyan/10">Add as stop</button>
+      </div>
     </div>
   );
 }

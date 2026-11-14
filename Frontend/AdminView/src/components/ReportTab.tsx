@@ -56,8 +56,8 @@ export function ReportTab() {
 
   return (
     <div className="flex flex-col gap-6 px-4 pb-6 pt-4">
-      <div className={cx('flex items-center gap-3 rounded-[3px] border px-3 py-2.5', ok ? 'border-cyan/40 bg-cyan/5' : 'border-red/50 bg-red/5')}>
-        <div className={cx('font-display text-[20px] font-bold tracking-[0.12em]', ok ? 'text-cyan' : 'text-red')}>{ok ? 'OK' : 'No safe walk'}</div>
+      <div className={cx('flex items-center gap-3 rounded-[3px] border px-3 py-2.5', ok ? 'border-ok/40 bg-ok/5' : 'border-red/50 bg-red/5')}>
+        <div className={cx('font-display text-[20px] font-bold tracking-[0.12em]', ok ? 'text-ok' : 'text-red')}>{ok ? 'OK' : 'No safe walk'}</div>
         <div className="min-w-0 flex-1 text-[11px] leading-snug text-mute">
           <div className="truncate text-ink-2">{plannerLabel}</div>
           <div className="num">EVA base {base.short} · safe area {zoneArea !== null ? `${zoneArea.toFixed(2)} km²` : '—'} · solved {Math.round(plan.solveMs)} ms · fields {fieldsSource === 'server' ? 'hab server' : fieldsSource === 'engine' ? 'engine' : 'estimate'} · {plan.reqHash.slice(0, 14)}</div>
@@ -71,18 +71,18 @@ export function ReportTab() {
       )}
 
       {binding && (
-        <section className="relative overflow-hidden rounded-[4px] border border-amber/50 bg-gradient-to-br from-amber/[0.09] to-transparent p-4">
-          <div className="label !text-amber/80">What limits this walk <span className="text-dim normal-case tracking-normal">(binding constraint)</span></div>
+        <section className="relative overflow-hidden rounded-[4px] border border-line-2 p-4">
+          <div className="label">What limits this walk <span className="text-dim normal-case tracking-normal">(binding constraint)</span></div>
           <div className="mt-2 font-display text-[22px] font-semibold leading-tight text-ink">{bindRule?.label ?? binding.rule}</div>
           <div className="mt-1.5 text-[12.5px] leading-snug text-ink-2">{rl(binding.text)}</div>
           <div className="mt-3 flex items-end gap-6">
             {bindMargin && (
-              <Stat label="Margin left" value={fmt.num(bindMargin.min, bindMargin.min < 10 ? 1 : 0)} unit={UNIT[binding.rule]} sub={`at +${Math.round(bindMargin.atMin)} min`} tone="amber" />
+              <Stat label="Margin left" value={fmt.num(bindMargin.min, bindMargin.min < 10 ? 1 : 0)} unit={UNIT[binding.rule]} sub={`at +${Math.round(bindMargin.atMin)} min`} />
             )}
             {bindRule && <Stat label="Limit" value={bindRule.value} unit={bindRule.unit === 'deg' ? '°' : bindRule.unit} />}
             <Stat label="On leg" value={binding.seg + 1} sub={segLabel(binding.seg)} />
           </div>
-          {bindRule && <div className="mt-3 border-t border-amber/20 pt-2 text-[10.5px] leading-snug text-mute">{bindRule.citation}</div>}
+          {bindRule && <div className="mt-3 border-t border-line pt-2 text-[10.5px] leading-snug text-mute">{bindRule.citation}</div>}
         </section>
       )}
 
@@ -146,7 +146,7 @@ export function ReportTab() {
                   <div className="mt-1 text-[11px] text-ink-2">
                     {r?.label ?? d.rule} <span className="text-dim">— {d.text}</span>
                   </div>
-                  <div className="mt-1 text-[10.5px] text-amber/90">→ {consequence}</div>
+                  <div className="mt-1 text-[10.5px] text-caution/90">→ {consequence}</div>
                 </div>
               );
             })}
@@ -164,7 +164,7 @@ export function ReportTab() {
                 <div key={l.id} className="grid grid-cols-[42px_1fr_70px] items-center gap-2">
                   <span className="num text-[11px] text-mute">{l.id}</span>
                   <div className="h-[5px] overflow-hidden rounded-[1px] bg-sunk ring-1 ring-line">
-                    <div className="h-full bg-ochre" style={{ width: `${(vpm / maxMarginal) * 100}%` }} />
+                    <div className="h-full bg-mute" style={{ width: `${(vpm / maxMarginal) * 100}%` }} />
                   </div>
                   <span className="num text-right text-[10.5px] text-ink-2">{l.value} / {Math.round(l.marginalMin)}m</span>
                 </div>
@@ -180,7 +180,7 @@ export function ReportTab() {
           <div className="mt-2.5 overflow-hidden rounded-[3px] border border-line">
             {plan.bingo.map((b) => (
               <div key={b.id} className="flex items-center gap-3 border-b border-line px-3 py-2 last:border-0">
-                <span className="num w-10 text-[11px] text-amber">{b.id === 'HAB' ? base.short : b.id}</span>
+                <span className="num w-10 text-[11px] text-cyan">{b.id === 'HAB' ? base.short : b.id}</span>
                 <span className="min-w-0 flex-1 truncate text-[11.5px] text-ink-2">{rl(b.text)}</span>
                 <span className="num text-[12px] text-ink">{fmtLtst(b.ltstMin)}</span>
                 <span className="num w-14 text-right text-[10.5px] text-dim">+{Math.round(b.tMin)}m</span>

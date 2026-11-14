@@ -6,9 +6,9 @@ import { evaLtst, fmtLtst } from '../lib/marsclock';
 import { cx } from './ui';
 
 const LEVEL: Record<'info' | 'caution' | 'warning', { bar: string; ink: string; bg: string }> = {
-  info: { bar: 'bg-cyan', ink: 'text-cyan', bg: 'bg-[#0f1a1d]/95' },
-  caution: { bar: 'bg-amber', ink: 'text-amber', bg: 'bg-[#1d180e]/95' },
-  warning: { bar: 'bg-red', ink: 'text-red', bg: 'bg-[#211110]/95' },
+  info: { bar: 'bg-ok', ink: 'text-ok', bg: 'bg-black' },
+  caution: { bar: 'bg-ink', ink: 'text-ink', bg: 'bg-black' },
+  warning: { bar: 'bg-red', ink: 'text-red', bg: 'bg-black' },
 };
 
 /** Alert queue across the top of the map: newest unacknowledged first, colour-coded, each acknowledgeable. */
@@ -36,7 +36,7 @@ export function AlertBanner() {
               exit={{ opacity: 0, y: -6 }}
               role="alert"
               data-level={a.level}
-              className={cx('pointer-events-auto relative flex w-[min(680px,100%)] items-center gap-3 overflow-hidden rounded-[10px] py-2.5 pl-5 pr-2 shadow-[0_12px_32px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.06] backdrop-blur-md', L.bg)}
+              className={cx('pointer-events-auto relative flex w-[min(680px,100%)] items-center gap-3 overflow-hidden rounded-[10px] py-2.5 pl-5 pr-2 ring-1 ring-white/[0.06]', L.bg)}
             >
               <span className={cx('absolute inset-y-0 left-0 w-[4px]', L.bar)} />
               <div className="min-w-0 flex-1">

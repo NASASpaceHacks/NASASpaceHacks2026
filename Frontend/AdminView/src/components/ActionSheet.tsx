@@ -31,7 +31,7 @@ export function ActionSheet() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 12, opacity: 0 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="pointer-events-auto w-[min(440px,100%)] overflow-hidden rounded-[14px] bg-panel shadow-[0_30px_80px_rgba(0,0,0,0.75)] ring-1 ring-white/[0.07]"
+            className="pointer-events-auto w-[min(440px,100%)] overflow-hidden rounded-[14px] bg-panel ring-1 ring-white/[0.07]"
           >
             <Body sheet={sheet} />
           </motion.div>
@@ -95,7 +95,7 @@ function Body({ sheet }: { sheet: NonNullable<ReturnType<typeof useConsole.getSt
                   data-testid={`cut-${m}`}
                   disabled={sheet.cutMin !== undefined}
                   onClick={() => void shortenEva(m)}
-                  className={cx('num h-11 rounded-[8px] text-[14px] transition-colors disabled:cursor-default', sheet.cutMin === m ? 'bg-amber/20 text-amber ring-1 ring-amber/60' : 'bg-raised text-ink-2 hover:text-ink disabled:opacity-40')}
+                  className={cx('num h-11 rounded-[8px] text-[14px] transition-colors disabled:cursor-default', sheet.cutMin === m ? 'bg-cyan/20 text-cyan ring-1 ring-cyan/60' : 'bg-raised text-ink-2 hover:text-ink disabled:opacity-40')}
                 >
                   {m} min
                 </button>
@@ -119,7 +119,7 @@ function Body({ sheet }: { sheet: NonNullable<ReturnType<typeof useConsole.getSt
         {!waitingInput && (
           <div className="mt-2">
             {working ? (
-              <div className="flex h-[92px] items-center gap-3 text-[14px] text-amber"><span className="mw-pulse h-2.5 w-2.5 rounded-full bg-amber" />Finding the safest new plan…</div>
+              <div className="flex h-[92px] items-center gap-3 text-[14px] text-cyan"><span className="mw-pulse h-2.5 w-2.5 rounded-full bg-cyan" />Finding the safest new plan…</div>
             ) : plan && changed ? (
               <Change before={sheet.before} />
             ) : (
@@ -132,9 +132,9 @@ function Body({ sheet }: { sheet: NonNullable<ReturnType<typeof useConsole.getSt
       <footer className="bg-sunk/60 px-5 py-4">
         {sent ? (
           route!.acked ? (
-            <div data-testid="route-acked" className="flex h-[52px] items-center text-[16px] font-semibold text-cyan">✓ Accepted by EV1 · v{route!.seq}</div>
+            <div data-testid="route-acked" className="flex h-[52px] items-center text-[16px] font-semibold text-ok">✓ Accepted by EV1 · v{route!.seq}</div>
           ) : (
-            <div className="flex h-[52px] items-center gap-3"><span className="mw-pulse h-2.5 w-2.5 rounded-full bg-amber" /><span data-testid="route-sent" className="text-[15px] font-medium text-amber">Waiting for crew to accept v{route!.seq}…</span></div>
+            <div className="flex h-[52px] items-center gap-3"><span className="mw-pulse h-2.5 w-2.5 rounded-full bg-cyan" /><span data-testid="route-sent" className="text-[15px] font-medium text-cyan">Waiting for crew to accept v{route!.seq}…</span></div>
           )
         ) : (
           <>
@@ -168,7 +168,7 @@ function Body({ sheet }: { sheet: NonNullable<ReturnType<typeof useConsole.getSt
           {ret ? `Arrive about ${fmtLtst(evaLtst(start, (last?.t1Min ?? 0)))} by the safest path.` : `Back at ${endName} ${fmtLtst(evaLtst(start, (last?.t1Min ?? 0)))}`}
           {before && !ret && <> · was {fmtLtst(evaLtst(start, before.endT))}</>}
         </div>
-        {droppedNow.length > 0 && <div className="mt-1.5 text-[12px] text-amber">Skips {droppedNow.join(', ')}</div>}
+        {droppedNow.length > 0 && <div className="mt-1.5 text-[12px] text-caution">Skips {droppedNow.join(', ')}</div>}
         {lim && !ret && <div className="mt-1.5 text-[12px] text-mute">Limits: {lim.head}</div>}
       </div>
     );

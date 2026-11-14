@@ -8,9 +8,9 @@ import { LtstScrubber, stayInSentence, stayInWhy } from './PlanParts';
 import { Button, Kbd, Popover, Tip, ToneMark, cx } from './ui';
 
 const VERDICT_STYLE: Record<Verdict['status'], { word: string; ink: string; glow: string }> = {
-  GO: { word: 'GO', ink: 'text-cyan', glow: 'from-cyan/[0.10]' },
-  CAUTION: { word: 'CAUTION', ink: 'text-amber', glow: 'from-amber/[0.10]' },
-  'NO-GO': { word: 'NO-GO', ink: 'text-red', glow: 'from-red/[0.14]' },
+  GO: { word: 'GO', ink: 'text-ok', glow: 'border-ok' },
+  CAUTION: { word: 'CAUTION', ink: 'text-caution', glow: 'border-caution' },
+  'NO-GO': { word: 'NO-GO', ink: 'text-red', glow: 'border-red' },
 };
 
 function VerdictCard() {
@@ -50,13 +50,13 @@ function VerdictCard() {
       data-testid={nogo ? 'stayin-card' : 'verdict'}
       data-verdict={v.status}
       aria-live="polite"
-      className={cx('relative overflow-hidden rounded-[12px] bg-gradient-to-b to-transparent px-5 pb-4 pt-4', st.glow, nogo ? 'bg-red/[0.05] ring-1 ring-red/35' : 'bg-raised/50')}
+      className={cx('relative border bg-black px-4 pb-4 pt-3', nogo ? 'border-red' : 'border-line-2')}
     >
       <div className="flex items-center justify-between">
         <span className="eyebrow">{nogo ? `From ${base.short}` : `Route check · from ${base.short}`}</span>
-        {status === 'planning' && <span className="mw-pulse text-[11px] text-amber">Re-planning…</span>}
+        {status === 'planning' && <span className="mw-pulse text-[11px] text-caution">Re-planning…</span>}
       </div>
-      <div className={cx('mt-1 font-display text-[50px] font-bold leading-[1.02] tracking-[0.04em]', st.ink, status === 'planning' && 'opacity-60')} data-testid="verdict-word">
+      <div className={cx('mt-2 inline-block border px-4 pt-1 font-display text-[64px] font-bold leading-[1.02] tracking-[0.06em]', st.ink, st.glow, status === 'planning' && 'opacity-60')} data-testid="verdict-word">
         {st.word}
       </div>
       <div className="mt-0.5 text-[16px] font-medium text-ink" data-testid="verdict-headline">{v.headline}</div>
@@ -70,7 +70,7 @@ function VerdictCard() {
               Start from rover instead <Kbd>⏎</Kbd>
             </Button>
           )}
-          {stagingText && <div className="mt-2.5 text-[12px] leading-snug text-cyan/90">{stagingText.replace(/^Staging the EVA from/, 'Starting from')}</div>}
+          {stagingText && <div className="mt-2.5 text-[12px] leading-snug text-ok/90">{stagingText.replace(/^Staging the EVA from/, 'Starting from')}</div>}
           {long && (
             <div className="mt-2">
               <button onClick={() => setWhy((x) => !x)} className="text-[12px] text-mute hover:text-ink" aria-expanded={why}>{why ? 'Hide the physics' : 'Show the physics'}</button>
@@ -85,8 +85,8 @@ function VerdictCard() {
             <li key={l.key} data-tone={l.tone} data-line={l.key}>
               <Tip content={l.sub ?? l.text} side="left" width={300} className="w-full">
                 <span className="flex w-full items-start gap-2.5">
-                  <ToneMark tone={l.tone} className="mt-[1px]" />
-                  <span className={cx('text-[14px] leading-snug', l.key === 'limit' ? 'text-ink-2' : 'text-ink')}>{l.text}</span>
+                  {l.neutral ? <span aria-label="Info" className="mt-[1px] inline-flex h-[20px] w-[20px] shrink-0 items-center justify-center border border-line-2 text-mute">i</span> : <ToneMark tone={l.tone} className="mt-[1px]" />}
+                  <span className={cx('text-[14px] leading-snug', l.neutral ? 'text-ink-2' : 'text-ink')}>{l.text}</span>
                 </span>
               </Tip>
             </li>
@@ -107,7 +107,7 @@ function StartControls() {
   const movable = shelters.some((s) => s.movable);
   return (
     <div className="grid grid-cols-[1fr_auto] items-end gap-3">
-      <div>
+      <div className="hidden">
                 <div className="flex rounded-[8px] bg-sunk p-[3px]" role="radiogroup" aria-label="EVA base">
           {shelters.map((sh) => {
             const on = evaBase === sh.id;
@@ -120,7 +120,7 @@ function StartControls() {
                 disabled={uiMode === 'live'}
                 onClick={() => setEvaBase(sh.id)}
                 title={sh.kind === 'rover' ? `${sh.name}: the EVA starts and ends at the rover. Drag it on the map to move it.` : `${sh.name}: the EVA starts and ends at the habitat airlock.`}
-                className={cx('flex h-14 flex-1 flex-col items-center justify-center rounded-[6px] leading-tight transition-colors', on ? 'bg-raised text-ink shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]' : 'text-mute hover:text-ink-2')}
+                className={cx('flex h-14 flex-1 flex-col items-center justify-center rounded-[6px] leading-tight transition-colors', on ? 'bg-raised text-ink' : 'text-mute hover:text-ink-2')}
               >
                 <span className="font-display text-[13px] uppercase tracking-[0.1em]">{shortName(sh)}</span>
                 <span className="text-[10.5px] opacity-75">{sh.kind === 'rover' ? 'Rover' : 'Habitat'}{on ? ' · start' : ''}</span>
@@ -130,7 +130,7 @@ function StartControls() {
         </div>
       </div>
       <div className="relative">
-        <div className="eyebrow mb-1.5">Start time</div>
+        
         <button
           data-popover-anchor
           data-testid="start-time"
@@ -146,7 +146,7 @@ function StartControls() {
           <div className="mt-3 text-[11px] leading-snug text-dim">Drag along the sun curve. The plan updates as you go.</div>
         </Popover>
       </div>
-      {movable && <div className="col-span-2 -mt-1 text-[11px] text-dim">Click Hab-1 or PR-1 on the map to choose too. Drag the rover to move it.</div>}
+      {movable && <div className="col-span-2 -mt-1 text-[12px] text-dim">Pick the start in the From field, or click Hab-1 or PR-1 on the map. Drag the rover to move it.</div>}
     </div>
   );
 }
@@ -154,7 +154,7 @@ function StartControls() {
 function SectionHead({ n, title, sub, right }: { n: number; title: string; sub?: string; right?: React.ReactNode }) {
   return (
     <div className="mb-2 flex items-center gap-2.5 px-1">
-      <span className="num flex h-6 w-6 items-center justify-center rounded-full bg-amber text-[12px] font-bold text-[#16110a]">{n}</span>
+      <span className="num flex h-6 w-6 items-center justify-center border border-cyan bg-black text-[12px] font-bold text-white">{n}</span>
       <div className="min-w-0">
         <div className="font-display text-[15px] font-semibold tracking-[0.04em] text-ink">{title}</div>
         {sub && <div className="text-[11.5px] text-mute">{sub}</div>}
@@ -194,7 +194,7 @@ function Destinations() {
             const reason = dropped ? `Can't include: ${dropReason(dropped, rules)}` : plan && !planned && status !== 'planning' ? "Can't include in this walk" : null;
             return (
               <li key={st.id} data-testid={`dest-${st.id}`} className="flex min-h-[52px] items-center gap-3 rounded-[10px] bg-raised/50 px-3 py-1.5">
-                <span className={cx('num flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full text-[12px] font-bold', reason ? 'bg-sunk text-red ring-1 ring-red/40' : 'bg-amber text-[#16110a]')}>
+                <span className={cx('num flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full text-[12px] font-bold', reason ? 'bg-sunk text-red ring-1 ring-red/40' : 'bg-cyan text-black')}>
                   {reason ? '✕' : single ? 'B' : i + 1}
                 </span>
                 <div className="min-w-0 flex-1">
@@ -232,21 +232,21 @@ function RouteSection() {
   const dropped = plan?.dropped.filter((d) => dests.includes(d.id)) ?? [];
   return (
     <section data-testid="route-section">
-      <SectionHead n={3} title="Route & verdict" />
+      <SectionHead n={2} title="Is it safe?" />
       <VerdictCard />
-      {dropped.length > 0 && plan?.status !== 'STAY_IN' && (
+      {dropped.length > 0 && (
         <ul className="mt-2 flex flex-col gap-1 px-1 text-[12.5px] text-red/90" data-testid="dropped-list">
           {dropped.map((d) => (
-            <li key={d.id}>{d.id} ({nameOf(d.id)}) left out: {dropReason(d, rules)}</li>
+            <li key={d.id}>{d.id} ({nameOf(d.id)}) can't be reached safely: {dropReason(d, rules)}</li>
           ))}
         </ul>
       )}
-      <div className="mt-2 px-1 text-[11.5px] text-mute">Round trip &mdash; the walk must end at a shelter.</div>
+      <div className="mt-2 px-1 text-[12px] text-mute">Stops are reordered for the fastest safe loop &middot; round trip back to the start.</div>
     </section>
   );
 }
 
-/** ① PLAN: route builder. 1 Start, 2 Where to, 3 Route & verdict; one primary action. */
+/** ① PLAN: route builder. 1 Start, 2 Where to, 3 Route; one primary action. */
 export function PlanPanel() {
   const plan = useConsole((s) => s.plan);
   const status = useConsole((s) => s.planStatus);
@@ -259,17 +259,16 @@ export function PlanPanel() {
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4 pt-4">
         <div className="flex flex-col gap-6">
           <section>
-            <SectionHead n={1} title="Start & end" sub="A: where the walk starts and ends" />
+            <SectionHead n={1} title="Start time" />
             <StartControls />
           </section>
-          <Destinations />
           <RouteSection />
-          {has && <button onClick={() => openDetails('report')} className="self-start px-1 text-[12px] text-cyan hover:underline">Full report, rules and margins in Details →</button>}
+          {has && <button onClick={() => openDetails('report')} className="self-start px-1 text-[12px] text-ok hover:underline">Full report, rules and margins in Details →</button>}
         </div>
       </div>
       {plan?.status !== 'STAY_IN' && (
-        <div className="shrink-0 bg-panel px-4 pb-4 pt-3 shadow-[0_-12px_24px_rgba(10,11,13,0.9)]">
-          {differs && <div className="mb-2 text-[11.5px] text-amber">This plan differs from route v{route!.seq} the crew has.</div>}
+        <div className="shrink-0 bg-panel px-4 pb-4 pt-3">
+          {differs && <div className="mb-2 text-[11.5px] text-caution">This plan differs from route v{route!.seq} the crew has.</div>}
           <Button data-testid="review-send" variant="primary" size="xl" className="w-full" disabled={!has || !sendable || status !== 'ready'} onClick={primaryAction}>
             Review &amp; send <span aria-hidden>→</span> <Kbd>⏎</Kbd>
           </Button>

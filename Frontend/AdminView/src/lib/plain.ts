@@ -119,6 +119,8 @@ export interface VerdictLine {
   tone: Tone;
   text: string;
   sub?: string;
+  /** Informational only: shown grey, never a problem. */
+  neutral?: boolean;
 }
 
 export interface Verdict {
@@ -187,7 +189,14 @@ export function verdictOf(args: {
   });
 
   const lim = limitLine(p, pack, base);
-  if (lim && !ret) lines.push({ key: 'limit', tone: 'watch', text: `Limits: ${lim.head[0].toLowerCase()}${lim.head.slice(1)}`, sub: lim.detail });
+  if (lim && !ret) {
+    const bm = p.margins[p.binding!.rule];
+    const tight = rests.count > 0 || spare < 30 || /\(−\d+ min\)/.test(p.binding!.text) || (!!bm && bm.min <= 1);
+    const what = `${lim.head[0].toLowerCase()}${lim.head.slice(1)}`;
+    lines.push(tight
+      ? { key: 'limit', tone: 'watch', text: `Limits: ${what}`, sub: lim.detail }
+      : { key: 'limit', tone: 'ok', neutral: true, text: `Tightest margin: ${what} (plenty of room)`, sub: lim.detail });
+  }
 
   const worst = lines.some((l) => l.tone === 'act') || lines.some((l) => l.key !== 'limit' && l.tone === 'watch');
   return { status: worst ? 'CAUTION' : 'GO', headline, lines, spareMin: spare, deadlineLtst: dl !== null ? evaLtst(startLtstMin, dl) : null };

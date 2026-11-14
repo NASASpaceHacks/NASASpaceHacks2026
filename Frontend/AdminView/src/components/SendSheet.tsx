@@ -20,12 +20,12 @@ export function PackageSize({ bytes, estimated }: { bytes: number; estimated?: b
     <div data-testid="package-size">
       <div className="num flex items-baseline justify-between text-[12.5px]">
         <span className="text-ink">
-          Route package {estimated ? '≈' : ''}{(bytes / 1000).toFixed(1)} KB <span className={fits ? 'text-cyan' : 'text-red'}>· {fits ? 'fits' : 'too big'}</span>
+          Route package {estimated ? '≈' : ''}{(bytes / 1000).toFixed(1)} KB <span className={fits ? 'text-ok' : 'text-red'}>· {fits ? 'fits' : 'too big'}</span>
         </span>
         <span className="text-mute">of {(UPLINK_BYTES / 1000).toFixed(0)} KB Curiosity daily uplink</span>
       </div>
       <div className="relative mt-2 h-[6px] overflow-hidden rounded-full bg-sunk">
-        <div className={cx('absolute inset-y-0 left-0 rounded-full', fits ? 'bg-cyan' : 'bg-red')} style={{ width: `${frac * 100}%` }} />
+        <div className={cx('absolute inset-y-0 left-0 rounded-full', fits ? 'bg-ok' : 'bg-red')} style={{ width: `${frac * 100}%` }} />
         <div className="absolute inset-y-0 w-px bg-ink-2/60" style={{ left: `${(BUDGET_BYTES / UPLINK_BYTES) * 100}%` }} title="25 KB package budget" />
       </div>
     </div>
@@ -38,7 +38,7 @@ export function SendSheet() {
   return (
     <AnimatePresence>
       {open && (
-        <motion.div key="send" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="absolute inset-0 z-40 flex items-start justify-center overflow-y-auto bg-[#07080a]/70 px-6 py-6 backdrop-blur-[3px]">
+        <motion.div key="send" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="absolute inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/70 px-6 py-6">
           <motion.div initial={{ y: 14, opacity: 0.6 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 10, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="w-[min(680px,100%)]">
             <Brief />
           </motion.div>
@@ -88,7 +88,7 @@ function Brief() {
   const back = last?.t1Min ?? 0;
 
   return (
-    <section data-testid="crew-brief" className="overflow-hidden rounded-[14px] bg-panel shadow-[0_30px_80px_rgba(0,0,0,0.7)] ring-1 ring-white/[0.06]">
+    <section data-testid="crew-brief" className="overflow-hidden rounded-[14px] bg-panel ring-1 ring-white/[0.06]">
       <header className="flex items-start gap-4 px-6 pb-4 pt-5">
         <div className="min-w-0">
           <div className="eyebrow">Crew brief · route v{sent ? route!.seq : nextSeq}</div>
@@ -114,7 +114,7 @@ function Brief() {
                   <th className="pb-1.5 font-normal">Stop</th>
                   <th className="pb-1.5 text-right font-normal">Arrive</th>
                   <th className="pb-1.5 text-right font-normal">Leave</th>
-                  <th className="pb-1.5 text-right font-normal text-amber/80">Leave by</th>
+                  <th className="pb-1.5 text-right font-normal text-ink-2">Leave by</th>
                 </tr>
               </thead>
               <tbody>
@@ -123,11 +123,11 @@ function Brief() {
                   const b = plan.bingo.find((x) => x.id === st.id);
                   return (
                     <tr key={st.id} className="text-[13px]">
-                      <td className="py-1"><span className="num inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-amber text-[11px] font-semibold text-[#16110a]">{i + 1}</span></td>
+                      <td className="py-1"><span className="num inline-flex h-[22px] w-[22px] items-center justify-center border border-cyan bg-black text-[11px] font-semibold text-white">{i + 1}</span></td>
                       <td className="truncate py-1 pr-3 text-ink"><span className="num mr-2 text-[11.5px] text-mute">{st.id}</span>{s?.name.replace(/\s*\([^)]*\)\s*$/, '') ?? st.id}</td>
                       <td className="num py-1 text-right text-ink-2">{fmtLtst(evaLtst(start, st.arriveMin))}</td>
                       <td className="num py-1 text-right text-ink-2">{fmtLtst(evaLtst(start, st.departMin))}</td>
-                      <td className="num py-1 text-right text-amber">{b ? fmtLtst(b.ltstMin) : '—'}</td>
+                      <td className="num py-1 text-right text-ink">{b ? fmtLtst(b.ltstMin) : '—'}</td>
                     </tr>
                   );
                 })}
@@ -141,14 +141,14 @@ function Brief() {
             <div className="eyebrow mb-1.5">What limits this walk</div>
             <div className="text-[13.5px] leading-snug text-ink">{lim ? lim.head : plan.order.length ? 'Nothing close to a limit' : `Direct return to ${endName}`}</div>
             {lim?.detail && <div className="mt-1 text-[12px] leading-snug text-mute">{lim.detail}</div>}
-            <div className="mt-2 text-[12px] text-mute">Back <span className="text-cyan">{hm(v.spareMin)}</span> before the walk-back deadline</div>
+            <div className="mt-2 text-[12px] text-mute">Back <span className="text-ok">{hm(v.spareMin)}</span> before the walk-back deadline</div>
           </div>
           <div>
             <div className="eyebrow mb-1.5">Three things to watch</div>
             <ol className="flex flex-col gap-1.5" data-testid="watch-list">
               {watch.map((w, i) => (
                 <li key={i} className="flex gap-2 text-[12.5px] leading-snug text-ink-2">
-                  <span className="num text-amber">{i + 1}</span>
+                  <span className="num text-cyan">{i + 1}</span>
                   <span>{w}</span>
                 </li>
               ))}
@@ -157,7 +157,7 @@ function Brief() {
         </div>
 
         {sent ? <PackageSize bytes={route!.bytes} estimated={route!.estimated} /> : est ? <PackageSize bytes={est.bytes} estimated /> : <div className="h-[30px] text-[12px] text-dim">Sizing the route package…</div>}
-        {dirty && !sent && <div className="text-[12px] text-amber">Inputs changed: re-planning before you send.</div>}
+        {dirty && !sent && <div className="text-[12px] text-caution">Inputs changed: re-planning before you send.</div>}
       </div>
 
       <footer className="bg-sunk/60 px-6 py-4">
@@ -175,13 +175,13 @@ function SendState() {
   const dirty = useConsole((s) => s.dirty);
   const sent = !!route && route.reqHash === plan?.reqHash;
   if (confirm.stage === 'pushing') {
-    return <div className="flex h-[52px] items-center gap-3 text-[15px] text-amber"><span className="mw-pulse h-2.5 w-2.5 rounded-full bg-amber" />Sending to the crew…</div>;
+    return <div className="flex h-[52px] items-center gap-3 text-[15px] text-cyan"><span className="mw-pulse h-2.5 w-2.5 rounded-full bg-cyan" />Sending to the crew…</div>;
   }
   if (sent && confirm.stage === 'awaitingAck') {
     return (
       <div className="flex h-[52px] items-center gap-3">
-        <span className="mw-pulse h-2.5 w-2.5 rounded-full bg-amber" />
-        <span data-testid="route-sent" className="text-[16px] font-medium text-amber">Waiting for crew to accept v{route!.seq}…</span>
+        <span className="mw-pulse h-2.5 w-2.5 rounded-full bg-cyan" />
+        <span data-testid="route-sent" className="text-[16px] font-medium text-cyan">Waiting for crew to accept v{route!.seq}…</span>
         <span className="ml-auto text-[12px] text-mute">Signed and sent · the visor checks the signature</span>
       </div>
     );
@@ -189,7 +189,7 @@ function SendState() {
   if (sent && route!.acked) {
     return (
       <div className="flex h-[52px] items-center gap-3">
-        <span data-testid="route-acked" className="text-[17px] font-semibold text-cyan">✓ Accepted by EV1 · v{route!.seq}</span>
+        <span data-testid="route-acked" className="text-[17px] font-semibold text-ok">✓ Accepted by EV1 · v{route!.seq}</span>
         <span className="ml-auto text-[12px] text-mute">Opening EVA live…</span>
         <Button variant="cyan" onClick={() => setMode('live')}>EVA live <Kbd>⏎</Kbd></Button>
       </div>

@@ -11,7 +11,7 @@ export function Requests() {
   return (
     <div className="flex flex-col gap-1.5">
       {reqs.slice(0, 6).map((r) => (
-        <div key={r.id} className={cx('rounded-[3px] border px-2.5 py-2', r.handled ? 'border-line opacity-60' : r.kind === 'ABORT' ? 'border-red/60 bg-red/5' : 'border-amber/50 bg-amber/5')}>
+        <div key={r.id} className={cx('rounded-[3px] border px-2.5 py-2', r.handled ? 'border-line opacity-60' : r.kind === 'ABORT' ? 'border-red/60 bg-red/5' : 'border-caution/50 bg-caution/5')}>
           <div className="flex items-center gap-2">
             <Badge tone={r.kind === 'ABORT' ? 'red' : 'amber'}>{r.kind.replace('_', ' ')}</Badge>
             <span className="num text-[10.5px] text-mute">+{r.t.toFixed(0)} min</span>
@@ -26,7 +26,7 @@ export function Requests() {
           )}
         </div>
       ))}
-      {open.length > 0 && <div className="text-[10px] text-amber">{open.length} open</div>}
+      {open.length > 0 && <div className="text-[10px] text-caution">{open.length} open</div>}
     </div>
   );
 }
@@ -56,7 +56,7 @@ export function LinkControls() {
         <Button data-testid="sim-link" variant={ctl.drop ? 'cyan' : 'danger'} onClick={() => void setLinkCtl({ drop: !ctl.drop })} className="flex-1">
           {ctl.drop ? 'Restore link' : 'Drop link'}
         </Button>
-        <span className={cx('font-display text-[10.5px] uppercase tracking-[0.14em]', link === 'up' ? 'text-cyan' : link === 'degraded' ? 'text-amber' : 'text-red')}>Visor {link}</span>
+        <span className={cx('font-display text-[10.5px] uppercase tracking-[0.14em]', link === 'up' ? 'text-ok' : link === 'degraded' ? 'text-caution' : 'text-red')}>Visor {link}</span>
       </div>
       <label className="grid grid-cols-[70px_1fr_56px] items-center gap-2">
         <span className="label !text-[9px]">Latency</span>
@@ -87,7 +87,7 @@ export function SimControls() {
       <div className="flex items-center gap-1">
         <span className="label mr-2 !text-[9px]">Speed</span>
         {[10, 30, 60, 120].map((v) => (
-          <button key={v} onClick={() => void setSim({ speed: v })} className={cx('num h-6 flex-1 rounded-[2px] border text-[10.5px]', sim.speed === v ? 'border-amber/60 bg-amber/10 text-amber' : 'border-line-2 text-mute hover:text-ink')}>
+          <button key={v} onClick={() => void setSim({ speed: v })} className={cx('num h-6 flex-1 rounded-[2px] border text-[10.5px]', sim.speed === v ? 'border-cyan/60 bg-cyan/10 text-cyan' : 'border-line-2 text-mute hover:text-ink')}>
             {v}×
           </button>
         ))}
@@ -100,7 +100,7 @@ export function SimControls() {
 /** Event log (Details → Log). */
 export function EventLog() {
   const log = useConsole((s) => s.log);
-  const tone = { info: 'text-ink-2', ok: 'text-cyan', caution: 'text-amber', warning: 'text-red' } as const;
+  const tone = { info: 'text-ink-2', ok: 'text-ok', caution: 'text-caution', warning: 'text-red' } as const;
   return (
     <div className="max-h-[260px] overflow-y-auto rounded-[3px] border border-line bg-sunk/60">
       {log.length === 0 && <div className="px-3 py-3 text-[11px] text-dim">Nothing logged yet.</div>}

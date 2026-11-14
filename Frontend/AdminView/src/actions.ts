@@ -266,7 +266,7 @@ function applyDestinations(ids: string[], why: string) {
   const s = get();
   const stationOn: Record<string, boolean> = {};
   ids.forEach((id) => (stationOn[id] = true));
-  set({ destinations: ids, stationOn, mustVisit: Object.fromEntries(Object.entries(s.mustVisit).filter(([k, v]) => v && stationOn[k])), mapPopover: null });
+  set({ destinations: ids, stationOn, customStops: s.customStops.filter((c) => ids.includes(c.id)), mustVisit: Object.fromEntries(Object.entries(s.mustVisit).filter(([k, v]) => v && stationOn[k])), mapPopover: null });
   if (!ids.length) {
     planToken++;
     if (replanTimer) clearTimeout(replanTimer);
@@ -280,6 +280,8 @@ function applyDestinations(ids: string[], why: string) {
 export function addDestination(id: string) {
   const s = get();
   if (s.destinations.includes(id) || s.destinations.length >= 15) return;
+  // Anything the officer chooses is a must-visit: the optimizer reorders it but never silently drops it.
+  set({ mustVisit: { ...s.mustVisit, [id]: true } });
   applyDestinations([...s.destinations, id], `Replanned: ${id} added`);
 }
 
@@ -292,16 +294,23 @@ export function clearDestinations() {
   applyDestinations([], 'Cleared');
 }
 
-/** Click on empty terrain → "Add custom stop here": a new stop WPn (value 50, 10 min) at that cell. */
-export function addCustomStop(cell: Cell) {
+/** A place anywhere on the map (dropped pin, landmark, base): becomes a stop Pn the planner must visit. */
+export function addPlace(cell: Cell, name = 'Dropped pin'): string {
   const s = get();
   const g = s.pack!.manifest.grid;
   let n = 1;
-  while (s.customStops.some((c) => c.id === `WP${n}`)) n++;
+  while (s.customStops.some((c) => c.id === `P${n}`)) n++;
   const [x, y] = cellToXY(g, cell);
-  const st: Station = { id: `WP${n}`, name: `Custom stop WP${n}`, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A stop you placed on the map.' };
-  set({ customStops: [...s.customStops, st] });
+  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? `Dropped pin ${n}` : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
+  set({ customStops: [...s.customStops, st], mapPopover: null });
   addDestination(st.id);
+  return st.id;
+}
+
+/** "Go here": one destination only, replacing the current ones. */
+export function goHere(cell: Cell, name?: string) {
+  applyDestinations([], 'Cleared');
+  addPlace(cell, name);
 }
 
 /** "Suggest best stops": the planner picks its best subset and order from all targets. */

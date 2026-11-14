@@ -35,7 +35,7 @@ const VECTORS: { id: VectorId; label: string; legend: string }[] = [
   { id: 'route', label: 'Route', legend: 'Amber line with arrows, in walking order.' },
   { id: 'stations', label: 'Stops', legend: 'Numbered = in the plan · hollow = left out.' },
   { id: 'stationDetail', label: 'Station values & left-out marks', legend: 'Science value next to each stop; red × = left out by a rule.' },
-  { id: 'contours', label: 'Minutes-to-shelter lines', legend: 'Dashed lines every 10 min; amber = the shelter limit.' },
+  { id: 'contours', label: 'Minutes-to-shelter lines', legend: 'Dashed lines every 10 min; red = the shelter limit.' },
   { id: 'keepouts', label: 'Keep-out zones', legend: 'Red hatch: plume or hazard zones the route may not enter.' },
   { id: 'traverse', label: 'Curiosity traverse', legend: 'Dotted line: the rover\'s real drive path.' },
   { id: 'shelters', label: 'Hab + rover', legend: 'Cyan square = Hab-1 · diamond = pressurized rover (drag to move).' },
@@ -45,9 +45,9 @@ function Legend({ meta }: { meta: OverlayMeta }) {
   if (meta.id === 'safezone') {
     return (
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10.5px] text-mute">
-        <span className="flex items-center gap-1.5"><span className="h-2.5 w-3.5 rounded-[1px] border border-cyan bg-cyan/20" />Safe</span>
+        <span className="flex items-center gap-1.5"><span className="h-2.5 w-3.5 rounded-[1px] border border-ok bg-ok/20" />Safe</span>
         <span className="flex items-center gap-1.5"><span className="h-2.5 w-3.5 rounded-[1px] bg-[#0a0b0e] ring-1 ring-line-2" />Excluded</span>
-        <span className="flex items-center gap-1.5"><span className="h-2.5 w-3.5 rounded-[1px] bg-amber/60" />Rule being applied</span>
+        <span className="flex items-center gap-1.5"><span className="h-2.5 w-3.5 rounded-[1px] bg-caution/60" />Rule being applied</span>
       </div>
     );
   }
@@ -75,14 +75,14 @@ function provLine(p: Provenance[] | undefined): string {
 
 function SymbolLegend() {
   const rows: [JSX.Element, string][] = [
-    [<rect key="h" x="2.5" y="2.5" width="11" height="11" fill="#4FD1E0" stroke="#0b0d10" strokeWidth="1.5" />, 'Hab (primary shelter)'],
+    [<rect key="h" x="2.5" y="2.5" width="11" height="11" fill="#00e5ff" stroke="#0b0d10" strokeWidth="1.5" />, 'Hab (primary shelter)'],
     [<rect key="r" x="3.5" y="3.5" width="9" height="9" transform="rotate(45 8 8)" fill="#E9E4D8" stroke="#0b0d10" strokeWidth="1.5" />, 'Pressurized rover · drag to move'],
-    [<g key="p"><circle cx="8" cy="8" r="6" fill="#F2B544" stroke="#0b0d10" strokeWidth="1.5" /><text x="8" y="11" textAnchor="middle" fontSize="8" fill="#0b0d10" fontFamily="var(--font-mono)">1</text></g>, 'Station in plan (stop order)'],
-    [<g key="d"><circle cx="8" cy="8" r="5.5" fill="#0b0d10" stroke="#FF5A4E" strokeWidth="1.5" /><text x="8" y="11" textAnchor="middle" fontSize="9" fill="#FF5A4E">×</text></g>, 'Station dropped by a rule'],
-    [<path key="rt" d="M1 12 L15 4" stroke="#F2B544" strokeWidth="2.5" strokeLinecap="round" />, 'Route with direction arrows'],
-    [<path key="iso" d="M1 10 C5 4, 11 14, 15 6" stroke="#4FD1E0" strokeWidth="1.2" strokeDasharray="2 2" fill="none" />, 'Minutes to shelter (amber = limit)'],
-    [<g key="ko"><rect x="2" y="2" width="12" height="12" fill="none" stroke="#FF5A4E" strokeDasharray="3 2" /><path d="M2 10 L6 14 M2 6 L10 14 M2 2 L14 14 M6 2 L14 10 M10 2 L14 6" stroke="#FF5A4E" strokeOpacity="0.6" /></g>, 'Keep-out zone'],
-    [<g key="ev"><circle cx="8" cy="8" r="6.5" fill="rgba(79,209,224,0.12)" stroke="#4FD1E0" strokeDasharray="2 2" /><circle cx="8" cy="8" r="3" fill="#4FD1E0" /></g>, 'EV1 position · 2σ uncertainty'],
+    [<g key="p"><circle cx="8" cy="8" r="6" fill="#000" stroke="#ff2bd6" strokeWidth="1.5" /><text x="8" y="11" textAnchor="middle" fontSize="8" fill="#0b0d10" fontFamily="var(--font-mono)">1</text></g>, 'Station in plan (stop order)'],
+    [<g key="d"><circle cx="8" cy="8" r="5.5" fill="#0b0d10" stroke="#ff3b30" strokeWidth="1.5" /><text x="8" y="11" textAnchor="middle" fontSize="9" fill="#ff3b30">×</text></g>, 'Station dropped by a rule'],
+    [<path key="rt" d="M1 12 L15 4" stroke="#ff2bd6" strokeWidth="2.5" strokeLinecap="round" />, 'Route with direction arrows'],
+    [<path key="iso" d="M1 10 C5 4, 11 14, 15 6" stroke="#00e5ff" strokeWidth="1.2" strokeDasharray="2 2" fill="none" />, 'Minutes to shelter (red = limit)'],
+    [<g key="ko"><rect x="2" y="2" width="12" height="12" fill="none" stroke="#ff3b30" strokeDasharray="3 2" /><path d="M2 10 L6 14 M2 6 L10 14 M2 2 L14 14 M6 2 L14 10 M10 2 L14 6" stroke="#ff3b30" strokeOpacity="0.6" /></g>, 'Keep-out zone'],
+    [<g key="ev"><circle cx="8" cy="8" r="6.5" fill="rgba(79,209,224,0.12)" stroke="#00e5ff" strokeDasharray="2 2" /><circle cx="8" cy="8" r="3" fill="#00e5ff" /></g>, 'EV1 position · 2σ uncertainty'],
   ];
   return (
     <div className="mt-2.5 grid grid-cols-1 gap-1.5">
@@ -129,7 +129,7 @@ export function LayersPanel() {
               data-testid={`preset-${p}`}
               onClick={() => applyPreset(p)}
               title={`${PRESETS[p].hint} (${i})`}
-              className={cx('flex h-11 flex-col items-center justify-center rounded-[6px] font-display text-[11px] uppercase tracking-[0.1em] transition-colors', preset === p ? 'bg-amber/15 text-amber' : 'text-ink-2 hover:bg-raised hover:text-ink')}
+              className={cx('flex h-11 flex-col items-center justify-center rounded-[6px] font-display text-[11px] uppercase tracking-[0.1em] transition-colors', preset === p ? 'bg-cyan/15 text-cyan' : 'text-ink-2 hover:bg-raised hover:text-ink')}
             >
               {PRESETS[p].label}
               <span className="num text-[9px] opacity-50">{i}</span>
@@ -229,7 +229,7 @@ export function SourcesSection() {
                   <span className="text-[12px] font-medium text-ink">{r.layer}</span>
                   {r.indicative && <Badge tone="ochre">Indicative</Badge>}
                 </div>
-                <div className="mt-1 text-[11px] text-ochre">{r.prov.mission} · {r.prov.instrument}</div>
+                <div className="mt-1 text-[11px] text-mute">{r.prov.mission} · {r.prov.instrument}</div>
                 <div className="num mt-1 text-[10.5px] text-mute">
                   {r.prov.product}
                   {r.prov.resolutionM ? ` · ${r.prov.resolutionM} m/px` : ''}
@@ -239,7 +239,7 @@ export function SourcesSection() {
                 <div className="mt-1.5 flex items-center justify-between gap-2 text-[10px]">
                   <span className="truncate text-dim">{r.prov.license}</span>
                   {/^https?:/.test(r.prov.url) && (
-                    <a className="shrink-0 text-cyan hover:underline" href={r.prov.url} target="_blank" rel="noreferrer">Source ↗</a>
+                    <a className="shrink-0 text-ok hover:underline" href={r.prov.url} target="_blank" rel="noreferrer">Source ↗</a>
                   )}
                 </div>
               </div>

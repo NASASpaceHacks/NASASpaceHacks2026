@@ -11,9 +11,9 @@ export function Mark({ size = 22 }: { size?: number }) {
   // Hab (square) → dotted traverse → footfall chevron. Team-made mark.
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect x="2.5" y="14.5" width="7" height="7" rx="1" stroke="#C8763A" strokeWidth="1.6" />
-      <path d="M9.5 15.5 C 13 13, 13 9, 16.5 7.5" stroke="#F2B544" strokeWidth="1.6" strokeDasharray="1.2 2.4" strokeLinecap="round" />
-      <path d="M15.2 3.6 L 21 6.4 L 16.4 10.4" stroke="#F2B544" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="2.5" y="14.5" width="7" height="7" rx="1" stroke="#ffffff" strokeWidth="1.6" />
+      <path d="M9.5 15.5 C 13 13, 13 9, 16.5 7.5" stroke="#ffffff" strokeWidth="1.6" strokeDasharray="1.2 2.4" strokeLinecap="round" />
+      <path d="M15.2 3.6 L 21 6.4 L 16.4 10.4" stroke="#ffffff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -45,10 +45,10 @@ function Stepper() {
             onClick={() => setMode(st.id)}
             className={cx(
               'flex h-11 items-center gap-2 rounded-[7px] px-3.5 font-display text-[13px] uppercase tracking-[0.1em] transition-colors disabled:cursor-not-allowed',
-              active ? 'bg-raised text-ink shadow-[inset_0_-2px_0_var(--color-amber)]' : enabled ? 'text-ink-2 hover:text-ink' : 'text-dim/70',
+              active ? 'bg-raised text-ink' : enabled ? 'text-ink-2 hover:text-ink' : 'text-dim/70',
             )}
           >
-            <span className={cx('num flex h-[20px] w-[20px] items-center justify-center rounded-full text-[11px]', active ? 'bg-amber text-[#16110a]' : done ? 'bg-cyan/20 text-cyan' : 'bg-white/[0.06]')}>{done ? '✓' : st.n}</span>
+            <span className={cx('num flex h-[20px] w-[20px] items-center justify-center rounded-full text-[11px]', active ? 'bg-cyan text-black' : done ? 'bg-ok/20 text-ok' : 'bg-white/[0.06]')}>{done ? '✓' : st.n}</span>
             {st.label}
           </button>
         );
@@ -69,16 +69,16 @@ function SimMenu() {
         data-testid="sim-menu"
         onClick={() => set((s) => ({ simOpen: !s.simOpen, layersOpen: false }))}
         aria-expanded={open}
-        className={cx('flex h-10 items-center gap-2 rounded-[8px] border border-dashed px-3 text-[12.5px] transition-colors', open ? 'border-ochre text-ochre' : 'border-ochre/45 text-ochre/85 hover:border-ochre hover:text-ochre')}
+        className={cx('flex h-10 items-center gap-2 rounded-[8px] border border-dashed px-3 text-[12.5px] transition-colors', open ? 'border-mute text-mute' : 'border-mute/45 text-mute/85 hover:border-mute hover:text-mute')}
         title="Demo controls: simulated astronaut and link"
       >
         Simulation
-        {(sim.running || drop) && <span className={cx('h-1.5 w-1.5 rounded-full', drop ? 'bg-red' : 'bg-ochre mw-pulse')} />}
+        {(sim.running || drop) && <span className={cx('h-1.5 w-1.5 rounded-full', drop ? 'bg-red' : 'bg-mute mw-pulse')} />}
       </button>
       <Popover open={open} onClose={() => set({ simOpen: false })} label="Simulation" className="right-0 top-12 w-[320px] p-4">
         <div className="flex items-center gap-2">
-          <span className="font-display text-[13px] uppercase tracking-[0.12em] text-ochre">Simulation</span>
-          <span className="rounded-full bg-ochre/15 px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-ochre">demo only</span>
+          <span className="font-display text-[13px] uppercase tracking-[0.12em] text-mute">Simulation</span>
+          <span className="rounded-full bg-mute/15 px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-mute">demo only</span>
         </div>
         <div className="mt-1 text-[11.5px] leading-snug text-mute">Not real operations. {mode === 'mock' ? 'An in-browser visor simulates the astronaut.' : 'The visor runs a simulated astronaut on the accepted route.'}</div>
         <div className="eyebrow mb-2 mt-4">Simulated astronaut</div>
@@ -152,8 +152,8 @@ export function TopBar() {
               Visor offline
             </div>
           ) : (
-            <div data-testid="crew-link" data-link={link} className={cx('flex h-10 items-center gap-2 rounded-[8px] px-3 text-[12.5px]', link === 'up' ? 'text-cyan' : link === 'degraded' ? 'bg-amber/10 text-amber' : 'bg-red/12 text-red')}>
-              <span className={cx('h-2 w-2 rounded-full', link === 'up' ? 'bg-cyan' : link === 'degraded' ? 'bg-amber mw-pulse' : 'bg-red mw-pulse')} />
+            <div data-testid="crew-link" data-link={link} className={cx('flex h-10 items-center gap-2 rounded-[8px] px-3 text-[12.5px]', link === 'up' ? 'text-ok' : link === 'degraded' ? 'bg-caution/10 text-caution' : 'bg-red/12 text-red')}>
+              <span className={cx('h-2 w-2 rounded-full', link === 'up' ? 'bg-ok' : link === 'degraded' ? 'bg-caution mw-pulse' : 'bg-red mw-pulse')} />
               Crew link {link === 'up' ? 'OK' : link === 'degraded' ? 'weak' : 'lost'}
             </div>
           )}
@@ -161,7 +161,7 @@ export function TopBar() {
         {route && (
           <div className="num hidden h-10 items-center gap-1.5 px-1 text-[12px] text-mute min-[1440px]:flex" title="Route version the crew has">
             Route v{route.seq}
-            {route.acked ? <span className="text-cyan">✓</span> : confirmStage === 'rejected' ? <span className="text-red">✕</span> : <span className="mw-pulse text-amber">…</span>}
+            {route.acked ? <span className="text-ok">✓</span> : confirmStage === 'rejected' ? <span className="text-red">✕</span> : <span className="mw-pulse text-caution">…</span>}
           </div>
         )}
         <SimMenu />

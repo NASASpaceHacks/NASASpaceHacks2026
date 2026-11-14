@@ -90,7 +90,7 @@ function Boot() {
         <div className="mt-8 flex flex-col gap-1.5">
           {steps.map((s, i) => (
             <motion.div key={i} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} className="num flex items-center gap-2 text-[11.5px] text-mute">
-              <span className={i === steps.length - 1 && !err ? 'text-amber mw-pulse' : 'text-cyan'}>{i === steps.length - 1 && !err ? '›' : '✓'}</span>
+              <span className={i === steps.length - 1 && !err ? 'text-cyan mw-pulse' : 'text-ok'}>{i === steps.length - 1 && !err ? '›' : '✓'}</span>
               {s}
             </motion.div>
           ))}
@@ -115,8 +115,8 @@ function Help() {
   return (
     <AnimatePresence>
       {show && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] flex items-center justify-center bg-black/55 backdrop-blur-[2px]" onClick={() => set({ showHelp: false })}>
-          <motion.div role="dialog" aria-label="Keyboard" initial={{ y: 10, scale: 0.98 }} animate={{ y: 0, scale: 1 }} exit={{ y: 10, scale: 0.98 }} className="w-[440px] rounded-[12px] bg-panel p-5 shadow-2xl ring-1 ring-white/[0.06]" onClick={(e) => e.stopPropagation()}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70" onClick={() => set({ showHelp: false })}>
+          <motion.div role="dialog" aria-label="Keyboard" initial={{ y: 10, scale: 0.98 }} animate={{ y: 0, scale: 1 }} exit={{ y: 10, scale: 0.98 }} className="w-[440px] rounded-[12px] bg-panel p-5 ring-1 ring-white/[0.06]" onClick={(e) => e.stopPropagation()}>
             <div className="eyebrow">Keyboard</div>
             <div className="mt-3 flex flex-col gap-2.5">
               {SHORTCUTS.map(([k, d]) => (

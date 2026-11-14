@@ -421,7 +421,7 @@ export class MapController {
     const k = Math.max(2, Math.ceil(g.w / 250));
     setContours(this.contour, isolines(g, zone.shelter, ks, { downsample: k, minLengthM: 700 }), (v) => `${Math.round(v)} min to shelter`, {
       emphasize: (v) => v === lim,
-      color: (v) => (v === lim ? '#F2B544' : '#4FD1E0'),
+      color: (v) => (v === lim ? '#ff3b30' : '#a8a8a8'),
     });
 
   }

@@ -50,9 +50,9 @@ export function LtstScrubber() {
           <rect x="0" y={y(minEl)} width={W} height={H - y(minEl)} fill="rgba(255,255,255,0.02)" />
           <line x1="0" x2={W} y1={y(minEl)} y2={y(minEl)} stroke="#5b5f67" strokeDasharray="2 3" strokeWidth="0.75" />
           {duration > 0 && <rect x={x(start)} y="0" width={Math.max(1, x(Math.min(T1, end)) - x(start))} height={H} fill="rgba(242,181,68,0.08)" />}
-          <path d={path} fill="none" stroke="#C8763A" strokeWidth="1.5" />
-          <line x1={x(start)} x2={x(start)} y1="0" y2={H} stroke="#F2B544" strokeWidth="1" />
-          <circle cx={x(start)} cy={y(sun.elevDeg)} r="3.5" fill="#F2B544" />
+          <path d={path} fill="none" stroke="#9aa3ad" strokeWidth="1.5" />
+          <line x1={x(start)} x2={x(start)} y1="0" y2={H} stroke="#e9edf2" strokeWidth="1" />
+          <circle cx={x(start)} cy={y(sun.elevDeg)} r="3.5" fill="#e9edf2" />
         </svg>
         <input
           aria-label="EVA start time (Mars local time)"
@@ -73,8 +73,8 @@ export function LtstScrubber() {
 }
 
 const COV_STYLE: Record<Coverage, { label: string; cls: string }> = {
-  full: { label: 'Covered', cls: 'text-cyan border-cyan/40 bg-cyan/5' },
-  partial: { label: 'Partial', cls: 'text-amber border-amber/40 bg-amber/5' },
+  full: { label: 'Covered', cls: 'text-ok border-ok/40 bg-ok/5' },
+  partial: { label: 'Partial', cls: 'text-caution border-caution/40 bg-caution/5' },
   lost: { label: 'Lost', cls: 'text-red border-red/50 bg-red/5' },
   none: { label: 'No station', cls: 'text-dim border-line-2' },
 };
@@ -93,7 +93,7 @@ export function SciencePanel() {
         <div key={g.id}>
           <Tip content={g.statement} side="left" width={300}>
             <div className="flex items-baseline gap-2">
-              <span className="num text-[10.5px] text-ochre">{g.id}</span>
+              <span className="num text-[10.5px] text-mute">{g.id}</span>
               <span className="line-clamp-1 text-[11.5px] text-ink-2">{g.statement}</span>
             </div>
           </Tip>
@@ -142,21 +142,21 @@ export function StationDetails({ st }: { st: Station }) {
         {why && <div className="text-[12.5px] leading-snug text-ink-2">{why}</div>}
         {stop && (
           <div className="num mt-1.5 text-[11.5px] text-mute">
-            Arrive {fmtLtst(evaLtst(startLtst, stop.arriveMin))} · leave {fmtLtst(evaLtst(startLtst, stop.departMin))}{bingo ? <> · <span className="text-amber">leave by {fmtLtst(bingo.ltstMin)}</span></> : null}
+            Arrive {fmtLtst(evaLtst(startLtst, stop.arriveMin))} · leave {fmtLtst(evaLtst(startLtst, stop.departMin))}{bingo ? <> · <span className="text-caution">leave by {fmtLtst(bingo.ltstMin)}</span></> : null}
           </div>
         )}
         <div className="mt-2 flex flex-wrap items-center gap-1">
           {st.objectiveIds.map((oid) => {
             const o = objectiveById.get(oid);
             return (
-              <Tip key={oid} side="left" width={300} content={o ? <><div className="num mb-1 text-[10px] text-ochre">{oid} · {goalById.get(o.goal)?.id}</div>{o.statement}</> : oid}>
-                <span tabIndex={0} className="num rounded-[3px] bg-raised px-1.5 py-0.5 text-[10px] text-ink-2 hover:text-ochre">{oid}</span>
+              <Tip key={oid} side="left" width={300} content={o ? <><div className="num mb-1 text-[10px] text-mute">{oid} · {goalById.get(o.goal)?.id}</div>{o.statement}</> : oid}>
+                <span tabIndex={0} className="num rounded-[3px] bg-raised px-1.5 py-0.5 text-[10px] text-ink-2 hover:text-mute">{oid}</span>
               </Tip>
             );
           })}
           <span className="num ml-1 text-[10.5px] text-dim">{st.dwellMin} min at the stop</span>
           {st.citation && /^https?:/.test(st.citation) && (
-            <a href={st.citation} target="_blank" rel="noreferrer" className="ml-auto text-[11px] text-cyan hover:underline">
+            <a href={st.citation} target="_blank" rel="noreferrer" className="ml-auto text-[11px] text-ok hover:underline">
               Source ↗
             </a>
           )}
@@ -260,7 +260,7 @@ function RuleRow({ r }: { r: Rule }) {
             const v = Number(e.target.value);
             if (Number.isFinite(v)) updateRule(r.id, { value: v });
           }}
-          className="num h-6 w-[58px] rounded-[2px] border border-line-2 bg-sunk px-1.5 text-right text-[11px] text-ink focus:border-amber/60 focus:outline-none"
+          className="num h-6 w-[58px] rounded-[2px] border border-line-2 bg-sunk px-1.5 text-right text-[11px] text-ink focus:border-cyan/60 focus:outline-none"
           aria-label={`${r.label} value`}
           title={fmtRule(r.value, r.unit)}
         />
@@ -284,7 +284,7 @@ export function RulesSection() {
       <div data-testid="rules" className="mt-1">
         {rules.map((r) => <RuleRow key={r.id} r={r} />)}
       </div>
-      <button data-testid="open-limitations" onClick={() => openEvidence('limitations')} className="mt-2 text-[11.5px] text-cyan hover:underline">
+      <button data-testid="open-limitations" onClick={() => openEvidence('limitations')} className="mt-2 text-[11.5px] text-ok hover:underline">
         Limitations &amp; assumptions →
       </button>
     </section>

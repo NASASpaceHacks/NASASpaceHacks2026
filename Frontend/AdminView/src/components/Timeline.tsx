@@ -78,7 +78,7 @@ export function Timeline() {
   const px = (a: number, b: number) => ((Math.min(t1, b) - Math.max(0, a)) / t1) * trackW;
   const spare = dl - back;
   const deltaText = delta === null ? null : delta.offRouteM > 60 ? `${Math.round(delta.offRouteM)} m off route` : Math.abs(delta.deltaMin) < 2 ? 'On plan' : delta.deltaMin > 0 ? `${Math.round(delta.deltaMin)} min ahead` : `${Math.round(-delta.deltaMin)} min behind`;
-  const deltaTone = delta === null ? '' : delta.offRouteM > 60 || delta.deltaMin < -10 ? 'text-red' : delta.deltaMin < -2 ? 'text-amber' : 'text-cyan';
+  const deltaTone = delta === null ? '' : delta.offRouteM > 60 || delta.deltaMin < -10 ? 'text-red' : delta.deltaMin < -2 ? 'text-caution' : 'text-ok';
 
   return (
     <div data-testid="timeline" className="relative flex h-full flex-col px-5 pb-2.5 pt-2.5" aria-label="EVA timeline">
@@ -91,9 +91,9 @@ export function Timeline() {
           </span>
         )}
         <span className="ml-auto flex items-center gap-4 text-[11px] text-mute">
-          <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-[2px] bg-amber/25 ring-1 ring-amber/60" />Stop</span>
+          <span className="flex items-center gap-1.5"><span className="h-3 w-3 border border-magenta bg-black" />Stop</span>
           <span className="flex items-center gap-1.5"><span className="mw-rest h-3 w-3 rounded-[2px]" />Rest</span>
-          <span className="flex items-center gap-1.5"><span className="h-3 w-[2px] bg-amber" />Leave by</span>
+          <span className="flex items-center gap-1.5"><span className="h-3 w-[2px] bg-white" />Leave by</span>
           <span className="flex items-center gap-1.5"><span className="h-3 w-0 border-l-2 border-dashed border-red" />Walk-back deadline</span>
         </span>
       </div>
@@ -101,15 +101,15 @@ export function Timeline() {
       <div ref={trackRef} className="relative mt-2 flex-1">
         {/* hour grid */}
         {hours.map((h) => (
-          <div key={h.ltst} className="absolute bottom-[16px] top-0 w-px bg-white/[0.04]" style={{ left: x(h.t) }} />
+          <div key={h.ltst} className="absolute bottom-[16px] top-0 w-px bg-line" style={{ left: x(h.t) }} />
         ))}
 
         {/* leave-by ticks */}
         <div className="absolute inset-x-0 top-0 h-[18px]">
           {plan.bingo.filter((b) => b.id !== 'HAB' && order(b.id) > 0).map((b) => (
             <div key={b.id} className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: x(b.tMin) }} title={`Leave ${b.id} by ${fmtLtst(b.ltstMin)}`}>
-              <span className="num text-[9.5px] leading-none text-amber">{order(b.id)}</span>
-              <span className="mt-[2px] h-[7px] w-[2px] rounded-full bg-amber/80" />
+              <span className="num text-[10px] leading-none text-white">{order(b.id)}</span>
+              <span className="mt-[2px] h-[7px] w-[1px] bg-white" />
             </div>
           ))}
         </div>
@@ -124,9 +124,9 @@ export function Timeline() {
           {/* spare time before the walk-back deadline */}
           {spare > 0 && (
             <div className="mw-spare absolute inset-y-[6px] flex items-center justify-end rounded-r-[4px] pr-2" style={{ left: x(back), width: w(back, dl) }} title={`Spare time to get home: ${hm(spare)} before the walk-back deadline ${fmtLtst(evaLtst(start, dl))}`}>
-              <span className="num truncate text-right text-[11.5px] leading-tight text-cyan">
+              <span className="num truncate text-right text-[11.5px] leading-tight text-ok">
                 <span className="font-medium">{hmShort(spare)} before deadline</span>
-                {px(back + half, dl) > 190 && <span className="text-cyan/70"> {fmtLtst(evaLtst(start, dl))}</span>}
+                {px(back + half, dl) > 190 && <span className="text-ok/70"> {fmtLtst(evaLtst(start, dl))}</span>}
               </span>
             </div>
           )}
@@ -138,9 +138,9 @@ export function Timeline() {
             const restStart = s.t1Min - s.restMin;
             return (
               <div key={i}>
-                <div className="absolute top-1/2 h-[4px] -translate-y-1/2 rounded-full bg-amber/70" style={{ left: x(s.t0Min), width: w(s.t0Min, s.t1Min) }} title={`Walk ${label(s.from, s.cells[0])} → ${label(s.to, s.cells[s.cells.length - 1])} · ${Math.round(s.t1Min - s.t0Min)} min · ${Math.round(s.distM)} m`} />
+                <div className="absolute top-1/2 h-[4px] -translate-y-1/2 bg-magenta" style={{ left: x(s.t0Min), width: w(s.t0Min, s.t1Min) }} title={`Walk ${label(s.from, s.cells[0])} → ${label(s.to, s.cells[s.cells.length - 1])} · ${Math.round(s.t1Min - s.t0Min)} min · ${Math.round(s.distM)} m`} />
                 {s.restMin > 0.05 && (
-                  <div className="mw-rest absolute inset-y-[9px] rounded-[2px] ring-1 ring-amber/40" style={{ left: x(restStart), width: `max(4px, ${w(restStart, restEnd)})` }} title={`Rest${s.restMin >= 1 ? `s, ${Math.round(s.restMin)} min` : ', under a minute'} on this walk (suit heat)`} />
+                  <div className="mw-rest absolute inset-y-[9px] rounded-[2px] border border-line-2" style={{ left: x(restStart), width: `max(4px, ${w(restStart, restEnd)})` }} title={`Rest${s.restMin >= 1 ? `s, ${Math.round(s.restMin)} min` : ', under a minute'} on this walk (suit heat)`} />
                 )}
               </div>
             );
@@ -153,11 +153,11 @@ export function Timeline() {
               <button
                 key={st.id}
                 onClick={() => set({ selectedStation: st.id })}
-                className={cx('absolute inset-y-0 flex min-w-[6px] items-center gap-1 overflow-hidden rounded-[4px] px-1.5 text-left transition-colors', selected === st.id ? 'bg-amber/35 ring-1 ring-amber' : 'bg-amber/18 ring-1 ring-amber/55 hover:bg-amber/28')}
+                className={cx('absolute inset-y-0 flex min-w-[6px] items-center gap-1 overflow-hidden px-1.5 text-left transition-colors', selected === st.id ? 'border border-cyan bg-cyan/20' : 'border border-magenta bg-black hover:bg-magenta/10')}
                 style={{ left: x(st.arriveMin), width: w(st.arriveMin, st.departMin) }}
                 title={`Stop ${n} · ${st.id} · ${dwell} min · arrive ${fmtLtst(evaLtst(start, st.arriveMin))}, leave ${fmtLtst(evaLtst(start, st.departMin))}${bingo ? ` · leave by ${fmtLtst(bingo.ltstMin)}` : ''}`}
               >
-                <span className="num text-[11px] font-semibold text-amber">{n}</span>
+                <span className="num text-[11px] font-semibold text-magenta">{n}</span>
                 {px(st.arriveMin, st.departMin) >= 50 && <span className="num truncate text-[11px] text-ink">{st.id}</span>}
                 {px(st.arriveMin, st.departMin) >= 82 && <span className="num truncate text-[10px] text-mute">{dwell}′</span>}
               </button>
@@ -169,13 +169,13 @@ export function Timeline() {
         </div>
 
         {/* walk-back deadline */}
-        <div className="pointer-events-none absolute bottom-[16px] top-[18px] border-l-2 border-dashed border-red/80" style={{ left: x(dl) }} title={`Walk-back deadline ${fmtLtst(evaLtst(start, dl))}`} />
+        <div className="pointer-events-none absolute bottom-[16px] top-[18px] border-l-2 border-dashed border-red" style={{ left: x(dl) }} title={`Walk-back deadline ${fmtLtst(evaLtst(start, dl))}`} />
 
         {/* now */}
         {lastT !== null && (
           <>
             <div className="pointer-events-none absolute bottom-[16px] left-0 top-[18px] bg-bg/55" style={{ width: x(lastT) }} />
-            <div data-testid="timeline-now" className="pointer-events-none absolute bottom-[12px] top-[14px] w-[2px] -translate-x-1/2 rounded-full bg-cyan shadow-[0_0_10px_rgba(79,209,224,0.7)]" style={{ left: x(lastT) }} />
+            <div data-testid="timeline-now" className="pointer-events-none absolute bottom-[12px] top-[14px] w-[2px] -translate-x-1/2 bg-cyan" style={{ left: x(lastT) }} />
           </>
         )}
 
@@ -185,7 +185,7 @@ export function Timeline() {
           {hours.filter((h) => h.t / t1 > 0.06).map((h) => (
             <span key={h.ltst} className="num absolute -translate-x-1/2 text-[10px] text-dim" style={{ left: x(h.t) }}>{fmtLtst(h.ltst)}</span>
           ))}
-          <span className="num absolute -translate-x-1/2 whitespace-nowrap rounded-[3px] bg-panel px-1 text-[10px] text-red" style={{ left: x(dl) }}>{fmtLtst(evaLtst(start, dl))}</span>
+          <span className="num absolute -translate-x-1/2 whitespace-nowrap rounded-[3px] bg-black px-1 text-[10px] text-red" style={{ left: x(dl) }}>{fmtLtst(evaLtst(start, dl))}</span>
         </div>
       </div>
     </div>
@@ -194,7 +194,7 @@ export function Timeline() {
 
 function Block({ left, width, tone, title, children }: { left: string; width: string; tone: 'airlock'; title: string; children: string }) {
   return (
-    <div className={cx('absolute inset-y-[5px] flex items-center justify-center overflow-hidden rounded-[4px] px-1', tone === 'airlock' && 'bg-[#232830] text-mute')} style={{ left, width }} title={title}>
+    <div className={cx('absolute inset-y-[5px] flex items-center justify-center overflow-hidden rounded-[4px] px-1', tone === 'airlock' && 'border border-line-2 bg-black text-mute')} style={{ left, width }} title={title}>
       <span className="truncate font-display text-[10px] uppercase tracking-[0.1em]">{children}</span>
     </div>
   );

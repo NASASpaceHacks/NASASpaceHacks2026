@@ -207,16 +207,16 @@ export interface MapTheme {
 }
 
 export const DEFAULT_THEME: MapTheme = {
-  route: MAP_COLORS.amber,
-  routeCasing: 'rgba(11,13,16,0.85)',
-  safe: MAP_COLORS.cyan,
-  caution: MAP_COLORS.amber,
+  route: MAP_COLORS.magenta,
+  routeCasing: 'rgba(0,0,0,0.85)',
+  safe: '#2dff6f',
+  caution: MAP_COLORS.paper,
   violation: MAP_COLORS.red,
   label: MAP_COLORS.paper,
-  halo: 'rgba(11,13,16,0.9)',
+  halo: 'rgba(0,0,0,0.9)',
   muted: MAP_COLORS.muted,
-  font: '600 11px "DIN Alternate", "Bahnschrift", "Roboto Condensed", system-ui, sans-serif',
-  monoFont: '500 10.5px "SF Mono", "JetBrains Mono", ui-monospace, Menlo, monospace',
+  font: '600 13px "Barlow Condensed", sans-serif',
+  monoFont: '500 10.5px "Roboto Mono", ui-monospace, Menlo, monospace',
 };
 
 const halo = (t: MapTheme, width = 3) => new Stroke({ color: t.halo, width });
@@ -236,7 +236,7 @@ export function createContourLayer(theme: MapTheme = DEFAULT_THEME): VectorLayer
       if (!s) {
         const color = (f.get('color') as string) ?? theme.safe;
         s = [
-          new Style({ stroke: new Stroke({ color: 'rgba(11,13,16,0.55)', width: emph ? 3.5 : 2.5 }) }),
+          new Style({ stroke: new Stroke({ color: 'rgba(0,0,0,0.55)', width: emph ? 3.5 : 2.5 }) }),
           new Style({
             stroke: new Stroke({ color, width: emph ? 1.5 : 1, lineDash: emph ? [7, 4] : [3, 3] }),
             text: new Text({
@@ -280,12 +280,12 @@ export function setContours(
 }
 
 /** Safe-zone outline polygons (crisp vector edge over the GPU fill). */
-export function createOutlineLayer(color: string = MAP_COLORS.cyan): VectorLayer<VectorSource> {
+export function createOutlineLayer(color: string = '#ffffff'): VectorLayer<VectorSource> {
   return new VectorLayer({
     source: new VectorSource(),
     style: [
-      new Style({ stroke: new Stroke({ color: 'rgba(11,13,16,0.6)', width: 4 }) }),
-      new Style({ stroke: new Stroke({ color, width: 1.6 }) }),
+      new Style({ stroke: new Stroke({ color: 'rgba(0,0,0,0.6)', width: 4 }) }),
+      new Style({ stroke: new Stroke({ color, width: 1.25, lineDash: [6, 4] }) }),
     ],
   });
 }
@@ -403,23 +403,23 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
       if (state === 'choice') {
         // Route builder: a neutral numbered pin with a short label (nothing chosen yet).
         const id = String(f.get('id'));
-        const num = /^ST0*(\d+)$/.exec(id)?.[1] ?? id;
+        const num = id === 'PIN' ? '+' : /^ST0*(\d+)$/.exec(id)?.[1] ?? id;
         const nm = String(f.get('name') ?? '').replace(/\s*\([^)]*\)\s*$/, '');
         return [
           new Style({
-            image: new CircleStyle({ radius: 11, fill: new Fill({ color: 'rgba(11,13,16,0.82)' }), stroke: new Stroke({ color: 'rgba(233,228,216,0.9)', width: 1.75 }), declutterMode: 'obstacle' }),
-            text: new Text({ text: num, font: '600 11px ui-monospace, monospace', fill: new Fill({ color: '#E9E4D8' }), declutterMode: 'none' }),
+            image: new CircleStyle({ radius: 11, fill: new Fill({ color: '#000' }), stroke: new Stroke({ color: MAP_COLORS.cyan, width: 2 }), declutterMode: 'obstacle' }),
+            text: new Text({ text: num, font: '500 11px "Roboto Mono", monospace', fill: new Fill({ color: '#ffffff' }), declutterMode: 'none' }),
             zIndex: 1,
           }),
           new Style({
-            text: new Text({ text: nm.length > 24 ? `${nm.slice(0, 23)}…` : nm, font: theme.font, offsetX: 17, textAlign: 'left', fill: new Fill({ color: theme.label }), stroke: halo(theme) }),
+            text: new Text({ text: nm.length > 24 ? `${nm.slice(0, 23)}…` : nm, font: theme.font, offsetX: f.get('flip') ? -15 : 17, offsetY: f.get('flip') ? 16 : -4, textAlign: f.get('flip') ? 'right' : 'left', fill: new Fill({ color: theme.label }), stroke: halo(theme), declutterMode: 'none' }),
             zIndex: 0,
           }),
         ];
       }
       if (!detail && (state === 'dropped' || state === 'idle' || state === 'disabled')) {
         return new Style({
-          image: new CircleStyle({ radius: 4, fill: new Fill({ color: 'rgba(11,13,16,0.65)' }), stroke: new Stroke({ color: 'rgba(233,228,216,0.55)', width: 1.25 }), declutterMode: 'obstacle' }),
+          image: new CircleStyle({ radius: 4, fill: new Fill({ color: 'rgba(0,0,0,0.65)' }), stroke: new Stroke({ color: 'rgba(255,255,255,0.55)', width: 1.25 }), declutterMode: 'obstacle' }),
           zIndex: 0,
         });
       }
@@ -430,15 +430,15 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
       const symbol = new Style({
         image: new CircleStyle({
           radius: r,
-          fill: new Fill({ color: filled ? color : 'rgba(11,13,16,0.75)' }),
-          stroke: new Stroke({ color: filled ? theme.routeCasing : color, width: filled ? 2 : 1.5, lineDash: state === 'disabled' ? [2, 2] : undefined }),
+          fill: new Fill({ color: filled ? '#000' : 'rgba(0,0,0,0.75)' }),
+          stroke: new Stroke({ color, width: filled ? 2 : 1.5, lineDash: state === 'disabled' ? [2, 2] : undefined }),
           declutterMode: 'obstacle',
         }),
         text:
           order !== undefined && filled
-            ? new Text({ text: String(order), font: theme.monoFont, fill: new Fill({ color: theme.routeCasing }), declutterMode: 'none' })
+            ? new Text({ text: String(order), font: '500 11px "Roboto Mono", monospace', fill: new Fill({ color: '#ffffff' }), declutterMode: 'none' })
             : state === 'dropped'
-              ? new Text({ text: '×', font: '700 12px system-ui', fill: new Fill({ color }), declutterMode: 'none' })
+              ? new Text({ text: '×', font: '700 12px sans-serif', fill: new Fill({ color }), declutterMode: 'none' })
               : undefined,
         zIndex: filled ? 2 : 1,
       });
@@ -446,8 +446,8 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
         text: new Text({
           text: detail ? `${f.get('id')}  ${Math.round(value)}` : String(f.get('id')),
           font: theme.monoFont,
-          offsetX: r + 6,
-          textAlign: 'left',
+          offsetX: f.get('flip') ? -(r + 6) : r + 6,
+          textAlign: f.get('flip') ? 'right' : 'left',
           fill: new Fill({ color: state === 'idle' || state === 'disabled' ? theme.muted : theme.label }),
           stroke: halo(theme),
         }),
@@ -476,7 +476,9 @@ export function setStations(
   src.addFeatures(
     stations.map((s) => {
       const st = stateOf(s.id);
-      const f = new Feature({ geometry: new Point([s.x, s.y]), id: s.id, name: s.name, value: s.value, state: st.state, order: st.order });
+      // Neighbours within 30 m alternate label sides so their text never collides.
+      const nearer = stations.slice(0, stations.indexOf(s)).filter((o) => Math.hypot(o.x - s.x, o.y - s.y) < 30).length;
+      const f = new Feature({ geometry: new Point([s.x, s.y]), id: s.id, name: s.name, value: s.value, state: st.state, order: st.order, flip: nearer % 2 === 1 });
       f.setId(s.id);
       return f;
     }),
@@ -508,8 +510,8 @@ export function createSheltersLayer(
       const isHab = kind === 'hab';
       const badge = f.get('isA')
         ? [new Style({
-            image: new CircleStyle({ radius: 10, fill: new Fill({ color: '#F2B544' }), stroke: new Stroke({ color: theme.routeCasing, width: 2 }), displacement: [16, 16] }),
-            text: new Text({ text: 'A', font: '700 12px system-ui', offsetX: 16, offsetY: -16, fill: new Fill({ color: '#16110a' }) }),
+            image: new CircleStyle({ radius: 10, fill: new Fill({ color: MAP_COLORS.cyan }), stroke: new Stroke({ color: theme.routeCasing, width: 2 }), displacement: [16, 16] }),
+            text: new Text({ text: 'A', font: '700 13px "Barlow Condensed", sans-serif', offsetX: 16, offsetY: -16, fill: new Fill({ color: '#000' }) }),
             zIndex: 5,
           })]
         : [];
@@ -520,10 +522,10 @@ export function createSheltersLayer(
             points: 4,
             radius: isHab ? 10 : 9,
             angle: isHab ? Math.PI / 4 : 0,
-            fill: new Fill({ color: isHab ? theme.safe : dragging ? theme.caution : '#E9E4D8' }),
+            fill: new Fill({ color: isHab ? theme.safe : dragging ? theme.caution : '#e6e6e6' }),
             stroke: new Stroke({ color: theme.routeCasing, width: 2.5 }),
           }),
-          text: new Text({ text: isHab ? 'H' : 'R', font: '700 10px system-ui', fill: new Fill({ color: theme.routeCasing }) }),
+          text: new Text({ text: isHab ? 'H' : 'R', font: '700 10px sans-serif', fill: new Fill({ color: theme.routeCasing }) }),
         }),
         new Style({
           text: new Text({
@@ -585,7 +587,7 @@ export function createKeepoutLayer(keepouts: KeepOut[], theme: MapTheme = DEFAUL
     f.setId(k.id);
     src.addFeature(f);
   }
-  const fill = new Fill({ color: hatchPattern('rgba(255,90,78,0.55)') });
+  const fill = new Fill({ color: hatchPattern('rgba(255,59,48,0.55)') });
   return new VectorLayer({
     source: src,
     declutter: 'labels',
@@ -599,12 +601,12 @@ export function createKeepoutLayer(keepouts: KeepOut[], theme: MapTheme = DEFAUL
       }
       return new Style({
         fill,
-        stroke: new Stroke({ color: 'rgba(255,90,78,0.85)', width: 1.25, lineDash: [6, 4] }),
+        stroke: new Stroke({ color: 'rgba(255,59,48,0.85)', width: 1.25, lineDash: [6, 4] }),
         text: new Text({
           text: (f.get('label') as string).toUpperCase(),
           font: theme.monoFont,
           overflow: true,
-          fill: new Fill({ color: 'rgba(255,170,160,0.95)' }),
+          fill: new Fill({ color: 'rgba(255,120,110,0.95)' }),
           stroke: halo(theme),
         }),
       });
@@ -628,15 +630,15 @@ export function createTraverseLayer(traverse: SitePackManifest['traverse'], them
     declutter: 'labels',
     zIndex: 5,
     style: [
-      new Style({ stroke: new Stroke({ color: 'rgba(11,13,16,0.55)', width: 3.5 }) }),
+      new Style({ stroke: new Stroke({ color: 'rgba(0,0,0,0.55)', width: 3.5 }) }),
       new Style({
-        stroke: new Stroke({ color: 'rgba(233,228,216,0.85)', width: 1.5, lineDash: [1, 4], lineCap: 'round' }),
+        stroke: new Stroke({ color: 'rgba(255,255,255,0.85)', width: 1.5, lineDash: [1, 4], lineCap: 'round' }),
         text: new Text({
           text: traverse?.label ?? '',
           font: theme.monoFont,
           placement: 'line',
           repeat: 700,
-          fill: new Fill({ color: 'rgba(233,228,216,0.9)' }),
+          fill: new Fill({ color: 'rgba(255,255,255,0.9)' }),
           stroke: halo(theme),
         }),
       }),
@@ -673,11 +675,11 @@ export function createAstronautLayer(theme: MapTheme = DEFAULT_THEME): VectorLay
     style: (f: FeatureLike) => {
       const kind = f.get('kind');
       if (kind === 'ellipse') {
-        return new Style({ fill: new Fill({ color: 'rgba(79,209,224,0.1)' }), stroke: new Stroke({ color: theme.safe, width: 1.25, lineDash: [3, 3] }) });
+        return new Style({ fill: new Fill({ color: 'rgba(45,255,111,0.1)' }), stroke: new Stroke({ color: theme.safe, width: 1.25, lineDash: [3, 3] }) });
       }
       if (kind === 'track') {
         return [
-          new Style({ stroke: new Stroke({ color: 'rgba(11,13,16,0.7)', width: 4.5 }) }),
+          new Style({ stroke: new Stroke({ color: 'rgba(0,0,0,0.7)', width: 4.5 }) }),
           new Style({ stroke: new Stroke({ color: theme.safe, width: 2 }) }),
         ];
       }

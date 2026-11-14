@@ -7,8 +7,8 @@ import { liveValues, scheduleDelta, type Tone } from '../lib/plain';
 import type { ActionKind } from '../lib/types';
 import { Button, Kbd, cx } from './ui';
 
-const TONE_INK: Record<Tone, string> = { ok: 'text-ink', watch: 'text-amber', act: 'text-red' };
-const TONE_DOT: Record<Tone, string> = { ok: 'bg-cyan', watch: 'bg-amber', act: 'bg-red' };
+const TONE_INK: Record<Tone, string> = { ok: 'text-ink', watch: 'text-caution', act: 'text-red' };
+const TONE_DOT: Record<Tone, string> = { ok: 'bg-ok', watch: 'bg-caution', act: 'bg-red' };
 
 /** ③ EVA live: is my crew OK, are we on time, what's next? Readable in one glance. */
 function CrewCard() {
@@ -61,7 +61,7 @@ function CrewCard() {
     next = <>Radiation spike: crew told to head for shelter. <b className="font-medium text-ink">Send them the return route.</b></>;
   } else if (stopNow) {
     const b = plan.bingo.find((x) => x.id === stopNow.id);
-    next = <>Leave <b className="font-medium text-ink">{stopNow.id}</b> at {fmtLtst(evaLtst(start, stopNow.departMin))}{b ? <span className="text-amber"> · latest {fmtLtst(b.ltstMin)}</span> : null}</>;
+    next = <>Leave <b className="font-medium text-ink">{stopNow.id}</b> at {fmtLtst(evaLtst(start, stopNow.departMin))}{b ? <span className="text-caution"> · latest {fmtLtst(b.ltstMin)}</span> : null}</>;
   } else if (nextStop) {
     next = <>Arrive <b className="font-medium text-ink">{nextStop.id}</b> at {fmtLtst(evaLtst(start, nextStop.arriveMin))} <span className="text-mute">(stop {plan.order.indexOf(nextStop.id) + 1} of {plan.order.length})</span></>;
   } else if (lastSeg) {
@@ -75,7 +75,7 @@ function CrewCard() {
         <span className="eyebrow">Crew · EV1 · {fmtLtst(evaLtst(start, last.t))}</span>
         <LinkPill />
       </div>
-      <div data-testid="crew-status" className={cx('mt-1.5 font-display text-[32px] font-bold leading-none tracking-[0.03em]', statusTone === 'ok' ? 'text-cyan' : statusTone === 'watch' ? 'text-amber' : 'text-red')}>
+      <div data-testid="crew-status" className={cx('mt-1.5 font-display text-[32px] font-bold leading-none tracking-[0.03em]', statusTone === 'ok' ? 'text-ok' : statusTone === 'watch' ? 'text-caution' : 'text-red')}>
         {statusText}
       </div>
       {next && <div data-testid="crew-next" className="mt-2 text-[14.5px] leading-snug text-ink-2"><span className="text-mute">Next: </span>{next}</div>}
@@ -101,8 +101,8 @@ function CrewCard() {
 function LinkPill() {
   const link = useConsole((s) => s.link);
   return (
-    <span className={cx('flex items-center gap-1.5 text-[12px]', link === 'up' ? 'text-cyan' : link === 'degraded' ? 'text-amber' : 'text-red')}>
-      <span className={cx('h-2 w-2 rounded-full', link === 'up' ? 'bg-cyan' : link === 'degraded' ? 'bg-amber mw-pulse' : 'bg-red mw-pulse')} />
+    <span className={cx('flex items-center gap-1.5 text-[12px]', link === 'up' ? 'text-ok' : link === 'degraded' ? 'text-caution' : 'text-red')}>
+      <span className={cx('h-2 w-2 rounded-full', link === 'up' ? 'bg-ok' : link === 'degraded' ? 'bg-caution mw-pulse' : 'bg-red mw-pulse')} />
       {link === 'up' ? 'Link OK' : link === 'degraded' ? 'Link weak' : 'Link lost'}
     </span>
   );
@@ -156,8 +156,8 @@ function UnsentChange() {
   const status = useConsole((s) => s.planStatus);
   if (sheet || !plan || !route || plan.reqHash === route.reqHash || !isSendable(plan) || status !== 'ready') return null;
   return (
-    <div className="rounded-[10px] bg-amber/[0.08] px-4 py-3 ring-1 ring-amber/30">
-      <div className="text-[13px] font-medium text-amber">New plan not sent yet</div>
+    <div className="rounded-[10px] bg-caution/[0.08] px-4 py-3 ring-1 ring-caution/30">
+      <div className="text-[13px] font-medium text-caution">New plan not sent yet</div>
       <div className="mt-0.5 text-[12px] text-ink-2">The crew is still on route v{route.seq}.</div>
       <Button variant="primary" className="mt-2.5 w-full" onClick={() => set({ uiMode: 'send', confirm: { stage: 'review' } })}>Review &amp; send <Kbd>⏎</Kbd></Button>
     </div>
@@ -175,7 +175,7 @@ export function LivePanel() {
           <div className="flex items-center gap-3 px-1 text-[12px]">
             <button onClick={() => setMode('plan')} className="text-mute hover:text-ink">See the plan</button>
             <span className="text-line-2">·</span>
-            <button onClick={() => openDetails('margins')} className="text-cyan hover:underline">Margins over time →</button>
+            <button onClick={() => openDetails('margins')} className="text-ok hover:underline">Margins over time →</button>
           </div>
         </div>
       </div>

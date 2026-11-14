@@ -37,17 +37,17 @@ function ExplainCard() {
           transition={{ duration: 0.25, ease: 'easeOut' }}
           className="pointer-events-none absolute left-4 top-4 z-20 w-[min(600px,calc(100%-330px))] min-w-[380px]"
         >
-          <div className="overflow-hidden rounded-[4px] border border-line-2 bg-[#0e1014]/92 shadow-[0_18px_48px_rgba(0,0,0,0.6)] backdrop-blur-md">
+          <div className="overflow-hidden rounded-[4px] border border-line-2 bg-black">
             <div className="flex items-stretch border-b border-line">
               {STEP_LABELS.map((l, i) => {
                 const n = i + 1;
                 const done = ex.step > n;
                 const active = ex.step === n;
                 return (
-                  <div key={l} className={cx('relative flex flex-1 items-center gap-1.5 px-2.5 py-2 transition-colors', active && 'bg-amber/10')}>
-                    <span className={cx('num flex h-4 w-4 items-center justify-center rounded-full text-[9px]', done ? 'bg-cyan text-[#06222a]' : active ? 'bg-amber text-[#16110a]' : 'bg-line text-dim')}>{done ? '✓' : n}</span>
-                    <span className={cx('truncate font-display text-[9.5px] uppercase tracking-[0.1em]', active ? 'text-amber' : done ? 'text-ink-2' : 'text-dim')}>{l}</span>
-                    {active && <motion.span layoutId="explain-bar" className="absolute inset-x-0 bottom-0 h-[2px] bg-amber" />}
+                  <div key={l} className={cx('relative flex flex-1 items-center gap-1.5 px-2.5 py-2 transition-colors', active && 'bg-cyan/10')}>
+                    <span className={cx('num flex h-4 w-4 items-center justify-center rounded-full text-[9px]', done ? 'bg-ok text-black' : active ? 'bg-cyan text-black' : 'bg-line text-dim')}>{done ? '✓' : n}</span>
+                    <span className={cx('truncate font-display text-[9.5px] uppercase tracking-[0.1em]', active ? 'text-cyan' : done ? 'text-ink-2' : 'text-dim')}>{l}</span>
+                    {active && <motion.span layoutId="explain-bar" className="absolute inset-x-0 bottom-0 h-[2px] bg-cyan" />}
                   </div>
                 );
               })}
@@ -63,12 +63,12 @@ function ExplainCard() {
               </div>
               <div className="shrink-0 text-right">
                 <div className="label !text-[9px]">Reachable</div>
-                <div className={cx('num mt-1 text-[26px] leading-none', ex.step >= 6 ? 'text-cyan' : 'text-ink')}>
+                <div className={cx('num mt-1 text-[26px] leading-none', ex.step >= 6 ? 'text-ok' : 'text-ink')}>
                   <AnimatedNumber from={ex.areaFrom} to={ex.areaTo} />
                   <span className="ml-1 text-[12px] text-mute">km²</span>
                 </div>
                 {ex.step >= 1 && ex.step <= 6 && ex.areaFrom - ex.areaTo > 0.004 && (
-                  <div className="num mt-1 text-[11px] text-amber">−{(ex.areaFrom - ex.areaTo).toFixed(2)} km²</div>
+                  <div className="num mt-1 text-[11px] text-caution">−{(ex.areaFrom - ex.areaTo).toFixed(2)} km²</div>
                 )}
                 {ex.step >= 1 && ex.step <= 5 && ex.areaFrom - ex.areaTo <= 0.004 && <div className="mt-1 text-[11px] text-dim">already inside</div>}
               </div>
@@ -93,12 +93,12 @@ function StationTip() {
   const img = stationImage(pack.manifest, st);
   const left = Math.max(8, hover.x + 16);
   return (
-    <div className="pointer-events-none absolute z-30 w-[280px] rounded-[4px] border border-line-2 bg-[#121419]/95 shadow-[0_12px_32px_rgba(0,0,0,0.55)] backdrop-blur-md" style={{ left, top: Math.max(8, hover.y - 20) }}>
+    <div className="pointer-events-none absolute z-30 w-[280px] rounded-[4px] border border-line-2 bg-[#121419]/95" style={{ left, top: Math.max(8, hover.y - 20) }}>
       <div className="flex gap-3 p-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="num text-[11px] text-mute">{st.id}</span>
-            <span className="num ml-auto text-[11px] text-ochre">value {Math.round(st.value)}</span>
+            <span className="num ml-auto text-[11px] text-mute">value {Math.round(st.value)}</span>
           </div>
           <div className="mt-1 text-[12.5px] leading-snug text-ink">{st.name}</div>
           <div className="mt-1 line-clamp-3 text-[11px] leading-snug text-mute">{whyItMatters(st)}</div>
@@ -110,7 +110,7 @@ function StationTip() {
           <span key={o} title={objectiveById.get(o)?.statement} className="num rounded-[2px] border border-line-2 px-1 text-[9.5px] text-ink-2">{o}</span>
         ))}
         <span className="num ml-auto text-[10.5px]">
-          {!on ? <span className="text-dim">not offered</span> : order >= 0 ? <span className="text-amber">stop {order + 1}{stop ? ` · arrive +${Math.round(stop.arriveMin)}′` : ''}</span> : dropped ? <span className="text-red">{dropped.text.replace(/^ST\d+\s*/, '')}</span> : <span className="text-dim">not in plan</span>}
+          {!on ? <span className="text-dim">not offered</span> : order >= 0 ? <span className="text-cyan">stop {order + 1}{stop ? ` · arrive +${Math.round(stop.arriveMin)}′` : ''}</span> : dropped ? <span className="text-red">{dropped.text.replace(/^ST\d+\s*/, '')}</span> : <span className="text-dim">not in plan</span>}
         </span>
       </div>
     </div>
@@ -127,14 +127,14 @@ function LayersButton() {
         data-testid="layers-button"
         onClick={() => set((s) => ({ layersOpen: !s.layersOpen, simOpen: false }))}
         aria-expanded={open}
-        className={cx('flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur-md transition-colors', open ? 'bg-[#1c2026]/95 text-ink' : 'bg-[#0e1014]/85 text-ink-2 hover:text-ink')}
+        className={cx('flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] transition-colors', open ? 'bg-[#1c2026]/95 text-ink' : 'bg-black text-ink-2 hover:text-ink')}
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" aria-hidden>
           <path d="M8 2 L14.5 5.5 L8 9 L1.5 5.5 Z" />
           <path d="M1.5 8.5 L8 12 L14.5 8.5" />
         </svg>
         Layers
-        {preset !== 'calm' && <span className="rounded-full bg-amber/15 px-2 py-0.5 text-[11px] text-amber">{PRESETS[preset].label}</span>}
+        {preset !== 'calm' && <span className="rounded-full bg-caution/15 px-2 py-0.5 text-[11px] text-caution">{PRESETS[preset].label}</span>}
       </button>
       <Popover open={open} onClose={() => set({ layersOpen: false })} label="Map layers" className="right-0 top-[52px]">
         <LayersPanel />
@@ -167,8 +167,8 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
   return (
     <>
       {planStatus === 'planning' && (
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[2px] overflow-hidden bg-amber/15">
-          <div className="mw-scan h-full w-1/3 bg-amber" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[2px] overflow-hidden bg-caution/15">
+          <div className="mw-scan h-full w-1/3 bg-cyan" />
         </div>
       )}
 
@@ -178,8 +178,8 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
           onClick={() => void explainSafeZone()}
           disabled={!hasZone}
           className={cx(
-            'flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur-md transition-colors disabled:opacity-40',
-            explaining ? 'bg-amber/20 text-amber' : 'bg-[#0e1014]/85 text-ink-2 hover:text-ink',
+            'flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] transition-colors disabled:opacity-40',
+            explaining ? 'bg-cyan/20 text-cyan' : 'bg-black text-ink-2 hover:text-ink',
           )}
           title="Watch the safe area shrink one flight rule at a time (S)"
         >
@@ -194,7 +194,7 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
       <AnimatePresence>
         {hazardPick && !sheet && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2">
-            <div className="flex items-center gap-3 rounded-[10px] bg-[#1a0f0e]/92 px-4 py-2.5 text-[13px] text-ink ring-1 ring-red/50 backdrop-blur-sm">
+            <div className="flex items-center gap-3 rounded-[10px] bg-[#1a0f0e]/92 px-4 py-2.5 text-[13px] text-ink ring-1 ring-red/50">
               <span className="h-2 w-2 rounded-full bg-red mw-pulse" />
               Click the map where the hazard is
               <button onClick={() => (sheet ? closeSheet() : startHazardPick())} className="ml-2 text-mute hover:text-ink">Cancel <Kbd>Esc</Kbd></button>
@@ -204,10 +204,10 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
       </AnimatePresence>
 
       <div className="pointer-events-none absolute bottom-3 left-4 z-10 flex items-end gap-3">
-        <div className="pointer-events-auto rounded-[8px] bg-[#0e1014]/70 px-2.5 pb-1.5 pt-1.5 backdrop-blur-sm">
+        <div className="pointer-events-auto rounded-[8px] bg-black px-2.5 pb-1.5 pt-1.5">
           <div ref={scaleRef} className="num pr-3 text-[9.5px] text-ink-2 [&_.mw-sb-bar]:text-ink" />
         </div>
-        <div ref={readoutRef} className={cx('flex gap-3 rounded-[8px] bg-[#0e1014]/70 px-2.5 py-1.5 text-[11px] backdrop-blur-sm transition-opacity', hover ? 'opacity-100' : 'opacity-0')} aria-hidden={!hover}>
+        <div ref={readoutRef} className={cx('flex gap-3 rounded-[8px] bg-black px-2.5 py-1.5 text-[11px] transition-opacity', hover ? 'opacity-100' : 'opacity-0')} aria-hidden={!hover}>
           <span><span className="text-dim">lat </span><span data-v className="num text-ink-2">—</span></span>
           <span><span className="text-dim">lon </span><span data-v className="num text-ink-2">—</span></span>
           <span><span className="text-dim">elev </span><span data-v className="num text-ink-2">—</span></span>
@@ -215,9 +215,9 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
         </div>
       </div>
 
-      <div className={cx('absolute right-4 z-10 flex flex-col overflow-hidden rounded-[10px] bg-[#0e1014]/80 backdrop-blur-sm', sheet ? 'top-[72px]' : 'bottom-4')}>
+      <div className={cx('absolute right-4 z-10 flex flex-col overflow-hidden rounded-[10px] bg-black', sheet ? 'top-[72px]' : 'bottom-4')}>
         {live && (
-          <button title={follow ? 'Following the crew: click to stop' : 'Follow the crew'} aria-pressed={follow} onClick={() => set((s) => ({ follow: !s.follow }))} className={cx('flex h-10 w-10 items-center justify-center text-[11px]', follow ? 'text-cyan' : 'text-mute hover:text-ink')}>
+          <button title={follow ? 'Following the crew: click to stop' : 'Follow the crew'} aria-pressed={follow} onClick={() => set((s) => ({ follow: !s.follow }))} className={cx('flex h-10 w-10 items-center justify-center text-[11px]', follow ? 'text-ok' : 'text-mute hover:text-ink')}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden><circle cx="8" cy="8" r="2.4" fill={follow ? 'currentColor' : 'none'} /><path d="M8 1.5 V4 M8 12 V14.5 M1.5 8 H4 M12 8 H14.5" strokeLinecap="round" /></svg>
           </button>
         )}

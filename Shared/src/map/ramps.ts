@@ -13,13 +13,12 @@ export interface Ramp {
 }
 
 export const MAP_COLORS = {
-  ochre: '#C8763A',
-  amber: '#F2B544',
-  cyan: '#4FD1E0',
-  red: '#FF5A4E',
+  magenta: '#ff2bd6',
+  cyan: '#00e5ff',
+  red: '#ff3b30',
   ink: '#0B0D10',
-  paper: '#E9E4D8',
-  muted: '#9A9CA3',
+  paper: '#e9edf2',
+  muted: '#9aa3ad',
 } as const;
 
 /** Minutes-to-safety ramp (short = bright cyan, near the limit = deep blue). Values in minutes. */
@@ -34,14 +33,14 @@ export const TIME_RAMP: Ramp = {
   ],
 };
 
-/** Slope (deg): transparent on gentle ground, amber at the metabolic-data edge, red above the hard limit. */
+/** Slope (deg): transparent on gentle ground, white at the metabolic-data edge, red above the hard limit. */
 export const SLOPE_RAMP: Ramp = {
   id: 'slope',
   stops: [
-    [0, [242, 181, 68, 0]],
-    [8, [242, 181, 68, 0]],
-    [16.7, [242, 181, 68, 0.42]],
-    [19.99, [242, 150, 60, 0.55]],
+    [0, [255, 255, 255, 0]],
+    [8, [255, 255, 255, 0]],
+    [16.7, [255, 255, 255, 0.35]],
+    [19.99, [255, 255, 255, 0.5]],
     [20, [255, 90, 78, 0.55]],
     [35, [255, 90, 78, 0.8]],
   ],
@@ -58,11 +57,11 @@ export const LOS_RAMP: Ramp = {
   ],
 };
 
-/** Thermal inertia (J m⁻² K⁻¹ s⁻½), viridis reversed: loose sand (low TI) = yellow, bedrock = violet. */
+/** Thermal inertia (J m⁻² K⁻¹ s⁻½), viridis reversed: loose sand (low TI) = pale blue, bedrock = violet. */
 export const TI_RAMP: Ramp = {
   id: 'ti',
   stops: [
-    [50, [253, 231, 37, 0.62]],
+    [50, [190, 220, 255, 0.55]],
     [150, [94, 201, 98, 0.5]],
     [250, [33, 145, 140, 0.42]],
     [400, [59, 82, 139, 0.36]],

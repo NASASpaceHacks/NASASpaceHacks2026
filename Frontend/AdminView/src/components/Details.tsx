@@ -40,7 +40,7 @@ export function Details() {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 40, opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="absolute inset-y-0 right-0 z-50 flex w-[min(560px,100%)] flex-col bg-panel shadow-[-24px_0_60px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.05]"
+          className="absolute inset-y-0 right-0 z-50 flex w-[min(560px,100%)] flex-col bg-panel ring-1 ring-white/[0.05]"
         >
           <header className="shrink-0 px-5 pt-4">
             <div className="flex items-center gap-3">
@@ -53,7 +53,7 @@ export function Details() {
               </button>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button data-testid="open-evidence" onClick={() => openEvidence('open')} className="flex h-9 items-center gap-2 rounded-[7px] bg-cyan/10 px-3 text-[12.5px] text-cyan hover:bg-cyan/18">
+              <button data-testid="open-evidence" onClick={() => openEvidence('open')} className="flex h-9 items-center gap-2 rounded-[7px] bg-ok/10 px-3 text-[12.5px] text-ok hover:bg-ok/18">
                 Evidence: what we measure and assume <Kbd>E</Kbd>
               </button>
               <button onClick={() => { closeDetails(); void explainSafeZone(); }} disabled={!hasZone} className="flex h-9 items-center gap-2 rounded-[7px] bg-raised px-3 text-[12.5px] text-ink-2 hover:text-ink disabled:opacity-40">
@@ -74,7 +74,7 @@ export function Details() {
                   className={cx('relative h-9 shrink-0 whitespace-nowrap rounded-t-[6px] px-2.5 text-[12.5px] transition-colors', tab === t.id ? 'text-ink' : 'text-mute hover:text-ink-2')}
                 >
                   {t.label}
-                  {tab === t.id && <span className="absolute inset-x-2 bottom-0 h-[2px] rounded-full bg-amber" />}
+                  {tab === t.id && <span className="absolute inset-x-2 bottom-0 h-[2px] rounded-full bg-cyan" />}
                 </button>
               ))}
             </nav>
