@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useConsole, set } from '../store';
-import { fmtLtst, marsTime } from '../lib/marsclock';
+import { isSendable, openDetails, setMode } from '../actions';
+import { set, useConsole } from '../store';
+import { evaLtst, fmtLtst, marsTime } from '../lib/marsclock';
 import { dataSummary } from '../lib/science';
-import { Badge, Tip, cx } from './ui';
+import type { UiMode } from '../lib/types';
+import { LinkControls, SimControls } from './LiveParts';
+import { Kbd, Popover, Tip, cx } from './ui';
 
 export function Mark({ size = 22 }: { size?: number }) {
   // Hab (square) → dotted traverse → footfall chevron. Team-made mark.
@@ -15,129 +18,165 @@ export function Mark({ size = 22 }: { size?: number }) {
   );
 }
 
-function ClockCell({ label, value, title }: { label: string; value: string; title?: string }) {
+const STEPS: { id: UiMode; n: string; label: string }[] = [
+  { id: 'plan', n: '1', label: 'Plan' },
+  { id: 'send', n: '2', label: 'Send' },
+  { id: 'live', n: '3', label: 'EVA live' },
+];
+
+function Stepper() {
+  const uiMode = useConsole((s) => s.uiMode);
+  const plan = useConsole((s) => s.plan);
+  const route = useConsole((s) => s.route);
+  const sendable = isSendable(plan);
+  const idx = STEPS.findIndex((s) => s.id === uiMode);
   return (
-    <div className="flex flex-col justify-center px-3" title={title}>
-      <div className="label !text-[9px] leading-none">{label}</div>
-      <div className="num mt-1 text-[13.5px] leading-none text-ink">{value}</div>
+    <nav aria-label="Console mode" className="flex items-center gap-1 rounded-[10px] bg-sunk p-1" data-testid="stepper">
+      {STEPS.map((st, i) => {
+        const active = st.id === uiMode;
+        const enabled = st.id === 'plan' || (st.id === 'send' && sendable) || (st.id === 'live' && !!route);
+        const done = i < idx;
+        return (
+          <button
+            key={st.id}
+            data-testid={`step-${st.id}`}
+            aria-current={active ? 'step' : undefined}
+            disabled={!enabled}
+            onClick={() => setMode(st.id)}
+            className={cx(
+              'flex h-11 items-center gap-2 rounded-[7px] px-3.5 font-display text-[13px] uppercase tracking-[0.1em] transition-colors disabled:cursor-not-allowed',
+              active ? 'bg-raised text-ink shadow-[inset_0_-2px_0_var(--color-amber)]' : enabled ? 'text-ink-2 hover:text-ink' : 'text-dim/70',
+            )}
+          >
+            <span className={cx('num flex h-[20px] w-[20px] items-center justify-center rounded-full text-[11px]', active ? 'bg-amber text-[#16110a]' : done ? 'bg-cyan/20 text-cyan' : 'bg-white/[0.06]')}>{done ? '✓' : st.n}</span>
+            {st.label}
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+function SimMenu() {
+  const open = useConsole((s) => s.simOpen);
+  const sim = useConsole((s) => s.sim);
+  const drop = useConsole((s) => s.linkCtl.drop);
+  const mode = useConsole((s) => s.mode);
+  return (
+    <div className="relative">
+      <button
+        data-popover-anchor
+        data-testid="sim-menu"
+        onClick={() => set((s) => ({ simOpen: !s.simOpen, layersOpen: false }))}
+        aria-expanded={open}
+        className={cx('flex h-10 items-center gap-2 rounded-[8px] border border-dashed px-3 text-[12.5px] transition-colors', open ? 'border-ochre text-ochre' : 'border-ochre/45 text-ochre/85 hover:border-ochre hover:text-ochre')}
+        title="Demo controls: simulated astronaut and link"
+      >
+        Simulation
+        {(sim.running || drop) && <span className={cx('h-1.5 w-1.5 rounded-full', drop ? 'bg-red' : 'bg-ochre mw-pulse')} />}
+      </button>
+      <Popover open={open} onClose={() => set({ simOpen: false })} label="Simulation" className="right-0 top-12 w-[320px] p-4">
+        <div className="flex items-center gap-2">
+          <span className="font-display text-[13px] uppercase tracking-[0.12em] text-ochre">Simulation</span>
+          <span className="rounded-full bg-ochre/15 px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] text-ochre">demo only</span>
+        </div>
+        <div className="mt-1 text-[11.5px] leading-snug text-mute">Not real operations. {mode === 'mock' ? 'An in-browser visor simulates the astronaut.' : 'The visor runs a simulated astronaut on the accepted route.'}</div>
+        <div className="eyebrow mb-2 mt-4">Simulated astronaut</div>
+        <SimControls />
+        <div className="eyebrow mb-2 mt-5">Surface link</div>
+        <LinkControls />
+      </Popover>
     </div>
   );
 }
 
 export function TopBar() {
   const pack = useConsole((s) => s.pack);
-  const mode = useConsole((s) => s.mode);
   const startLtst = useConsole((s) => s.startLtstMin);
   const lsDeg = useConsole((s) => s.lsDeg);
   const link = useConsole((s) => s.link);
   const route = useConsole((s) => s.route);
   const confirmStage = useConsole((s) => s.confirm.stage);
   const lastT = useConsole((s) => (s.telem.length ? s.telem[s.telem.length - 1].t : null));
-  const sourceReason = useConsole((s) => s.sourceReason);
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
-
   const m = pack?.manifest;
   const lon = m?.grid.centerLonLat[0] ?? 137.388;
   const lat = m?.grid.centerLonLat[1] ?? -4.805;
   const mt = marsTime(now, lon);
   const summary = useMemo(() => (m ? dataSummary(m) : null), [m]);
-  const missionLtst = startLtst + (lastT ?? 0);
-
-  const linkTone = link === 'up' ? 'text-cyan border-cyan/40' : link === 'degraded' ? 'text-amber border-amber/50' : 'text-red border-red/60';
-  const linkDot = link === 'up' ? 'bg-cyan' : link === 'degraded' ? 'bg-amber' : 'bg-red';
+  const missionLtst = evaLtst(startLtst, lastT ?? 0);
+  const site = m?.name.replace(/\s*—.*$/, '') ?? 'Loading site…';
 
   return (
-    <header className="relative z-20 flex h-[52px] shrink-0 items-stretch border-b border-line bg-panel">
-      <div className="flex items-center gap-3 px-4">
+    <header className="relative z-30 flex h-[60px] shrink-0 items-center gap-4 bg-panel px-4">
+      <div className="flex items-center gap-3">
         <Mark />
         <div className="flex flex-col leading-none">
           <span className="font-display text-[15px] font-bold tracking-[0.24em] text-ink">MARSWALK</span>
           <span className="label mt-[3px] !text-[8.5px] !tracking-[0.3em]">Habitat console</span>
         </div>
       </div>
-      <div className="my-2.5 w-px bg-line" />
-      <div className="flex min-w-0 flex-col justify-center px-4">
-        <div className="truncate text-[12.5px] font-medium text-ink">{m?.name ?? 'Loading site…'}</div>
-        <div className="num mt-0.5 text-[10.5px] text-mute">
-          {Math.abs(lat).toFixed(3)}°{lat < 0 ? 'S' : 'N'} {lon.toFixed(3)}°E · {m ? `${(m.grid.w * m.grid.cellM) / 1000} × ${(m.grid.h * m.grid.cellM) / 1000} km AOI` : ''}
+      <Tip
+        side="bottom"
+        width={300}
+        content={
+          <>
+            <div className="text-ink">{m?.name}</div>
+            <div className="num mt-1">{Math.abs(lat).toFixed(3)}°{lat < 0 ? 'S' : 'N'} {lon.toFixed(3)}°E · {m ? `${(m.grid.w * m.grid.cellM) / 1000} × ${(m.grid.h * m.grid.cellM) / 1000} km` : ''}</div>
+            <div className="num mt-1">Season Ls {lsDeg.toFixed(0)}° · Coordinated Mars Time now {String(Math.floor(mt.mtcH)).padStart(2, '0')}:{String(Math.floor((mt.mtcH % 1) * 60)).padStart(2, '0')} (Mars24)</div>
+          </>
+        }
+      >
+        <div tabIndex={0} className="flex min-w-0 items-baseline gap-2 whitespace-nowrap text-[13px] text-ink-2">
+          <span className="hidden truncate text-ink min-[1440px]:inline">{site}</span>
+          <span className="hidden text-dim min-[1440px]:inline">·</span>
+          <span className="num">Sol {m?.scenario.sol ?? '—'}</span>
+          <span className="text-dim">·</span>
+          <span><span className="text-mute">Mars local </span><span className="num text-ink">{fmtLtst(missionLtst)}</span></span>
         </div>
+      </Tip>
+
+      <div className="flex flex-1 justify-center">
+        <Stepper />
       </div>
 
-      <div className="ml-auto flex items-stretch">
-        <div className="flex items-stretch border-l border-line">
-          <ClockCell label="Sol" value={String(m?.scenario.sol ?? '—')} title="Mission sol (scenario)" />
-          <ClockCell label={lastT !== null ? 'LTST · EVA' : 'LTST · start'} value={fmtLtst(missionLtst)} title="Local True Solar Time at the site" />
-          <ClockCell label="Ls" value={`${lsDeg.toFixed(0)}°`} title="Areocentric solar longitude (season)" />
-          <ClockCell label="MTC now" value={`${String(Math.floor(mt.mtcH)).padStart(2, '0')}:${String(Math.floor((mt.mtcH % 1) * 60)).padStart(2, '0')}`} title={`Coordinated Mars Time · MSD ${mt.msd.toFixed(2)} (Mars24 algorithm)`} />
-        </div>
-
-        <div className="flex items-center gap-2 border-l border-line px-3">
-          {summary && (
-            <button
-              onClick={() => set({ leftSection: 'sources' })}
-              className="group flex h-7 items-center gap-2 rounded-[3px] border border-line-2 px-2.5 hover:border-ochre/60"
-              title="Open the Sources panel"
-            >
-              <span className="label !text-[9px] group-hover:text-ochre">Data</span>
-              {summary.synthetic ? (
-                <span className="num text-[11px] text-ink-2">synthetic terrain</span>
-              ) : (
-                <span className="num text-[11px] text-ink">
-                  {summary.missions.length} missions <span className="text-dim">·</span> {summary.kinds.length} data kinds
-                </span>
-              )}
-            </button>
-          )}
-
-          <button
-            data-testid="open-evidence"
-            onClick={() => set({ evidence: 'open' })}
-            className="group flex h-7 items-center gap-2 rounded-[3px] border border-line-2 px-2.5 hover:border-cyan/60"
-            title="Evidence: what we reproduce, calibrate and measure (E)"
-          >
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden className="text-cyan">
-              <path d="M6 1 L10.5 2.8 V6.2 C10.5 8.6 8.6 10.4 6 11 C3.4 10.4 1.5 8.6 1.5 6.2 V2.8 Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
-              <path d="M4 6.1 L5.5 7.6 L8.2 4.7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span className="label !text-[9px] text-ink-2 group-hover:text-cyan">Evidence</span>
-          </button>
-
-          <Tip content={<>Surface link to the visor (EV1). When it drops, the visor keeps guiding autonomously from its onboard safety core.</>} side="bottom" width={260}>
-            <div className={cx('flex h-7 items-center gap-2 rounded-[3px] border px-2.5', linkTone)}>
-              <span className={cx('h-1.5 w-1.5 rounded-full', linkDot, link !== 'up' && 'mw-pulse')} />
-              <span className="font-display text-[10.5px] uppercase tracking-[0.14em]">Visor {link}</span>
+      <div className="flex items-center gap-2">
+        <Tip side="bottom" width={280} content={link === 'down' ? 'Link to the visor is down. The visor keeps guiding the crew on board on the last accepted route.' : 'Surface radio link to the crew visor (EV1).'}>
+          {link === 'down' && !route ? (
+            <div data-testid="crew-link" data-link={link} className="flex h-10 items-center gap-2 rounded-[8px] px-3 text-[12.5px] text-mute">
+              <span className="h-2 w-2 rounded-full bg-dim" />
+              Visor offline
             </div>
-          </Tip>
-
-          <div className="flex h-7 items-center gap-2 rounded-[3px] border border-line-2 px-2.5">
-            <span className="label !text-[9px]">Route</span>
-            {route ? (
-              <>
-                <span className="num text-[12px] text-ink">v{route.seq}</span>
-                {route.acked ? (
-                  <span className="font-display text-[10px] uppercase tracking-[0.14em] text-cyan">ACK ✓</span>
-                ) : confirmStage === 'rejected' ? (
-                  <span className="font-display text-[10px] uppercase tracking-[0.14em] text-red">Rejected</span>
-                ) : (
-                  <span className="mw-pulse font-display text-[10px] uppercase tracking-[0.14em] text-amber">Awaiting ACK</span>
-                )}
-              </>
-            ) : (
-              <span className="font-display text-[10px] uppercase tracking-[0.14em] text-dim">None pushed</span>
-            )}
+          ) : (
+            <div data-testid="crew-link" data-link={link} className={cx('flex h-10 items-center gap-2 rounded-[8px] px-3 text-[12.5px]', link === 'up' ? 'text-cyan' : link === 'degraded' ? 'bg-amber/10 text-amber' : 'bg-red/12 text-red')}>
+              <span className={cx('h-2 w-2 rounded-full', link === 'up' ? 'bg-cyan' : link === 'degraded' ? 'bg-amber mw-pulse' : 'bg-red mw-pulse')} />
+              Crew link {link === 'up' ? 'OK' : link === 'degraded' ? 'weak' : 'lost'}
+            </div>
+          )}
+        </Tip>
+        {route && (
+          <div className="num hidden h-10 items-center gap-1.5 px-1 text-[12px] text-mute min-[1440px]:flex" title="Route version the crew has">
+            Route v{route.seq}
+            {route.acked ? <span className="text-cyan">✓</span> : confirmStage === 'rejected' ? <span className="text-red">✕</span> : <span className="mw-pulse text-amber">…</span>}
           </div>
-
-          <Tip content={sourceReason || (mode === 'mock' ? 'In-browser synthetic site' : 'Hab server')} side="bottom" width={260}>
-            {mode === 'mock' ? <Badge tone="amber">Mock data</Badge> : mode === 'live' ? <Badge tone="cyan">Live</Badge> : <Badge>…</Badge>}
-          </Tip>
-          <button onClick={() => set((s) => ({ showHelp: !s.showHelp }))} className="num flex h-7 w-7 items-center justify-center rounded-[3px] border border-line-2 text-[12px] text-mute hover:text-ink" aria-label="Keyboard shortcuts">
-            ?
+        )}
+        <SimMenu />
+        {summary && (
+          <button onClick={() => openDetails('sources')} className="flex h-10 items-center gap-1.5 rounded-[8px] px-2.5 text-[12.5px] text-mute hover:bg-raised hover:text-ink" title={summary.synthetic ? 'Synthetic terrain' : `${summary.missions.length} missions · ${summary.kinds.length} data kinds`}>
+            Data
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden><circle cx="7" cy="7" r="5.6" /><path d="M7 6.2 V10 M7 4.1 V4.3" strokeLinecap="round" /></svg>
           </button>
-        </div>
+        )}
+        <button data-testid="open-details" onClick={() => openDetails()} className="flex h-10 items-center gap-2 rounded-[8px] bg-raised px-3.5 text-[12.5px] text-ink-2 hover:text-ink">
+          Details <Kbd>D</Kbd>
+        </button>
+        <button onClick={() => set((s) => ({ showHelp: !s.showHelp }))} className="num flex h-10 w-10 items-center justify-center rounded-[8px] text-[13px] text-mute hover:bg-raised hover:text-ink" aria-label="Keyboard shortcuts">
+          ?
+        </button>
       </div>
     </header>
   );

@@ -51,6 +51,7 @@ import {
   setRoute,
   setRouteProgress,
   setStations,
+  setStationsDetail,
   type BandSource,
   type CursorReadout,
   type Ramp,
@@ -95,6 +96,9 @@ export class MapController {
   private routeLayer = createRouteLayer();
   private stationsLayer = createStationsLayer();
   private keepouts: VectorLayer<VectorSource>;
+  /** Crew-reported hazards: always visible, separate from the keep-out polygons (a Safety-view layer). */
+  private hazards: VectorLayer<VectorSource> = createKeepoutLayer([]);
+  private outlineOn = true;
   private traverse: VectorLayer<VectorSource>;
   private astronaut = createAstronautLayer();
   private aoi: VectorLayer<VectorSource>;
@@ -165,6 +169,7 @@ export class MapController {
         ...(['ti', 'slope'] as OverlayId[]).map((k) => this.fieldLayers[k]).filter((x): x is WebGLTileLayer => !!x),
         this.aoi,
         this.keepouts,
+        this.hazards,
         this.traverse,
         this.contour,
         this.outline,
@@ -317,6 +322,9 @@ export class MapController {
 
   setVectors(v: Record<VectorId, boolean>) {
     this.contourWasVisible = v.contours;
+    this.outlineOn = v.outline;
+    this.outline.setVisible(this.outlineOn || this.overlayState.ids.includes('safezone') || this.explaining);
+    setStationsDetail(this.stationsLayer, v.stationDetail);
     if (!this.explaining) this.contour.setVisible(v.contours);
     this.keepouts.setVisible(v.keepouts);
     this.traverse.setVisible(v.traverse);
@@ -337,7 +345,7 @@ export class MapController {
       this.safe.setOpacity(opacity.safezone ?? 1);
     }
     this.safeCanvas?.setVisible(ids.includes('safezone') || this.explaining);
-    this.outline.setVisible(ids.includes('safezone') || this.explaining);
+    this.outline.setVisible(this.outlineOn || ids.includes('safezone') || this.explaining);
   }
 
   /** Install a new safe-zone solution. With `morph`, the region animates from the previous one. */
@@ -433,7 +441,9 @@ export class MapController {
     if (!this.zone || !this.limits) return;
     const g = this.pack.manifest.grid;
     const mask = safeZoneMask(this.zone, this.limits);
-    setOutline(this.outline, maskPolygons(g, mask, { downsample: Math.max(2, Math.ceil(g.w / 400)), minAreaM2: 15000 }));
+    // One clean outline: small islands and steep speckle holes (< 2 ha) are left out of the line;
+    // the Safety view's shading shows the exact cells.
+    setOutline(this.outline, maskPolygons(g, mask, { downsample: Math.max(2, Math.ceil(g.w / 400)), minAreaM2: 20000, minHoleM2: 20000 }));
   }
 
   private routeCells: number[] = [];
@@ -479,7 +489,21 @@ export class MapController {
       const p = cellToXY(g, c);
       if (!pts.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 30)) pts.push(p);
     }
-    setHazards(this.keepouts, pts);
+    setHazards(this.hazards, pts);
+  }
+
+  /** EVA live: keep the crew in view (pans only when they leave the middle of the map). */
+  followCrew(cell: Cell) {
+    const g = this.pack.manifest.grid;
+    const size = this.map.getSize();
+    if (!size) return;
+    const xy = cellToXY(g, cell);
+    const px = this.map.getPixelFromCoordinate(xy);
+    if (!px) return;
+    const mx = size[0] * 0.25, my = size[1] * 0.25;
+    if (px[0] < mx || px[0] > size[0] - mx || px[1] < my || px[1] > size[1] - my) {
+      this.map.getView().animate({ center: xy, duration: 600 });
+    }
   }
 
   setTelemetry(telem: Telem[]) {

@@ -4,6 +4,9 @@ import type { Cell, FieldSet, LoadedSitePack, PlanEvent, PlanRequest, PlanResult
 import { DEFAULT_RULES } from '@mw/shared/contracts';
 import type { SafeZoneInputs, SafeZoneLimits } from '@mw/shared/map';
 import type {
+  ActionKind,
+  ConsoleAlert,
+  DetailsTab,
   EarthView,
   FieldsSource,
   LinkCtl,
@@ -13,7 +16,7 @@ import type {
   OverlayId,
   PresetId,
   RequestMsg,
-  TabId,
+  UiMode,
   VectorId,
 } from './lib/types';
 
@@ -39,6 +42,8 @@ export interface ConsoleState {
   // Planning inputs
   rules: Rule[];
   stationOn: Record<string, boolean>;
+  /** "Must visit" pins: the planner gives these stations priority (still dropped, with the reason, if unsafe). */
+  mustVisit: Record<string, boolean>;
   startLtstMin: number;
   lsDeg: number;
   shelterCells: Record<string, Cell>;
@@ -64,12 +69,21 @@ export interface ConsoleState {
   dirty: boolean;
 
   // Display
+  /** Top stepper: ① Plan → ② Send → ③ EVA live. */
+  uiMode: UiMode;
   preset: PresetId;
   overlays: OverlayId[];
   opacity: Record<OverlayId, number>;
   vectors: Record<VectorId, boolean>;
-  tab: TabId;
-  leftSection: 'layers' | 'sources';
+  /** Details drawer (expert depth): closed, or open on a section. */
+  details: { open: boolean; tab: DetailsTab };
+  layersOpen: boolean;
+  simOpen: boolean;
+  /** EVA live: guided response sheet (action → engine's new plan as a change → Send to crew). */
+  sheet: { kind: ActionKind; cutMin?: number; before?: { order: string[]; durationMin: number; endT: number } } | null;
+  /** EVA live: the map keeps the crew in view. */
+  follow: boolean;
+  alerts: ConsoleAlert[];
   explain: ExplainState;
   hazardPick: boolean;
   selectedStation: string | null;
@@ -79,8 +93,10 @@ export interface ConsoleState {
   evidence: 'closed' | 'open' | 'limitations';
 
   // Confirm / link / live
-  confirm: { stage: ConfirmStage; seq?: number; id?: string; bytes?: number; estimated?: boolean; error?: string };
+  confirm: { stage: ConfirmStage; seq?: number; id?: string; bytes?: number; estimated?: boolean; error?: string; ackUtcMs?: number };
   route: { seq: number; id: string; acked: boolean; bytes: number; estimated?: boolean; reqHash: string } | null;
+  /** The plan behind the route the crew has (EVA live shows this; a drafted change lives in `plan`). */
+  sentPlan: PlanResult | null;
   link: LinkStatus;
   linkCtl: LinkCtl;
   telem: Telem[];
@@ -94,11 +110,16 @@ export interface ConsoleState {
 
 export const OVERLAY_LIMIT = 3;
 
-export const PRESETS: Record<PresetId, { label: string; overlays: OverlayId[]; vectors: Partial<Record<VectorId, boolean>>; hint: string }> = {
-  plan: { label: 'Plan', overlays: ['safezone'], vectors: { contours: true, route: true, stations: true, keepouts: true, traverse: false }, hint: 'Safe region, route and stations' },
-  safety: { label: 'Safety', overlays: ['shelter', 'slope'], vectors: { contours: true, route: true, stations: true, keepouts: true, traverse: false }, hint: 'Time to shelter and slope hazards' },
-  science: { label: 'Science', overlays: ['ti'], vectors: { contours: false, route: true, stations: true, keepouts: false, traverse: true }, hint: 'Stations, thermal inertia and Curiosity traverse' },
-  comms: { label: 'Comms', overlays: ['los'], vectors: { contours: false, route: true, stations: true, keepouts: false, traverse: false }, hint: 'Comm line of sight (hab mast ∪ rover relay) and comm shadow' },
+/** Calm default: imagery, route, numbered stops, base/rover, crew and one safe-area outline. */
+const CALM_VECTORS: Partial<Record<VectorId, boolean>> = { outline: true, contours: false, keepouts: false, traverse: false, stationDetail: false, route: true, stations: true, shelters: true };
+
+/** Map presets behind the Layers button. Each brings its own one-line legend. */
+export const PRESETS: Record<PresetId, { label: string; overlays: OverlayId[]; vectors: Partial<Record<VectorId, boolean>>; hint: string; legend: string }> = {
+  calm: { label: 'Calm', overlays: [], vectors: CALM_VECTORS, hint: 'Route, stops, base, crew and the safe area', legend: 'Cyan outline = safe area (every hard rule met). Small steep patches inside it are left out of the outline.' },
+  safety: { label: 'Safety', overlays: ['safezone', 'shelter'], vectors: { ...CALM_VECTORS, contours: true, keepouts: true }, hint: 'Safe area, minutes to shelter, keep-out zones', legend: 'Dark = outside the safe area · blue = minutes to shelter (lines every 10 min, amber = limit) · red hatch = keep-out.' },
+  science: { label: 'Science', overlays: ['ti'], vectors: { ...CALM_VECTORS, traverse: true, stationDetail: true }, hint: 'Station values, left-out stops, Curiosity traverse', legend: 'Number next to a stop = science value · red × = left out · dotted line = Curiosity traverse · colour = loose sand → rock.' },
+  radio: { label: 'Radio', overlays: ['los'], vectors: CALM_VECTORS, hint: 'Where the crew can talk to Hab-1 or the rover', legend: 'Cyan = in radio contact with the hab mast or the rover relay · darker = longer out of contact.' },
+  terrain: { label: 'Terrain', overlays: ['slope'], vectors: CALM_VECTORS, hint: 'Slope: where walking gets hard or unsafe', legend: 'Amber from 16.7° (walking gets costly) · red above 20° (too steep for suited crew).' },
 };
 
 let logId = 1;
@@ -114,6 +135,7 @@ export const useConsole = create<ConsoleState>()(
 
     rules: DEFAULT_RULES.map((r) => ({ ...r })),
     stationOn: {},
+    mustVisit: {},
     startLtstMin: 9 * 60 + 40,
     lsDeg: 150,
     shelterCells: {},
@@ -135,12 +157,17 @@ export const useConsole = create<ConsoleState>()(
     planVersion: 0,
     dirty: false,
 
-    preset: 'plan',
-    overlays: ['safezone'],
+    uiMode: 'plan',
+    preset: 'calm',
+    overlays: [],
     opacity: { safezone: 1, shelter: 0.9, walkback: 0.85, los: 0.9, slope: 0.7, ti: 0.6 },
-    vectors: { contours: true, keepouts: true, traverse: false, stations: true, route: true, shelters: true, imagery: true },
-    tab: 'plan',
-    leftSection: 'layers',
+    vectors: { outline: true, contours: false, keepouts: false, traverse: false, stations: true, stationDetail: false, route: true, shelters: true, imagery: true },
+    details: { open: false, tab: 'report' },
+    layersOpen: false,
+    simOpen: false,
+    sheet: null,
+    follow: true,
+    alerts: [],
     explain: { running: false, step: 0, caption: '', detail: '', areaFrom: 0, areaTo: 0 },
     hazardPick: false,
     selectedStation: null,
@@ -150,6 +177,7 @@ export const useConsole = create<ConsoleState>()(
 
     confirm: { stage: 'idle' },
     route: null,
+    sentPlan: null,
     link: 'up',
     linkCtl: { latencyMs: 0, lossPct: 0, drop: false },
     telem: [],
@@ -163,6 +191,15 @@ export const useConsole = create<ConsoleState>()(
 
 export const get = () => useConsole.getState();
 export const set = (p: Partial<ConsoleState> | ((s: ConsoleState) => Partial<ConsoleState>)) => useConsole.setState(p);
+
+let alertId = 1;
+
+/** Push an alert onto the banner queue (newest first). */
+export function pushAlert(a: Omit<ConsoleAlert, 'id' | 'utcMs' | 'acked'>) {
+  const e: ConsoleAlert = { ...a, id: alertId++, utcMs: Date.now(), acked: false };
+  set((s) => ({ alerts: [e, ...s.alerts].slice(0, 40) }));
+  return e.id;
+}
 
 export function log(text: string, level: LogLevel = 'info', source: LogEntry['source'] = 'hab', tMin?: number) {
   const e: LogEntry = { id: logId++, utcMs: Date.now(), text, level, source, tMin };

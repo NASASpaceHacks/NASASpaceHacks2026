@@ -378,7 +378,10 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
       const { reqHash } = parsed.data;
       const entry = await getEntry(reqHash);
       if (!entry) return bad(c, 'unknown reqHash (plan first)', {}, 404);
-      if (entry.result.status !== 'OK') return bad(c, 'plan status is STAY_IN — nothing to confirm', { notes: entry.result.notes }, 409);
+      // STAY_IN is never pushed, except when the crew is already outside: then the engine's attached
+      // direct return to the EVA base is the route to send (console "Recall crew").
+      const crewReturn = !!entry.req.resume && entry.result.segments.length > 0;
+      if (entry.result.status !== 'OK' && !crewReturn) return bad(c, 'plan status is STAY_IN — nothing to confirm', { notes: entry.result.notes }, 409);
       const notes: string[] = [];
       if (entry.engine === 'fallback') notes.push('route from golden fixture (engine unavailable)');
       const nextSeq = seq + 1;

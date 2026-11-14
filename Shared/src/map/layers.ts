@@ -385,9 +385,13 @@ export function setRouteProgress(layer: VectorLayer<VectorSource>, frac: number)
 
 export type StationState = 'planned' | 'dropped' | 'idle' | 'disabled' | 'visited';
 
-/** Stations: value-scaled symbols, planned order inside, decluttered labels. */
+/**
+ * Stations: value-scaled symbols, planned order inside, decluttered labels. Calm by default: planned
+ * stops are numbered and labelled with their id; stops not in the plan are small hollow dots. With
+ * `setStationsDetail(layer, true)` labels carry the science value and dropped stops show a red ×.
+ */
 export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLayer<VectorSource> {
-  return new VectorLayer({
+  const layer: VectorLayer<VectorSource> = new VectorLayer({
     source: new VectorSource(),
     declutter: 'labels',
     zIndex: 20,
@@ -395,7 +399,14 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
       const value = f.get('value') as number;
       const state = f.get('state') as StationState;
       const order = f.get('order') as number | undefined;
-      const r = 5 + (Math.max(0, Math.min(100, value)) / 100) * 6;
+      const detail = !!layer.get('detail');
+      if (!detail && (state === 'dropped' || state === 'idle' || state === 'disabled')) {
+        return new Style({
+          image: new CircleStyle({ radius: 4, fill: new Fill({ color: 'rgba(11,13,16,0.65)' }), stroke: new Stroke({ color: 'rgba(233,228,216,0.55)', width: 1.25 }), declutterMode: 'obstacle' }),
+          zIndex: 0,
+        });
+      }
+      const r = detail ? 5 + (Math.max(0, Math.min(100, value)) / 100) * 6 : 9;
       const color =
         state === 'planned' ? theme.route : state === 'visited' ? theme.safe : state === 'dropped' ? theme.violation : theme.muted;
       const filled = state === 'planned' || state === 'visited';
@@ -416,7 +427,7 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
       });
       const label = new Style({
         text: new Text({
-          text: `${f.get('id')}  ${Math.round(value)}`,
+          text: detail ? `${f.get('id')}  ${Math.round(value)}` : String(f.get('id')),
           font: theme.monoFont,
           offsetX: r + 6,
           textAlign: 'left',
@@ -428,6 +439,14 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
       return [symbol, label];
     },
   });
+  return layer;
+}
+
+/** Stations detail mode: value labels and red × on dropped stops (Science view). */
+export function setStationsDetail(layer: VectorLayer<VectorSource>, on: boolean): void {
+  if (!!layer.get('detail') === on) return;
+  layer.set('detail', on);
+  layer.changed();
 }
 
 export function setStations(

@@ -86,6 +86,9 @@ export function MapView() {
         (t) => {
           ctrl.setTelemetry(t);
           ctrl.refreshStations(stationStateFn());
+          const s = get();
+          const last = t[t.length - 1];
+          if (last && s.uiMode === 'live' && s.follow && !s.explain.running) ctrl.followCrew(last.cell);
         },
       ),
     ];
@@ -100,7 +103,7 @@ export function MapView() {
   }, [pack]);
 
   return (
-    <div className="relative min-w-0 flex-1">
+    <div className="absolute inset-0">
       <div ref={el} className="mw-map absolute inset-0" />
       <MapHud readoutRef={readoutRef} scaleRef={scaleRef} />
     </div>

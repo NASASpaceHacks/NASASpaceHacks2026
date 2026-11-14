@@ -1,12 +1,12 @@
-import { useMemo, type JSX } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LOS_RAMP, SLOPE_RAMP, TIME_RAMP, TI_RAMP, rampCss, type Ramp } from '@mw/shared/map';
 import type { Provenance } from '@mw/shared/contracts';
 import { applyPreset, setOpacity, toggleOverlay, toggleVector } from '../actions';
-import { OVERLAY_LIMIT, PRESETS, set, useConsole } from '../store';
+import { OVERLAY_LIMIT, PRESETS, useConsole } from '../store';
 import { sourceRows, type SourceRow } from '../lib/science';
 import type { OverlayId, PresetId, VectorId } from '../lib/types';
-import { Badge, Kbd, SectionHead, Switch, Tip, cx } from './ui';
+import { Badge, Kbd, SectionHead, Switch, cx } from './ui';
 
 interface OverlayMeta {
   id: OverlayId;
@@ -21,22 +21,24 @@ interface OverlayMeta {
 
 function overlayMeta(limits: { shelter: number; walkback: number; los: number; slope: number }): OverlayMeta[] {
   return [
-    { id: 'safezone', label: 'Safe region', what: 'Ground that satisfies every hard flight rule at once.' },
-    { id: 'shelter', label: 'Time to shelter', what: `Minutes to the nearest hab or pressurized rover; hidden beyond ${limits.shelter} min.`, ramp: TIME_RAMP, min: 0, max: Math.min(60, limits.shelter), ticks: [[0, '0'], [limits.shelter / 2, `${limits.shelter / 2}`], [limits.shelter, `${limits.shelter} min`]] },
-    { id: 'walkback', label: 'Walkback budget', what: `Outbound time plus a 0.5× pace return to the hab; hidden beyond ${Math.round(limits.walkback)} min.`, ramp: { id: 'wb', stops: TIME_RAMP.stops.map(([v, c]) => [v * (limits.walkback / 30), c]) }, min: 0, max: limits.walkback, ticks: [[0, '0'], [limits.walkback, `${Math.round(limits.walkback)} min`]] },
-    { id: 'los', label: 'Comm line of sight', what: 'Cyan = engine radio line of sight to the hab mast or the pressurized-rover relay. Shadow deepens with the round trip spent out of sight, timed on the terrain.', ramp: LOS_RAMP, min: 0, max: 30, ticks: [[0, 'LOS'], [limits.los, `${limits.los} min`], [30, '30']] },
+    { id: 'safezone', label: 'Safe area shading', what: 'Darkens ground outside the safe area (every hard flight rule met at once).' },
+    { id: 'shelter', label: 'Minutes to shelter', what: `Minutes to the nearest hab or pressurized rover; hidden beyond ${limits.shelter} min.`, ramp: TIME_RAMP, min: 0, max: Math.min(60, limits.shelter), ticks: [[0, '0'], [limits.shelter / 2, `${limits.shelter / 2}`], [limits.shelter, `${limits.shelter} min`]] },
+    { id: 'walkback', label: 'Walk-back time', what: `Time out plus a slow (half-pace) walk back to the base; hidden beyond ${Math.round(limits.walkback)} min.`, ramp: { id: 'wb', stops: TIME_RAMP.stops.map(([v, c]) => [v * (limits.walkback / 30), c]) }, min: 0, max: limits.walkback, ticks: [[0, '0'], [limits.walkback, `${Math.round(limits.walkback)} min`]] },
+    { id: 'los', label: 'Radio contact', what: 'Cyan = radio line of sight to the hab mast or the pressurized-rover relay. Shadow deepens with the round trip spent out of contact, timed on the terrain.', ramp: LOS_RAMP, min: 0, max: 30, ticks: [[0, 'LOS'], [limits.los, `${limits.los} min`], [30, '30']] },
     { id: 'slope', label: 'Slope', what: 'Amber from the 16.7° metabolic-data edge; red above the 20° suited-crew limit.', ramp: SLOPE_RAMP, min: 0, max: 35, ticks: [[0, '0°'], [16.7, '16.7'], [20, '20°'], [35, '35°']], raster: 'slope' },
     { id: 'ti', label: 'Thermal inertia', what: 'Low values suggest loose sand (slower, costlier walking). Indicative.', ramp: TI_RAMP, min: 50, max: 700, ticks: [[50, 'sand'], [400, '400'], [700, 'rock']], raster: 'ti' },
   ];
 }
 
-const VECTORS: { id: VectorId; label: string }[] = [
-  { id: 'contours', label: 'Shelter isochrones' },
-  { id: 'route', label: 'Route' },
-  { id: 'stations', label: 'Science stations' },
-  { id: 'keepouts', label: 'Keep-out zones' },
-  { id: 'traverse', label: 'Curiosity traverse' },
-  { id: 'shelters', label: 'Hab + rover' },
+const VECTORS: { id: VectorId; label: string; legend: string }[] = [
+  { id: 'outline', label: 'Safe-area outline', legend: 'Cyan line around ground that meets every hard rule (small steep patches inside are left out).' },
+  { id: 'route', label: 'Route', legend: 'Amber line with arrows, in walking order.' },
+  { id: 'stations', label: 'Stops', legend: 'Numbered = in the plan · hollow = left out.' },
+  { id: 'stationDetail', label: 'Station values & left-out marks', legend: 'Science value next to each stop; red × = left out by a rule.' },
+  { id: 'contours', label: 'Minutes-to-shelter lines', legend: 'Dashed lines every 10 min; amber = the shelter limit.' },
+  { id: 'keepouts', label: 'Keep-out zones', legend: 'Red hatch: plume or hazard zones the route may not enter.' },
+  { id: 'traverse', label: 'Curiosity traverse', legend: 'Dotted line: the rover\'s real drive path.' },
+  { id: 'shelters', label: 'Hab + rover', legend: 'Cyan square = Hab-1 · diamond = pressurized rover (drag to move).' },
 ];
 
 function Legend({ meta }: { meta: OverlayMeta }) {
@@ -94,7 +96,8 @@ function SymbolLegend() {
   );
 }
 
-function LayersSection() {
+/** Layers popover content: presets (each with a one-line legend), then every layer on demand. */
+export function LayersPanel() {
   const preset = useConsole((s) => s.preset);
   const overlays = useConsole((s) => s.overlays);
   const opacity = useConsole((s) => s.opacity);
@@ -102,6 +105,7 @@ function LayersSection() {
   const limits = useConsole((s) => s.limits);
   const fieldsSource = useConsole((s) => s.fieldsSource);
   const pack = useConsole((s) => s.pack);
+  const [all, setAll] = useState(false);
   const lim = {
     shelter: limits && Number.isFinite(limits.shelterMax) ? limits.shelterMax : 30,
     walkback: limits && Number.isFinite(limits.walkbackMax) ? limits.walkbackMax : 300,
@@ -110,49 +114,55 @@ function LayersSection() {
   };
   const metas = overlayMeta(lim).filter((m) => !m.raster || pack?.rasters[m.raster]);
   const engineCredit = fieldsSource === 'server' ? 'Marswalk engine (hab server)' : fieldsSource === 'engine' ? 'Marswalk engine (in-browser)' : 'Distance estimate (engine offline)';
+  const presetIds = Object.keys(PRESETS) as PresetId[];
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <SectionHead>Presets</SectionHead>
-        <div className="mt-2.5 grid grid-cols-4 gap-1">
-          {(Object.keys(PRESETS) as PresetId[]).map((p, i) => (
-            <Tip key={p} content={PRESETS[p].hint} side="bottom" width={200}>
-              <button
-                onClick={() => applyPreset(p)}
-                className={cx(
-                  'relative flex h-12 w-full flex-col items-center justify-center gap-1 rounded-[3px] border transition-colors',
-                  preset === p ? 'border-amber/70 bg-amber/10 text-amber' : 'border-line-2 text-ink-2 hover:border-[#454b55] hover:text-ink',
-                )}
-              >
-                <span className="font-display text-[11px] uppercase tracking-[0.12em]">{PRESETS[p].label}</span>
-                <span className="num text-[9px] text-dim">{i + 1}</span>
-              </button>
-            </Tip>
+    <div className="flex max-h-[min(640px,calc(100vh-200px))] w-[340px] flex-col">
+      <div className="p-3">
+        <div className="eyebrow px-1 pb-2">Map view</div>
+        <div className="grid grid-cols-5 gap-1" role="radiogroup" aria-label="Map view">
+          {presetIds.map((p, i) => (
+            <button
+              key={p}
+              role="radio"
+              aria-checked={preset === p}
+              data-testid={`preset-${p}`}
+              onClick={() => applyPreset(p)}
+              title={`${PRESETS[p].hint} (${i})`}
+              className={cx('flex h-11 flex-col items-center justify-center rounded-[6px] font-display text-[11px] uppercase tracking-[0.1em] transition-colors', preset === p ? 'bg-amber/15 text-amber' : 'text-ink-2 hover:bg-raised hover:text-ink')}
+            >
+              {PRESETS[p].label}
+              <span className="num text-[9px] opacity-50">{i}</span>
+            </button>
           ))}
         </div>
+        <div data-testid="preset-legend" className="mt-2.5 rounded-[6px] bg-sunk/70 px-3 py-2 text-[12px] leading-snug text-ink-2">
+          <span className="text-ink">{PRESETS[preset].hint}.</span> {PRESETS[preset].legend}
+        </div>
       </div>
-
-      <div>
-        <SectionHead right={<span className="num text-[10px] text-dim">{overlays.length}/{OVERLAY_LIMIT}</span>}>Overlays</SectionHead>
-        <div className="mt-2 flex flex-col">
+      <button onClick={() => setAll((v) => !v)} className="flex items-center justify-between px-4 py-2.5 text-left text-[12px] text-mute hover:text-ink" aria-expanded={all}>
+        <span>All layers</span>
+        <span className="num">{all ? '−' : '+'}</span>
+      </button>
+      {all && (
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+          <div className="eyebrow pb-1 pt-1">Overlays <span className="num normal-case tracking-normal text-dim">· up to {OVERLAY_LIMIT}</span></div>
           {metas.map((m) => {
             const on = overlays.includes(m.id);
             const prov = m.raster ? pack?.manifest.rasters[m.raster]?.provenance : undefined;
             const indicative = m.raster ? pack?.manifest.rasters[m.raster]?.indicative : false;
             return (
-              <div key={m.id} className={cx('border-b border-line/70 py-2.5 last:border-0')}>
+              <div key={m.id} className="py-2">
                 <div className="flex items-center gap-2.5">
                   <Switch on={on} onChange={() => toggleOverlay(m.id)} label={m.label} tone={m.id === 'safezone' || m.id === 'los' ? 'cyan' : 'amber'} />
-                  <Tip content={m.what} side="right" width={240}>
-                    <span className={cx('text-[12.5px]', on ? 'text-ink' : 'text-ink-2')}>{m.label}</span>
-                  </Tip>
+                  <span className={cx('text-[12.5px]', on ? 'text-ink' : 'text-ink-2')}>{m.label}</span>
                   {indicative && <Badge tone="ochre">Indicative</Badge>}
                 </div>
                 <AnimatePresence initial={false}>
                   {on && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.18 }} className="overflow-hidden">
-                      <div className="flex flex-col gap-2 pl-[38px] pt-2.5">
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.16 }} className="overflow-hidden">
+                      <div className="flex flex-col gap-2 pl-[38px] pt-2">
+                        <div className="text-[11px] leading-snug text-mute">{m.what}</div>
                         <Legend meta={m} />
                         <div className="flex items-center gap-2">
                           <span className="label !text-[9px] w-12">Opacity</span>
@@ -167,38 +177,35 @@ function LayersSection() {
               </div>
             );
           })}
-        </div>
-      </div>
-
-      <div>
-        <SectionHead>Map features</SectionHead>
-        <div className="mt-2 grid grid-cols-1 gap-1.5">
+          <div className="eyebrow pb-1 pt-3">Map features</div>
           {VECTORS.filter((v) => v.id !== 'traverse' || pack?.manifest.traverse).map((v) => (
-            <label key={v.id} className="flex cursor-pointer items-center gap-2.5 py-0.5 text-[12px] text-ink-2 hover:text-ink">
-              <Switch size="sm" on={vectors[v.id]} onChange={() => toggleVector(v.id)} label={v.label} />
-              {v.label}
-            </label>
+            <div key={v.id} className="py-1.5">
+              <label className="flex cursor-pointer items-center gap-2.5 text-[12.5px] text-ink-2 hover:text-ink">
+                <Switch size="sm" on={vectors[v.id]} onChange={() => toggleVector(v.id)} label={v.label} />
+                {v.label}
+              </label>
+              {vectors[v.id] && <div className="pl-[34px] pt-0.5 text-[11px] leading-snug text-dim">{v.legend}</div>}
+            </div>
           ))}
           {!!pack?.manifest.imagery.length && (
-            <label className="flex cursor-pointer items-center gap-2.5 py-0.5 text-[12px] text-ink-2 hover:text-ink">
+            <label className="flex cursor-pointer items-center gap-2.5 py-1.5 text-[12.5px] text-ink-2 hover:text-ink">
               <Switch size="sm" on={vectors.imagery} onChange={() => toggleVector('imagery')} label="Orthoimage" />
               {pack.manifest.imagery[0].label}
             </label>
           )}
+          <div className="eyebrow pb-1 pt-3">Map key</div>
+          <SymbolLegend />
+          <div className="mt-3 flex items-center gap-2 text-[10.5px] text-dim"><Kbd>0</Kbd>–<Kbd>4</Kbd> map views</div>
         </div>
-      </div>
-
-      <div>
-        <SectionHead>Symbols</SectionHead>
-        <SymbolLegend />
-      </div>
+      )}
     </div>
   );
 }
 
 const KIND_ORDER = ['optical', 'topographic', 'thermal', 'atmospheric', 'radiation', 'space weather', 'traverse', 'imagery'];
 
-function SourcesSection() {
+/** Every data layer with mission, instrument, resolution and citation (Details → Sources). */
+export function SourcesSection() {
   const pack = useConsole((s) => s.pack);
   const fieldsSource = useConsole((s) => s.fieldsSource);
   const rows = useMemo(() => (pack ? sourceRows(pack.manifest) : []), [pack]);
@@ -243,39 +250,10 @@ function SourcesSection() {
       <div>
         <SectionHead>Derived</SectionHead>
         <div className="mt-2 rounded-[3px] border border-line bg-sunk/60 p-2.5 text-[11px] leading-relaxed text-mute">
-          Safe region, shelter time, walkback and line of sight are computed by the Marswalk engine from the DEM and the flight rules ({fieldsSource === 'server' ? 'hab server' : fieldsSource === 'engine' ? 'in-browser engine' : 'distance estimate while the engine is offline'}). Each rule cites its NASA source in the Plan tab.
+          Safe region, shelter time, walkback and line of sight are computed by the Marswalk engine from the DEM and the flight rules ({fieldsSource === 'server' ? 'hab server' : fieldsSource === 'engine' ? 'in-browser engine' : 'distance estimate while the engine is offline'}). Each rule cites its NASA source under Rules.
         </div>
       </div>
     </div>
   );
 }
 
-export function LeftRail() {
-  const section = useConsole((s) => s.leftSection);
-  return (
-    <aside className="flex w-[276px] shrink-0 flex-col border-r border-line bg-panel">
-      <div className="flex h-10 shrink-0 items-stretch border-b border-line px-2">
-        {(['layers', 'sources'] as const).map((k) => (
-          <button
-            key={k}
-            onClick={() => set({ leftSection: k })}
-            className={cx('relative flex-1 font-display text-[11px] uppercase tracking-[0.14em] transition-colors', section === k ? 'text-ink' : 'text-mute hover:text-ink-2')}
-          >
-            {k}
-            {section === k && <motion.span layoutId="left-tab" className="absolute inset-x-4 bottom-0 h-[2px] bg-amber" />}
-          </button>
-        ))}
-      </div>
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={section} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 6 }} transition={{ duration: 0.14 }}>
-            {section === 'layers' ? <LayersSection /> : <SourcesSection />}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-      <div className="flex shrink-0 items-center gap-2 border-t border-line px-4 py-2.5 text-[10.5px] text-dim">
-        <Kbd>1</Kbd>–<Kbd>4</Kbd> presets <span className="mx-1">·</span> <Kbd>?</Kbd> shortcuts
-      </div>
-    </aside>
-  );
-}

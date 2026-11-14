@@ -7,11 +7,11 @@
  */
 @theme {
   --color-bg: #0a0b0d;
-  --color-panel: #111317;
-  --color-raised: #171a1f;
-  --color-sunk: #0d0f12;
-  --color-line: #22262d;
-  --color-line-2: #2e333b;
+  --color-panel: #101216;
+  --color-raised: #181b21;
+  --color-sunk: #0c0e11;
+  --color-line: #1d2127;
+  --color-line-2: #2a2f37;
   --color-ink: #ebe6da;
   --color-ink-2: #bdb8ad;
   --color-mute: #858891;
@@ -42,7 +42,7 @@ body,
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: 12.5px;
+  font-size: 13.5px;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
@@ -75,8 +75,27 @@ body,
 }
 
 *:focus-visible {
-  outline: 1.5px solid var(--color-amber);
+  outline: 2px solid var(--color-amber);
   outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Eyebrow label for a panel section: quiet, no rule line. */
+.eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 11px;
+  color: var(--color-mute);
+}
+
+/* Timeline rest blocks: diagonal hatch in the suit-heat colour. */
+.mw-rest {
+  background-image: repeating-linear-gradient(135deg, rgba(242, 181, 68, 0.55) 0 2px, transparent 2px 5px);
+}
+/* Timeline spare time: the margin the officer protects. */
+.mw-spare {
+  background-image: repeating-linear-gradient(90deg, rgba(79, 209, 224, 0.16) 0 1px, transparent 1px 6px);
 }
 
 ::-webkit-scrollbar {

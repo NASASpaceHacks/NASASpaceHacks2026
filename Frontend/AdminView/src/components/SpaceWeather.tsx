@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { fireEvent } from '../actions';
+import { closeDetails, fireEvent, openSheet } from '../actions';
 import { useConsole } from '../store';
 import { fmtLtst, marsTime } from '../lib/marsclock';
 import {
@@ -79,7 +79,7 @@ function Forecast({ now }: { now: number }) {
           <span className="label !text-[9px]">Planned EVA start (demo)</span>
           <span className="num text-[11.5px] text-ink">{fmtUtc(evaMs, true)}</span>
         </div>
-        <div className="mt-0.5 text-[10px] text-dim">next {fmtLtst(start)} LTST at Gale, from today&apos;s real date</div>
+        <div className="mt-0.5 text-[10px] text-dim">next {fmtLtst(start)} Mars local time at Gale, from today&apos;s real date</div>
         <div data-testid="forecast-verdict" className={cx('mt-1.5 text-[11px] leading-snug', chk.status === 'CAUTION' ? 'text-amber' : 'text-ink-2')}>
           {chk.status === 'NO_DATA'
             ? 'No ENLIL runs in the site pack.'
@@ -148,9 +148,12 @@ function Nowcast() {
   const busy = useConsole((s) => s.busyEvent);
   const shelterMax = useConsole((s) => s.rules.find((r) => r.id === 'shelter_time_max_min')?.value ?? 30);
   return (
-    <Tier n={3} name="Nowcast" lead="now, measured on site" tone="red" testId="tier-nowcast">
-      <Button data-testid="sep-nowcast" variant="danger" className="w-full" onClick={() => void fireEvent({ type: 'SEP_NOWCAST', leadMin: shelterMax }, 'SEP nowcast: onboard dose rate +25 %')} disabled={!!busy}>
-        {busy === 'SEP_NOWCAST' ? 'Replanning…' : 'Dose rate +25 % · SEP nowcast'}
+    <Tier n={3} name="Nowcast (SEP)" lead="now, measured on site" tone="red" testId="tier-nowcast">
+      <Button data-testid="sep-nowcast" variant="danger" className="w-full" onClick={() => {
+        if (useConsole.getState().uiMode === 'live') { closeDetails(); openSheet('sep'); }
+        else void fireEvent({ type: 'SEP_NOWCAST', leadMin: shelterMax }, 'SEP nowcast: onboard dose rate +25 %');
+      }} disabled={!!busy}>
+        {busy === 'SEP_NOWCAST' ? 'Re-planning…' : 'Radiation spike on board · dose rate +25 %'}
       </Button>
       <div className="mt-2 text-[11px] leading-snug text-ink-2">
         The only tier that orders <span className="text-red">return now</span>: it is measured on site, with no light delay. The hab alerts the visor at once and replans from EV1&apos;s position to shelter within {shelterMax} min.

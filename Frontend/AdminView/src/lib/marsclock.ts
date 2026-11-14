@@ -83,3 +83,16 @@ export function fmtLtst(min: number): string {
   const m = mod(Math.round(min), 1440);
   return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 }
+
+/** Mars-clock minutes per Earth minute: 1 sol = 1.027491252 Earth days (Mars24 C-2; same as the engine's ltstAt). */
+export const EARTH_MIN_PER_MARS_MIN = 1.027491252;
+
+/** Mars local time (LTST minutes) at EVA minute `tMin` (Earth minutes) of an EVA starting at `startLtstMin`. */
+export function evaLtst(startLtstMin: number, tMin: number): number {
+  return startLtstMin + tMin / EARTH_MIN_PER_MARS_MIN;
+}
+
+/** EVA minute (Earth minutes) at Mars local time `ltstMin`. */
+export function evaMinAt(startLtstMin: number, ltstMin: number): number {
+  return (ltstMin - startLtstMin) * EARTH_MIN_PER_MARS_MIN;
+}

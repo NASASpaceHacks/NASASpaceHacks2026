@@ -6,6 +6,7 @@ import {
   type PlanRequest,
   type PlanResult,
   type RuleId,
+  type SitePackManifest,
   cellToXY,
   goldenPlanResult,
   loadSitePack,
@@ -27,7 +28,10 @@ export interface Backend {
   kind: 'live' | 'mock';
   /** Human-readable data source, shown in the top bar. */
   label: string;
-  loadPack(onStep?: (s: string) => void): Promise<LoadedSitePack>;
+  /** `onManifest` fires as soon as the manifest is read, before the rasters (used to start the first plan early). */
+  loadPack(onStep?: (s: string) => void, onManifest?: (m: SitePackManifest) => void): Promise<LoadedSitePack>;
+  /** Start solving a request now; a later identical `plan(req)` reuses the answer (first plan on load). */
+  prefetchPlan?(req: PlanRequest): void;
   plan(req: PlanRequest): Promise<PlanBundle>;
   /** Fire an operational event. `req` is the current request including accumulated events. */
   event(e: ConsoleEvent, req: PlanRequest): Promise<PlanBundle>;
@@ -150,6 +154,11 @@ async function packageBytes(base: LoadedSitePack, bundle: PlanBundle, req: PlanR
   }
 }
 
+/** Route package size before sending (engine codec on the console; the hab server signs and sends the real one). */
+export function estimatePackageBytes(pack: LoadedSitePack, bundle: PlanBundle, req: PlanRequest, seq: number) {
+  return packageBytes(pack, bundle, req, seq);
+}
+
 // ───────────────────────────── Live (hab server) ─────────────────────────────
 
 export class HttpBackend implements Backend {
@@ -158,10 +167,20 @@ export class HttpBackend implements Backend {
   private pack: LoadedSitePack | null = null;
   constructor(private siteId: string) {}
 
-  async loadPack(onStep?: (s: string) => void): Promise<LoadedSitePack> {
+  private prefetched: { key: string; result: Promise<PlanResult> } | null = null;
+
+  async loadPack(onStep?: (s: string) => void, onManifest?: (m: SitePackManifest) => void): Promise<LoadedSitePack> {
     onStep?.(`Loading site pack ${this.siteId}`);
     try {
-      this.pack = await loadSitePack(`/sitepacks/${this.siteId}`);
+      // Hand the manifest out as soon as it arrives, so the first plan solves while the rasters load.
+      const tap = async (url: string) => {
+        const r = await fetch(url);
+        if (onManifest && r.ok && url.endsWith('/manifest.json')) {
+          void r.clone().json().then((m: SitePackManifest) => onManifest(m)).catch(() => {});
+        }
+        return r;
+      };
+      this.pack = await loadSitePack(`/sitepacks/${this.siteId}`, tap as unknown as Parameters<typeof loadSitePack>[1]);
     } catch (err) {
       // The hab server falls back to the in-memory mockSitePack() when the pack is missing.
       const m = /^mock-(\d+)$/.exec(this.siteId);
@@ -208,8 +227,18 @@ export class HttpBackend implements Backend {
     return { result, fields, fieldsSource: source, plannerLabel: `${result.planner.pathSearch} · ${result.planner.costModel}` };
   }
 
+  prefetchPlan(req: PlanRequest) {
+    const body = JSON.stringify(req);
+    const result = json<PlanResult>('/api/plan', { method: 'POST', body }, 20000);
+    result.catch(() => {});
+    this.prefetched = { key: body, result };
+  }
+
   async plan(req: PlanRequest): Promise<PlanBundle> {
-    const result = await json<PlanResult>('/api/plan', { method: 'POST', body: JSON.stringify(req) }, 20000);
+    const body = JSON.stringify(req);
+    const pre = this.prefetched;
+    this.prefetched = null;
+    const result = pre && pre.key === body ? await pre.result : await json<PlanResult>('/api/plan', { method: 'POST', body }, 20000);
     return this.bundle(result, req);
   }
 

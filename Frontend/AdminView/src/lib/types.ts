@@ -4,9 +4,29 @@ import type { LinkStatus } from './engine';
 export type { LinkStatus };
 
 export type OverlayId = 'safezone' | 'shelter' | 'walkback' | 'los' | 'slope' | 'ti';
-export type VectorId = 'contours' | 'keepouts' | 'traverse' | 'stations' | 'route' | 'shelters' | 'imagery';
-export type PresetId = 'plan' | 'safety' | 'science' | 'comms';
-export type TabId = 'plan' | 'report' | 'burndown' | 'live';
+/** Vector map features. `outline` = the single clean safe-area outline; `stationDetail` = value labels + left-out marks. */
+export type VectorId = 'outline' | 'contours' | 'keepouts' | 'traverse' | 'stations' | 'stationDetail' | 'route' | 'shelters' | 'imagery';
+/** Map presets: `calm` is the default (imagery, route, stops, base/rover, crew, safe-area outline). */
+export type PresetId = 'calm' | 'safety' | 'science' | 'radio' | 'terrain';
+/** The console's three modes (top stepper): ① Plan → ② Send → ③ EVA live. */
+export type UiMode = 'plan' | 'send' | 'live';
+/** Details drawer sections (expert depth, on demand). */
+export type DetailsTab = 'report' | 'rules' | 'margins' | 'weather' | 'science' | 'sources' | 'log';
+/** Guided responses in EVA live (action dock → sheet → Send to crew). */
+export type ActionKind = 'sep' | 'hazard' | 'cut' | 'recall';
+
+export interface ConsoleAlert {
+  id: number;
+  utcMs: number;
+  level: 'info' | 'caution' | 'warning';
+  title: string;
+  text?: string;
+  /** EVA minutes when known. */
+  tMin?: number;
+  /** Visor request this alert came from (hazard requests offer "Block area & re-plan"). */
+  requestId?: number;
+  acked: boolean;
+}
 
 export type FieldsSource = 'server' | 'engine' | 'estimate';
 

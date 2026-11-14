@@ -143,11 +143,11 @@ export function BurndownTab() {
     const egressHalf = 30;
     return [
       {
-        key: 'wb', title: 'Walkback margin', unit: 'min', plan: (b) => b.walkbackMarginMin, limit: 0, limitLabel: 'zero margin',
+        key: 'wb', title: 'Spare time to get home', unit: 'min', plan: (b) => b.walkbackMarginMin, limit: 0, limitLabel: 'zero margin',
         actual: fields ? (t) => (Number.isFinite(fields.walkbackMin[t.cell]) ? wbMax + egressHalf - t.t - fields.walkbackMin[t.cell] : null) : undefined,
       },
       {
-        key: 'sh', title: 'Shelter margin', unit: 'min', plan: (b) => b.shelterMarginMin, limit: 0, limitLabel: 'zero margin',
+        key: 'sh', title: 'Shelter limit minus minutes to shelter', unit: 'min', plan: (b) => b.shelterMarginMin, limit: 0, limitLabel: 'zero margin',
         actual: fields ? (t) => (Number.isFinite(fields.shelterMin[t.cell]) ? shMax - fields.shelterMin[t.cell] : null) : undefined,
       },
       { key: 'o2', title: 'O₂ remaining (planned)', unit: '%', plan: (b) => b.o2Pct, actual: (t) => t.o2Pct, limit: 0 },
@@ -160,8 +160,8 @@ export function BurndownTab() {
   if (!plan || !plan.burndown.length) {
     return (
       <div className="p-4">
-        <Empty title="No burndown yet" action={<Button variant="primary" onClick={() => void generatePlan()}>Generate plan</Button>}>
-          Burndowns show how each margin is spent over the EVA. Live telemetry overlays the actual once the route is confirmed.
+        <Empty title="No margins yet" action={<Button variant="primary" onClick={() => void generatePlan()}>Plan now</Button>}>
+          These charts show how each margin is spent over the EVA. Live crew data overlays the actual once the route is sent.
         </Empty>
       </div>
     );
@@ -178,13 +178,13 @@ export function BurndownTab() {
           </div>
         }
       >
-        Burndowns
+        Margins over time
       </SectionHead>
       {defs.map((d) => (
         <Chart key={d.key} def={d} plan={plan.burndown} telem={telem} nowT={nowT} />
       ))}
       <div className="text-[10.5px] leading-snug text-dim">
-        Minutes from EVA start. Actual margins are recomputed from telemetry position against the current safety fields{telem.length ? '' : ' — none received yet'}.
+        Minutes from EVA start (technical name: burndowns). Actual margins are recomputed from the crew's position against the current safety fields{telem.length ? '' : '; no crew data yet'}.
       </div>
     </div>
   );
