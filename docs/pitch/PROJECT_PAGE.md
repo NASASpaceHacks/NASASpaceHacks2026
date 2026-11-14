@@ -47,3 +47,21 @@ A two-device Mars EVA route planner. The habitat console computes constraint-saf
 - Repository: [https://github.com/NASASpaceHacks/NASASpaceHacks2026]
 - Video (30 s): [URL]
 - Live demo: [URL]
+
+## Challenge alignment (clause by clause)
+> "Create a layered, integrated view of a location or route on the Martian surface that pulls together data from multiple NASA science missions and could help a human explorer plan and carry out a successful Marswalk while conducting new and exciting science along the way."
+
+| Clause | What we built | Where |
+|---|---|---|
+| Layered, integrated view | 2D Mars map with layer presets (Plan / Safety / Science / Comms). Layers are **fused** into one safe zone, a constraint report and a route, not just stacked. | Habitat Console |
+| Location or route on Mars | Gale crater / Mount Sharp, 5×5 km on Curiosity's 2025–26 boxwork traverse, plus generated EVA routes | Site pack `gale-v1` |
+| Data from multiple NASA missions | MRO HiRISE (terrain, orthophoto), Mars Odyssey THEMIS (thermal inertia), MSL Curiosity (traverse, Mastcam/Navcam photos, REMS weather, RAD radiation), MGS MOLA (in the merged DEM), heliophysics fleet via CCMC DONKI (space weather) | Sources panel; "N missions · M data kinds" badge |
+| Help a human explorer **plan** | Constraint-safe route generation with margins, binding constraint, bingo times, dropped-station reasons | Habitat Console |
+| …and **carry out** a successful Marswalk | Confirmed route pushed to the helmet visor; glass-cockpit navigation; walkback and shelter margins; autonomy if the link drops | Visor |
+| **New and exciting science** along the way | 12 real boxwork-era Curiosity targets in a cited Science Traceability Matrix; the optimizer maximizes science value under the safety rules; objective coverage shown; crew task checklists and real Curiosity photos at each station | STM panel, station cards |
+| ≥3 data kinds (brief) | Optical, topographic, thermal, atmospheric, radiation, space weather (+ spectral, stretch goal) | Sources panel |
+| Safety: radiation/space weather, suit mobility, obstacles (brief) | Three-tier space-weather response + terrain-shielding model; NASA suited walking-energy model + suit heat budget; slope and roughness avoidance | Engine |
+| HUD / tablet / habitat display (considerations) | Habitat console + helmet visor GUI (hardware port later) | Both apps |
+| Point-of-view imagery (considerations) | Curiosity Mastcam/Navcam photos at each station ("What you'll see") | Station cards |
+| Rovers / working in pairs (considerations) | Pressurized rover as a movable safe haven; buddy pair walks the same route | Engine, Console |
+| Updates on current conditions (intro) | Curiosity REMS weather, DONKI space weather, light-delayed Earth relay | Live tab, Earth panel |
