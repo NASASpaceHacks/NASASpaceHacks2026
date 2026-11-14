@@ -1,1 +1,160 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* Marswalk EVA visor — glass-cockpit tokens. Pure black, phosphor green + amber vectors, ≥2 px strokes. */
+:root {
+  --bg: #000;
+  --g: #4dff94;
+  --g2: #33c46f;
+  --g3: #1d7a45;
+  --g4: #0f3d23;
+  --a: #ffb627;
+  --a2: #a8730b;
+  --a3: #3d2a05;
+  --r: #ff4534;
+  --r3: #3a0d08;
+  --c: #4ee6ff;
+  --c3: #0b3a44;
+  --w: #f2fff7;
+  --line: #1f4a31;
+  --font-num: 'B612 Mono', 'SF Mono', 'JetBrains Mono', 'IBM Plex Mono', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  --font-ui: 'B612', 'DIN Alternate', 'Bahnschrift', 'Roboto Condensed', 'Arial Narrow', 'Helvetica Neue', system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  color: var(--g);
+  font-family: var(--font-ui);
+  cursor: default;
+}
+
+.viewport {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  overflow: hidden;
+}
+
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  transition: transform 0.45s cubic-bezier(0.3, 0.7, 0.2, 1);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.lbl {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--g2);
+}
+
+.frame {
+  position: absolute;
+  border: 2px solid var(--line);
+  background: #000;
+}
+/* Corner brackets: the classic avionics panel frame. */
+.frame::before,
+.frame::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+.frame::before {
+  left: -2px;
+  top: -2px;
+  border-left: 3px solid var(--g3);
+  border-top: 3px solid var(--g3);
+}
+.frame::after {
+  right: -2px;
+  bottom: -2px;
+  border-right: 3px solid var(--g3);
+  border-bottom: 3px solid var(--g3);
+}
+.frame > .tab {
+  position: absolute;
+  top: -15px;
+  left: 18px;
+  padding: 0 10px;
+  background: #000;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  height: 52px;
+  padding: 0 8px;
+  border: 3px solid currentColor;
+  border-radius: 6px;
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.blink {
+  animation: blink 1.1s steps(2, jump-none) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+.pulse-border {
+  animation: pulseb 1.2s ease-in-out infinite;
+}
+@keyframes pulseb {
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 69, 52, 0.18), inset 0 0 40px rgba(255, 69, 52, 0.15);
+  }
+}
+.scan {
+  animation: scan 2.6s linear infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes scan {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ol-viewport canvas {
+  image-rendering: auto;
+}
+.hatch-amber {
+  background-image: repeating-linear-gradient(-45deg, rgba(255, 182, 39, 0.16) 0 6px, transparent 6px 16px);
+}
+.hatch-red {
+  background-image: repeating-linear-gradient(-45deg, rgba(255, 69, 52, 0.22) 0 8px, transparent 8px 20px);
+}

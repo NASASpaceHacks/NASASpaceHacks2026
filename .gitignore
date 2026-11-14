@@ -37,3 +37,6 @@ Research/bench/results/2*/
 # Pipeline build outputs / site-pack images (release assets)
 Pipeline/dist/
 SitePacks/*/images/
+
+# UI screenshots: only curated ones are committed (git add -f)
+Frontend/*/docs/*.png
