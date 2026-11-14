@@ -1,0 +1,371 @@
+[
+  {
+    "name": "hirise_dem_range",
+    "url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1",
+      "Range": "bytes=0-4095"
+    },
+    "checked_utc": "2026-11-14T18:25:48.125709+00:00",
+    "status": 206,
+    "final_url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif",
+    "headers": {
+      "x-amz-request-id": "C7FRBFZDDCFT2XK5",
+      "x-amz-id-2": "OdhZU7hk1kEYPS+kMLlltZe0SgkBFHxsgv6tRHvNvm5as1h9RLYsjnGOcvffIt8slEdgiwAattE=",
+      "Content-Length": "4096",
+      "Accept-Ranges": "bytes",
+      "Content-Range": "bytes 0-4095/1839545409",
+      "Date": "Sat, 14 Nov 2026 18:25:48 GMT",
+      "Server": "AmazonS3",
+      "Last-Modified": "Thu, 10 Nov 2022 21:35:06 GMT",
+      "ETag": "\"50aff29b9a8b2355e780149fbccbcc24-220\"",
+      "x-amz-version-id": "null",
+      "Content-Type": "image/tiff",
+      "x-amz-storage-class": "STANDARD_IA",
+      "Connection": "close"
+    },
+    "bytes_read": 4096,
+    "sample_sha256": "93f0320773f6c7570b8413735b5269a5a6613e83d52f5ad86f66824a4add7384"
+  },
+  {
+    "name": "hirise_label",
+    "url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.xml",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:48.127045+00:00",
+    "status": 200,
+    "final_url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.xml",
+    "headers": {
+      "x-amz-request-id": "C7FG33M753EJ1KZP",
+      "x-amz-id-2": "OLr9zIsb1+oonsS4KPsSSdYycxpdEMur7jYGl2FwSDPepiaeZloMa3nM6KkMYkUPaFbO1Qso4u8=",
+      "Content-Length": "18939",
+      "Accept-Ranges": "bytes",
+      "Date": "Sat, 14 Nov 2026 18:25:48 GMT",
+      "Server": "AmazonS3",
+      "Last-Modified": "Thu, 10 Nov 2022 21:40:38 GMT",
+      "ETag": "\"190c85b20c22cece9db3940d95c3e0aa\"",
+      "x-amz-version-id": "null",
+      "Content-Type": "text/xml",
+      "x-amz-storage-class": "STANDARD_IA",
+      "Connection": "close"
+    },
+    "bytes_read": 18939,
+    "sample_sha256": "5455f7a0638aadda8358fc78e2b8c20dac4fa67b59aa0412f2bfad6ca113b79b",
+    "text_sample": "\ufeff<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!--Record created using version 2.0.5 of the USGS Metadata Wizard tool. (https://github.com/usgs/fort-pymdwizard)-->\r\n<metadata>\r\n  <idinfo>\r\n    <citation>\r\n      <citeinfo>\r\n        <origin>Robin Fergason</origin>\r\n        <origin>Donna Galuszka</origin>\r\n        <origin>Trent Hare</origin>\r\n        <origin>David Mayer</origin>\r\n        <origin>Bonnie Redding</origin>\r\n        <origin>Ethan Smith</origin>\r\n        <pubdate>20200724</pubdate>\r\n        <title>High-Resolution Imaging Science Experiment Digital Terrain Model Mosaic for Mars 2020 Terrain Relative Navigation</title>\r\n        <geoform>raster digital data</geoform>\r\n        <onlink>https://doi.org/10.5066/P9REJ9JN</onlink>\r\n        <lworkcit>\r\n          <citeinfo>\r\n            <origin>Mars 2020 Terrain Relative Navigation</origin>\r\n            <pubdate>20200724</pubdate>\r\n            <title>JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif</title>\r\n            <geoform>raster digital data</geoform>\r\n            <pubinfo>\r\n              <pubplace>Flagstaff, Arizona</pubplace>\r\n              <publish>United States Geological Survey, Astrogeology Science Center</publish>\r\n            </pubinfo>\r\n            <onlink>http://astrogeology.usgs.gov</onlink>\r\n          </citeinfo>\r\n        </lworkcit>\r\n      </citeinfo>\r\n    </citation>\r\n    <descript>\r\n      <abstract>The Mars 2020 rover will explore Jezero crater, Mars to investigate an ancient delta "
+  },
+  {
+    "name": "hirise_pds3_label",
+    "url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40_pds3.lbl",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:48.129002+00:00",
+    "status": 200,
+    "final_url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40_pds3.lbl",
+    "headers": {
+      "x-amz-request-id": "C7FSWRY35DDA9S8G",
+      "x-amz-id-2": "SDHiAoLk3vKWRhc0B+xCZi6NaOcjWpLfCeVRnWi6bOgEHR1YLwUx6iav8tUX2GhOq1QikeRKqr4=",
+      "Content-Length": "2296",
+      "Accept-Ranges": "bytes",
+      "Date": "Sat, 14 Nov 2026 18:25:48 GMT",
+      "Server": "AmazonS3",
+      "Last-Modified": "Thu, 10 Nov 2022 21:40:40 GMT",
+      "ETag": "\"8f0c03a3ef7c66e063352d1910374d67\"",
+      "x-amz-version-id": "null",
+      "Content-Type": "binary/octet-stream",
+      "x-amz-storage-class": "STANDARD_IA",
+      "Connection": "close"
+    },
+    "bytes_read": 2296,
+    "sample_sha256": "99b972f7ea13f9e05e9d3f265435a0566b53dbde4088781673edeb0b6d24cade",
+    "text_sample": "PDS_VERSION_ID                 = PDS3\r\nDD_VERSION_ID                  = PDSCAT1R100\r\nLABEL_REVISION_NOTE            = \"2017-05-01, David P. Mayer (USGS), initial PDS3 label pointing to GeoTIFF;\"\r\nRECORD_TYPE                    = FIXED_LENGTH\r\nRECORD_BYTES                   = 85600\r\nTARGET_NAME                    = MARS\r\n^IMAGE                         = (\"JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif\", 172610 <BYTES>)\r\nOBJECT                         = IMAGE\r\n  LINES                        = 21488\r\n  LINE_SAMPLES                 = 21400\r\n  SAMPLE_BITS                  = 32\r\n  SAMPLE_TYPE                  = IEEE_REAL\r\n  BANDS                        = 1\r\n  BAND_STORAGE_TYPE            = BAND_SEQUENTIAL\r\n  SCALING_FACTOR               = 1.0\r\n  OFFSET                       = 0.0\r\nEND_OBJECT                     = IMAGE\r\nOBJECT                         = IMAGE_MAP_PROJECTION\r\n  MAP_PROJECTION_TYPE          = EQUIRECTANGULAR\r\n  A_AXIS_RADIUS                = 3396.19 <KILOMETERS>\r\n  B_AXIS_RADIUS                = 3396.19 <KILOMETERS>\r\n  C_AXIS_RADIUS                = 3396.19 <KILOMETERS>\r\n  FIRST_STANDARD_PARALLEL      = N/A\r\n  SECOND_STANDARD_PARALLEL     = N/A\r\n  POSITIVE_LONGITUDE_DIRECTION = EAST\r\n  CENTER_LATITUDE              = 0.0 <DEGREES>\r\n  CENTER_LONGITUDE             = 0.0 <DEGREES>\r\n  REFERENCE_LATITUDE           = N/A\r\n  REFERENCE_LONGITUDE          = N/A\r\n  LINE_FIRST_PIXEL             = 1\r\n  LINE_LAST_PIXEL              = 21488\r\n  SAMPLE"
+  },
+  {
+    "name": "trek_docs",
+    "url": "https://trek.nasa.gov/tiles/apidoc/trekAPI.html?body=mars",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:48.130385+00:00",
+    "status": 200,
+    "final_url": "https://trek.nasa.gov/tiles/apidoc/trekAPI.html?body=mars",
+    "headers": {
+      "Date": "Sat, 14 Nov 2026 18:25:48 GMT",
+      "Server": "Apache/2.4.65 (Unix) OpenSSL/3.4.3",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+      "X-Content-Type-Options": "nosniff",
+      "Last-Modified": "Thu, 21 Nov 2019 18:50:26 GMT",
+      "ETag": "\"10d8-597dfc53a8080\"",
+      "Accept-Ranges": "bytes",
+      "Content-Length": "4312",
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "text/html",
+      "Content-Security-Policy": "frame-ancestors 'self' aelp.smartsparrow.com;",
+      "Connection": "close"
+    },
+    "bytes_read": 4312,
+    "sample_sha256": "7ff5aea6018ea8e4184e12c84ad456c05033dc01d3794b8c07eac1026aa1d190",
+    "text_sample": "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><link rel=\"shortcut icon\" href=\"favicon.ico\"><script src=\"lib/jquery/jquery.min.js\"></script><script src=\"lib/bootstrap/bootstrap.min.js\"></script><script src=\"js/trekApi.js\"></script><link rel=\"stylesheet\" href=\"lib/bootstrap/bootstrap.min.css\"><link rel=\"stylesheet\" href=\"css/trekAPI.css\"></head><body><div class=\"container-fluid\" id=\"introContainer\"><div class=\"topNavigatorDiv\"><ul class=\"navList\"><li><a href=\"index.html\">TREK MAP SERVICES</a></li><li><a href=\"#description\">DESCRIPTION</a></li><li><a href=\"#services\">SERVICES</a></li><li><a href=\"https://trek.nasa.gov\"><span class=\"homeSite\">SOLAR SYSTEM TREKS</span></a></li></ul></div><div class=\"row\"><div class=\"introLogo h1Top\"><img class=\"nasaLogoLarge\" src=\"assets/nasa-logo-large.png\"></div></div><div class=\"row\"><h1 class=\"h1Center lightWeight\"></h1></div><div class=\"row\"><h1 class=\"h1Center\"><span class=\"mainSubtitle\">WMTS Layer Services</span></h1></div></div><a name=\"description\"></a><div class=\"container-fluid contentContainer\"><button class=\"subHeader\" data-toggle=\"collapse\" data-target=\"#desContent\" onclick=\"this.blur();\">Description</button><div class=\"collapse in\" id=\"desContent\"><p>Map layers are available through the OGC RESTful WMTS protocol. To find out more information about OGC WMTS, go to <a href=\"https://www.opengeospatial.org"
+  },
+  {
+    "name": "trek_wmts",
+    "url": "https://trek.nasa.gov/tiles/Mars/EQ/CTX_beta01_uncontrolled_5m_Caltech/1.0.0/WMTSCapabilities.xml",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:48.591588+00:00",
+    "status": 200,
+    "final_url": "https://trek.nasa.gov/tiles/Mars/EQ/CTX_beta01_uncontrolled_5m_Caltech/1.0.0/WMTSCapabilities.xml",
+    "headers": {
+      "Date": "Sat, 14 Nov 2026 18:25:48 GMT",
+      "Server": "Apache/2.4.65 (Unix) OpenSSL/3.4.3",
+      "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+      "X-Content-Type-Options": "nosniff",
+      "Last-Modified": "Tue, 08 Sep 2020 17:14:48 GMT",
+      "ETag": "\"1f79-5aed078e8adee\"",
+      "Accept-Ranges": "bytes",
+      "Content-Length": "8057",
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/xml",
+      "Content-Security-Policy": "frame-ancestors 'self' aelp.smartsparrow.com;",
+      "Connection": "close"
+    },
+    "bytes_read": 8057,
+    "sample_sha256": "16919bec258e3292e07f4a1b42d9d847accc929a0d93fa6cb0989b2ba50aafcf",
+    "text_sample": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Capabilities xmlns=\"http://www.opengis.net/wmts/1.0\" xmlns:ows=\"http://www.opengis.net/ows/1.1\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:gml=\"http://www.opengis.net/gml\" xsi:schemaLocation=\"http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd\" version=\"1.0.0\">\n    <!-- Service Identification --> \n    <ows:ServiceIdentification>\n        <ows:Title>CTX Global BETA Uncontrolled 5m Caltech</ows:Title>\n        <ows:ServiceType>OGC WMTS</ows:ServiceType>\n        <ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>\n    </ows:ServiceIdentification> <!-- Operations Metadata --> \n    <ows:OperationsMetadata>\n        <ows:Operation name=\"GetCapabilities\">\n            <ows:DCP>\n                <ows:HTTP>\n                    <ows:Get xlink:href=\"https://trek.nasa.gov/tiles/Mars/EQ/CTX_beta01_uncontrolled_5m_Caltech/1.0.0/WMTSCapabilities.xml\">\n                        <ows:Constraint name=\"GetEncoding\">\n                            <ows:AllowedValues>\n                                <ows:Value>RESTful</ows:Value>\n                            </ows:AllowedValues>\n                        </ows:Constraint>\n                    </ows:Get>\n                    \n                </ows:HTTP>\n            </ows:DCP>\n        </ows:Operation>\n        <ows:Operation name=\"GetTile\">\n            <ows:DCP>\n                <ows:HTTP>\n                    <ows:Ge"
+  },
+  {
+    "name": "ode_rest",
+    "url": "https://oderest.rsl.wustl.edu/live2/?query=product&target=mars&ihid=mro&iid=hirise&pt=dtm&results=cm&limit=1&output=json",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:48.595502+00:00",
+    "status": 200,
+    "final_url": "https://oderest.rsl.wustl.edu/live2/?query=product&target=mars&ihid=mro&iid=hirise&pt=dtm&results=cm&limit=1&output=json",
+    "headers": {
+      "Cache-Control": "private",
+      "Transfer-Encoding": "chunked",
+      "Content-Type": "application/json; charset=utf-8",
+      "Server": "Microsoft-IIS/10.0",
+      "X-Frame-Options": "SAMEORIGIN",
+      "X-Xss-Protection": "1; mode=block",
+      "Access-Control-Allow-Origin": "*",
+      "Strict-Transport-Security": "max-age=30000000; includeSubDomains",
+      "Date": "Sat, 14 Nov 2026 18:25:48 GMT",
+      "Connection": "close"
+    },
+    "bytes_read": 2755,
+    "sample_sha256": "fd49f08ca0b07837d0744abaf944e7a85070b74d64f4547f5ef4db16d25d582f",
+    "text_sample": "{ \"ODEResults\": {\"Count\": \"1\", \"Products\": {\"Product\": {\"BB_georeferenced\": \"True\", \"Center_georeferenced\": \"True\", \"Center_latitude\": \"-23.8491\", \"Center_longitude\": \"326.7864\", \"Comment\": \"Possible MSL rover landing site Eberswalde Crater\", \"Easternmost_longitude\": \"326.854\", \"External_url\": \"https:\\/\\/www.uahirise.org\\/ESP_011265_1560\", \"FilesURL\": \"https:\\/\\/ode.rsl.wustl.edu\\/mars\\/productfiles.aspx?product_id=DTEEC_011265_1560_011331_1560_U01&product_idGeo=26730993\", \"Footprint_C0_geometry\": \"POLYGON ((-33.281 -23.703, -33.186 -23.6927, -33.146 -23.9952, -33.241 -24.0054, -33.281 -23.703))\", \"Footprint_geometry\": \"POLYGON ((326.719 -23.703, 326.814 -23.6927, 326.854 -23.9952, 326.759 -24.0054, 326.719 -23.703))\", \"Footprint_GL_geometry\": \"POLYGON ((326.719 -23.703, 326.814 -23.6927, 326.854 -23.9952, 326.759 -24.0054, 326.719 -23.703))\", \"Footprint_NP_geometry\": \"GEOMETRYCOLLECTION EMPTY\", \"Footprint_souce\": \"PDS Archive Index Table\", \"Footprint_SP_geometry\": \"GEOMETRYCOLLECTION EMPTY\", \"Footprints_cross_meridian\": \"False\", \"LabelURL\": \"https:\\/\\/hirise.lpl.arizona.edu\\/PDS\\/DTM\\/ESP\\/ORB_011200_011299\\/ESP_011265_1560_ESP_011331_1560\\/DTEEC_011265_1560_011331_1560_U01.IMG\", \"Map_resolution\": \"58751.35000732\", \"Map_scale\": \"1.0082077204447\", \"Maximum_latitude\": \"-23.6927\", \"Minimum_latitude\": \"-24.0054\", \"ODE_notes\": { \"ODE_note\": [ \"NOTE: Product Type set by ODE\", \"NOTE: Map Resolution set from label map projection object\", \"NOTE: Map scale from the label map projectio"
+  },
+  {
+    "name": "pds_rest",
+    "url": "https://pds.nasa.gov/api/search/1/products?limit=1",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:48.596489+00:00",
+    "status": 200,
+    "final_url": "https://pds.mcp.nasa.gov/api/search/1/products?limit=1",
+    "headers": {
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Date": "Sat, 14 Nov 2026 18:25:49 GMT",
+      "X-Cache": "Miss from cloudfront",
+      "Via": "1.1 6c1523d2d6afbcacf7b5c3d3f467f8c4.cloudfront.net (CloudFront)",
+      "X-Amz-Cf-Pop": "ORD56-P16",
+      "X-Amz-Cf-Id": "lM0eOvMd0YWGNyJLrN5UVuAJt-gHrZMVPttacuZpPyz2uhbC8Fs-eQ=="
+    },
+    "bytes_read": 4782,
+    "sample_sha256": "8266e509653df46104de2bfb31a403f220a6dc55b4fb2604709a4f38c10a532d",
+    "text_sample": "{\"summary\":{\"hits\":93894768,\"properties\":[\"_package_id\",\"alternate_ids\",\"description\",\"lid\",\"lidvid\",\"ops:Harvest_Info.ops:harvest_date_time\",\"ops:Harvest_Info.ops:harvest_version\",\"ops:Harvest_Info.ops:node_name\",\"ops:Label_File_Info.ops:creation_date_time\",\"ops:Label_File_Info.ops:file_name\",\"ops:Label_File_Info.ops:file_ref\",\"ops:Label_File_Info.ops:file_size\",\"ops:Label_File_Info.ops:md5_checksum\",\"ops:Provenance.ops:registry_sweepers_provenance_hotfixed_version\",\"ops:Provenance.ops:registry_sweepers_provenance_version\",\"ops:Provenance.ops:registry_sweepers_repairkit_version\",\"ops:Provenance.ops:reindexed_at\",\"ops:Provenance.ops:superseded_by\",\"ops:Tracking_Meta.ops:archive_status\",\"pds:Identification_Area.pds:information_model_version\",\"pds:Identification_Area.pds:logical_identifier\",\"pds:Identification_Area.pds:product_class\",\"pds:Identification_Area.pds:title\",\"pds:Identification_Area.pds:version_id\",\"pds:Internal_Reference.pds:lid_reference\",\"pds:Internal_Reference.pds:reference_type\",\"pds:Modification_Detail.pds:description\",\"pds:Modification_Detail.pds:modification_date\",\"pds:Modification_Detail.pds:version_id\",\"pds:Service.pds:abstract_desc\",\"pds:Service.pds:category\",\"pds:Service.pds:description\",\"pds:Service.pds:interface_type\",\"pds:Service.pds:name\",\"pds:Service.pds:service_type\",\"pds:Service.pds:software_language\",\"pds:Service.pds:supported_operating_system_note\",\"pds:Service.pds:system_requirements_note\",\"pds:Service.pds:url\",\"product_class\",\"ref_lid_node\",\"ti"
+  },
+  {
+    "name": "usgs_stac",
+    "url": "https://stac.astrogeology.usgs.gov/api/",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:48.602849+00:00",
+    "status": 200,
+    "final_url": "https://stac.astrogeology.usgs.gov/api/",
+    "headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "2987",
+      "Connection": "close",
+      "X-Amz-Cf-Pop": "YTO53-P1",
+      "Date": "Sat, 14 Nov 2026 18:25:48 GMT",
+      "X-Amzn-Trace-Id": "Root=1-6af8a7ac-34863017045119087759d64a;Parent=2938dae7e7c48d5b;Sampled=0;Lineage=1:1649b04f:0",
+      "x-amzn-RequestId": "4a8dcee2-992f-4b58-8f4d-e570343f41b2",
+      "x-amzn-Remapped-content-length": "2987",
+      "x-amz-apigw-id": "G18jGHaCPHcEk1Q=",
+      "vary": "Accept-Encoding",
+      "etag": "W/\"bab-NFTi8b1Ao/lGKIZlKsAXYOxEzMk\"",
+      "x-powered-by": "Express",
+      "Via": "1.1 3a47889f4affe170af0ca09ef8eb1140.cloudfront.net (CloudFront), 1.1 54704f25530eb7440881e3a166d68472.cloudfront.net (CloudFront)",
+      "X-Cache": "Miss from cloudfront",
+      "X-Amz-Cf-Id": "9cKOcDMs-XdnGjym-NjLIG7FMML9HClCd34yoHve2ngKRhaB7Kvmqw==",
+      "Vary": "Accept-Encoding"
+    },
+    "bytes_read": 2987,
+    "sample_sha256": "93b919a775f56b58a5cdebc093381d3cbd56acb7dda07a5e53e73f92e9d066eb",
+    "text_sample": "{\"stac_version\":\"1.1.0\",\"type\":\"Catalog\",\"id\":\"usgs-stac-api\",\"title\":\"USGS Astrogeology STAC API\",\"description\":\"A STAC API for planetary data\",\"conformsTo\":[\"https://api.stacspec.org/v1.0.0/core\",\"https://api.stacspec.org/v1.0.0/collections\",\"https://api.stacspec.org/v1.0.0/ogcapi-features\",\"https://api.stacspec.org/v1.0.0/item-search\",\"https://api.stacspec.org/v1.0.0/ogcapi-features#fields\",\"https://api.stacspec.org/v1.0.0/ogcapi-features#sort\",\"https://api.stacspec.org/v1.0.0/ogcapi-features#query\",\"https://api.stacspec.org/v1.0.0/item-search#fields\",\"https://api.stacspec.org/v1.0.0/item-search#sort\",\"https://api.stacspec.org/v1.0.0/item-search#query\",\"https://api.stacspec.org/v1.0.0/item-search#filter\",\"https://api.stacspec.org/v0.3.0/aggregation\",\"https://api.stacspec.org/v0.3.0/aggregation#query\",\"https://api.stacspec.org/v0.3.0/aggregation#filter\",\"http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core\",\"http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/oas30\",\"http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/geojson\",\"http://www.opengis.net/spec/ogcapi-features-3/1.0/conf/filter\",\"http://www.opengis.net/spec/ogcapi-features-3/1.0/conf/features-filter\",\"http://www.opengis.net/spec/cql2/1.0/conf/basic-cql2\",\"http://www.opengis.net/spec/cql2/1.0/conf/cql2-json\",\"http://www.opengis.net/spec/cql2/1.0/conf/basic-spatial-functions\",\"http://www.opengis.net/spec/cql2/1.0/conf/basic-spatial-functions-plus\"],\"links\":[{\"rel\":\"self\",\"type\":\"application/json\",\"href"
+  },
+  {
+    "name": "usgs_stac_collections",
+    "url": "https://stac.astrogeology.usgs.gov/api/collections",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:48.851755+00:00",
+    "status": 200,
+    "final_url": "https://stac.astrogeology.usgs.gov/api/collections",
+    "headers": {
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "64658",
+      "Connection": "close",
+      "X-Amz-Cf-Pop": "YTO53-P1",
+      "Date": "Sat, 14 Nov 2026 18:25:48 GMT",
+      "X-Amzn-Trace-Id": "Root=1-6af8a7ac-3657b9a959c5b8cf6b5f9d86;Parent=0deded1ec30b20ba;Sampled=0;Lineage=1:1649b04f:0",
+      "x-amzn-RequestId": "b74d90dd-3f60-4264-8e45-8364caf32eb1",
+      "x-amzn-Remapped-content-length": "64658",
+      "x-amz-apigw-id": "G18jGF-LPHcErjA=",
+      "vary": "Accept-Encoding",
+      "etag": "W/\"fc92-MFTe+vm/KUkwH4KVdbWYOsGNY44\"",
+      "x-powered-by": "Express",
+      "Via": "1.1 93dd261beb8bff4a306c0517cbe46df0.cloudfront.net (CloudFront), 1.1 829010acd0fdda0ad4dee0ccb1db7af4.cloudfront.net (CloudFront)",
+      "X-Cache": "Miss from cloudfront",
+      "X-Amz-Cf-Id": "JDFBiY1GUPeDeIXPZmfvtxSgE2LqR_eDEMleF0yYXQs-8TLxeqkGSA==",
+      "Vary": "Accept-Encoding"
+    },
+    "bytes_read": 64658,
+    "sample_sha256": "1ef852a2cf239d04a9120279586e1b0e964b358d2410596b4e4da482673eb29b",
+    "text_sample": "{\"collections\":[{\"type\":\"Collection\",\"id\":\"lunar_orbiter_laser_altimeter\",\"stac_version\":\"1.0.0\",\"description\":\"These data are Lunar Orbiter Laser Altimeter (LOLA) Reduced Data Record (RDR) spot observations stored in latitude, longitude, radius (km). All data in this collection were acquired from the Planetary Data System (PDS) LOLA RDR Query Tool, Version 2.0. The data have been converted from Comma Separated Value (CSV) to Cloud Optimized Point Cloud (COPC) file format for efficient query and download by tools such as the Point Data Abstraction Library (PDAL). Data are released in geographic coordinates (IAU moon sphere, center longitude 0, -180 - 180 longitude domain) and include the appropriate IAU Well-known Text v2 (WKT2).\",\"links\":[{\"rel\":\"self\",\"type\":\"application/json\",\"href\":\"https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod/collections/lunar_orbiter_laser_altimeter\"},{\"rel\":\"parent\",\"type\":\"application/json\",\"href\":\"https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod\"},{\"rel\":\"root\",\"type\":\"application/json\",\"href\":\"https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod\"},{\"rel\":\"items\",\"type\":\"application/geo+json\",\"href\":\"https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod/collections/lunar_orbiter_laser_altimeter/items\"},{\"rel\":\"http://www.opengis.net/def/rel/ogc/1.0/queryables\",\"type\":\"application/schema+json\",\"href\":\"https://g6goyz4w56.execute-api.us-west-2.amazonaws.com/prod/collections/lunar_orbiter_laser_altimeter/queryables\""
+  },
+  {
+    "name": "mola",
+    "url": "https://pds-geosciences.wustl.edu/missions/mgs/megdr.html",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:48.931035+00:00",
+    "status": 200,
+    "final_url": "https://pds-geosciences.wustl.edu/missions/mgs/megdr.html",
+    "headers": {
+      "Content-Type": "text/html",
+      "Last-Modified": "Wed, 30 Sep 2026 19:20:20 GMT",
+      "Accept-Ranges": "bytes",
+      "ETag": "\"62c8ddbb1051dd1:0\"",
+      "Server": "Microsoft-IIS/10.0",
+      "X-Frame-Options": "SAMEORIGIN",
+      "X-Xss-Protection": "1; mode=block",
+      "Strict-Transport-Security": "max-age=30000000; includeSubDomains",
+      "Date": "Sat, 14 Nov 2026 18:25:48 GMT",
+      "Connection": "close",
+      "Content-Length": "72131"
+    },
+    "bytes_read": 72131,
+    "sample_sha256": "acc4c54e1a449f1abdfaefd8bac091091c8e225bbc627eef7a88470554d1288a",
+    "text_sample": "\ufeff<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\r\n<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\r\n<!-- #BeginTemplate \"../../defaultWNav.dwt\" -->\r\n<head>\r\n<!-- #BeginEditable \"keywords\" -->\r\n<meta name=\"keywords\" content=\"Planetary Data System Geosciences Node\">\r\n<!-- #EndEditable -->\r\n\r\n<meta name=\"GENERATOR\" content=\"Microsoft FrontPage 12.0\">\r\n<meta name=\"ProgId\" content=\"FrontPage.Editor.Document\">\r\n\r\n<!-- #BeginEditable \"doctitle\" -->\r\n\r\n<title>PDS Geosciences Node Data and Services: MGS MOLA MEGDRs</title>\r\n<!-- #EndEditable -->\r\n<!-- #BeginEditable \"description\" -->\r\n<meta  name=\"description\" content=\"This site provides planetary science data, tools, and documentation from the PDS Geosciences Node.\">\r\n<!-- #EndEditable -->\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\r\n<link href=\"../../css/pds_style.css\" rel=\"stylesheet\" type=\"text/css\">\r\n<script type=\"text/javascript\" src=\"../../js/page1.js\"></script>\r\n<script language=\"JavaScript\" src=\"../../js/lastMod.js\"></script>\r\n<script language=\"JavaScript\" type=\"text/JavaScript\">\r\n<!--\r\n\r\nfunction newImage(arg) {\r\n   \tif (document.images) {\r\n   \t\trslt = new Image();\r\n   \t\trslt.src = arg;\r\n   \t\treturn rslt;\r\n   \t}\r\n   }\r\n   \r\n   function changeImages() {\r\n   \tif (document.images && (preloadFlag == true)) {\r\n   \t\tfor (var i=0; i<changeImages.arguments.length; i+=2) {\r\n   \t\t\tdocument[changeImages.arguments[i]].src = changeImages.arguments[i+1];\r\n   \t\t}\r\n   \t}\r\n   }\r\n   \r\n   var prelo"
+  },
+  {
+    "name": "hrsc",
+    "url": "https://hrscteam.dlr.de/public/data/regionaldtms.php",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:49.149022+00:00",
+    "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)>"
+  },
+  {
+    "name": "mcd",
+    "url": "https://www-mars.lmd.jussieu.fr/mars/access",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:49.232187+00:00",
+    "status": 200,
+    "final_url": "https://www-mars.lmd.jussieu.fr/mars/access",
+    "headers": {
+      "Date": "Sat, 14 Nov 2026 18:25:49 GMT",
+      "Server": "Apache",
+      "Content-Location": "access.html",
+      "Vary": "negotiate,Accept-Encoding",
+      "TCN": "choice",
+      "Last-Modified": "Thu, 01 Oct 2026 06:53:41 GMT",
+      "ETag": "\"1927-65cc1e0445607;65cc1e0447547",
+      "Accept-Ranges": "bytes",
+      "Content-Length": "6439",
+      "Connection": "close",
+      "Content-Type": "text/html; charset=utf-8"
+    },
+    "bytes_read": 6439,
+    "sample_sha256": "8b56c78e018e2ea8daaa6231c4b79c3c89895968fa92ef42f86c6062d1a265e7",
+    "text_sample": "<html>\r\n<head>\r\n<title> MARS CLIMATE DATABASE ACCESS </title>\r\n</head>\r\n\r\n<!--\r\n<BODY TEXT=\"#FFFFFF\" bgcolor=\"#000000\" link=\"#FFD700\" vlink=\"#DAA520\">\r\n-->\r\n<BODY TEXT=\"#000000\" bgcolor=\"#FFFFFF\" link=\"blue\" vlink=\"brown\">\r\n<!--Author : E.M , F.F. version of 2014-->\r\n\r\n<h1 style=\"text-align:center;\"> \r\nTwo ways to use the Mars Climate Database:\r\n</h1>\r\n<p>\r\n\r\n<br>\r\n<div>\r\nThe Mars Climate Database WEB interface is intented for moderate\r\nuse only. Engineers and scientists planning to use the\r\ndatabase for intensive or precise work are invited to register\r\nfor the  full version freely downloadable. \r\nThis full database contains all the datafiles\r\n(in netcdf format) along with access software (written in Fortran; simple examples of C, Matlab, IDL and Python interfaces are also included).\r\n</div>\r\n<br>\r\n<table border=\"0\" width=\"100%\">\r\n<tr>\r\n<td width=\"350\" ><a href=\"http://www-mars.lmd.jussieu.fr/mcd_python/\" target=\"_blank\"><img WIDTH=320 SRC=\"http://www-mars.lmd.jussieu.fr/mars/gif/fig_mcd_web.gif\" ALT=\"MCD WEB\" BORDER=0  align=CENTER></a>\r\n</td> \r\n<td> <b> The MCD 6.2 Web Interface: <br> Follow this <a href=\"http://www-mars.lmd.jussieu.fr/mcd_python\">link</a> </b>\r\n</tr>\r\n<tr>\r\n<td>  &nbsp; <br> </td> <td>  &nbsp; <br> </td> \r\n</tr>\r\n<tr>\r\n<td><a href=\"mailto:forget@lmd.jussieu.fr,millour@lmd.jussieu.fr\" target=\"_blank\"><img WIDTH=320 SRC=\"http://www-mars.lmd.jussieu.fr/mars/gif/fig_mcd_pro.gif\" ALT=\"MCD FULL\" BORDER=0  align=CENTER></a>\r\n</td> \r\n<td>\r\n<b> The MCD 6.2 Full ve"
+  },
+  {
+    "name": "meda",
+    "url": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/",
+    "method": "GET",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:49.260851+00:00",
+    "status": 200,
+    "final_url": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/",
+    "headers": {
+      "Date": "Sat, 14 Nov 2026 18:25:49 GMT",
+      "Server": "Apache/2.4.37 (Red Hat Enterprise Linux) mod_wsgi/5.0.0 Python/3.11 PHP/8.3.36",
+      "X-Frame-Options": "DENY",
+      "Content-Security-Policy": "frame-ancestors 'none';",
+      "Connection": "close",
+      "Transfer-Encoding": "chunked",
+      "Content-Type": "text/html;charset=ISO-8859-1"
+    },
+    "bytes_read": 3078,
+    "sample_sha256": "26ba0385b03a10f7eb29e7c8156bc3a0b583a520d7eabe7e05be8e7dddb32b78",
+    "text_sample": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n<html>\n <head>\n  <title>Index of /PDS/data/PDS4/Mars2020/mars2020_meda</title>\n </head>\n <body>\n<h1>Index of /PDS/data/PDS4/Mars2020/mars2020_meda</h1>\n  <table>\n   <tr><th valign=\"top\"><img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C=N;O=D\">Name</a></th><th><a href=\"?C=M;O=A\">Last modified</a></th><th><a href=\"?C=S;O=A\">Size</a></th><th><a href=\"?C=D;O=A\">Description</a></th></tr>\n   <tr><th colspan=\"5\"><hr></th></tr>\n<tr><td valign=\"top\"><img src=\"/icons/back.gif\" alt=\"[PARENTDIR]\"></td><td><a href=\"/PDS/data/PDS4/Mars2020/\">Parent Directory</a></td><td>&nbsp;</td><td align=\"right\">  - </td><td>&nbsp;</td></tr>\n<tr><td valign=\"top\"><img src=\"/icons/folder.gif\" alt=\"[DIR]\"></td><td><a href=\"browse_skycam/\">browse_skycam/</a></td><td align=\"right\">2026-08-11 09:13  </td><td align=\"right\">  - </td><td>&nbsp;</td></tr>\n<tr><td valign=\"top\"><img src=\"/icons/text.gif\" alt=\"[TXT]\"></td><td><a href=\"bundle.xml\">bundle.xml</a></td><td align=\"right\">2026-08-11 09:13  </td><td align=\"right\">9.7K</td><td>&nbsp;</td></tr>\n<tr><td valign=\"top\"><img src=\"/icons/folder.gif\" alt=\"[DIR]\"></td><td><a href=\"context/\">context/</a></td><td align=\"right\">2026-08-12 11:35  </td><td align=\"right\">  - </td><td>&nbsp;</td></tr>\n<tr><td valign=\"top\"><img src=\"/icons/folder.gif\" alt=\"[DIR]\"></td><td><a href=\"data_calibrated_env/\">data_calibrated_env/</a></td><td align=\"right\">2026-08-11 09:00  </td><td align=\"right\">  - </td><td>&nbsp;"
+  },
+  {
+    "name": "ctx_dem_head",
+    "url": "https://planetarymaps.usgs.gov/mosaic/mars2020_trn/CTX/ScienceInvestigationMaps_JPL/M20_JezeroCrater_CTXDEM_20m.tif",
+    "method": "HEAD",
+    "request_headers": {
+      "User-Agent": "MarsTerrainResearch/0.1"
+    },
+    "checked_utc": "2026-11-14T18:25:49.298441+00:00",
+    "status": 200,
+    "final_url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/CTX/ScienceInvestigationMaps_JPL/M20_JezeroCrater_CTXDEM_20m.tif",
+    "headers": {
+      "x-amz-id-2": "OuCyTtkxR+bPcVxmTaLot7v35IZq5n5epeeoRZnmTMJwF2ZpNAA6APlVU8nrxo+HKJ6wQVogT68=",
+      "x-amz-request-id": "8V0RTYST12M3E8WC",
+      "Server": "AmazonS3",
+      "Date": "Sat, 14 Nov 2026 18:25:50 GMT",
+      "Last-Modified": "Thu, 10 Nov 2022 20:44:38 GMT",
+      "ETag": "\"00327770797a739b1bf9456faa602add-11\"",
+      "x-amz-storage-class": "STANDARD_IA",
+      "x-amz-version-id": "null",
+      "Accept-Ranges": "bytes",
+      "Content-Length": "90345300",
+      "Content-Type": "image/tiff",
+      "Connection": "close"
+    },
+    "bytes_read": 0,
+    "sample_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

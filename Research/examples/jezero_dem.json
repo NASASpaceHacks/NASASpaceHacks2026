@@ -1,0 +1,62 @@
+{
+  "source_url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif",
+  "product": "JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40",
+  "request": {
+    "center_east_lon_planetocentric_lat": [
+      77.45,
+      18.445
+    ],
+    "size_pixels": 256
+  },
+  "acquired_utc": "2026-11-14T18:21:25.288483+00:00",
+  "http_headers": {
+    "x-amz-request-id": "R6BG69XGQKTGF62J",
+    "x-amz-id-2": "si/nsV6FHrgDk7WCslLnM2uNQnYveRQLPmGSodENv9jXt9J+UOGycCkk4VVRnddy2u73eg7SM/Wt+TyxEOfq8HOTR9LyyHaR",
+    "Content-Length": "16",
+    "Accept-Ranges": "bytes",
+    "Content-Range": "bytes 0-15/1839545409",
+    "Date": "Sat, 14 Nov 2026 18:21:19 GMT",
+    "Server": "AmazonS3",
+    "Last-Modified": "Thu, 10 Nov 2022 21:35:06 GMT",
+    "ETag": "\"50aff29b9a8b2355e780149fbccbcc24-220\"",
+    "x-amz-version-id": "null",
+    "Content-Type": "image/tiff",
+    "x-amz-storage-class": "STANDARD_IA",
+    "Connection": "close"
+  },
+  "source_shape": [
+    21488,
+    21400
+  ],
+  "source_block_shapes": [
+    [
+      1,
+      21400
+    ]
+  ],
+  "source_dtype": "float32",
+  "nodata": -3.4028226550889045e+38,
+  "crs_wkt": "PROJCS[\"Equirectangular Mars 2000 Sphere IAU\",GEOGCS[\"D_Mars_2000_Sphere\",DATUM[\"Mars_2000_(Sphere)\",SPHEROID[\"Mars_2000_Sphere_IAU\",3396190,0],AUTHORITY[\"ESRI\",\"106971\"]],PRIMEM[\"Reference_Meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Equirectangular\"],PARAMETER[\"standard_parallel_1\",0],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+  "transform": [
+    1.0,
+    0.0,
+    4590697.0,
+    0.0,
+    -1.0,
+    1093450.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "source_window": [
+    13331,
+    13168,
+    256,
+    256
+  ],
+  "resampling": "none; native pixel values preserved",
+  "data_kind": "real_mars_stereo_dem",
+  "vertical_reference": "MOLA topography; retain source DeltaGeoid processing history",
+  "label_url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40_pds3.lbl",
+  "crop_sha256": "e45041be98107edaa2c6bec80fd658bbb3609d31cab69246b0434158033da2a9"
+}

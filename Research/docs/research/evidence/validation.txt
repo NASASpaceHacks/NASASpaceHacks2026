@@ -1,0 +1,80 @@
+Checked UTC: 2026-11-14T18:33:09.728767+00:00
+
+COMMAND: python -m unittest discover -s tests -v
+EXIT: 0
+test_cached_crop_and_real_path (test_routes.RealDataTests.test_cached_crop_and_real_path) ... ok
+test_astar_matches_dijkstra (test_routes.RoutingTests.test_astar_matches_dijkstra) ... ok
+test_directional_time_formula (test_routes.RoutingTests.test_directional_time_formula) ... ok
+test_edge_slope_excludes_spike (test_routes.RoutingTests.test_edge_slope_excludes_spike) ... ok
+test_invalid_stop_matrix_and_budget (test_routes.RoutingTests.test_invalid_stop_matrix_and_budget) ... ok
+test_known_flat_shortest_path (test_routes.RoutingTests.test_known_flat_shortest_path) ... ok
+test_no_diagonal_corner_cutting (test_routes.RoutingTests.test_no_diagonal_corner_cutting) ... ok
+test_nodata_avoidance_and_invalid_endpoint (test_routes.RoutingTests.test_nodata_avoidance_and_invalid_endpoint) ... ok
+test_obstacle_avoidance_and_unreachable (test_routes.RoutingTests.test_obstacle_avoidance_and_unreachable) ... ok
+test_ordering_is_directed (test_routes.RoutingTests.test_ordering_is_directed) ... ok
+test_return_direction_and_budget (test_routes.RoutingTests.test_return_direction_and_budget) ... ok
+test_same_start_goal (test_routes.RoutingTests.test_same_start_goal) ... ok
+test_stricter_scenario_excludes_nodes_in_reverse_search (test_routes.RoutingTests.test_stricter_scenario_excludes_nodes_in_reverse_search) ... ok
+test_analytic_planar_slope (test_routes.TerrainTests.test_analytic_planar_slope) ... ok
+test_coordinate_roundtrip_and_longitude_convention (test_routes.TerrainTests.test_coordinate_roundtrip_and_longitude_convention) ... ok
+test_ground_spacing_matches_mars_geodesic (test_routes.TerrainTests.test_ground_spacing_matches_mars_geodesic) ... ok
+test_nodata_halo_and_boundary (test_routes.TerrainTests.test_nodata_halo_and_boundary) ... ok
+test_reject_earth_and_bad_parameters (test_routes.TerrainTests.test_reject_earth_and_bad_parameters) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.812s
+
+OK
+
+COMMAND: python -m mars_routes --start 77.4485183698317 18.44647962260933 --goal 77.4513863726576 18.443611619783454 --out examples/two_point
+EXIT: 0
+{
+  "output": "examples\\two_point",
+  "stop_order": [
+    0,
+    1
+  ],
+  "metrics": {
+    "length_3d_m": 234.70438833417285,
+    "walking_s": 525.8076273299838,
+    "elevation_gain_m": 4.69677734375,
+    "elevation_loss_m": 4.61328125,
+    "max_edge_slope_deg": 13.515062526775624,
+    "max_cell_slope_deg": 13.353137414765852,
+    "positive_gravitational_work_J_per_kg": 17.4250439453125,
+    "elapsed_s": 525.8076273299836,
+    "minimum_return_margin_s": 1948.8549144710973,
+    "budget_s": 3600,
+    "reserve_s": 600
+  }
+}
+
+COMMAND: python -m mars_routes --stop 77.45088025451184 18.446142210512168 --stop 77.44885578192887 18.444117737929194 --return-to-base --dwell-min 2 --out examples/multi_stop
+EXIT: 0
+{
+  "output": "examples\\multi_stop",
+  "stop_order": [
+    0,
+    2,
+    3,
+    1,
+    0
+  ],
+  "metrics": {
+    "length_3d_m": 609.0653674177652,
+    "walking_s": 1343.6596079095204,
+    "elevation_gain_m": 10.428466796875,
+    "elevation_loss_m": 10.428466796875,
+    "max_edge_slope_deg": 12.858668236539522,
+    "max_cell_slope_deg": 14.861882702865252,
+    "positive_gravitational_work_J_per_kg": 38.68961181640625,
+    "elapsed_s": 1703.6596079095184,
+    "minimum_return_margin_s": 1296.3403920904807,
+    "budget_s": 3600,
+    "reserve_s": 600
+  }
+}
+
+COMMAND: python -m mars_routes --budget-min 5 --reserve-min 0 --out outputs/should_fail
+EXIT: 2
+Route failed: EVA time budget or emergency return reserve violated
