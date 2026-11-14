@@ -214,6 +214,12 @@ export interface Rule {
   citation: string;
   /** True when the value is a team design parameter rather than a published NASA number. */
   assumption?: boolean;
+  /**
+   * Evidence class (scheme adopted from the team's research, Research/README.md on main):
+   * M = measured (flight/lab data), A = analog / flight experience, D = NASA design requirement or derived
+   * from NASA documents, S = simulated, E = team engineering assumption.
+   */
+  evidence?: 'M' | 'A' | 'D' | 'S' | 'E';
 }
 
 // ───────────────────────────── Planning ─────────────────────────────

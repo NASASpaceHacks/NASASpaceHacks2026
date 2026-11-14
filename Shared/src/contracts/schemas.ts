@@ -147,6 +147,7 @@ export const RuleSchema = z.object({
   enabled: z.boolean(),
   citation: z.string(),
   assumption: z.boolean().optional(),
+  evidence: z.enum(['M', 'A', 'D', 'S', 'E']).optional(),
 });
 
 export const PlanRequestSchema = z.object({

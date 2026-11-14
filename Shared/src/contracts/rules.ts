@@ -7,6 +7,7 @@ import type { CrewParams, Rule, RuleId } from './types';
 export const DEFAULT_RULES: Rule[] = [
   {
     id: 'slope_max_deg',
+    evidence: 'A',
     label: 'Max walking slope',
     value: 20,
     unit: 'deg',
@@ -17,6 +18,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'slope_soft_deg',
+    evidence: 'M',
     label: 'Slope comfort limit (metabolic data edge)',
     value: 16.7,
     unit: 'deg',
@@ -27,6 +29,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'eva_duration_max_min',
+    evidence: 'D',
     label: 'EVA duration (nominal)',
     value: 360,
     unit: 'min',
@@ -36,6 +39,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'egress_ingress_min',
+    evidence: 'D',
     label: 'Egress + ingress overhead',
     value: 60,
     unit: 'min',
@@ -45,6 +49,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'contingency_o2_min',
+    evidence: 'D',
     label: 'Contingency O₂ reserve (never planned into)',
     value: 60,
     unit: 'min',
@@ -54,6 +59,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'walkback_speed_factor',
+    evidence: 'E',
     label: 'Contingency walkback speed factor',
     value: 0.5,
     unit: '×v₀',
@@ -65,6 +71,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'shelter_time_max_min',
+    evidence: 'D',
     label: 'Max time to shelter (SEP)',
     value: 30,
     unit: 'min',
@@ -75,6 +82,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'los_gap_max_min',
+    evidence: 'E',
     label: 'Max time without habitat line-of-sight',
     value: 10,
     unit: 'min',
@@ -86,6 +94,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'daylight_min_sun_elev_deg',
+    evidence: 'E',
     label: 'Min sun elevation (daylight only)',
     value: 5,
     unit: 'deg',
@@ -96,6 +105,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'heat_avg_max_w',
+    evidence: 'D',
     label: 'Suit heat-rejection budget (30-min avg)',
     value: 352,
     unit: 'W',
@@ -106,6 +116,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'walk_radius_max_m',
+    evidence: 'D',
     label: 'Max distance from habitat (walking)',
     value: 2000,
     unit: 'm',
@@ -116,6 +127,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'plume_keepout_m',
+    evidence: 'D',
     label: 'Lander plume-ejecta keep-out radius',
     value: 1000,
     unit: 'm',
