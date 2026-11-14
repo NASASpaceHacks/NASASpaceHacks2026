@@ -297,7 +297,7 @@ export interface BurndownPoint {
   walkbackMarginMin: number;
   shelterMarginMin: number;
   metW: number;            // metabolic rate
-  heatAvgW: number;        // 15-min rolling average
+  heatAvgW: number;        // 30-min rolling (leaky-bucket) average
   inLos: boolean;
   sunElevDeg: number;
 }
@@ -346,7 +346,7 @@ export interface FieldSet {
   shelterMin: Float32Array;
   /** Outbound time from the hab (min). */
   outboundMin: Float32Array;
-  /** 1 = line of sight to the hab mast. */
+  /** 1 = comm line of sight to the hab mast OR a pressurized-rover relay mast (rover relay = team assumption). */
   los: Uint8Array;
   /** Hard-blocked cells (slope, keep-out, nodata, hazards). */
   blocked: Uint8Array;

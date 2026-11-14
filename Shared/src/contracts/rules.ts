@@ -96,7 +96,7 @@ export const DEFAULT_RULES: Rule[] = [
   },
   {
     id: 'heat_avg_max_w',
-    label: 'Suit heat-rejection budget (15-min avg)',
+    label: 'Suit heat-rejection budget (30-min avg)',
     value: 352,
     unit: 'W',
     hard: true,
