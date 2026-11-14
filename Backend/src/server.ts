@@ -9,6 +9,7 @@ import {
   PlanPackageSchema,
   PlanRequestSchema,
   type FieldSet,
+  type LinkMsg,
   type PlanEvent,
   type PlanPackage,
   type PlanRequest,
@@ -461,6 +462,20 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
     const base = baseHash ? (await getEntry(baseHash))?.req : undefined;
     if (!baseHash || !base) return bad(c, 'no plan to replan from — POST /api/plan first', {}, 409);
 
+    if (ev.type === 'SEP_NOWCAST') {
+      // Safety first: warn the crew immediately over the surface link (held and flushed if the link is
+      // dropped); the replanned return route follows once the EVA officer confirms it.
+      const alert: LinkMsg = {
+        type: 'ALERT',
+        level: 'warning',
+        code: 'SEP_NOWCAST',
+        text: `SEP NOWCAST — REACH SHELTER WITHIN ${ev.leadMin} MIN`,
+        t: lastTelem?.t ?? 0,
+      };
+      evlog.append('alert', { from: 'hab', level: alert.level, code: alert.code, text: alert.text, t: alert.t });
+      hub.sendToVisors(alert);
+      hub.sendToConsoles(alert);
+    }
     const planEvent: PlanEvent =
       ev.type === 'SEP_NOWCAST'
         ? { t: 'SEP_NOWCAST', leadMin: ev.leadMin }

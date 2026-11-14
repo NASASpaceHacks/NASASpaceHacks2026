@@ -7,6 +7,7 @@
  * with RETURN_NOW (safety core or hab ALERT) and AUTONOMOUS (link 'down' ≥3 s) layered on top.
  */
 import {
+  cellToXY,
   decodeRaster,
   mockSitePack,
   xyToCell,
@@ -18,22 +19,22 @@ import {
   type SitePackManifest,
   type Station,
 } from '@mw/shared/contracts';
+import { etaFromThermalInertia, formatLtst } from '@mw/shared/engine';
 import { bearingDeg, coarseAt, createSafetyCore, defaultLs, engineImpl, ltstAt, norm360, type SafetyCore, type SafetyState } from '../adapters/engine';
 import { connectVisorLink, linkImpl, verifyRoute, withLocalDrop, type DroppableLink, type LinkStatus } from '../adapters/link';
 import { mapImpl } from '../adapters/map';
 import { initialSnapshot, useVisor, type DisplayState, type NextInfo, type PendingInfo, type ReturnInfo, type Snapshot, type StationInfo, type Toast } from '../state/store';
 import {
   AUTONOMOUS_AFTER_MS,
-  EVA_DURATION_MIN,
   HEAT_BUDGET_W,
   HEAT_PACE_FACTOR,
-  INGRESS_RESERVE_MIN,
   MOCK_DEFAULT_SPEED,
   OUTBOX_MAX,
   SHELTER_MAX_MIN,
   SIM_POLL_MS,
   SIM_TICK_MS,
   SPEED_STEPS,
+  SURFACE_MIN,
   TELEM_PERIOD_MS,
   V0,
   WALKBACK_FACTOR,
@@ -43,7 +44,7 @@ import { headingCue, pickLandmark } from './cues';
 import { buildMockScenario, MockHabLink, nextVersion } from './mock';
 import { Checkpoint, type DynState } from './persist';
 import { crewTasks, galeStation, objectivesFor, type CrewTask } from './science';
-import { RouteModel } from './route';
+import { RouteModel, shelterAt, shelterLabel } from './route';
 import { departNow, estimatedXY, newSim, rebaseSim, simTick, type SimState } from './sim';
 
 export interface MapLayers {
@@ -67,6 +68,8 @@ export class VisorController {
   grid: GridSpec | null = null;
   packBase = '';
   dem: Float32Array | null = null;
+  /** Pandolf terrain factor per cell from THEMIS TI (engine etaFromThermalInertia); null → 1.0. */
+  eta: Float32Array | null = null;
   los: Uint8Array | null = null;
   layers: MapLayers | null = null;
 
@@ -87,6 +90,8 @@ export class VisorController {
   private safetyLatched = false;
   private linkStatus: LinkStatus = 'down';
   private linkDownSince: number | null = performance.now();
+  /** Last frame heard from the hab (heartbeats included). AUTONOMOUS = 3 s of silence. */
+  private lastHeard = performance.now();
   private wasAutonomous = false;
   private everUp = false;
   private mirror = false;
@@ -242,10 +247,34 @@ export class VisorController {
       const dem = decodeRaster(await r.arrayBuffer(), layer);
       if (dem.length !== manifest.grid.w * manifest.grid.h || this.manifest?.id !== manifest.id) return;
       this.dem = dem;
+      await this.loadEta(manifest);
+      this.applyTerrain();
       this.buildLayers();
     } catch {
       /* terrain contours are optional on the visor */
     }
+  }
+
+  /** THEMIS TI → engine terrain factor η, so the simulator's metabolic power matches the planner's. */
+  private async loadEta(manifest: SitePackManifest) {
+    const layer = manifest.rasters.ti;
+    if (!layer) return;
+    try {
+      const r = await fetch(`${this.packBase}/${layer.file}`);
+      if (!r.ok) return;
+      const ti = decodeRaster(await r.arrayBuffer(), layer);
+      if (ti.length !== manifest.grid.w * manifest.grid.h || this.manifest?.id !== manifest.id) return;
+      const eta = new Float32Array(ti.length);
+      for (let i = 0; i < ti.length; i++) eta[i] = etaFromThermalInertia(ti[i]);
+      this.eta = eta;
+    } catch {
+      /* η defaults to 1.0, as in the engine without TI */
+    }
+  }
+
+  /** Time/cost the current route with the engine cost model once the DEM is on board. */
+  private applyTerrain() {
+    if (this.route && this.dem && !this.route.terrain) this.route.setTerrain({ elev: this.dem, eta: this.eta });
   }
 
   private setPack(manifest: SitePackManifest, base: string, dem: Float32Array | null) {
@@ -253,6 +282,7 @@ export class VisorController {
     this.grid = manifest.grid;
     this.packBase = base;
     this.dem = dem;
+    this.eta = null;
     this.landmark = pickLandmark(manifest.landmarks);
     this.updateLs();
     this.buildLayers();
@@ -268,12 +298,18 @@ export class VisorController {
     const m = this.manifest, g = this.grid;
     if (!m || !g) return;
     let shadowIso: Iso[] = [];
+    const cl = this.pkg?.coarse;
     if (this.los) {
       const f = Math.max(1, Math.round(20 / g.cellM));
       const inv = new Float32Array(this.los.length);
       for (let i = 0; i < inv.length; i++) inv[i] = this.los[i] ? 0 : 1;
       const { vals, frame } = downsample(inv, g, f);
       shadowIso = isobands(vals, frame, [0.5]);
+    } else if (cl?.los && cl.los.length === cl.w * cl.h) {
+      // Live: comm shadow from the route package's 50 m engine LOS grid (hab mast ∪ rover relay).
+      const vals = new Float32Array(cl.los.length);
+      for (let i = 0; i < vals.length; i++) vals[i] = cl.los[i] ? 0 : 1;
+      shadowIso = isobands(vals, { w: cl.w, h: cl.h, cellM: cl.cellM, originX: g.originX, originY: g.originY }, [0.5]);
     }
     this.layers = {
       grid: g,
@@ -296,6 +332,7 @@ export class VisorController {
       if (prev !== 'down' || this.linkDownSince === null) this.linkDownSince = performance.now();
     } else {
       this.linkDownSince = null;
+      if (s === 'up') this.lastHeard = performance.now();
       if (!this.everUp) this.everUp = true;
       if (this.wasAutonomous) {
         const n = this.outbox.length;
@@ -308,6 +345,7 @@ export class VisorController {
   }
 
   private onMsg(m: LinkMsg) {
+    this.lastHeard = performance.now();
     if (m.type === 'ROUTE_PUSH') this.onRoutePush(m.pkg);
     else if (m.type === 'ALERT') this.onAlert(m);
     this.publish();
@@ -430,17 +468,23 @@ export class VisorController {
     const stopCells: Record<string, number> = {};
     for (const st of this.route.stops) stopCells[st.id] = st.station?.cell ?? st.cell;
     this.core = createSafetyCore(pkg, g, { stopCells }, { engine: this.mode === 'live' || this.params.get('core') === 'engine' });
+    this.applyTerrain();
     if (fresh) {
       if (!this.sim || this.sim.mode === 'DONE') this.sim = newSim(this.seed + pkg.seq, this.desired.running, this.desired.speed);
       else rebaseSim(this.sim, old, this.route);
-      this.alert = null;
-      this.safetyLatched = false;
+      // A science route supersedes any return order. A return-only route (no stops, e.g. the SEP
+      // replan) IS the return: keep the hab's alert so the visor stays in RETURN guidance.
+      if (pkg.stops.length > 0 || !this.alert) {
+        this.alert = null;
+        this.safetyLatched = false;
+      }
     }
     this.ck.savePkg(pkg);
     this.ck.savePending(null);
     this.updateLs();
     this.versions.route++;
     this.zoneLevel = NaN;
+    if (!this.los && pkg.coarse.los) this.buildLayers();
   }
 
   accept = async () => {
@@ -658,12 +702,25 @@ export class VisorController {
     this.publish();
   }
 
+  /** AUTONOMOUS once the hab has been silent ≥ 3 s (the shared link reports 'down' after 3 missed heartbeats). */
   private isAutonomous(): boolean {
-    return this.linkStatus === 'down' && this.linkDownSince !== null && performance.now() - this.linkDownSince >= AUTONOMOUS_AFTER_MS;
+    return this.linkStatus === 'down' && performance.now() - this.lastHeard >= AUTONOMOUS_AFTER_MS;
   }
 
+  /** Planned surface minutes left (= walkback deadline − t), from planned O₂ (engine timeline convention). */
   private remainingMin(): number {
-    return ((this.sim?.o2Pct ?? 100) / 100) * EVA_DURATION_MIN - INGRESS_RESERVE_MIN;
+    return ((this.sim?.o2Pct ?? 100) / 100) * SURFACE_MIN;
+  }
+
+  /** Comm line of sight at a cell: dense field (mock) or the route package's 50 m engine LOS grid (live). */
+  private losAt(cell: number): boolean | null {
+    if (this.los) return this.los[cell] === 1;
+    const c = this.pkg?.coarse, g = this.grid;
+    if (!c?.los || !g || cell < 0) return null;
+    const f = c.cellM / g.cellM;
+    const r = Math.min(c.h - 1, Math.floor(Math.floor(cell / g.w) / f));
+    const col = Math.min(c.w - 1, Math.floor((cell % g.w) / f));
+    return c.los[r * c.w + col] === 1;
   }
 
   /** Safe zone = cells where walkback ≤ remaining time AND time-to-shelter ≤ the shelter rule (coarse 50 m grid). */
@@ -745,7 +802,17 @@ export class VisorController {
     const last = p.stops[p.stops.length - 1];
     const first = p.stops[0];
     const firstBingo = p.bingo.find((b) => b.id === first?.id);
+    const g = this.grid;
+    const endSh = g && p.route.length ? shelterAt(this.manifest, g, p.route[p.route.length - 1]) : null;
+    const startSh = g && p.route.length ? shelterAt(this.manifest, g, p.route[0]) : null;
+    const toLabel = endSh ? shelterLabel(endSh) : 'HAB';
+    // A mid-EVA replan starts where the crew is ('HERE'); a fresh route starts at a shelter.
+    const [sx, sy] = g && p.route.length ? cellToXY(g, p.route[0]) : [NaN, NaN];
+    const outAndBack = p.route.length > 1 && p.route[0] === p.route[p.route.length - 1];
+    const fromLabel = outAndBack ? toLabel : startSh && Math.hypot(startSh.x - sx, startSh.y - sy) < 25 ? shelterLabel(startSh) : 'HERE';
     return {
+      fromLabel,
+      toLabel,
       seq: p.seq,
       parentSeq: this.pkg && p.parent === this.pkg.id ? this.pkg.seq : null,
       author: p.author,
@@ -753,7 +820,7 @@ export class VisorController {
       distM,
       durMin: last ? last.departMin - (first?.arriveMin ?? 0) + distM / V0 / 60 / Math.max(1, p.stops.length + 1) : distM / V0 / 60,
       firstStop: first?.id ?? null,
-      bingo: firstBingo ? firstBingo.text : null,
+      bingo: firstBingo ? `LEAVE ${firstBingo.id} BY ${formatLtst(firstBingo.ltstMin)} LTST` : null,
       sameAsCurrentGeometry: false,
       sig: this.pendingSig,
     };
@@ -823,7 +890,7 @@ export class VisorController {
         const etaMin = distM / pace / 60;
         next = {
           id: st ? st.id : route.home.name,
-          name: st ? st.name : 'Habitat airlock',
+          name: st ? st.name : route.home.full,
           isHome: !st,
           distM,
           etaMin,
@@ -895,9 +962,10 @@ export class VisorController {
         };
       }
 
-      if (this.los) {
-        const c0 = xyToCell(g, est[0], est[1]);
-        const inLos = c0 >= 0 ? this.los[c0] === 1 : true;
+      const c0 = xyToCell(g, est[0], est[1]);
+      const here = this.losAt(c0);
+      if (here !== null) {
+        const inLos = here;
         let changeInMin: number | null = null;
         const dir = sim.mode === 'RETURN' ? sim.returnDir : 1;
         for (let d = 10; d <= pace * 60 * 20; d += 10) {
@@ -906,7 +974,7 @@ export class VisorController {
           const [x, y] = route.pointAt(s1);
           const c = xyToCell(g, x, y);
           if (c < 0) break;
-          if ((this.los[c] === 1) !== inLos) {
+          if (this.losAt(c) !== inLos) {
             changeInMin = d / pace / 60;
             break;
           }
@@ -955,6 +1023,8 @@ export class VisorController {
       metW: sim?.metW ?? 0,
       heatAvgW: sim?.heatAvgW ?? 0,
       heatAdvisory,
+      heatRest: sim?.resting ? { active: true, leftMin: (sim.restLeftS ?? 0) / 60 } : null,
+      homeName: route?.home.name ?? (m ? shelterLabel(m.shelters.find((x) => x.kind === 'hab') ?? { id: 'HAB', name: 'HAB' }) : 'HAB'),
       sigmaM: sim?.sigmaM ?? 0,
       headingDeg: heading,
       est,

@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { Rule, Station } from '@mw/shared/contracts';
-import { generatePlan, setAllStations, setStartLtst, toggleStation, updateRule } from '../actions';
+import { DEFAULT_CREW, cellDistM } from '@mw/shared/contracts';
+import { marsMetabolicW } from '@mw/shared/engine';
+import { generatePlan, setAllStations, setEvaBase, setStartLtst, toggleStation, updateRule } from '../actions';
+import { baseInfo, relabel, shortName, type BaseInfo } from '../lib/base';
 import { set, useConsole } from '../store';
 import { fmtLtst, sunAtLtst } from '../lib/marsclock';
 import { fmtRule } from '../lib/format';
@@ -188,6 +191,104 @@ function StationCard({ st }: { st: Station }) {
   );
 }
 
+/** EVA base selector: Hab-1 | PR-1 (rover-staged). */
+function BaseSelector() {
+  const pack = useConsole((s) => s.pack)!;
+  const evaBase = useConsole((s) => s.evaBase);
+  const shelters = pack.manifest.shelters.filter((s) => s.kind === 'hab' || s.kind === 'rover');
+  if (shelters.length < 2) return null;
+  return (
+    <section>
+      <SectionHead right={<span className="text-[10px] text-dim">EVA starts and ends here</span>}>EVA base</SectionHead>
+      <div className="mt-2.5 grid gap-1.5" style={{ gridTemplateColumns: `repeat(${shelters.length}, minmax(0, 1fr))` }} role="radiogroup" aria-label="EVA base">
+        {shelters.map((sh) => {
+          const on = evaBase === sh.id;
+          return (
+            <button
+              key={sh.id}
+              role="radio"
+              aria-checked={on}
+              data-testid={`eva-base-${sh.id}`}
+              onClick={() => setEvaBase(sh.id)}
+              className={cx(
+                'flex flex-col items-start rounded-[3px] border px-2.5 py-2 text-left transition-colors',
+                on ? 'border-amber/70 bg-amber/10' : 'border-line-2 hover:border-[#454b55]',
+              )}
+            >
+              <span className={cx('font-display text-[12px] uppercase tracking-[0.12em]', on ? 'text-amber' : 'text-ink-2')}>{shortName(sh)}</span>
+              <span className="text-[10.5px] leading-tight text-mute">{sh.kind === 'rover' ? 'Rover-staged · drag on map' : 'Habitat airlock'}</span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Physical reason behind a STAY_IN driven by EVA duration: the closest dropped station's elevation
+ * below the base (DEM) and the engine's own metabolic model on the climb back, against the suit-heat
+ * budget. Every number is computed (DEM, Pandolf–Santee-Mars, flight rules, engine deficits).
+ */
+function stayInWhy(base: BaseInfo): string | null {
+  const s = useConsole.getState();
+  const plan = s.plan, pack = s.pack;
+  if (!plan || !pack) return null;
+  const timeDrops = plan.dropped.filter((d) => d.rule === 'eva_duration_max_min' || d.rule === 'walkback_speed_factor' || d.rule === 'heat_avg_max_w');
+  if (!timeDrops.length) return null;
+  const d = [...timeDrops].sort((a, b) => a.deficitMin - b.deficitMin)[0];
+  const st = pack.manifest.stations.find((x) => x.id === d.id);
+  const dem = pack.rasters.dem;
+  if (!st || !dem) return null;
+  const g = pack.manifest.grid;
+  const dz = dem[base.cell] - dem[st.cell];
+  const dist = cellDistM(g, base.cell, st.cell);
+  const rule = (id: Rule['id']) => s.rules.find((r) => r.id === id);
+  const heat = rule('heat_avg_max_w');
+  const eva = rule('eva_duration_max_min');
+  const crew = DEFAULT_CREW;
+  const mass = Math.round(crew.bodyMassKg + crew.suitMassKg + crew.toolsKg);
+  const pLevel = marsMetabolicW(crew, crew.v0, 0, 1);
+  const deficit = d.deficitMin > 0 ? `by ${Math.ceil(d.deficitMin)} min` : '';
+  if (dz > 20 && dist > 0 && heat?.enabled) {
+    const grade = (100 * dz) / dist;
+    const pUp = marsMetabolicW(crew, crew.v0, grade, 1);
+    return `Suit heat: ${st.id} sits ${Math.round(dz)} m below ${base.short}, so the walk back climbs ≈${grade.toFixed(0)} % on average. Carrying ${mass} kg at 0.38 g and ${crew.v0} m/s that costs ≈${Math.round(pUp)} W (level ≈${Math.round(pLevel)} W) against the ${heat.value} W suit-heat budget, so the heat governor must insert rests and even the closest station overruns the ${eva?.value ?? 360}-min EVA ${deficit}.`;
+  }
+  return `Even the closest station (${st.id}) overruns the ${eva?.value ?? 360}-min EVA ${deficit} from ${base.short}${heat?.enabled && pLevel > heat.value ? ` (walking ≈${Math.round(pLevel)} W vs the ${heat.value} W suit-heat budget needs rests)` : ''}.`;
+}
+
+/** Demo moment 1's insight: why the hab says STAY IN, and the one-click fix (stage from the rover). */
+function StayInCard() {
+  const plan = useConsole((s) => s.plan);
+  const pack = useConsole((s) => s.pack)!;
+  const evaBase = useConsole((s) => s.evaBase);
+  const shelterCells = useConsole((s) => s.shelterCells);
+  const status = useConsole((s) => s.planStatus);
+  if (!plan || plan.status !== 'STAY_IN' || status === 'planning') return null;
+  const base = baseInfo(pack, evaBase, shelterCells);
+  const rover = pack.manifest.shelters.find((s) => s.kind === 'rover' && s.id !== base.id);
+  const why = stayInWhy(base);
+  const staging = plan.notes.find((n) => /^Staging the EVA from /.test(n));
+  const stagingText = staging ? relabel(pack, base, staging.replace(/\s*Re-plan with stageFromShelter\([^)]*\)\.?/, '')) : null;
+  return (
+    <section data-testid="stayin-card" className="rounded-[4px] border border-red/60 bg-gradient-to-br from-red/[0.10] to-transparent p-3.5">
+      <div className="flex items-center gap-2">
+        <span className="font-display text-[17px] font-bold tracking-[0.12em] text-red">STAY IN</span>
+        <span className="font-display text-[11px] uppercase tracking-[0.12em] text-ink-2">from {base.short}</span>
+      </div>
+      {plan.binding && <div data-testid="stayin-binding" className="mt-1.5 text-[12px] leading-snug text-ink">{relabel(pack, base, plan.binding.text)}</div>}
+      {why && <div data-testid="stayin-why" className="mt-2 text-[11.5px] leading-snug text-ink-2">{why}</div>}
+      {stagingText && <div className="mt-2 border-t border-line/70 pt-2 text-[11px] leading-snug text-cyan">{stagingText}</div>}
+      {rover && (
+        <Button data-testid="stage-from-rover" variant="primary" className="mt-3 w-full" onClick={() => setEvaBase(rover.id)}>
+          Stage from {shortName(rover)}
+        </Button>
+      )}
+    </section>
+  );
+}
+
 function RuleRow({ r }: { r: Rule }) {
   return (
     <div className={cx('flex items-center gap-2.5 border-b border-line/60 py-2 last:border-0', !r.enabled && 'opacity-50')}>
@@ -243,6 +344,9 @@ export function PlanTab() {
         </Button>
         {dirty && status !== 'planning' && <span className="max-w-[110px] text-[10.5px] leading-tight text-amber">Inputs changed since the last plan</span>}
       </div>
+
+      <BaseSelector />
+      <StayInCard />
 
       <section>
         <SectionHead>EVA start</SectionHead>

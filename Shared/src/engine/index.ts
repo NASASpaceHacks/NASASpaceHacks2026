@@ -21,4 +21,4 @@ export { createSafetyCore, type SafetyCore, type SafetyState, type SafetyLimits 
 export { pandolfSanteeMars, pandolfSanteeW, marsMetabolicW, etaFromThermalInertia, PANDOLF_SANTEE_MARS } from './costModel';
 export { dijkstraSearch, astarSearch } from './search';
 export { doseEqRateUSvPerMin, doseRateUGyPerDay, pressureAtElevation, skyShieldFactor } from './radiation';
-export { HEAT_TAU_MIN, REST_W, TASK_W_DEFAULT, HEAT_INITIAL_W } from './heat';
+export { HEAT_TAU_MIN, REST_W, TASK_W_DEFAULT, HEAT_INITIAL_W, restNeeded, heatAfterRest, heatAfterWork, type HeatParams } from './heat';

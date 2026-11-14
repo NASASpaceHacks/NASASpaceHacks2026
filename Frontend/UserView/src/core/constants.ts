@@ -13,6 +13,15 @@ export const EVA_DURATION_MIN = ruleValue(DEFAULT_RULES, 'eva_duration_max_min')
 export const EGRESS_INGRESS_MIN = ruleValue(DEFAULT_RULES, 'egress_ingress_min');
 export const EVA_T0_MIN = EGRESS_INGRESS_MIN / 2;
 export const INGRESS_RESERVE_MIN = EGRESS_INGRESS_MIN / 2;
+/**
+ * Planned surface time (min) and the walkback deadline (EVA min), exactly as the engine timeline
+ * defines them (Shared/src/engine/plan.ts makeTimeline): A = EVA max − egress/ingress, deadline = egress/2 + A.
+ * Planned O₂ (contract BurndownPoint.o2Pct) runs 100 % at surface start → 0 % at the deadline; the
+ * contingency reserve is never planned into.
+ */
+export const SURFACE_MIN = EVA_DURATION_MIN - EGRESS_INGRESS_MIN;
+export const O2_DEADLINE_MIN = EVA_T0_MIN + SURFACE_MIN;
+export const o2PctAt = (tMin: number) => Math.max(0, Math.min(100, (100 * (O2_DEADLINE_MIN - tMin)) / SURFACE_MIN));
 /** Max time to shelter, min (arXiv:2502.02469 nowcast lead; DRA 5.0 Addendum). */
 export const SHELTER_MAX_MIN = ruleValue(DEFAULT_RULES, 'shelter_time_max_min');
 /** Suit heat-rejection budget, W, rolling average (NASA ICES-2026-127; NTRS 20130014146). Averaged with the engine 30-min leaky integrator. */

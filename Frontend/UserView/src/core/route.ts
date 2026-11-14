@@ -2,8 +2,39 @@
  * Route geometry for the visor: the confirmed PlanPackage route as a smoothed polyline in projected
  * metres, with cumulative distance, located stops, and nearest-point queries.
  */
-import { cellToXY, type Bingo, type GridSpec, type PlanPackage, type SitePackManifest, type Station } from '@mw/shared/contracts';
+import { DEFAULT_CREW, cellToXY, type Bingo, type CostCtx, type CostGrid, type CrewParams, type GridSpec, type PlanPackage, type Shelter, type SitePackManifest, type Station } from '@mw/shared/contracts';
+import { DEFAULT_RULES } from '@mw/shared/contracts';
+import { marsMetabolicW, pandolfSanteeMars } from '@mw/shared/engine';
 import { bearingDeg } from '../adapters/engine';
+
+/** "Habitat (Hab-1)" → "HAB-1", "Pressurized rover (PR-1)" → "PR-1" (visor labels are upper case). */
+export function shelterLabel(s: Pick<Shelter, 'id' | 'name'>): string {
+  const m = /\(([^)]+)\)\s*$/.exec(s.name);
+  return (m ? m[1] : s.id).toUpperCase();
+}
+
+/**
+ * The shelter a route ends at. Exact cell, else within 25 m, else — the hab is fixed, so a route that
+ * ends elsewhere ends at a pressurized rover the EVA officer dragged — the nearest movable shelter.
+ */
+export function shelterAt(manifest: SitePackManifest | null, grid: GridSpec, cell: number): Shelter | null {
+  const sh = manifest?.shelters ?? [];
+  if (!sh.length) return null;
+  const exact = sh.find((s) => s.cell === cell);
+  if (exact) return exact;
+  const [x, y] = cellToXY(grid, cell);
+  const d = (s: Shelter) => Math.hypot(s.x - x, s.y - y);
+  const near = [...sh].sort((a, b) => d(a) - d(b));
+  if (d(near[0]) < 25) return near[0];
+  return near.find((s) => s.movable) ?? null;
+}
+
+/** Terrain the visor needs to time and cost the route like the planner (engine cost grid subset). */
+export interface RouteTerrain {
+  elev: Float32Array;
+  /** Pandolf terrain factor per cell (engine etaFromThermalInertia), or null → 1.0 (engine default without TI). */
+  eta: Float32Array | null;
+}
 
 export interface RouteStop {
   id: string;
@@ -28,8 +59,18 @@ export class RouteModel {
   readonly cum: Float64Array;
   readonly length: number;
   readonly stops: RouteStop[];
-  readonly home: { x: number; y: number; cell: number; name: string };
-  readonly start: { x: number; y: number; cell: number };
+  /** Route end = the EVA base (or, for a SEP return, the nearest shelter). `name` = short visor label (PR-1). */
+  readonly home: { x: number; y: number; cell: number; name: string; id: string; full: string; kind: Shelter['kind'] | null };
+  readonly start: { x: number; y: number; cell: number; atHome: boolean };
+  /**
+   * Per route segment i (cells[i] → cells[i+1]): planned travel time (s) and metabolic power (W) forward
+   * and backward, from the engine cost model (pandolf-santee-mars edgeCost / edgePowerW) on the DEM.
+   * Until the DEM is loaded: planar distance at v0 and level-ground power.
+   */
+  edgeT: Float64Array;
+  edgeP: Float64Array;
+  edgePRev: Float64Array;
+  terrain = false;
 
   constructor(readonly pkg: PlanPackage, readonly grid: GridSpec, manifest: SitePackManifest | null) {
     // Dedupe consecutive repeats; a repeat is the engine's stop marker (leg end + next leg start).
@@ -112,10 +153,55 @@ export class RouteModel {
     });
 
     const endCell = cells[n - 1];
-    const shelter = manifest?.shelters.find((s) => s.cell === endCell) ??
-      manifest?.shelters.find((s) => Math.hypot(s.x - xs[n - 1], s.y - ys[n - 1]) < 25);
-    this.home = { x: xs[n - 1], y: ys[n - 1], cell: endCell, name: shelter ? shelter.id : 'HAB' };
-    this.start = { x: xs[0], y: ys[0], cell: cells[0] };
+    const shelter = shelterAt(manifest, grid, endCell);
+    this.home = {
+      x: xs[n - 1], y: ys[n - 1], cell: endCell,
+      name: shelter ? shelterLabel(shelter) : 'HAB', id: shelter?.id ?? 'HAB', full: shelter?.name ?? 'Habitat', kind: shelter?.kind ?? null,
+    };
+    this.start = { x: xs[0], y: ys[0], cell: cells[0], atHome: Math.hypot(xs[0] - xs[n - 1], ys[0] - ys[n - 1]) < 25 };
+
+    this.edgeT = new Float64Array(Math.max(1, n - 1));
+    this.edgeP = new Float64Array(Math.max(1, n - 1));
+    this.edgePRev = new Float64Array(Math.max(1, n - 1));
+    const crew = DEFAULT_CREW;
+    const pLevel = marsMetabolicW(crew, crew.v0, 0, 1);
+    for (let i = 0; i + 1 < n; i++) {
+      this.edgeT[i] = Math.hypot(rx[i + 1] - rx[i], ry[i + 1] - ry[i]) / crew.v0;
+      this.edgeP[i] = this.edgePRev[i] = pLevel;
+    }
+  }
+
+  /**
+   * Time and cost every segment with the engine's own cost model on the real DEM (same crew, v0 and
+   * terrain factor as the planner), so the simulated crew's pace, metabolic rate and heat follow the plan.
+   */
+  setTerrain(t: RouteTerrain, crew: CrewParams = DEFAULT_CREW) {
+    const g = this.grid;
+    const n = g.w * g.h;
+    if (t.elev.length !== n) return;
+    const grid: CostGrid = {
+      w: g.w, h: g.h, cellM: g.cellM, elev: t.elev, slopeDeg: t.elev, rough: t.elev,
+      eta: t.eta && t.eta.length === n ? t.eta : onesF32(n), blocked: zerosU8(n),
+    };
+    const ctx: CostCtx = { crew, rules: DEFAULT_RULES, speedFactor: 1 };
+    const m = pandolfSanteeMars;
+    for (let i = 0; i + 1 < this.n; i++) {
+      const a = this.cells[i], b = this.cells[i + 1];
+      const dt = m.edgeCost(grid, a, b, ctx);
+      if (!(dt < Infinity)) continue; // nodata: keep the planar estimate
+      this.edgeT[i] = dt;
+      this.edgeP[i] = m.edgePowerW!(grid, a, b, ctx);
+      this.edgePRev[i] = m.edgePowerW!(grid, b, a, ctx);
+    }
+    this.terrain = true;
+  }
+
+  /** Walking speed along the smoothed polyline on segment i (m/s) that reproduces the planned edge time. */
+  speedOn(i: number): number {
+    const j = Math.max(0, Math.min(this.n - 2, i));
+    const len = this.cum[j + 1] - this.cum[j];
+    const t = this.edgeT[j];
+    return t > 0 && len > 0 ? len / t : DEFAULT_CREW.v0;
   }
 
   /** Segment index i and fraction f such that s lies on [i, i+1]. */
@@ -182,4 +268,15 @@ export class RouteModel {
     out.push(this.pointAt(b));
     return out;
   }
+}
+
+let ones: Float32Array | null = null;
+let zeros: Uint8Array | null = null;
+function onesF32(n: number): Float32Array {
+  if (!ones || ones.length !== n) ones = new Float32Array(n).fill(1);
+  return ones;
+}
+function zerosU8(n: number): Uint8Array {
+  if (!zeros || zeros.length !== n) zeros = new Uint8Array(n);
+  return zeros;
 }

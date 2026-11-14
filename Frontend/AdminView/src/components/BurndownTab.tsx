@@ -102,7 +102,7 @@ function Chart({ def, plan, telem, nowT }: { def: ChartDef; plan: BurndownPoint[
   const minPlan = plan.length ? Math.min(...plan.map(def.plan)) : null;
   const lastAct = def.actual && telem.length ? def.actual(telem[telem.length - 1]) : null;
   return (
-    <div className="rounded-[3px] border border-line bg-sunk/50 px-2.5 pb-1 pt-2">
+    <div data-testid={`burndown-${def.key}`} data-actual-points={telem.length} className="rounded-[3px] border border-line bg-sunk/50 px-2.5 pb-1 pt-2">
       <div className="flex items-baseline justify-between px-0.5">
         <span className="font-display text-[10.5px] uppercase tracking-[0.12em] text-ink-2">{def.title}</span>
         <span className="num text-[10.5px] text-mute">
@@ -152,7 +152,8 @@ export function BurndownTab() {
       },
       { key: 'o2', title: 'O₂ remaining (planned)', unit: '%', plan: (b) => b.o2Pct, actual: (t) => t.o2Pct, limit: 0 },
       { key: 'el', title: 'Elevation', unit: 'm', plan: (b) => b.elevM, actual: dem ? (t) => dem[t.cell] : undefined },
-      { key: 'heat', title: 'Heat load (15-min avg)', unit: 'W', plan: (b) => b.heatAvgW, actual: (t) => t.heatAvgW, limit: heatLimit, limitLabel: 'suit budget' },
+      { key: 'met', title: 'Metabolic rate', unit: 'W', plan: (b) => b.metW, actual: (t) => t.metW },
+      { key: 'heat', title: 'Suit heat (30-min avg)', unit: 'W', plan: (b) => b.heatAvgW, actual: (t) => t.heatAvgW, limit: heatLimit, limitLabel: 'suit budget' },
     ];
   }, [fields, limits, pack, heatLimit]);
 

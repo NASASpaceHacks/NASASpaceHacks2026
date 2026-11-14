@@ -1,11 +1,13 @@
 import type { Cell, LinkMsg, PlanEvent, PlanRequest, Rule, RuleId } from '@mw/shared/contracts';
 import { DEFAULT_CREW, cellToXY, xyToCell } from '@mw/shared/contracts';
+import { stageFromShelter } from '@mw/shared/engine';
 import { maskAreaKm2, safeZoneMask } from '@mw/shared/map';
 import { detectBackend, type Backend } from './api';
 import { marsTime } from './lib/marsclock';
+import { baseInfo, defaultBase, relabel, shelterById, shortName } from './lib/base';
 import { engineConst } from './lib/engine';
 import type { ConsoleEvent, LinkCtl, OverlayId, PlanBundle, PresetId, TabId, VectorId } from './lib/types';
-import { buildZone, explainSteps, zoneLimits } from './lib/zone';
+import { buildZone, explainSteps, losGapSource, zoneLimits } from './lib/zone';
 import type { MapController } from './map/MapController';
 import { OVERLAY_LIMIT, PRESETS, get, log, set } from './store';
 
@@ -48,6 +50,11 @@ export async function boot() {
       mode: b.kind,
       stationOn,
       shelterCells,
+      // Live / in-browser engine: stage from the rover by default. The offline golden fixture always
+      // plans from the hab, so mock mode without ?engine=1 starts from Hab-1 to stay coherent.
+      evaBase: b.kind === 'mock' && new URLSearchParams(location.search).get('engine') !== '1'
+        ? (m.shelters.find((x) => x.kind === 'hab')?.id ?? defaultBase(pack))
+        : defaultBase(pack),
       startLtstMin: m.scenario.startLtstMin,
       lsDeg,
     });
@@ -79,7 +86,7 @@ export function buildRequest(): PlanRequest {
   const s = get();
   const m = s.pack!.manifest;
   const hab = m.shelters.find((x) => x.kind === 'hab')!;
-  const req: PlanRequest = {
+  let req: PlanRequest = {
     siteId: m.id,
     hab: s.shelterCells[hab.id] ?? hab.cell,
     shelters: m.shelters.map((x) => ({ id: x.id, kind: x.kind, cell: s.shelterCells[x.id] ?? x.cell })),
@@ -94,13 +101,33 @@ export function buildRequest(): PlanRequest {
     seed: 1,
   };
   if (s.events.length) req.events = s.events;
+  // EVA base: a rover-staged EVA starts and ends at the pressurized rover (engine stageFromShelter
+  // sets req.hab to the rover cell; comm LOS stays the union of the hab mast and rover relay masts).
+  const base = shelterById(s.pack!, s.evaBase);
+  if (base && base.kind !== 'hab') req = stageFromShelter(req, base.id);
   return req;
+}
+
+/** Current EVA base (id, display name, cell). */
+export function currentBase() {
+  const s = get();
+  return baseInfo(s.pack!, s.evaBase, s.shelterCells);
+}
+
+/** EVA base selector (Plan tab) and the "Stage from PR-1" action on a STAY_IN explanation. */
+export function setEvaBase(id: string) {
+  const s = get();
+  const sh = shelterById(s.pack!, id);
+  if (!sh || s.evaBase === id) return;
+  set({ evaBase: id });
+  log(`EVA base → ${sh.name}${sh.kind === 'rover' ? ' (rover-staged EVA)' : ''} — replanning`, 'info');
+  scheduleReplan(`Replanned from ${shortName(sh)}`, 10);
 }
 
 function installBundle(bundle: PlanBundle, req: PlanRequest, why: string) {
   const s = get();
   const pack = s.pack!;
-  const zone = buildZone(pack, bundle.fields, s.hazards);
+  const zone = buildZone(pack, bundle.fields, s.hazards, req.hab);
   const limits = zoneLimits(s.rules, s.events);
   const area = maskAreaKm2(safeZoneMask(zone, limits), zone.cellM);
   const prevArea = s.zoneAreaKm2;
@@ -114,6 +141,7 @@ function installBundle(bundle: PlanBundle, req: PlanRequest, why: string) {
     zone,
     limits,
     zoneAreaKm2: area,
+    losSource: bundle.fieldsSource === 'estimate' ? 'estimate' : losGapSource(pack, bundle.fields),
     planStatus: 'ready',
     planError: null,
     planVersion: s.planVersion + 1,
@@ -122,11 +150,12 @@ function installBundle(bundle: PlanBundle, req: PlanRequest, why: string) {
   });
   map?.setZone(zone, limits, replaced);
   const r = bundle.result;
+  const base = baseInfo(pack, s.evaBase, s.shelterCells);
   const delta = prevArea !== null && Math.abs(area - prevArea) > 0.005 ? ` · safe region ${area > prevArea ? '+' : ''}${(area - prevArea).toFixed(2)} km²` : '';
   log(
     r.status === 'OK'
-      ? `${why}: ${r.order.length} stations, ${(r.totals.distM / 1000).toFixed(2)} km, ${Math.round(r.totals.durationMin)} min · solved in ${Math.round(r.solveMs)} ms${delta}`
-      : `${why}: STAY IN — ${r.notes[0] ?? 'no safe plan'}`,
+      ? `${why}: ${r.order.length ? `${r.order.length} stations from ${base.short}` : 'return route'}, ${(r.totals.distM / 1000).toFixed(2)} km, ${Math.round(r.totals.durationMin)} min · solved in ${Math.round(r.solveMs)} ms${delta}`
+      : `${why}: STAY IN from ${base.short} — ${r.binding ? relabel(pack, base, r.binding.text) : (r.notes[r.notes.length - 1] ?? 'no safe plan')}`,
     r.status === 'OK' ? 'ok' : 'warning',
   );
 }
@@ -160,8 +189,11 @@ export function moveShelter(id: string, cell: Cell) {
   const g = s.pack!.manifest.grid;
   set({ shelterCells: { ...s.shelterCells, [id]: cell } });
   const [x, y] = cellToXY(g, cell);
-  const name = s.pack!.manifest.shelters.find((x2) => x2.id === id)?.name ?? id;
-  log(`${name} moved to ${(x - g.originX).toFixed(0)} m E, ${(g.originY - y).toFixed(0)} m S of AOI corner — replanning`, 'info');
+  const sh = s.pack!.manifest.shelters.find((x2) => x2.id === id);
+  const name = sh?.name ?? id;
+  // Dragging the rover means "stage the EVA from here": the rover becomes the EVA base.
+  if (sh?.kind === 'rover' && s.evaBase !== id) set({ evaBase: id });
+  log(`${name} moved to ${(x - g.originX).toFixed(0)} m E, ${(g.originY - y).toFixed(0)} m S of AOI corner — replanning from ${sh ? shortName(sh) : id}`, 'info');
   scheduleReplan('Replanned after rover move', 10);
 }
 
@@ -224,6 +256,14 @@ export async function explainSafeZone() {
     return;
   }
   const steps = explainSteps(s.zone, s.limits);
+  // Say which line-of-sight model the comm-gap step uses (engine field from the hab server, not an estimate).
+  const masts = s.pack!.manifest.shelters.filter((x) => x.kind === 'hab' || x.kind === 'rover').map((x) => shortName(x)).join(' mast ∪ ');
+  const losStep = steps.find((x) => x.key === 'limLos');
+  if (losStep) {
+    losStep.detail = s.losSource === 'engine'
+      ? `Engine comm line of sight (${masts} relay, hab server field); time spent in comm shadow timed on the terrain. FOD constraint, NTRS 20250006063.`
+      : `Comm line of sight (${masts} relay) — straight-line gap estimate while the engine field is unavailable. FOD constraint, NTRS 20250006063.`;
+  }
   set({ explain: { running: true, step: 0, caption: 'Whole site', detail: 'Every cell before any flight rule is applied.', areaFrom: steps[0].areaBefore, areaTo: steps[0].areaBefore } });
   const ok = await map.explain(steps, (i) => {
     if (i <= steps.length) {
@@ -231,12 +271,14 @@ export async function explainSafeZone() {
       set({ explain: { running: true, step: i, caption: st.caption, detail: st.detail, areaFrom: st.areaBefore, areaTo: st.areaAfter } });
     } else {
       const last = steps[steps.length - 1];
-      const r = get().plan;
+      const st = get();
+      const r = st.plan;
+      const base = baseInfo(st.pack!, st.evaBase, st.shelterCells);
       set({
         explain: {
           running: true, step: 7,
-          caption: r?.status === 'OK' ? `Route: ${r.order.length} stations inside` : 'No safe route — stay in',
-          detail: r?.binding ? r.binding.text : 'The planner only uses ground inside the safe region.',
+          caption: r?.status === 'OK' ? `Route from ${base.short}: ${r.order.length} stations inside` : `No safe route from ${base.short} — stay in`,
+          detail: r?.binding ? relabel(st.pack!, base, r.binding.text) : 'The planner only uses ground inside the safe region.',
           areaFrom: last.areaAfter, areaTo: last.areaAfter,
         },
       });

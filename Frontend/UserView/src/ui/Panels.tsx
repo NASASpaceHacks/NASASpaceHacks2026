@@ -276,10 +276,10 @@ function NextPanel({ s }: { s: Snapshot }) {
               — — —
             </div>
             <div className="lbl" style={{ fontSize: 24, marginTop: 12 }}>
-              {s.display === 'COMPLETE' ? 'AT HAB · INGRESS' : 'NO CONFIRMED ROUTE'}
+              {s.display === 'COMPLETE' ? `AT ${s.homeName} · INGRESS` : 'NO CONFIRMED ROUTE'}
             </div>
             <div className="lbl" style={{ fontSize: 20, marginTop: 6, color: 'var(--g3)' }}>
-              HOLD AT HAB · AWAIT ROUTE PUSH
+              {s.display === 'COMPLETE' ? 'EVA COMPLETE' : 'HOLD AT AIRLOCK · AWAIT ROUTE PUSH'}
             </div>
           </>
         )}
@@ -321,6 +321,7 @@ function MarginsPanel({ s }: { s: Snapshot }) {
 function AdvisoryPanel({ s }: { s: Snapshot }) {
   const heatFrac = s.heatAvgW / (HEAT_BUDGET_W * 1.3);
   const adv = s.heatAdvisory;
+  const rest = s.heatRest?.active ? s.heatRest : null;
   const comm = s.comm;
   const commMain = !comm.available ? 'N/A' : comm.inLos ? 'LOS' : 'SHADOW';
   const commSub = !comm.available
@@ -330,7 +331,7 @@ function AdvisoryPanel({ s }: { s: Snapshot }) {
       : `${comm.inLos ? 'SHADOW' : 'LOS'} IN ${Math.max(1, Math.round(comm.changeInMin))} MIN`;
   const commWarn = comm.available && (!comm.inLos || (comm.changeInMin !== null && comm.changeInMin < 5));
   return (
-    <Frame x={0} y={632} w={CW} h={132} label="Advisory" tone={adv ? 'amber' : undefined}>
+    <Frame x={0} y={632} w={CW} h={132} label="Advisory" tone={adv || rest ? 'amber' : undefined}>
       <div className="absolute flex items-center" style={{ left: 20, top: 24, gap: 26 }}>
         <div
           className={adv ? 'blink' : ''}
@@ -340,17 +341,17 @@ function AdvisoryPanel({ s }: { s: Snapshot }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            border: `3px solid ${adv ? 'var(--a)' : 'var(--g3)'}`,
+            border: `3px solid ${adv || rest ? 'var(--a)' : 'var(--g3)'}`,
             background: adv ? 'var(--a)' : 'transparent',
-            color: adv ? '#000' : 'var(--g2)',
+            color: adv ? '#000' : rest ? 'var(--a)' : 'var(--g2)',
             fontFamily: 'var(--font-ui)',
             fontWeight: 800,
-            fontSize: adv ? 32 : 28,
+            fontSize: adv || rest ? 30 : 28,
             letterSpacing: '0.05em',
             whiteSpace: 'nowrap',
           }}
         >
-          {adv ? 'SLOW PACE — HEAT' : 'PACE NOMINAL'}
+          {adv ? 'SLOW PACE — HEAT' : rest ? `HEAT REST ${Math.max(0.1, rest.leftMin).toFixed(1)} MIN` : 'PACE NOMINAL'}
         </div>
         <div className="flex flex-col" style={{ width: 216, gap: 2 }}>
           <div className="lbl" style={{ fontSize: 17, whiteSpace: 'nowrap' }}>

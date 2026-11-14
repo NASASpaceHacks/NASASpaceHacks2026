@@ -14,6 +14,9 @@ export interface Toast {
 }
 
 export interface PendingInfo {
+  /** Route endpoints as visor labels: start (PR-1, or HERE for a mid-EVA replan) and end shelter. */
+  fromLabel: string;
+  toLabel: string;
   seq: number;
   parentSeq: number | null;
   author: 'hab' | 'earth';
@@ -94,6 +97,10 @@ export interface Snapshot {
   metW: number;
   heatAvgW: number;
   heatAdvisory: boolean;
+  /** Engine suit-heat governor rest in progress (simulated crew standing at REST_W). */
+  heatRest: { active: boolean; leftMin: number } | null;
+  /** Short label of the route's home shelter (EVA base): PR-1 or HAB-1. */
+  homeName: string;
   sigmaM: number;
   headingDeg: number;
   est: [number, number] | null;
@@ -143,6 +150,8 @@ export const initialSnapshot: Snapshot = {
   metW: 0,
   heatAvgW: 0,
   heatAdvisory: false,
+  heatRest: null,
+  homeName: 'HAB',
   sigmaM: 0,
   headingDeg: 0,
   est: null,

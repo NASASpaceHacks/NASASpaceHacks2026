@@ -18,7 +18,7 @@ import {
   type PlanResult,
   type CoarseSafetyGrid,
 } from '@mw/shared/contracts';
-import { EVA_DURATION_MIN, INGRESS_RESERVE_MIN, SHELTER_MAX_MIN } from '../core/constants';
+import { O2_DEADLINE_MIN, SHELTER_MAX_MIN, SURFACE_MIN } from '../core/constants';
 
 export interface SafetyState {
   routeIdx: number;
@@ -139,7 +139,7 @@ function fallbackSafetyCore(pkg: PlanPackage, grid: GridSpec, hints: SafetyHints
         out.bearingToNextDeg = bearingDeg(x, y, homeX, homeY);
         out.bingoInMin = null;
       }
-      const remaining = (o2Pct / 100) * EVA_DURATION_MIN - INGRESS_RESERVE_MIN;
+      const remaining = (o2Pct / 100) * SURFACE_MIN;
       const wb = coarseAt(grid, pkg.coarse, 'walkbackMin', cell);
       const sh = coarseAt(grid, pkg.coarse, 'shelterMin', cell);
       out.walkbackMarginMin = Number.isFinite(wb) ? remaining - wb : -Infinity;
@@ -187,7 +187,7 @@ export function createSafetyCore(pkg: PlanPackage, grid: GridSpec, hints?: Safet
       // Engine walkback deadline = the package's 'HAB' bingo; packages without one (fixtures) use the
       // planned O₂ end minus the ingress reserve (same rule as the local core).
       const hasHab = pkg.bingo.some((b) => b.id === 'HAB');
-      const core = eng.createSafetyCore(pkg, grid, hasHab ? {} : { deadlineMin: EVA_DURATION_MIN - INGRESS_RESERVE_MIN });
+      const core = eng.createSafetyCore(pkg, grid, hasHab ? {} : { deadlineMin: O2_DEADLINE_MIN });
       engineImpl.safetyCore = 'shared';
       return core;
     } catch (e) {

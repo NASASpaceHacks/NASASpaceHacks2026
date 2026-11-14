@@ -5,6 +5,7 @@ import { fmt } from '../lib/format';
 import { fmtLtst } from '../lib/marsclock';
 import { dropConsequence, objectiveCoverage } from '../lib/science';
 import { Badge, Button, Empty, MarginBar, SectionHead, Stat, Tip, cx } from './ui';
+import { endpointLabel, relabel, useBaseInfo } from '../lib/base';
 
 const UNIT: Partial<Record<RuleId, string>> = {
   shelter_time_max_min: 'min', walk_radius_max_m: 'm', heat_avg_max_w: 'W', slope_max_deg: '°', slope_soft_deg: '°',
@@ -19,7 +20,9 @@ export function ReportTab() {
   const plannerLabel = useConsole((s) => s.plannerLabel);
   const fieldsSource = useConsole((s) => s.fieldsSource);
   const startLtst = useConsole((s) => s.startLtstMin);
-  if (!plan || !pack) {
+  const shelterCells = useConsole((s) => s.shelterCells);
+  const base = useBaseInfo();
+  if (!plan || !pack || !base) {
     return (
       <div className="p-4">
         <Empty title="No plan yet" action={<Button variant="primary" onClick={() => void generatePlan()}>Generate plan</Button>}>
@@ -41,6 +44,12 @@ export function ReportTab() {
     const fa = a[1].min / (ruleOf(a[0])?.value || 1), fb = b[1].min / (ruleOf(b[0])?.value || 1);
     return fa - fb;
   });
+  const rl = (t: string) => relabel(pack, base, t);
+  const segLabel = (i: number) => {
+    const sg = plan.segments[i];
+    if (!sg) return undefined;
+    return `${endpointLabel(pack, base, sg.from, shelterCells, sg.cells[0])} → ${endpointLabel(pack, base, sg.to, shelterCells, sg.cells[sg.cells.length - 1])}`;
+  };
   const maxMarginal = Math.max(1, ...plan.leaderboard.map((l) => l.value / Math.max(1, l.marginalMin)));
 
   return (
@@ -49,13 +58,13 @@ export function ReportTab() {
         <div className={cx('font-display text-[20px] font-bold tracking-[0.12em]', ok ? 'text-cyan' : 'text-red')}>{ok ? 'OK' : 'STAY IN'}</div>
         <div className="min-w-0 flex-1 text-[11px] leading-snug text-mute">
           <div className="truncate text-ink-2">{plannerLabel}</div>
-          <div className="num">solved {Math.round(plan.solveMs)} ms · fields {fieldsSource === 'server' ? 'hab server' : fieldsSource === 'engine' ? 'engine' : 'estimate'} · {plan.reqHash.slice(0, 14)}</div>
+          <div className="num">EVA base {base.short} · solved {Math.round(plan.solveMs)} ms · fields {fieldsSource === 'server' ? 'hab server' : fieldsSource === 'engine' ? 'engine' : 'estimate'} · {plan.reqHash.slice(0, 14)}</div>
         </div>
       </div>
 
       {!ok && plan.notes.length > 0 && (
         <div className="flex flex-col gap-1 text-[12px] text-ink-2">
-          {plan.notes.map((n, i) => <div key={i}>• {n}</div>)}
+          {plan.notes.map((n, i) => <div key={i}>• {rl(n)}</div>)}
         </div>
       )}
 
@@ -63,13 +72,13 @@ export function ReportTab() {
         <section className="relative overflow-hidden rounded-[4px] border border-amber/50 bg-gradient-to-br from-amber/[0.09] to-transparent p-4">
           <div className="label !text-amber/80">Binding constraint</div>
           <div className="mt-2 font-display text-[22px] font-semibold leading-tight text-ink">{bindRule?.label ?? binding.rule}</div>
-          <div className="mt-1.5 text-[12.5px] leading-snug text-ink-2">{binding.text}</div>
+          <div className="mt-1.5 text-[12.5px] leading-snug text-ink-2">{rl(binding.text)}</div>
           <div className="mt-3 flex items-end gap-6">
             {bindMargin && (
               <Stat label="Margin left" value={fmt.num(bindMargin.min, bindMargin.min < 10 ? 1 : 0)} unit={UNIT[binding.rule]} sub={`at +${Math.round(bindMargin.atMin)} min`} tone="amber" />
             )}
             {bindRule && <Stat label="Limit" value={bindRule.value} unit={bindRule.unit === 'deg' ? '°' : bindRule.unit} />}
-            <Stat label="On leg" value={binding.seg + 1} sub={plan.segments[binding.seg] ? `${plan.segments[binding.seg].from} → ${plan.segments[binding.seg].to}` : undefined} />
+            <Stat label="On leg" value={binding.seg + 1} sub={segLabel(binding.seg)} />
           </div>
           {bindRule && <div className="mt-3 border-t border-amber/20 pt-2 text-[10.5px] leading-snug text-mute">{bindRule.citation}</div>}
         </section>
@@ -78,7 +87,7 @@ export function ReportTab() {
       <section>
         <SectionHead>Totals</SectionHead>
         <div className="mt-3 grid grid-cols-3 gap-x-3 gap-y-4">
-          <Stat label="Distance" value={(plan.totals.distM / 1000).toFixed(2)} unit="km" sub={`max ${fmt.dist(plan.totals.maxDistHabM)} from hab`} />
+          <Stat label="Distance" value={(plan.totals.distM / 1000).toFixed(2)} unit="km" sub={`max ${fmt.dist(plan.totals.maxDistHabM)} from ${base.short}`} />
           <Stat label="Duration" value={fmt.dur(plan.totals.durationMin)} sub={`${fmtLtst(startLtst)} → ${fmtLtst(startLtst + plan.totals.durationMin)}`} />
           <Stat label="O₂ used" value={plan.totals.o2UsedPct.toFixed(0)} unit="%" sub="excl. contingency" />
           <Stat label="Energy" value={Math.round(plan.totals.energyKJ).toLocaleString()} unit="kJ" />
@@ -166,8 +175,8 @@ export function ReportTab() {
           <div className="mt-2.5 overflow-hidden rounded-[3px] border border-line">
             {plan.bingo.map((b) => (
               <div key={b.id} className="flex items-center gap-3 border-b border-line px-3 py-2 last:border-0">
-                <span className="num w-10 text-[11px] text-amber">{b.id}</span>
-                <span className="min-w-0 flex-1 truncate text-[11.5px] text-ink-2">{b.text}</span>
+                <span className="num w-10 text-[11px] text-amber">{b.id === 'HAB' ? base.short : b.id}</span>
+                <span className="min-w-0 flex-1 truncate text-[11.5px] text-ink-2">{rl(b.text)}</span>
                 <span className="num text-[12px] text-ink">{fmtLtst(b.ltstMin)}</span>
                 <span className="num w-14 text-right text-[10.5px] text-dim">+{Math.round(b.tMin)}m</span>
               </div>
@@ -181,7 +190,7 @@ export function ReportTab() {
         <section>
           <SectionHead>Notes</SectionHead>
           <div className="mt-2 flex flex-col gap-1 text-[11px] leading-snug text-mute">
-            {plan.notes.map((n, i) => <div key={i}>{n}</div>)}
+            {plan.notes.map((n, i) => <div key={i}>{rl(n)}</div>)}
           </div>
         </section>
       )}

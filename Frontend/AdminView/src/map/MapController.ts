@@ -436,10 +436,29 @@ export class MapController {
     setOutline(this.outline, maskPolygons(g, mask, { downsample: Math.max(2, Math.ceil(g.w / 400)), minAreaM2: 15000 }));
   }
 
+  private routeCells: number[] = [];
+
+  /** Zoom to the current route and its stations (falls back to the whole AOI). */
+  fitRoute(duration = 450) {
+    const g = this.pack.manifest.grid;
+    if (!this.routeCells.length) return this.fit(duration);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const c of this.routeCells) {
+      const [x, y] = cellToXY(g, c);
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+    const pad = Math.max(250, 0.35 * Math.max(x1 - x0, y1 - y0));
+    this.map.getView().fit([x0 - pad, y0 - pad, x1 + pad, y1 + pad], { padding: [72, 36, 64, 36], duration });
+  }
+
   setPlan(plan: PlanResult | null, stateOf: (id: string) => { state: StationState; order?: number }) {
     const g = this.pack.manifest.grid;
     const cells: number[] = [];
     for (const s of plan?.segments ?? []) for (const c of s.cells) cells.push(c);
+    this.routeCells = cells;
     setRoute(this.routeLayer, routeCoords(g, cells));
     this.refreshStations(stateOf);
   }

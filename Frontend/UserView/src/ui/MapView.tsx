@@ -4,6 +4,7 @@
  * An SVG overlay draws the ARC-mode compass rose (rotates with the simulated track).
  */
 import { useEffect, useRef } from 'react';
+import { shelterLabel } from '../core/route';
 import OLMap from 'ol/Map';
 import View from 'ol/View';
 import VectorLayer from 'ol/layer/Vector';
@@ -231,9 +232,9 @@ function syncDynamic(m: MapCtx, ctl: VisorController, s: Snapshot) {
     feats.push(h);
   }
   for (const sh of L?.shelters ?? []) {
-    if (route && sh.cell === route.home.cell) continue;
+    if (route && (sh.cell === route.home.cell || sh.id === route.home.id)) continue; // home drawn at the route end (rover may have moved)
     const f = new Feature(new Point([sh.x, sh.y]));
-    f.set('id', sh.id);
+    f.set('id', shelterLabel(sh));
     f.set('kind', sh.kind === 'hab' ? 'home' : 'shelter');
     feats.push(f);
   }

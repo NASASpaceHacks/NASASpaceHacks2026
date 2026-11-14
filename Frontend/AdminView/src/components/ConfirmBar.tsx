@@ -3,6 +3,7 @@ import { cancelReview, confirmPush, review } from '../actions';
 import { useConsole } from '../store';
 import { fmt } from '../lib/format';
 import { Button, Kbd, cx } from './ui';
+import { endpointLabel, relabel, useBaseInfo } from '../lib/base';
 
 /** Curiosity's typical daily uplink volume used for the size comparison (design doc §5 budget table). */
 const UPLINK_BYTES = 28_000;
@@ -36,6 +37,20 @@ export function ConfirmBar() {
   const ok = plan?.status === 'OK';
   const nextSeq = (route?.seq ?? 0) + 1;
   const differs = !!route && !!plan && plan.reqHash !== route.reqHash;
+  const pack = useConsole((s) => s.pack);
+  const base = useBaseInfo();
+  const shelterCells = useConsole((s) => s.shelterCells);
+  const rl = (t: string) => (pack && base ? relabel(pack, base, t) : t);
+  /** Where the route ends: the EVA base, or (SEP return) whichever shelter is nearest. */
+  const endName = (p: NonNullable<typeof plan>) => {
+    const last = p.segments[p.segments.length - 1];
+    if (!last || !pack || !base) return base?.short ?? 'HAB';
+    return endpointLabel(pack, base, last.to, shelterCells, last.cells[last.cells.length - 1]);
+  };
+  const stopsText = (p: NonNullable<typeof plan>) => {
+    const start = p.segments[0]?.from === 'HERE' ? 'EV1' : (base?.short ?? 'HAB');
+    return [start, ...p.order, endName(p)].join(' → ');
+  };
 
   return (
     <div className="shrink-0 border-t border-line bg-[#0f1115] px-4 py-3">
@@ -44,9 +59,9 @@ export function ConfirmBar() {
           <motion.div key="review" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.16 }}>
             <div className="label !text-amber/90">Review before push</div>
             <div className="mt-2 grid grid-cols-3 gap-2 text-[11px]">
-              <div><div className="text-dim">Stations</div><div className="num text-ink">{plan.order.join(' → ') || '—'}</div></div>
+              <div><div className="text-dim">Route</div><div data-testid="review-route" className="num text-ink">{stopsText(plan)}</div></div>
               <div><div className="text-dim">Distance · time</div><div className="num text-ink">{(plan.totals.distM / 1000).toFixed(2)} km · {fmt.dur(plan.totals.durationMin)}</div></div>
-              <div><div className="text-dim">Binding</div><div className="truncate text-ink">{plan.binding?.text ?? 'none'}</div></div>
+              <div><div className="text-dim">Binding</div><div className="truncate text-ink" title={plan.binding ? rl(plan.binding.text) : undefined}>{plan.binding ? rl(plan.binding.text) : 'none'}</div></div>
             </div>
             {dirty && <div className="mt-2 text-[10.5px] text-amber">Inputs changed after this plan was generated — regenerate to include them.</div>}
             <div className="mt-3 flex gap-2">
@@ -65,13 +80,13 @@ export function ConfirmBar() {
           <motion.div key="sent" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex flex-col gap-2.5">
             <div className="flex items-center gap-2">
               {route.acked ? (
-                <span className="font-display text-[12.5px] uppercase tracking-[0.12em] text-cyan">✓ v{route.seq} accepted by EV1</span>
+                <span data-testid="route-acked" className="font-display text-[12.5px] uppercase tracking-[0.12em] text-cyan">✓ v{route.seq} accepted by EV1 · ACK</span>
               ) : confirm.stage === 'rejected' ? (
                 <span className="font-display text-[12.5px] uppercase tracking-[0.12em] text-red">v{route.seq} rejected by EV1</span>
               ) : (
                 <>
                   <span className="h-2 w-2 rounded-full bg-amber mw-pulse" />
-                  <span className="font-display text-[12.5px] uppercase tracking-[0.12em] text-amber">v{route.seq} sent · waiting for ACK</span>
+                  <span data-testid="route-sent" className="font-display text-[12.5px] uppercase tracking-[0.12em] text-amber">v{route.seq} sent · waiting for ACK</span>
                 </>
               )}
             </div>
@@ -85,11 +100,11 @@ export function ConfirmBar() {
               <div className="min-w-0 flex-1 text-[11px] leading-snug">
                 {ok ? (
                   <>
-                    <div className="num text-ink">{plan!.order.length} stations · {(plan!.totals.distM / 1000).toFixed(2)} km · {fmt.dur(plan!.totals.durationMin)}</div>
-                    <div className="truncate text-mute">{plan!.binding?.text ?? 'No binding constraint'}</div>
+                    <div className="num truncate text-ink">{plan!.segments[0]?.from === 'HERE' ? 'EV1' : (base?.short ?? 'HAB')} · {plan!.order.length ? `${plan!.order.length} stations` : `return to ${endName(plan!)}`} · {(plan!.totals.distM / 1000).toFixed(2)} km · {fmt.dur(plan!.totals.durationMin)}</div>
+                    <div className="truncate text-mute">{plan!.binding ? rl(plan!.binding.text) : 'No binding constraint'}</div>
                   </>
                 ) : plan ? (
-                  <div className="text-red">STAY IN — nothing safe to push</div>
+                  <div className="text-red">STAY IN{base ? ` from ${base.short}` : ''} — nothing safe to push</div>
                 ) : (
                   <div className="text-mute">{status === 'planning' ? 'Planning…' : 'Generate a plan to push it'}</div>
                 )}

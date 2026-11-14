@@ -60,8 +60,8 @@ export function NewRouteModal({ s }: { s: Snapshot }) {
               <div className="lbl" style={{ fontSize: 20 }}>
                 Stops
               </div>
-              <div className="num" style={{ fontSize: 40, color: 'var(--g)', lineHeight: '52px' }}>
-                {['HAB', ...p.stops, 'HAB'].join('  ›  ')}
+              <div className="num" style={{ fontSize: p.stops.length > 5 ? 32 : 40, color: 'var(--g)', lineHeight: p.stops.length > 5 ? '44px' : '52px' }}>
+                {[p.fromLabel, ...p.stops, p.toLabel].join('  ›  ')}
               </div>
               <div className="flex" style={{ gap: 60, marginTop: 22 }}>
                 <div>
@@ -88,7 +88,7 @@ export function NewRouteModal({ s }: { s: Snapshot }) {
                     <div className="lbl" style={{ fontSize: 20 }}>
                       First bingo
                     </div>
-                    <div className="num" style={{ fontSize: 34, color: 'var(--a)', lineHeight: '56px' }}>
+                    <div className="num" style={{ fontSize: 34, color: 'var(--a)', lineHeight: '56px', whiteSpace: 'nowrap' }}>
                       {p.bingo.toUpperCase()}
                     </div>
                   </div>
@@ -402,7 +402,7 @@ export function CompleteOverlay({ s }: { s: Snapshot }) {
           <div className="lbl" style={{ fontSize: 26, color: 'var(--c)' }}>
             Ingress
           </div>
-          <div style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 72, color: 'var(--w)', letterSpacing: '0.06em' }}>AT HAB · EVA COMPLETE</div>
+          <div style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 72, color: 'var(--w)', letterSpacing: '0.06em' }}>AT {s.homeName} · EVA COMPLETE</div>
           <div className="flex" style={{ gap: 70, marginTop: 50 }}>
             {[
               ['Elapsed', `T+${fmtElapsed(s.t)}`],

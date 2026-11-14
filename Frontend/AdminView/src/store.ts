@@ -41,6 +41,8 @@ export interface ConsoleState {
   startLtstMin: number;
   lsDeg: number;
   shelterCells: Record<string, Cell>;
+  /** EVA base shelter id: the request is staged from this shelter (Hab-1, or PR-1 = rover-staged). */
+  evaBase: string | null;
   events: PlanEvent[];
   hazards: Cell[];
 
@@ -55,6 +57,8 @@ export interface ConsoleState {
   zone: SafeZoneInputs | null;
   limits: SafeZoneLimits | null;
   zoneAreaKm2: number | null;
+  /** Comm LOS behind the zone: 'engine' = engine LOS field + engine travel time for gaps. */
+  losSource: 'engine' | 'estimate' | null;
   planVersion: number;
   dirty: boolean;
 
@@ -89,7 +93,7 @@ export const PRESETS: Record<PresetId, { label: string; overlays: OverlayId[]; v
   plan: { label: 'Plan', overlays: ['safezone'], vectors: { contours: true, route: true, stations: true, keepouts: true, traverse: false }, hint: 'Safe region, route and stations' },
   safety: { label: 'Safety', overlays: ['shelter', 'slope'], vectors: { contours: true, route: true, stations: true, keepouts: true, traverse: false }, hint: 'Time to shelter and slope hazards' },
   science: { label: 'Science', overlays: ['ti'], vectors: { contours: false, route: true, stations: true, keepouts: false, traverse: true }, hint: 'Stations, thermal inertia and Curiosity traverse' },
-  comms: { label: 'Comms', overlays: ['los'], vectors: { contours: false, route: true, stations: true, keepouts: false, traverse: false }, hint: 'Hab line of sight and comm shadow' },
+  comms: { label: 'Comms', overlays: ['los'], vectors: { contours: false, route: true, stations: true, keepouts: false, traverse: false }, hint: 'Comm line of sight (hab mast ∪ rover relay) and comm shadow' },
 };
 
 let logId = 1;
@@ -108,6 +112,7 @@ export const useConsole = create<ConsoleState>()(
     startLtstMin: 9 * 60 + 40,
     lsDeg: 150,
     shelterCells: {},
+    evaBase: null,
     events: [],
     hazards: [],
 
@@ -121,6 +126,7 @@ export const useConsole = create<ConsoleState>()(
     zone: null,
     limits: null,
     zoneAreaKm2: null,
+    losSource: null,
     planVersion: 0,
     dirty: false,
 

@@ -483,7 +483,8 @@ export function createSheltersLayer(
         }),
         new Style({
           text: new Text({
-            text: isHab ? 'HAB' : `${(f.get('name') as string).toUpperCase()}${f.get('movable') ? '  ⇲' : ''}`,
+            // Short shelter name ("Habitat (Hab-1)" → HAB-1, "Pressurized rover (PR-1)" → PR-1) keeps the map uncluttered.
+            text: `${(/\(([^)]+)\)\s*$/.exec(f.get('name') as string)?.[1] ?? (isHab ? 'HAB' : (f.get('name') as string))).toUpperCase()}${f.get('movable') ? '  ⇲' : ''}`,
             font: theme.font,
             offsetY: 19,
             fill: new Fill({ color: isHab ? theme.safe : theme.label }),

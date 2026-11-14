@@ -4,6 +4,7 @@ import { useConsole } from '../store';
 import { fmt } from '../lib/format';
 import { fmtLtst } from '../lib/marsclock';
 import { Badge, Button, Kbd, SectionHead, Stat, cx } from './ui';
+import { useBaseInfo } from '../lib/base';
 
 function Telemetry() {
   const telem = useConsole((s) => s.telem);
@@ -12,18 +13,18 @@ function Telemetry() {
   const limits = useConsole((s) => s.limits);
   const link = useConsole((s) => s.link);
   const start = useConsole((s) => s.startLtstMin);
+  const base = useBaseInfo();
   const last = telem[telem.length - 1];
-  if (!last || !pack) {
+  if (!last || !pack || !base) {
     return <div className="rounded-[3px] border border-dashed border-line-2 px-3 py-4 text-[11.5px] leading-relaxed text-mute">No telemetry yet. Confirm a route, then start the astronaut simulator below{link === 'down' ? ' — the visor link is down' : ''}.</div>;
   }
   const g = pack.manifest.grid;
-  const hab = pack.manifest.shelters.find((s) => s.kind === 'hab')!;
-  const dist = cellDistM(g, hab.cell, last.cell);
+  const dist = cellDistM(g, base.cell, last.cell);
   const sh = fields ? fields.shelterMin[last.cell] : NaN;
   const shMax = limits && Number.isFinite(limits.shelterMax) ? limits.shelterMax : 30;
   const age = link === 'down' ? 'stale — link down' : 'live';
   return (
-    <div className={cx('rounded-[3px] border p-3', link === 'down' ? 'border-red/40' : 'border-line')}>
+    <div data-testid="telemetry" className={cx('rounded-[3px] border p-3', link === 'down' ? 'border-red/40' : 'border-line')}>
       <div className="mb-3 flex items-center justify-between">
         <span className="num text-[11px] text-ink-2">EV1 · +{last.t.toFixed(1)} min · {fmtLtst(start + last.t)} LTST</span>
         <span className={cx('font-display text-[9.5px] uppercase tracking-[0.12em]', link === 'down' ? 'text-red' : 'text-cyan')}>{age}</span>
@@ -32,7 +33,7 @@ function Telemetry() {
         <Stat label="O₂" value={last.o2Pct.toFixed(1)} unit="%" tone={last.o2Pct < 20 ? 'red' : undefined} />
         <Stat label="Metabolic" value={Math.round(last.metW)} unit="W" />
         <Stat label="Heat avg" value={Math.round(last.heatAvgW)} unit="W" tone={last.heatAvgW > 352 ? 'amber' : undefined} />
-        <Stat label="From hab" value={fmt.dist(dist)} />
+        <Stat label={`From ${base.short}`} value={fmt.dist(dist)} />
         <Stat label="Shelter" value={Number.isFinite(sh) ? sh.toFixed(0) : '—'} unit="min" tone={sh > shMax ? 'red' : sh > shMax * 0.8 ? 'amber' : 'cyan'} />
         <Stat label="Position ±" value={(last.sigmaM * 2).toFixed(0)} unit="m" sub="2σ dead reckoning" />
       </div>

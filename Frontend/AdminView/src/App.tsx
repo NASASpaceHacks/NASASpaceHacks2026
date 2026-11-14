@@ -16,6 +16,7 @@ const SHORTCUTS: [string, string][] = [
   ['P R B L', 'Tabs: Plan · Report · Burndowns · Live'],
   ['H', 'Report hazard (click map)'],
   ['F', 'Fit map to AOI'],
+  ['Z', 'Zoom to route'],
   ['Esc', 'Cancel / close'],
 ];
 
@@ -39,6 +40,7 @@ function useShortcuts() {
       if (k === 'g') return void generatePlan();
       if (k === 's') return void explainSafeZone();
       if (k === 'f') return getMap()?.fit();
+      if (k === 'z') return getMap()?.fitRoute();
       if (k === 'h') return startHazardPick();
       if (k === 'c') return s.confirm.stage === 'review' ? void confirmPush() : review();
       if (['1', '2', '3', '4'].includes(k)) return applyPreset((['plan', 'safety', 'science', 'comms'] as const)[Number(k) - 1]);

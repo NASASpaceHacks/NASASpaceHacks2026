@@ -40,3 +40,6 @@ SitePacks/*/images/
 
 # UI screenshots: only curated ones are committed (git add -f)
 Frontend/*/docs/*.png
+
+# e2e screenshots: only curated ones are committed (git add -f)
+qa/screens/*.png
