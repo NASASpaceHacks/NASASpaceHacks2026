@@ -1,0 +1,32 @@
+{
+  "name": "marswalk",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Habitat-to-helmet EVA route planning and navigation for the first humans on Mars (NASA Space Apps 2026).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "packageManager": "pnpm@10.28.2",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter ./Backend --filter ./Frontend/AdminView --filter ./Frontend/UserView dev",
+    "dev:backend": "pnpm --filter ./Backend dev",
+    "dev:admin": "pnpm --filter ./Frontend/AdminView dev",
+    "dev:visor": "pnpm --filter ./Frontend/UserView dev",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "vitest run",
+    "ci": "pnpm typecheck && vitest run",
+    "bench": "tsx Research/bench/run.ts",
+    "e2e": "playwright test -c qa/playwright.config.ts",
+    "sitepack": "Pipeline/.venv/bin/python Pipeline/build_sitepack.py"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^22.10.0",
+    "fast-check": "^4.3.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}
