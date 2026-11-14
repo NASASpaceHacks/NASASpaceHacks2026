@@ -19,7 +19,7 @@ MOLA_URL = "https://planetarymaps.usgs.gov/mosaic/Mars_MGS_MOLA_DEM_mosaic_globa
 RAW_API = "https://mars.nasa.gov/api/v1/raw_image_items/"
 REMS_URL = "https://mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json"
 DONKI = "https://api.nasa.gov/DONKI"
-DONKI_CCMC = "https://kauai.ccmc.gsfc.nasa.gov/DONKI/WS/get"
+DONKI_CCMC = "https://ccmc.gsfc.nasa.gov/DONKI-API/get"   # CCMC DONKI-API v2 (OpenAPI 3.0.1): keyless, max 60-day range
 GAZETTEER = REPO_DIR / "Content" / "gazetteer.json"
 
 
@@ -354,15 +354,15 @@ def build_conditions(site: Site, pack: Path, m: dict) -> dict:
     key = os.environ.get("NASA_API_KEY", "DEMO_KEY")
 
     def donki(path: str, q: str):
-        """api.nasa.gov (key; DEMO_KEY is heavily rate-limited) → fallback: CCMC's keyless DONKI web service (same data)."""
+        """CCMC's keyless DONKI-API v2 first (same data, no key) → fallback: api.nasa.gov DONKI (NASA_API_KEY or DEMO_KEY)."""
         try:
-            return http_get(f"{DONKI}/{path}?{q}&api_key={key}", timeout=60, retries=2).json() or []
+            return http_get(f"{DONKI_CCMC}/{path}?{q}", timeout=40, retries=2).json() or []
         except Exception as e:  # noqa: BLE001
-            print(f"  ! api.nasa.gov DONKI/{path}: {e}; trying CCMC", flush=True)
-            return http_get(f"{DONKI_CCMC}/{path}?{q}", timeout=25, retries=1).json() or []
+            print(f"  ! CCMC DONKI-API/{path}: {e}; trying api.nasa.gov", flush=True)
+            return http_get(f"{DONKI}/{path}?{q}&api_key={key}", timeout=60, retries=2).json() or []
 
     end = time.gmtime()
-    start = time.gmtime(time.time() - 60 * 86400)
+    start = time.gmtime(time.time() - 59 * 86400)   # DONKI-API v2 rejects ranges > 60 days
     sd, ed = time.strftime("%Y-%m-%d", start), time.strftime("%Y-%m-%d", end)
     events = []
     try:
@@ -379,7 +379,7 @@ def build_conditions(site: Site, pack: Path, m: dict) -> dict:
                            **({"marsArrivalUtc": arr} if arr else {}),
                            "note": f"WSA-ENLIL+Cone run lists Mars impact{' (glancing blow)' if mars[0].get('isGlancingBlow') else ''}; "
                                    f"CME {cmes[0].get('associatedCMEID', '')} speed {speed} km/s, half-angle {cmes[0].get('halfAngle')}°.",
-                           "sourceUrl": e.get("link") or f"{DONKI}/WSAEnlilSimulations"})
+                           "sourceUrl": e.get("link") or f"{DONKI_CCMC}/WSAEnlilSimulations"})
         print(f"  DONKI ENLIL: {len(enl)} runs in {sd}…{ed}, {len(events)} list Mars", flush=True)
         time.sleep(1.5)
         fl = donki("FLR", f"startDate={sd}&endDate={ed}")
@@ -388,7 +388,7 @@ def build_conditions(site: Site, pack: Path, m: dict) -> dict:
             events.append({"id": f.get("flrID"), "kind": "FLR", "startUtc": f.get("beginTime"),
                            "note": f"{f.get('classType')} flare from {f.get('sourceLocation') or 'unknown location'} (AR {f.get('activeRegionNum')}), "
                                    "observed from Earth orbit; relevance to Mars depends on heliolongitude.",
-                           "sourceUrl": f.get("link") or f"{DONKI}/FLR"})
+                           "sourceUrl": f.get("link") or f"{DONKI_CCMC}/FLR"})
         print(f"  DONKI FLR: {len(fl)} flares, kept {len(big)} ≥M5", flush=True)
         time.sleep(1.5)
         sep = donki("SEP", f"startDate={sd}&endDate={ed}")
@@ -396,7 +396,7 @@ def build_conditions(site: Site, pack: Path, m: dict) -> dict:
             inst = ", ".join(i.get("displayName", "") for i in (s.get("instruments") or []))
             events.append({"id": s.get("sepID"), "kind": "SEP", "startUtc": s.get("eventTime"),
                            "note": f"Solar energetic particle event detected by {inst or 'n/a'} (near Earth / STEREO, not at Mars).",
-                           "sourceUrl": s.get("link") or f"{DONKI}/SEP"})
+                           "sourceUrl": s.get("link") or f"{DONKI_CCMC}/SEP"})
         print(f"  DONKI SEP: {len(sep)} events", flush=True)
         cond["spaceWeather"] = [e for e in events if e.get("id") and e.get("startUtc")]
     except Exception as e:  # noqa: BLE001

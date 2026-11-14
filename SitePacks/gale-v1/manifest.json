@@ -3,7 +3,7 @@
  "id": "gale-v1",
  "name": "Gale Crater — Mount Sharp boxwork",
  "body": "mars",
- "createdUtc": "2026-11-14T19:18:26Z",
+ "createdUtc": "2026-11-14T19:31:27Z",
  "grid": {
   "w": 1000,
   "h": 1000,
@@ -964,7 +964,7 @@
   }
  ],
  "conditions": {
-  "fetchedUtc": "2026-11-14T18:51:55Z",
+  "fetchedUtc": "2026-11-14T19:31:23Z",
   "rems": [
    {
     "sol": 4995,
@@ -1385,6 +1385,270 @@
     "uvIndex": "Moderate",
     "sunrise": "06:46",
     "sunset": "18:55"
+   }
+  ],
+  "spaceWeather": [
+   {
+    "id": "WSA-ENLIL/48799/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-09-24T14:45Z",
+    "marsArrivalUtc": "2026-09-29T18:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 493.0 km/s, half-angle 29.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48799/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48836/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-09-26T19:36Z",
+    "marsArrivalUtc": "2026-10-01T12:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 427.0 km/s, half-angle 34.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48836/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48881/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-09-28T14:36Z",
+    "marsArrivalUtc": "2026-10-03T14:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 447.0 km/s, half-angle 45.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48881/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48882/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-09-28T17:58Z",
+    "marsArrivalUtc": "2026-10-03T12:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed None km/s, half-angle None°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48882/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48903/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-09-30T03:12Z",
+    "marsArrivalUtc": "2026-10-05T06:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 488.0 km/s, half-angle 36.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48903/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48927/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-02T00:53Z",
+    "marsArrivalUtc": "2026-10-08T04:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 255.0 km/s, half-angle 28.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48927/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48936/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-02T00:53Z",
+    "marsArrivalUtc": "2026-10-08T03:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 255.0 km/s, half-angle 28.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48936/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48963/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-04T07:24Z",
+    "marsArrivalUtc": "2026-10-09T16:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 336.0 km/s, half-angle 20.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48963/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48984/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-05T01:26Z",
+    "marsArrivalUtc": "2026-10-10T12:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 340.0 km/s, half-angle 18.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48984/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48993/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-06T12:08Z",
+    "marsArrivalUtc": "2026-10-11T06:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed None km/s, half-angle None°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48993/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48994/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-06T12:22Z",
+    "marsArrivalUtc": "2026-10-11T06:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed None km/s, half-angle None°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48994/-1"
+   },
+   {
+    "id": "WSA-ENLIL/48999/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-06T00:00Z",
+    "marsArrivalUtc": "2026-10-11T23:30Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 325.0 km/s, half-angle 17.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/48999/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49022/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-08T16:53Z",
+    "marsArrivalUtc": "2026-10-13T18:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 723.0 km/s, half-angle 35.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49022/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49028/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-08T16:24Z",
+    "marsArrivalUtc": "2026-10-13T12:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 579.0 km/s, half-angle 28.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49028/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49030/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-08T16:24Z",
+    "marsArrivalUtc": "2026-10-13T12:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 579.0 km/s, half-angle 28.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49030/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49068/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-10T08:36Z",
+    "marsArrivalUtc": "2026-10-16T07:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 368.0 km/s, half-angle 40.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49068/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49071/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-10T16:15Z",
+    "marsArrivalUtc": "2026-10-14T19:05Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 844.0 km/s, half-angle 43.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49071/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49073/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-10T19:10Z",
+    "marsArrivalUtc": "2026-10-14T15:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed None km/s, half-angle None°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49073/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49216/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-23T04:18Z",
+    "marsArrivalUtc": "2026-10-27T12:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 597.0 km/s, half-angle 26.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49216/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49248/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-25T19:24Z",
+    "marsArrivalUtc": "2026-11-01T01:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 275.0 km/s, half-angle 27.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49248/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49251/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-26T09:48Z",
+    "marsArrivalUtc": "2026-10-30T18:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 681.0 km/s, half-angle 24.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49251/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49252/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-26T09:48Z",
+    "marsArrivalUtc": "2026-10-30T18:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 681.0 km/s, half-angle 24.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49252/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49257/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-26T09:00Z",
+    "marsArrivalUtc": "2026-10-31T00:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 873.0 km/s, half-angle 11.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49257/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49259/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-26T09:00Z",
+    "marsArrivalUtc": "2026-10-30T18:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 873.0 km/s, half-angle 11.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49259/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49274/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-26T01:26Z",
+    "marsArrivalUtc": "2026-11-01T02:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 285.0 km/s, half-angle 10.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49274/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49279/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-26T18:48Z",
+    "marsArrivalUtc": "2026-10-31T11:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 616.0 km/s, half-angle 27.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49279/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49280/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-26T18:48Z",
+    "marsArrivalUtc": "2026-10-31T11:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 616.0 km/s, half-angle 27.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49280/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49326/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-10-29T10:36Z",
+    "marsArrivalUtc": "2026-11-04T08:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact; CME  speed 287.0 km/s, half-angle 30.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49326/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49360/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-11-01T19:00Z",
+    "marsArrivalUtc": "2026-11-07T06:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 357.0 km/s, half-angle 27.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49360/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49472/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-11-09T18:15Z",
+    "marsArrivalUtc": "2026-11-13T12:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 726.0 km/s, half-angle 10.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49472/-1"
+   },
+   {
+    "id": "WSA-ENLIL/49473/1",
+    "kind": "CME_ENLIL",
+    "startUtc": "2026-11-09T18:15Z",
+    "marsArrivalUtc": "2026-11-13T12:00Z",
+    "note": "WSA-ENLIL+Cone run lists Mars impact (glancing blow); CME  speed 726.0 km/s, half-angle 10.0°.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/49473/-1"
+   },
+   {
+    "id": "2026-10-08T15:29:00-FLR-001",
+    "kind": "FLR",
+    "startUtc": "2026-10-08T15:29Z",
+    "note": "M6.7 flare from N12W20 (AR 14549), observed from Earth orbit; relevance to Mars depends on heliolongitude.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/FLR/49015/-1"
+   },
+   {
+    "id": "2026-10-10T14:58:00-FLR-001",
+    "kind": "FLR",
+    "startUtc": "2026-10-10T14:58Z",
+    "note": "M6.4 flare from N08W54 (AR 14549), observed from Earth orbit; relevance to Mars depends on heliolongitude.",
+    "sourceUrl": "https://ccmc.gsfc.nasa.gov/DONKI/view/FLR/49057/-1"
    }
   ]
  },
