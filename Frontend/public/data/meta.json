@@ -1,0 +1,106 @@
+{
+ "schema": "eva-area-v1",
+ "generated_utc": "2026-11-14T20:12:57.832564+00:00",
+ "body": "Mars",
+ "site": "Jezero crater floor, Octavia E. Butler landing area",
+ "coordinate_convention": "east longitude, planetocentric latitude (deg); Mars 2000 sphere R=3396190 m",
+ "bounds": {
+  "west": 77.44135679806945,
+  "east": 77.45863229744415,
+  "south": 18.43636569499689,
+  "north": 18.453641194371603
+ },
+ "projected_origin_m": [
+  4590313,
+  1093834
+ ],
+ "size_m": 1024,
+ "ground_dx_factor": 0.9486277898169256,
+ "grid": {
+  "n": 512,
+  "cell_m": 2,
+  "order": "row-major, north row first",
+  "layers": [
+   "elevation float32 m",
+   "slope uint8 deg*4 (max of 1 m cells)",
+   "roughness uint8 cm (max)"
+  ]
+ },
+ "images": {
+  "optical": {
+   "file": "optical.jpg",
+   "px_m": 0.5
+  },
+  "hillshade": {
+   "file": "hillshade.png",
+   "px_m": 1
+  },
+  "thermal": {
+   "file": "thermal.png",
+   "native_px_m": 81.4
+  },
+  "thermal_regional": {
+   "file": "thermal_regional.png",
+   "bounds": {
+    "west": 77.34375,
+    "east": 77.6953125,
+    "south": 18.28125,
+    "north": 18.6328125
+   }
+  }
+ },
+ "elevation_range_m": [
+  -2583.774169921875,
+  -2548.675537109375
+ ],
+ "rover_dtm_minus_geoid_m": {
+  "median": 0.0001220703125,
+  "max_abs": 0.046875
+ },
+ "sources": [
+  {
+   "layer": "optical",
+   "evidence": "M",
+   "mission": "MRO HiRISE",
+   "product": "JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first.tif",
+   "url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first.tif",
+   "note": "25 cm orthomosaic averaged to 50 cm. Shows boulders/dunes for human hazard review."
+  },
+  {
+   "layer": "topographic",
+   "evidence": "M",
+   "mission": "MRO HiRISE stereo",
+   "product": "JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif",
+   "url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif",
+   "doi": "10.5066/P9REJ9JN",
+   "note": "1 m posting; does not resolve boot-scale obstacles."
+  },
+  {
+   "layer": "slope / roughness",
+   "evidence": "D",
+   "mission": "derived from HiRISE DTM",
+   "note": "Slope = gradient at 1 m, latitude-corrected. Roughness = std of 5 m-detrended residual."
+  },
+  {
+   "layer": "thermal",
+   "evidence": "M",
+   "mission": "Mars Odyssey THEMIS",
+   "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/732.png",
+   "note": "Night IR controlled mosaic via Mars Trek WMTS. Rendered brightness, not calibrated temperature. Brighter at night = higher thermal inertia (rock/indurated). ~100 m native; only ~12 px span this area."
+  },
+  {
+   "layer": "spectral",
+   "evidence": "M",
+   "mission": "MRO CRISM",
+   "url": "https://oderest.rsl.wustl.edu/live2/",
+   "note": "Targeted observation footprints (TRDR) from PDS ODE. Footprints show where mineral spectra exist; spectral cubes are not processed in the MVP."
+  },
+  {
+   "layer": "rover",
+   "evidence": "M",
+   "mission": "Mars 2020 Perseverance",
+   "url": "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json",
+   "note": "Localized end-of-drive positions and traverse; terrain driven by the rover is known-traversable for a rover, not certified for a suited human."
+  }
+ ]
+}

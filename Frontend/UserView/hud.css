@@ -1,0 +1,85 @@
+/* Visor HUD. Baseline is the Joint AR monochrome green (low power, legible on regolith); amber is reserved for
+   cautions and red for warnings, and "mono" mode removes even those (texture + symbols still carry severity). */
+.hud {
+  --fg: #5dff9e;
+  --fg-dim: rgba(93, 255, 158, 0.55);
+  --caution: #ffb84d;
+  --warning: #ff5a4d;
+  position: fixed; inset: 0; overflow: hidden; background: #000; color: var(--fg);
+  font: 600 14px/1.25 var(--mono); letter-spacing: .02em;
+  text-shadow: 0 0 6px rgba(0, 0, 0, .9), 0 0 2px #000;
+}
+.hud.mono { --caution: var(--fg); --warning: var(--fg); }
+.hud .world { position: absolute; inset: 0; background-size: cover; background-position: center; filter: grayscale(.4) brightness(.55) blur(1px); }
+.hud .worldtag { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); font-size: 10px; color: rgba(255,255,255,.4); font-weight: 400; }
+.hud .panel { position: absolute; background: rgba(0, 12, 6, .55); border: 1px solid var(--fg-dim); border-radius: 6px; padding: 10px 12px; }
+.hud .lbl { font-size: 11px; color: var(--fg-dim); letter-spacing: .12em; }
+.hud .sub { font-size: 12px; color: var(--fg-dim); font-weight: 500; margin-top: 3px; }
+.hud .hint { font-size: 11px; color: var(--fg-dim); margin-top: 4px; }
+
+.hud .tape { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); text-align: center; }
+.hud .tape svg { display: block; overflow: visible; }
+.hud .tape text { fill: currentColor; font: 11px var(--mono); }
+.hud .tape text.card { font: 700 14px var(--mono); }
+.hud .tape .hdg { display: inline-block; border: 1.5px solid var(--fg); padding: 1px 8px; border-radius: 4px; margin-top: 2px; font-size: 16px; background: rgba(0,0,0,.5); }
+
+.hud .tl { top: 14px; left: 16px; width: 300px; }
+.hud .wp { font-size: 15px; margin: 4px 0; display: flex; align-items: center; gap: 8px; }
+.hud .wp .num { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--fg); color: #000; text-shadow: none; font-size: 12px; flex: none; }
+.hud .big { font-size: 40px; font-weight: 700; line-height: 1.05; }
+.hud .bar { height: 6px; border: 1px solid var(--fg); border-radius: 3px; margin: 6px 0 2px; }
+.hud .bar div { height: 100%; background: var(--fg); }
+.hud .task .big { font-size: 30px; }
+
+.hud .center { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); text-align: center; }
+.hud .arrow { width: 150px; height: 150px; transition: transform .25s linear; filter: drop-shadow(0 0 3px #000); }
+.hud .steer { font-size: 20px; margin-top: 4px; }
+.hud .center.done { font-size: 34px; }
+
+.hud .tr { position: absolute; top: 14px; right: 16px; width: 340px; display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.hud .alert { padding: 7px 10px; border-radius: 5px; border: 1.5px solid var(--fg-dim); background: rgba(0, 12, 6, .6); font-size: 13px; }
+.hud .alert.caution { border-color: var(--caution); color: var(--caution); border-style: dashed; }
+.hud .alert.warning { border-color: var(--warning); color: var(--warning); border-width: 2.5px; animation: blink 1s steps(2) infinite; }
+.hud .alert.dimmed { color: var(--fg-dim); font-weight: 500; }
+@keyframes blink { 50% { background: rgba(255, 60, 40, .18); } }
+
+.hud .bl { left: 16px; bottom: 54px; width: 280px; display: grid; gap: 5px; }
+.hud .kv { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12.5px; }
+.hud .kv span { color: var(--fg-dim); font-weight: 500; font-size: 11px; letter-spacing: .08em; }
+.hud .kv.hot b, .hud .kv.hot span { color: var(--caution); }
+.hud .gauge .g { flex: 1; height: 7px; border: 1px solid currentColor; border-radius: 3px; }
+.hud .gauge .g div { height: 100%; background: currentColor; }
+
+.hud .br { position: absolute; right: 16px; bottom: 54px; }
+.hud .bc { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); text-align: center; }
+.hud .dots { display: flex; gap: 6px; justify-content: center; }
+.hud .dot { width: 22px; height: 22px; border: 1.5px solid var(--fg-dim); border-radius: 50%; display: grid; place-items: center; font-size: 11px; color: var(--fg-dim); }
+.hud .dot.done { background: var(--fg-dim); color: #000; text-shadow: none; border-color: transparent; }
+.hud .dot.next { border-color: var(--fg); color: var(--fg); box-shadow: 0 0 0 2px rgba(93,255,158,.25); }
+.hud .pages { margin-top: 6px; display: flex; gap: 10px; font-size: 10px; color: var(--fg-dim); justify-content: center; }
+.hud .pages .on { color: var(--fg); border-bottom: 1.5px solid var(--fg); }
+
+.hud .page { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); background: rgba(0, 12, 6, .78); border: 1px solid var(--fg-dim); border-radius: 8px; padding: 14px 16px; text-align: center; max-width: min(620px, 90vw); }
+.hud .page.sci img { display: block; max-width: 100%; max-height: 40vh; margin: 10px auto 4px; border: 1px solid var(--fg-dim); border-radius: 4px; filter: grayscale(.2); }
+.hud .page.sys2 { width: 460px; text-align: left; display: grid; gap: 6px; }
+
+.hud .start { position: absolute; left: 50%; top: 68%; transform: translateX(-50%); font-size: 16px; border: 1.5px solid var(--fg); padding: 6px 14px; border-radius: 6px; background: rgba(0,0,0,.5); animation: blink 1.6s steps(2) infinite; }
+.hud .footer { position: absolute; right: 16px; bottom: 26px; font-size: 10.5px; color: var(--fg-dim); font-weight: 500; }
+.hud .help { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(0, 10, 5, .95); border: 1.5px solid var(--fg); border-radius: 8px; padding: 16px 20px; display: grid; gap: 4px; font-size: 13px; font-weight: 500; z-index: 5; }
+.hud .help b { margin-bottom: 4px; }
+
+/* Declutter levels: 1 hides secondary info, 2 leaves only steering, distance and alerts. */
+.hud.dc2 .worldtag, .hud.dc2 .pages, .hud.dc2 .footer { display: none; }
+.hud.dc2 .br { opacity: .8; transform: scale(.75); transform-origin: bottom right; }
+
+.hud.boot { display: grid; place-items: center; }
+.hud .bootbox { border: 1.5px solid var(--fg); border-radius: 8px; padding: 22px 26px; max-width: 420px; text-align: center; background: rgba(0,12,6,.6); }
+.hud .bootbox .t { font-size: 18px; letter-spacing: .15em; margin-bottom: 8px; }
+.hud .bootbox p { color: var(--fg-dim); font-weight: 500; }
+.hud .bootbox button { background: none; color: var(--fg); border: 1.5px solid var(--fg); border-radius: 6px; padding: 8px 14px; font: inherit; cursor: pointer; }
+
+@media (max-width: 1000px) {
+  .hud .tl { width: 240px; } .hud .big { font-size: 30px; }
+  .hud .tr { width: 260px; }
+  .hud .tape svg { width: 360px; }
+}
