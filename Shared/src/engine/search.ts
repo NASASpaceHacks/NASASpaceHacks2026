@@ -74,6 +74,8 @@ function dialPointToPoint(
       const v = rr * w + cc;
       const sv = state[v];
       if (sv === 2 || g.blocked[v] !== 0) continue;
+      // No corner-cutting between two blocked cells (matches the field searches and the bench oracle).
+      if (DR[k] !== 0 && DC[k] !== 0 && (g.blocked[r * w + cc] !== 0 || g.blocked[rr * w + c] !== 0)) continue;
       const q = quantizeDs(cost.edgeCost(g, u, v, ctx));
       if (q === EDGE_INF) continue;
       if (q >= B) return q; // bucket ring too small: caller retries with a larger ring
@@ -226,6 +228,7 @@ export const astarSearch: PathSearch = {
         if (rr < 0 || cc < 0 || rr >= h || cc >= w) continue;
         const v = rr * w + cc;
         if (closed[v] || g.blocked[v] !== 0) continue;
+        if (DR[k] !== 0 && DC[k] !== 0 && (g.blocked[r * w + cc] !== 0 || g.blocked[rr * w + c] !== 0)) continue;
         const ec = cost.edgeCost(g, u, v, ctx);
         if (!(ec < Infinity)) continue;
         const ng = gu + ec;

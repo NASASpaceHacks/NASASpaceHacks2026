@@ -223,7 +223,11 @@ export function dialRun(o: DialRunOpts): DialRunResult {
       const v = u + off[k];
       const sv = state[v];
       if (sv === 2) continue;
-      if (mask !== null && mask[v] !== 0) continue;
+      if (mask !== null) {
+        if (mask[v] !== 0) continue;
+        // No corner-cutting: a diagonal step may not squeeze between two blocked (too-steep / keep-out) cells.
+        if ((k & 1) === 1 && (mask[u + off[(k + 7) & 7]] !== 0 || mask[u + off[(k + 1) & 7]] !== 0)) continue;
+      }
       const nd = cur + c;
       if (nd < dist[v]) {
         if (sv === 1) {
