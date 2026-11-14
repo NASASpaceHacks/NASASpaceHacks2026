@@ -205,6 +205,7 @@ export const PlanPackageSchema = z.object({
     los: z.array(z.number().int().min(0).max(1)).optional(),
   }),
   rules: z.array(z.object({ id: RuleIdSchema, value: num, enabled: z.boolean() })).optional(),
+  base: z.object({ id: z.string(), kind: z.enum(['hab', 'rover', 'cache']), cell: z.number().int().nonnegative() }).optional(),
   sig: z.string(),
 });
 
@@ -223,7 +224,7 @@ export const LinkMsgSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('ROUTE_PUSH'), pkg: PlanPackageSchema }),
   z.object({ type: z.literal('ACK'), id: z.string(), seq: z.number().int(), accepted: z.boolean() }),
   z.object({ type: z.literal('TELEM'), telem: TelemSchema }),
-  z.object({ type: z.literal('ALERT'), level: z.enum(['info', 'caution', 'warning']), code: z.string(), text: z.string(), t: num }),
+  z.object({ type: z.literal('ALERT'), level: z.enum(['info', 'caution', 'warning']), code: z.string(), text: z.string(), t: num, from: z.enum(['hab', 'visor']).optional() }),
   z.object({
     type: z.literal('REQUEST'),
     kind: z.enum(['NEW_TARGET', 'HAZARD', 'FATIGUED', 'ABORT']),

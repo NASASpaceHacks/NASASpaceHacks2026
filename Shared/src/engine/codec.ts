@@ -87,6 +87,7 @@ export function toPlanPackage(
     coarse,
     // the rule values this route was planned under (DEFAULT_RULES fill any rule the request omits)
     rules: mergeRules(req.rules).map((r) => ({ id: r.id, value: r.value, enabled: r.enabled })),
+    ...(() => { const s = req.shelters.find((x) => x.cell === req.hab); return s ? { base: { id: s.id, kind: s.kind, cell: s.cell } } : {}; })(),
     sig: '',
   };
   if (opts.parent !== undefined) pkg.parent = opts.parent;
@@ -218,6 +219,7 @@ export function encodePackage(pkg: PlanPackage): Uint8Array {
       los: pkg.coarse.los ? packBits(pkg.coarse.los) : undefined,
     },
     rules: pkg.rules?.map((r) => [r.id, r.value, r.enabled]),
+    base: pkg.base ? [pkg.base.id, pkg.base.kind, pkg.base.cell] : undefined,
     sig: pkg.sig,
   };
   const cbor = encoder.encode(canon(wire));
@@ -260,6 +262,7 @@ export function decodePackage(bytes: Uint8Array): PlanPackage {
   };
   if (o.coarse.los !== undefined) pkg.coarse.los = unpackBits(u8(o.coarse.los), o.coarse.w * o.coarse.h);
   if (o.rules !== undefined) pkg.rules = (o.rules as [RuleId, number, boolean][]).map(([id, value, enabled]) => ({ id, value, enabled }));
+  if (o.base !== undefined && o.base !== null) { const [id, kind, cell] = o.base as [string, 'hab' | 'rover' | 'cache', number]; pkg.base = { id, kind, cell }; }
   if (o.parent !== undefined) pkg.parent = o.parent;
   return pkg;
 }

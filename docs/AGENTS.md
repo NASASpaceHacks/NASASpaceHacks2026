@@ -75,7 +75,7 @@ export function createMemoryLinkPair(): [Link, Link]; // for the static public d
 | POST | `/api/link` | `{ latencyMs?, lossPct?, drop?: boolean }`: link degrade controls (demo) |
 | WS | `/link?role=console\|visor` | binary CBOR `LinkMsg` frames; the server relays visor↔hab and sends HEARTBEAT |
 
-Env: `PORT` (8787), `SITEPACK` (default `gale-v1`; falls back to the in-memory `mockSitePack()` if the pack is missing), `MARSWALK_PATH_SEARCH`, `MARSWALK_COST_MODEL`.
+Env: `MARSWALK_VAR_DIR` (hab state/event-log dir, default `Backend/var`; e2e uses a temp dir), `MARSWALK_ENGINE` (`golden-plan` forces the fixture), `PORT` (8787), `SITEPACK` (default `gale-v1`; falls back to the in-memory `mockSitePack()` if the pack is missing), `MARSWALK_PATH_SEARCH`, `MARSWALK_COST_MODEL`.
 
 ## Fixed area of interest (gale-v1)
 - **AOI**: 5 km × 5 km centred on **137.388°E, −4.805°N** (planetocentric). Covers Curiosity's 2025–2026 boxwork-era traverse (sols ~4400–5073). Curiosity at sol 5073: 137.388886°E, −4.82602331°N, −3472 m (`MSL_waypoints_current.json`).

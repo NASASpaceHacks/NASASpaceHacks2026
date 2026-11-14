@@ -299,7 +299,7 @@ export interface BurndownPoint {
   tMin: number;
   distHabM: number;        // straight-line distance from the hab
   elevM: number;
-  o2Pct: number;           // remaining planned O2 (100 → 0), excluding the never-planned contingency reserve
+  o2Pct: number;           // planned O2 remaining: 100 at surface start → 0 at the walkback deadline (available time); contingency reserve excluded
   walkbackMarginMin: number;
   shelterMarginMin: number;
   metW: number;            // metabolic rate
@@ -444,6 +444,8 @@ export interface PlanPackage {
   coarse: CoarseSafetyGrid;
   /** Optional (added at checkpoint 1): the rule values this route was planned under, so the visor need not assume defaults. */
   rules?: { id: RuleId; value: number; enabled: boolean }[];
+  /** Optional (checkpoint 2): the EVA base the route starts and ends at (hab or a pressurized rover). */
+  base?: { id: string; kind: ShelterKind; cell: Cell };
   /** Ed25519 signature (hex) over the canonical body; empty in mocks. */
   sig: string;
 }
@@ -465,7 +467,7 @@ export type LinkMsg =
   | { type: 'ROUTE_PUSH'; pkg: PlanPackage }
   | { type: 'ACK'; id: string; seq: number; accepted: boolean }
   | { type: 'TELEM'; telem: Telem }
-  | { type: 'ALERT'; level: AlertLevel; code: string; text: string; t: number }
+  | { type: 'ALERT'; level: AlertLevel; code: string; text: string; t: number; from?: 'hab' | 'visor' }
   | { type: 'REQUEST'; kind: 'NEW_TARGET' | 'HAZARD' | 'FATIGUED' | 'ABORT'; cell?: Cell; note?: string; t: number }
   | { type: 'HEARTBEAT'; from: 'hab' | 'visor'; t: number; seq: number };
 
