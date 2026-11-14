@@ -33,3 +33,7 @@ Research/bench/results/*.tmp
 
 # Benchmark: keep only results/latest in git
 Research/bench/results/2*/
+
+# Pipeline build outputs / site-pack images (release assets)
+Pipeline/dist/
+SitePacks/*/images/
