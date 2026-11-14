@@ -1,0 +1,212 @@
+[
+  {
+    "id": "ST01",
+    "name": "Altadena drill site (boxwork bedrock)",
+    "lon": 137.382987,
+    "lat": -4.800407,
+    "value": 80,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-2",
+      "OBJ-4"
+    ],
+    "dwellMin": 25,
+    "description": "Crew inspects the Altadena drill hole walls and tailings and takes a bedrock sample context set (hand-lens and spectrometer proxy for MAHLI/ChemCam). Why: Altadena was the drill campaign at the end of boxwork Phase 1; powder was delivered to CheMin and SAM, and the hole wall colour shifts slightly with depth. Crew cross-checks the in-situ record against orbital boxwork maps.",
+    "citation": "https://science.nasa.gov/blog/curiosity-blog-sols-4568-4569-a-close-look-at-the-altadena-drill-hole-and-tailings/",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4571 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 402,
+    "elevM": -3643.934
+  },
+  {
+    "id": "ST02",
+    "name": "Monte Grande hollow: Valle de la Luna drill site",
+    "lon": 137.381035,
+    "lat": -4.807839,
+    "value": 95,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-2",
+      "OBJ-4"
+    ],
+    "dwellMin": 30,
+    "description": "Crew documents the hollow floor drill hole (Valle de la Luna), the hollow wall and the neighbouring polygon-bearing block. Why: the team drilled a hollow and an adjacent ridge as a pair to learn how boxwork formed; ridge and hollow chemistry differ only subtly, so mineralogy is the discriminator. Hollow floors are normally covered in sand or pebbles, so a bedrock hollow site is rare and high value.",
+    "citation": "https://science.nasa.gov/blog/curiosity-blog-sols-4689-4694-drill-in-the-boxwork-unit-is-go/",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4687 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 444,
+    "elevM": -3610.432
+  },
+  {
+    "id": "ST03",
+    "name": "Nevado Sajama ridge-top drill site",
+    "lon": 137.381004,
+    "lat": -4.808008,
+    "value": 90,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-2",
+      "OBJ-4"
+    ],
+    "dwellMin": 25,
+    "description": "Crew examines the ridge-top drill hole (Nevado Sajama, drilled to completion on sol 4718, 13 Nov 2025) and veins on nearby ridge rocks, and photographs the view down to the Valle de la Luna hollow. Why: it is the ridge half of the ridge/hollow drill pair; ridge chemistry matches earlier boxwork ridge targets, and DAN measured hydrogen (water content) here.",
+    "citation": "https://science.nasa.gov/solar-system/curiosity-blog-sols-4716-4722-drilling-success-at-nevado-sajama",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4711 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 450,
+    "elevM": -3607.722
+  },
+  {
+    "id": "ST04",
+    "name": "Peace-sign ridge intersection and Laguna Miniques ridge/hollow contact",
+    "lon": 137.37946,
+    "lat": -4.80599,
+    "value": 70,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-2"
+    ],
+    "dwellMin": 20,
+    "description": "Crew traverses a boxwork ridge crest, images fracture troughs and the possible incipient hollow (Laguna Miniques), and notes bedrock-to-regolith transitions at the Santa Catalina / Puerto Teresa contact targets. Why: shows how fractures shift from bedrock to regolith and where hollows start, a direct test of the 'fluid cemented ridges, erosion removed the softer rock' hypothesis.",
+    "citation": "https://science.nasa.gov/blog/curiosity-blog-sols-4627-4628-a-ridge-stop-in-the-boxworks/",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4628 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 508,
+    "elevM": -3613.896
+  },
+  {
+    "id": "ST05",
+    "name": "Thola: dark float rock (possible meteorite)",
+    "lon": 137.382652,
+    "lat": -4.808822,
+    "value": 60,
+    "objectiveIds": [
+      "OBJ-5",
+      "OBJ-4"
+    ],
+    "dwellMin": 10,
+    "description": "Crew inspects a dark float rock (Thola) and photographs it in context for a quick-look classification. Why: the Curiosity team flagged Thola as possibly a meteorite (maybe a chondrite); chemistry and reflectance indicate whether it is native to Mars. Short, cheap stop with outsized public and scientific interest. Classification is not confirmed in the cited post.",
+    "citation": "https://science.nasa.gov/blog/curiosity-blog-sols-4825-4831-exploring-the-borderlands",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4830 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 389,
+    "elevM": -3609.236
+  },
+  {
+    "id": "ST06",
+    "name": "Southern boxwork edge and contact with the layered unit",
+    "lon": 137.382359,
+    "lat": -4.809716,
+    "value": 75,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-3",
+      "OBJ-5"
+    ],
+    "dwellMin": 20,
+    "description": "Crew walks to the southern boxwork edge (about 100 m south of the Thola workspace per the sol 4825-4831 plan) and images the contact with the light-toned layered unit, nodule-rich bedrock (Humahuaca) and pitted vertical faces (Timboy Chaco). Why: contacts show the stratigraphic relation between boxwork and surrounding units, which decides whether boxwork is a late diagenetic overprint.",
+    "citation": "https://science.nasa.gov/blog/curiosity-blog-sols-4825-4831-exploring-the-borderlands",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4837 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 435,
+    "elevM": -3603.622
+  },
+  {
+    "id": "ST07",
+    "name": "Antofagasta crater rim and Atacama sulfate block",
+    "lon": 137.381706,
+    "lat": -4.814267,
+    "value": 85,
+    "objectiveIds": [
+      "OBJ-3",
+      "OBJ-4",
+      "OBJ-2"
+    ],
+    "dwellMin": 30,
+    "description": "Crew samples context imagery of the rim polygons around a ~10 m crater and of the block Atacama, which looked drillable. Why: Atacama was chosen as a representative layered-sulfate drill target just above the boxwork; the crater floor itself is sand-filled and awkward (risk of entrapment), so the rim is the safe approach. Strong sample-selection case: representative, drillable, well documented.",
+    "citation": "https://science.nasa.gov/blog/curiosity-blog-sols-4867-4872-sand-fill-in-antofagasta-crater-and-finding-our-next-drill-target",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4868 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 663,
+    "elevM": -3570.45
+  },
+  {
+    "id": "ST08",
+    "name": "Valle Grande: post-boxwork layered sulfate buttes (sol 5073 position)",
+    "lon": 137.388886,
+    "lat": -4.826023,
+    "value": 65,
+    "objectiveIds": [
+      "OBJ-3",
+      "OBJ-5"
+    ],
+    "dwellMin": 20,
+    "description": "Crew images exposed layering in the buttes above the Valle Grande route and records the stratigraphy. Why: the post-boxwork strata are the continuing climb record up Mount Sharp. Coordinates are Curiosity's sol 5073 position; no sol-5073 blog post was reviewed, so the science description is from the sol 4867-4872 post.",
+    "citation": "https://science.nasa.gov/blog/curiosity-blog-sols-4867-4872-sand-fill-in-antofagasta-crater-and-finding-our-next-drill-target",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 5073 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 1247,
+    "elevM": -3472.085
+  },
+  {
+    "id": "ST09",
+    "name": "Kings Canyon drill site (sulfate unit)",
+    "lon": 137.409107,
+    "lat": -4.787303,
+    "value": 60,
+    "objectiveIds": [
+      "OBJ-3",
+      "OBJ-4"
+    ],
+    "dwellMin": 20,
+    "description": "Crew documents the 2024 drill hole and the surrounding layered strata as a pre-boxwork baseline. Why: Kings Canyon was drilled on sol 4263 (3 Aug 2024) in the sulfate-bearing unit and anchors the comparison with the boxwork samples. Far from the habitat: the stop is long-range and uses up most of the walkback budget.",
+    "citation": "https://science.nasa.gov/photojournal/curiositys-42-drill-holes/",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4282 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 1629,
+    "elevM": -3673.48
+  },
+  {
+    "id": "ST10",
+    "name": "Fascination Turret (upper Gediz Vallis ridge)",
+    "lon": 137.407426,
+    "lat": -4.781434,
+    "value": 70,
+    "objectiveIds": [
+      "OBJ-3",
+      "OBJ-5"
+    ],
+    "dwellMin": 25,
+    "description": "Crew images the east wall of Fascination Turret and the ridge bend, recording the debris-flow-like deposits. Why: Gediz Vallis ridge is a long-sought target; its deposits preserve a record of late water and debris flows on Mount Sharp. Far stop; the ridge-top approach is steep.",
+    "citation": "https://science.nasa.gov/blogs/sols-4137-4138-fascinated-by-fascination-turret",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4137 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 1808,
+    "elevM": -3722.68
+  },
+  {
+    "id": "ST11",
+    "name": "Mineral King drill site (typical sulfate unit)",
+    "lon": 137.407354,
+    "lat": -4.780118,
+    "value": 72,
+    "objectiveIds": [
+      "OBJ-3",
+      "OBJ-4"
+    ],
+    "dwellMin": 20,
+    "description": "Crew documents the Mineral King drill hole (sols 4107-4109, Curiosity's 40th hole) in layered sulfate rock. Why: the team calls Mineral King the last typical sulfate drill before the boxwork; ST07 (Atacama) is intended as the first typical one since. It is the baseline against which boxwork mineralogy is judged.",
+    "citation": "https://science.nasa.gov/missions/mars-science-laboratory/sols-4107-4109-drilling-mineral-king/",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 4102 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 1866,
+    "elevM": -3730.01
+  },
+  {
+    "id": "ST12",
+    "name": "Upper Gediz Vallis ridge float rocks (steep ridge-top)",
+    "lon": 137.400667,
+    "lat": -4.773338,
+    "value": 92,
+    "objectiveIds": [
+      "OBJ-3",
+      "OBJ-5",
+      "OBJ-4"
+    ],
+    "dwellMin": 30,
+    "description": "Crew inspects float rocks on the upper Gediz Vallis ridge, the most diverse exotic-rock sampling opportunity in the AOI. Why: 2023 blog and press coverage describe the ridge as a long-awaited goal with a steep (about 23 degree) approach and slippery sand, above the 20 degree slope rule, so this is high value but awkward: the planner should show it as blocked or reachable only by a detour, and say why.",
+    "citation": "https://science.nasa.gov/blogs/sols-3930-3931-wrapping-up-at-the-ridge/",
+    "coordSource": "MSL_waypoints.json, Curiosity position at sol 3924 (rover position, not target position; error up to ~10-20 m)",
+    "distFromAoiCentreM": 2020,
+    "elevM": -3771.69
+  }
+]

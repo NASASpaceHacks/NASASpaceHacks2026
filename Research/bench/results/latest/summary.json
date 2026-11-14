@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "site": "gale-v1",
+    "scenarios": 40,
+    "seed": 1,
+    "judge": "pandolf-santee-mars",
+    "baseline": {
+      "search": "dijkstra",
+      "cost": "pandolf-santee-mars"
+    },
+    "engineGrid": true,
+    "createdUtc": "2026-11-14T19:43:56.408Z"
+  },
+  "summary": [
+    {
+      "planner": "dijkstra",
+      "costModel": "pandolf-santee-mars",
+      "star": false,
+      "fast": false,
+      "static": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 5166.39369035423,
+        "meanGapPct": 0.03574581203384016,
+        "maxGapPct": 0.06380988606259598,
+        "meanLengthM": 2871.2138687454135,
+        "meanMaxSlope": 18.97524998188019,
+        "roughPct": 0,
+        "meanTurns": 101.825,
+        "expanded": 267523.45,
+        "msP50": 35.9875409999986,
+        "msP95": 86.56362499999886,
+        "memMB": 16.609893798828125,
+        "violations": 0
+      },
+      "hazard": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 5158.812145134812,
+        "meanExtraDistM": 124.21409626996547,
+        "meanReplans": 7.225,
+        "meanExtraCostPct": 3.4921066016194073,
+        "msP50": 124.07304100000147,
+        "msP95": 314.23966599999767,
+        "violations": 0
+      }
+    },
+    {
+      "planner": "dijkstra",
+      "costModel": "ref-slope",
+      "star": false,
+      "fast": false,
+      "static": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 4653.738802343703,
+        "meanGapPct": -4.914295961409875,
+        "maxGapPct": 5.2758759733198755,
+        "meanLengthM": 2593.730806315794,
+        "meanMaxSlope": 19.056249809265136,
+        "roughPct": 0,
+        "meanTurns": 105.125,
+        "expanded": 268407.475,
+        "msP50": 79.41966700000194,
+        "msP95": 137.99354199999652,
+        "memMB": 18.809879302978516,
+        "violations": 57
+      },
+      "hazard": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 4958.08140077703,
+        "meanExtraDistM": 24.022447762745887,
+        "meanReplans": 4.35,
+        "meanExtraCostPct": 1.4265264596921283,
+        "msP50": 151.2697079999998,
+        "msP95": 563.107415999988,
+        "violations": 83
+      }
+    },
+    {
+      "planner": "astar",
+      "costModel": "pandolf-santee-mars",
+      "star": true,
+      "fast": false,
+      "static": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 5164.597601506589,
+        "meanGapPct": 0,
+        "maxGapPct": 0,
+        "meanLengthM": 2871.2138687454144,
+        "meanMaxSlope": 19.04375,
+        "roughPct": 0,
+        "meanTurns": 99.6,
+        "expanded": 73575.1,
+        "msP50": 11.18016599999828,
+        "msP95": 80.08374999999796,
+        "memMB": 19.03235626220703,
+        "violations": 0
+      },
+      "hazard": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 5159.665912051813,
+        "meanExtraDistM": 125.6816106912377,
+        "meanReplans": 8.375,
+        "meanExtraCostPct": 3.486946122649356,
+        "msP50": 28.586080000000948,
+        "msP95": 272.4043749999837,
+        "violations": 0
+      }
+    },
+    {
+      "planner": "astar",
+      "costModel": "ref-slope",
+      "star": false,
+      "fast": false,
+      "static": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 4651.905318966092,
+        "meanGapPct": -4.924897624300892,
+        "maxGapPct": 5.277716805712993,
+        "meanLengthM": 2593.511136401684,
+        "meanMaxSlope": 19.043249750137328,
+        "roughPct": 0,
+        "meanTurns": 104.875,
+        "expanded": 103592.6,
+        "msP50": 31.04054200000246,
+        "msP95": 104.92758299999696,
+        "memMB": 21.768409729003906,
+        "violations": 62
+      },
+      "hazard": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 4957.074100462187,
+        "meanExtraDistM": 23.992117676855955,
+        "meanReplans": 4.45,
+        "meanExtraCostPct": 1.4143075230105082,
+        "msP50": 65.32199800000672,
+        "msP95": 226.17004100000486,
+        "violations": 86
+      }
+    },
+    {
+      "planner": "wastar-1.5",
+      "costModel": "pandolf-santee-mars",
+      "star": false,
+      "fast": false,
+      "static": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 5295.938375647203,
+        "meanGapPct": 2.846571717776649,
+        "maxGapPct": 9.328530321026062,
+        "meanLengthM": 2939.2280009091255,
+        "meanMaxSlope": 19.47724997997284,
+        "roughPct": 0.009632409338867266,
+        "meanTurns": 92.875,
+        "expanded": 44838.825,
+        "msP50": 8.79608300000109,
+        "msP95": 53.50620899999922,
+        "memMB": 16.079792022705078,
+        "violations": 0
+      },
+      "hazard": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 5322.27576180564,
+        "meanExtraDistM": 210.77343033149032,
+        "meanReplans": 3.825,
+        "meanExtraCostPct": 6.792562409933078,
+        "msP50": 6.814792999997735,
+        "msP95": 130.12787400000525,
+        "violations": 0
+      }
+    },
+    {
+      "planner": "wastar-1.5",
+      "costModel": "ref-slope",
+      "star": false,
+      "fast": false,
+      "static": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 4647.400216787284,
+        "meanGapPct": -4.9984067617155485,
+        "maxGapPct": 6.028074290631287,
+        "meanLengthM": 2591.4786508229568,
+        "meanMaxSlope": 19.244999766349792,
+        "roughPct": 0,
+        "meanTurns": 100.2,
+        "expanded": 51227.925,
+        "msP50": 14.876625000004424,
+        "msP95": 56.095000000001164,
+        "memMB": 22.263160705566406,
+        "violations": 75
+      },
+      "hazard": {
+        "n": 40,
+        "success": 1,
+        "meanCost": 4971.787514377758,
+        "meanExtraDistM": 31.66636905521134,
+        "meanReplans": 3.8,
+        "meanExtraCostPct": 1.7149026637032487,
+        "msP50": 23.4152910000048,
+        "msP95": 114.69600099999661,
+        "violations": 91
+      }
+    }
+  ]
+}

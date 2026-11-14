@@ -1,0 +1,8 @@
+rasterio>=1.4
+numpy
+scipy
+pyproj
+requests
+pillow
+matplotlib
+pyyaml

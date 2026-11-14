@@ -1,0 +1,70 @@
+{
+ "n_conditions": 20,
+ "mape_pct": 20.8,
+ "mean_signed_error_pct": -16.8,
+ "mape_speed_sensitivity": {
+  "0.56 m/s": 28.6,
+  "0.97 m/s": 21.7
+ },
+ "k_scale_all": 1.248,
+ "mape_after_single_scalar_insample": 22.5,
+ "logo": [
+  {
+   "held_out_g": 0.12,
+   "k": 1.144,
+   "mape_uncalibrated": 41.6,
+   "mape_heldout_scaled": 33.2
+  },
+  {
+   "held_out_g": 0.17,
+   "k": 1.2,
+   "mape_uncalibrated": 30.3,
+   "mape_heldout_scaled": 17.3
+  },
+  {
+   "held_out_g": 0.22,
+   "k": 1.268,
+   "mape_uncalibrated": 13.8,
+   "mape_heldout_scaled": 17.6
+  },
+  {
+   "held_out_g": 0.27,
+   "k": 1.306,
+   "mape_uncalibrated": 7.8,
+   "mape_heldout_scaled": 26.3
+  },
+  {
+   "held_out_g": 0.32,
+   "k": 1.333,
+   "mape_uncalibrated": 10.3,
+   "mape_heldout_scaled": 39.6
+  }
+ ],
+ "logo_mape_pct": 26.8,
+ "extrapolation_0_38g_W_uncal": {
+  "0": 457.9,
+  "10": 663.1,
+  "20": 868.3,
+  "30": 1073.6
+ },
+ "extrapolation_0_38g_W_scaled": {
+  "0": 571.6,
+  "10": 827.7,
+  "20": 1083.9,
+  "30": 1340.0
+ },
+ "digitization_check_stated_vs_digitized_offload_diff": {
+  "stated": {
+   "0": 1.9,
+   "10": 3.5,
+   "20": 8.7,
+   "30": 17.0
+  },
+  "digitized": {
+   "0": 1.8,
+   "10": 4.6,
+   "20": 8.9,
+   "30": 14.7
+  }
+ }
+}

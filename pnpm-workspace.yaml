@@ -1,0 +1,5 @@
+packages:
+  - Shared
+  - Backend
+  - Frontend/AdminView
+  - Frontend/UserView

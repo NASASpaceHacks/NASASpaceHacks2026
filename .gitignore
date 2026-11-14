@@ -1,0 +1,45 @@
+node_modules/
+dist/
+build/
+.vite/
+coverage/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Python pipeline
+Pipeline/.venv/
+Pipeline/cache/
+__pycache__/
+*.pyc
+
+# Large site-pack binaries are published as GitHub Release assets (see SitePacks/README.md)
+SitePacks/*/data/
+SitePacks/*/*.bin
+SitePacks/*/*.tif
+SitePacks/*/*.png
+SitePacks/*/*.jpg
+SitePacks/*/*.webp
+
+# Backend runtime state
+Backend/var/
+
+# Test artifacts
+qa/test-results/
+qa/playwright-report/
+Research/bench/results/*.tmp
+
+# Benchmark: keep only results/latest in git
+Research/bench/results/2*/
+
+# Pipeline build outputs / site-pack images (release assets)
+Pipeline/dist/
+SitePacks/*/images/
+
+# UI screenshots: only curated ones are committed (git add -f)
+Frontend/*/docs/*.png
+
+# e2e screenshots: only curated ones are committed (git add -f)
+qa/screens/*.png

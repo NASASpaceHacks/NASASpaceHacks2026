@@ -1,0 +1,109 @@
+{
+ "v1": {
+  "sites": [
+   {
+    "site": "P1",
+    "bg": "BG1",
+    "measured_drop_pct": 4.0,
+    "predicted_two_term_pct": 4.43,
+    "our_blocked_change_pp": 4.6,
+    "paper_blocked_change_pp": 5.8
+   },
+   {
+    "site": "P2",
+    "bg": "BG2",
+    "measured_drop_pct": 7.1,
+    "predicted_two_term_pct": 6.28,
+    "our_blocked_change_pp": 6.8,
+    "paper_blocked_change_pp": 9.4
+   },
+   {
+    "site": "P3",
+    "bg": "BG3",
+    "measured_drop_pct": 6.5,
+    "predicted_two_term_pct": 4.52,
+    "our_blocked_change_pp": 4.8,
+    "paper_blocked_change_pp": 5.5
+   },
+   {
+    "site": "P4",
+    "bg": "BG45",
+    "measured_drop_pct": 3.8,
+    "predicted_two_term_pct": -0.55,
+    "our_blocked_change_pp": -0.6,
+    "paper_blocked_change_pp": 2.6
+   },
+   {
+    "site": "P5",
+    "bg": "BG45",
+    "measured_drop_pct": 2.1,
+    "predicted_two_term_pct": -2.72,
+    "our_blocked_change_pp": -2.7,
+    "paper_blocked_change_pp": -0.4
+   },
+   {
+    "site": "P6",
+    "bg": "BG6",
+    "measured_drop_pct": 19.4,
+    "predicted_two_term_pct": 10.19,
+    "our_blocked_change_pp": 10.0,
+    "paper_blocked_change_pp": 19.9
+   },
+   {
+    "site": "P7",
+    "bg": "BG7",
+    "measured_drop_pct": 9.8,
+    "predicted_two_term_pct": 5.86,
+    "our_blocked_change_pp": 5.1,
+    "paper_blocked_change_pp": 10.7
+   },
+   {
+    "site": "P8",
+    "bg": "BG8",
+    "measured_drop_pct": 9.9,
+    "predicted_two_term_pct": 11.68,
+    "our_blocked_change_pp": 11.3,
+    "paper_blocked_change_pp": 11.8
+   },
+   {
+    "site": "Murray Buttes",
+    "measured_drop_pct": 4.0,
+    "predicted_two_term_pct": 8.39,
+    "note": "held out; BG is proxy"
+   }
+  ],
+  "n_obstructed_sky_comparisons": 15,
+  "mae_pp": 1.98,
+  "mae_pp_parking_only": 2.34,
+  "mae_pp_by_definition": {
+   "mean_ros": 6.51,
+   "solid_angle": 1.98,
+   "cos_sin": 11.91
+  },
+  "ros_pearson_r": 0.935,
+  "rmse_dose_pp": 4.34,
+  "rmse_dose_pp_detail": {
+   "two_term_ours": 4.34,
+   "two_term_paperROS": 1.77,
+   "linear_loo": 5.11,
+   "linear_insample": 4.08,
+   "null_zero": 9.34,
+   "null_mean_drop": 5.1
+  },
+  "murray_buttes": {
+   "measured_pct": 4.0,
+   "predicted_pct": 8.39
+  },
+  "notes": "Reproduces (not validates) Guo et al. 2026 obstructed-sky ratios from the USGS Gale 1 m DEM at MSL waypoint positions (MAE 2.0 pp over 15 periods, r=0.94). Metric definition chosen post hoc among 3 readings. Dose-drop RMSE 4.3 pp with our ROS vs 1.8 pp with the paper ROS; the largest miss is Maria Gordon Notch (narrow valley: ours 25.66% vs paper 37.9%). 8 events, one rover, one GCR model: indicative only."
+ },
+ "v2": {
+  "conditions": 20,
+  "mape_pct": 20.8,
+  "mape_pct_0_22_to_0_32g": 10.6,
+  "mape_pct_0_12_to_0_17g": 36.0,
+  "mean_signed_error_pct": -16.8,
+  "logo_mape_pct": 26.8,
+  "notes": "Pandolf+Santee x g-ratio vs IST-2 Mark III suited VO2 (digitized Fig. 36 trend lines, Norcross 2010), 5 gravities x 4 grades, subject mass 80.7 kg, suit 121 kg, speed 0.765 m/s (paper range 0.56-0.97). Model underpredicts at 0.12-0.17 g (measured VO2 has a gravity-independent floor) and is within about +-14% at 0.22-0.32 g. 0.38 g is an extrapolation beyond the 0.32 g maximum; no data there."
+ },
+ "generatedUtc": "2026-11-14T18:47:26Z"
+}
