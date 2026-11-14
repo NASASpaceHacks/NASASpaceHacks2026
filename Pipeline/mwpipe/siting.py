@@ -106,12 +106,25 @@ def build_siting(site: Site, pack: Path, m: dict) -> dict:
     walk = walkable_component(slope, (hr, hc))
 
     # ── ROVER ──
+    # Staged like a real EVA plan: the movable pressurized rover (DRA 5.0 safe haven) is parked on flat,
+    # walkable ground close to the science stations (Content/stations.gale.json), 300–900 m from the hab.
+    # Falls back to Curiosity's traverse waypoints if no station list exists.
     dh = np.hypot(rows - hr, cols - hc) * site.cell_m
     wps = _aoi_waypoints(pack)
     wrc = np.array([[w["cell"] // W, w["cell"] % W] for w in wps]) if wps else np.array([[hr, hc]])
-    rc_c = np.argwhere(flat & walk & (dh >= 700) & (dh <= 900))
+    if STATIONS_JSON.exists():
+        st_rc = []
+        for s in json.loads(STATIONS_JSON.read_text()):
+            x, y = site.fwd(s["lon"], s["lat"])
+            cell = site.xy_to_cell(x, y)
+            if cell >= 0:
+                st_rc.append([cell // W, cell % W])
+        if st_rc:
+            wrc = np.array(st_rc)
+    rc_c = np.argwhere(flat & walk & (dh >= 300) & (dh <= 900))
     if len(rc_c) == 0:
-        rc_c = np.argwhere((slope < FLAT) & walk & (dh >= 700) & (dh <= 900))
+        rc_c = np.argwhere((slope < FLAT) & walk & (dh >= 300) & (dh <= 900))
+    # Minimise the median distance to the targets (stations), so most stations sit within shelter range.
     med = np.array([np.median(np.hypot(wrc[:, 0] - r, wrc[:, 1] - c)) for r, c in rc_c])
     rr_, rcol = map(int, rc_c[int(med.argmin())])
     rover = _shelter(site, "ROVER1", "rover", "Pressurized rover (PR-1)", (rr_, rcol), True)

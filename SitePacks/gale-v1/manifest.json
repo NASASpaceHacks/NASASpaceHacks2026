@@ -3,7 +3,7 @@
  "id": "gale-v1",
  "name": "Gale Crater — Mount Sharp boxwork",
  "body": "mars",
- "createdUtc": "2026-11-14T18:54:55Z",
+ "createdUtc": "2026-11-14T19:18:26Z",
  "grid": {
   "w": 1000,
   "h": 1000,
@@ -413,14 +413,6 @@
  ],
  "landmarks": [
   {
-   "id": "LZ1",
-   "name": "Landing pad LZ-1 (scenario)",
-   "x": -2157.5,
-   "y": -282737.5,
-   "elevM": -4071.4,
-   "informal": true
-  },
-  {
    "id": "KNOB1",
    "name": "Knob 1 (unnamed; 122 m local relief)",
    "x": -2187.5,
@@ -515,6 +507,14 @@
    "y": -318839.9,
    "elevM": 771.0,
    "informal": false
+  },
+  {
+   "id": "LZ1",
+   "name": "Landing pad LZ-1 (scenario)",
+   "x": -2157.5,
+   "y": -282737.5,
+   "elevM": -4071.4,
+   "informal": true
   }
  ],
  "shelters": [
@@ -531,9 +531,9 @@
    "id": "ROVER1",
    "kind": "rover",
    "name": "Pressurized rover (PR-1)",
-   "x": 457.5,
-   "y": -284547.5,
-   "cell": 446615,
+   "x": -442.5,
+   "y": -284877.5,
+   "cell": 512435,
    "movable": true
   }
  ],
