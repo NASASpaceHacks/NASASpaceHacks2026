@@ -11,7 +11,7 @@ import type Projection from 'ol/proj/Projection';
 import VectorSource from 'ol/source/Vector';
 import { Stroke, Style } from 'ol/style';
 import { defaults as defaultInteractions } from 'ol/interaction/defaults';
-import type { Cell, LoadedSitePack, PlanResult, Telem } from '@mw/shared/contracts';
+import type { Cell, LoadedSitePack, PlanResult, Station, Telem } from '@mw/shared/contracts';
 import { cellToXY, gridExtent, xyToCell } from '@mw/shared/contracts';
 import {
   LOS_RAMP,
@@ -65,7 +65,7 @@ import { toVars, type ExplainStep } from '../lib/zone';
 
 export interface MapCallbacks {
   onShelterMoved(id: string, cell: Cell): void;
-  onClick(cell: Cell, stationId: string | null): void;
+  onClick(cell: Cell, stationId: string | null, extra?: { shelterId: string | null; pixel: [number, number] }): void;
   onReadout(r: CursorReadout | null): void;
   onHoverStation(id: string | null, pixel: [number, number] | null): void;
 }
@@ -199,7 +199,14 @@ export class MapController {
         stationId = (f.get('id') as string) ?? null;
         return true;
       }, { layerFilter: (l) => l === this.stationsLayer, hitTolerance: 6 });
-      if (cell >= 0) this.cb.onClick(cell, stationId);
+      let shelterId: string | null = null;
+      if (!stationId) {
+        this.map.forEachFeatureAtPixel(e.pixel, (f) => {
+          shelterId = (f.get('id') as string) ?? null;
+          return true;
+        }, { layerFilter: (l) => l === this.shelters.layer, hitTolerance: 6 });
+      }
+      if (cell >= 0) this.cb.onClick(cell, stationId, { shelterId, pixel: e.pixel as [number, number] });
     });
     let hovered: string | null = null;
     this.map.on('pointermove', (e) => {
@@ -474,7 +481,19 @@ export class MapController {
   }
 
   refreshStations(stateOf: (id: string) => { state: StationState; order?: number }) {
-    setStations(this.stationsLayer, this.pack.manifest.stations, stateOf);
+    setStations(this.stationsLayer, [...this.pack.manifest.stations, ...this.extraStations], stateOf);
+  }
+
+  private extraStations: Pick<Station, 'id' | 'name' | 'x' | 'y' | 'value'>[] = [];
+  /** Custom stops (not in the site pack) drawn with the pack's stations. */
+  setExtraStations(list: Pick<Station, 'id' | 'name' | 'x' | 'y' | 'value'>[]) {
+    this.extraStations = list;
+  }
+
+  /** Marks the chosen start base with an "A" badge. */
+  setBaseA(id: string | null) {
+    const src = this.shelters.layer.getSource()!;
+    src.getFeatures().forEach((f) => f.set('isA', f.get('id') === id));
   }
 
   setShelter(id: string, cell: Cell) {

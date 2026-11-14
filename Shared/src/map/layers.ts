@@ -383,7 +383,7 @@ export function setRouteProgress(layer: VectorLayer<VectorSource>, frac: number)
   (f.getGeometry() as LineString).setCoordinates(out);
 }
 
-export type StationState = 'planned' | 'dropped' | 'idle' | 'disabled' | 'visited';
+export type StationState = 'planned' | 'dropped' | 'idle' | 'disabled' | 'visited' | 'choice';
 
 /**
  * Stations: value-scaled symbols, planned order inside, decluttered labels. Calm by default: planned
@@ -400,6 +400,23 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
       const state = f.get('state') as StationState;
       const order = f.get('order') as number | undefined;
       const detail = !!layer.get('detail');
+      if (state === 'choice') {
+        // Route builder: a neutral numbered pin with a short label (nothing chosen yet).
+        const id = String(f.get('id'));
+        const num = /^ST0*(\d+)$/.exec(id)?.[1] ?? id;
+        const nm = String(f.get('name') ?? '').replace(/\s*\([^)]*\)\s*$/, '');
+        return [
+          new Style({
+            image: new CircleStyle({ radius: 11, fill: new Fill({ color: 'rgba(11,13,16,0.82)' }), stroke: new Stroke({ color: 'rgba(233,228,216,0.9)', width: 1.75 }), declutterMode: 'obstacle' }),
+            text: new Text({ text: num, font: '600 11px ui-monospace, monospace', fill: new Fill({ color: '#E9E4D8' }), declutterMode: 'none' }),
+            zIndex: 1,
+          }),
+          new Style({
+            text: new Text({ text: nm.length > 24 ? `${nm.slice(0, 23)}…` : nm, font: theme.font, offsetX: 17, textAlign: 'left', fill: new Fill({ color: theme.label }), stroke: halo(theme) }),
+            zIndex: 0,
+          }),
+        ];
+      }
       if (!detail && (state === 'dropped' || state === 'idle' || state === 'disabled')) {
         return new Style({
           image: new CircleStyle({ radius: 4, fill: new Fill({ color: 'rgba(11,13,16,0.65)' }), stroke: new Stroke({ color: 'rgba(233,228,216,0.55)', width: 1.25 }), declutterMode: 'obstacle' }),
@@ -489,7 +506,15 @@ export function createSheltersLayer(
       const kind = f.get('kind') as Shelter['kind'];
       const dragging = !!f.get('dragging');
       const isHab = kind === 'hab';
+      const badge = f.get('isA')
+        ? [new Style({
+            image: new CircleStyle({ radius: 10, fill: new Fill({ color: '#F2B544' }), stroke: new Stroke({ color: theme.routeCasing, width: 2 }), displacement: [16, 16] }),
+            text: new Text({ text: 'A', font: '700 12px system-ui', offsetX: 16, offsetY: -16, fill: new Fill({ color: '#16110a' }) }),
+            zIndex: 5,
+          })]
+        : [];
       return [
+        ...badge,
         new Style({
           image: new RegularShape({
             points: 4,

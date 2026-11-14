@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import type { Cell, FieldSet, LoadedSitePack, PlanEvent, PlanRequest, PlanResult, Rule, Telem } from '@mw/shared/contracts';
+import type { Cell, FieldSet, Station, LoadedSitePack, PlanEvent, PlanRequest, PlanResult, Rule, Telem } from '@mw/shared/contracts';
 import { DEFAULT_RULES } from '@mw/shared/contracts';
 import type { SafeZoneInputs, SafeZoneLimits } from '@mw/shared/map';
 import type {
@@ -42,6 +42,12 @@ export interface ConsoleState {
   // Planning inputs
   rules: Rule[];
   stationOn: Record<string, boolean>;
+  /** Route builder: chosen destinations (B, C…) in the order added (station ids and custom stops). */
+  destinations: string[];
+  /** Custom stops the officer dropped on the map (WP1, WP2…). */
+  customStops: Station[];
+  /** Small map popover for a clicked target or empty terrain (px = map pixel). */
+  mapPopover: { kind: 'station' | 'terrain'; id?: string; cell: Cell; px: [number, number] } | null;
   /** "Must visit" pins: the planner gives these stations priority (still dropped, with the reason, if unsafe). */
   mustVisit: Record<string, boolean>;
   startLtstMin: number;
@@ -135,6 +141,9 @@ export const useConsole = create<ConsoleState>()(
 
     rules: DEFAULT_RULES.map((r) => ({ ...r })),
     stationOn: {},
+    destinations: [],
+    customStops: [],
+    mapPopover: null,
     mustVisit: {},
     startLtstMin: 9 * 60 + 40,
     lsDeg: 150,

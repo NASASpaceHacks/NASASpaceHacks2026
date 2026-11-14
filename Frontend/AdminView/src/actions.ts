@@ -1,4 +1,4 @@
-import type { Cell, LinkMsg, PlanEvent, PlanRequest, PlanResult, Rule, RuleId, SitePackManifest } from '@mw/shared/contracts';
+import type { Cell, LinkMsg, Station, PlanEvent, PlanRequest, PlanResult, Rule, RuleId, SitePackManifest } from '@mw/shared/contracts';
 import { DEFAULT_CREW, cellToXY, xyToCell } from '@mw/shared/contracts';
 import { stageFromShelter } from '@mw/shared/engine';
 import { maskAreaKm2, safeZoneMask } from '@mw/shared/map';
@@ -47,16 +47,13 @@ export async function boot() {
     // server it starts solving as soon as the manifest is read (zero clicks, verdict in ≤ 3 s).
     const recommended = (m: SitePackManifest) => {
       const stationOn: Record<string, boolean> = {};
-      m.stations.forEach((s) => (stationOn[s.id] = true));
+      // Route builder: nothing is chosen until the officer picks destinations.
       const shelterCells: Record<string, Cell> = {};
       m.shelters.forEach((s) => (shelterCells[s.id] = s.cell));
       const evaBase = (m.shelters.find((s) => s.kind === 'rover') ?? m.shelters.find((s) => s.kind === 'hab') ?? m.shelters[0]).id;
       return { stationOn, shelterCells, evaBase, startLtstMin: m.scenario.startLtstMin };
     };
-    const pack = await b.loadPack(step, (m) => {
-      const r = recommended(m);
-      b.prefetchPlan?.(requestFor(m, { ...r, mustVisit: {}, rules: get().rules, events: [] }));
-    });
+    const pack = await b.loadPack(step);
     const m = pack.manifest;
     const { stationOn, shelterCells } = recommended(m);
     const rems = m.conditions.rems;
@@ -83,7 +80,6 @@ export async function boot() {
       pollTimer = setInterval(pollServer, 2000);
       void pollServer();
     }
-    void generatePlan();
   } catch (err) {
     set({ bootError: err instanceof Error ? err.message : String(err) });
   }
@@ -107,7 +103,7 @@ export function buildRequest(): PlanRequest {
 /** The plan request for a manifest and the planning inputs (pure; `buildRequest` = current state). */
 export function requestFor(
   m: SitePackManifest,
-  s: { shelterCells: Record<string, Cell>; stationOn: Record<string, boolean>; mustVisit: Record<string, boolean>; startLtstMin: number; rules: Rule[]; events: PlanEvent[]; evaBase: string | null },
+  s: { customStops?: Station[]; shelterCells: Record<string, Cell>; stationOn: Record<string, boolean>; mustVisit: Record<string, boolean>; startLtstMin: number; rules: Rule[]; events: PlanEvent[]; evaBase: string | null },
 ): PlanRequest {
   const hab = m.shelters.find((x) => x.kind === 'hab')!;
   let req: PlanRequest = {
@@ -116,7 +112,7 @@ export function requestFor(
     shelters: m.shelters.map((x) => ({ id: x.id, kind: x.kind, cell: s.shelterCells[x.id] ?? x.cell })),
     sol: m.scenario.sol,
     startLtstMin: s.startLtstMin,
-    stations: m.stations
+    stations: [...m.stations, ...(s.customStops ?? [])]
       .filter((x) => s.stationOn[x.id])
       .slice(0, 15)
       .map((x) => ({ id: x.id, cell: x.cell, value: x.value + (s.mustVisit[x.id] ? MUST_VISIT_BONUS : 0), dwellMin: x.dwellMin, ...(x.taskW !== undefined ? { taskW: x.taskW } : {}) })),
@@ -218,6 +214,11 @@ function installBundle(bundle: PlanBundle, req: PlanRequest, why: string) {
 export async function generatePlan(why = 'Plan generated') {
   if (!backend || !get().pack) return;
   const token = ++planToken;
+  if (!Object.values(get().stationOn).some(Boolean)) {
+    // Route builder: no destinations, no route.
+    set({ plan: null, planReq: null, planStatus: 'idle', planError: null, dirty: false });
+    return;
+  }
   set({ planStatus: 'planning', planError: null });
   const req = buildRequest();
   try {
@@ -254,10 +255,83 @@ export function moveShelter(id: string, cell: Cell) {
 
 /** Stops checklist: include / leave out a station. Re-plans at once. */
 export function toggleStation(id: string) {
+  const on0 = !get().stationOn[id];
+  if (on0) addDestination(id);
+  else removeDestination(id);
+}
+
+// ───────────────────────────── Route builder ─────────────────────────────
+
+function applyDestinations(ids: string[], why: string) {
   const s = get();
-  const on = !s.stationOn[id];
-  set({ stationOn: { ...s.stationOn, [id]: on }, ...(on ? {} : { mustVisit: { ...s.mustVisit, [id]: false } }) });
-  scheduleReplan(`Replanned: ${id} ${on ? 'included' : 'left out'}`, 60);
+  const stationOn: Record<string, boolean> = {};
+  ids.forEach((id) => (stationOn[id] = true));
+  set({ destinations: ids, stationOn, mustVisit: Object.fromEntries(Object.entries(s.mustVisit).filter(([k, v]) => v && stationOn[k])), mapPopover: null });
+  if (!ids.length) {
+    planToken++;
+    if (replanTimer) clearTimeout(replanTimer);
+    set({ plan: null, planReq: null, planStatus: 'idle', planError: null, dirty: false });
+    return;
+  }
+  set({ planStatus: 'planning' });
+  scheduleReplan(why, 60);
+}
+
+export function addDestination(id: string) {
+  const s = get();
+  if (s.destinations.includes(id) || s.destinations.length >= 15) return;
+  applyDestinations([...s.destinations, id], `Replanned: ${id} added`);
+}
+
+export function removeDestination(id: string) {
+  const s = get();
+  applyDestinations(s.destinations.filter((x) => x !== id), `Replanned: ${id} removed`);
+}
+
+export function clearDestinations() {
+  applyDestinations([], 'Cleared');
+}
+
+/** Click on empty terrain → "Add custom stop here": a new stop WPn (value 50, 10 min) at that cell. */
+export function addCustomStop(cell: Cell) {
+  const s = get();
+  const g = s.pack!.manifest.grid;
+  let n = 1;
+  while (s.customStops.some((c) => c.id === `WP${n}`)) n++;
+  const [x, y] = cellToXY(g, cell);
+  const st: Station = { id: `WP${n}`, name: `Custom stop WP${n}`, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A stop you placed on the map.' };
+  set({ customStops: [...s.customStops, st] });
+  addDestination(st.id);
+}
+
+/** "Suggest best stops": the planner picks its best subset and order from all targets. */
+export async function suggestStops() {
+  const s = get();
+  if (!backend || !s.pack) return;
+  const m = s.pack.manifest;
+  const all: Record<string, boolean> = {};
+  m.stations.forEach((x) => (all[x.id] = true));
+  const token = ++planToken;
+  set({ planStatus: 'planning', mapPopover: null });
+  try {
+    const req = requestFor(m, { ...s, stationOn: all, mustVisit: {}, customStops: [] });
+    const bundle = await backend.plan(req);
+    if (token !== planToken) return;
+    const order = bundle.result.order;
+    if (!order.length) {
+      set({ planStatus: 'idle' });
+      installBundle(bundle, req, 'Suggested stops');
+      return;
+    }
+    const stationOn: Record<string, boolean> = {};
+    order.forEach((id) => (stationOn[id] = true));
+    set({ destinations: order, stationOn, customStops: [] });
+    // Re-plan for exactly the chosen list (keeps the request and the crew route in step).
+    void generatePlan('Suggested best stops');
+  } catch (err) {
+    if (token !== planToken) return;
+    set({ planStatus: 'error', planError: err instanceof Error ? err.message : String(err) });
+  }
 }
 
 /** "Must visit" pin (implies included). Re-plans at once. */
@@ -647,8 +721,17 @@ export function startHazardPick() {
   set((s) => ({ hazardPick: !s.hazardPick }));
 }
 
-export function handleMapClick(cell: Cell, stationId: string | null) {
+export function handleMapClick(cell: Cell, stationId: string | null, extra?: { shelterId: string | null; pixel: [number, number] }) {
   const s = get();
+  if (s.uiMode === 'plan' && !s.hazardPick && extra) {
+    if (stationId) return set({ mapPopover: { kind: 'station', id: stationId, cell, px: extra.pixel }, selectedStation: stationId });
+    if (extra.shelterId) {
+      const sh = shelterById(s.pack!, extra.shelterId);
+      if (sh && (sh.kind === 'hab' || sh.kind === 'rover')) setEvaBase(sh.id);
+      return set({ mapPopover: null });
+    }
+    return set({ mapPopover: s.mapPopover ? null : { kind: 'terrain', cell, px: extra.pixel } });
+  }
   if (s.hazardPick) {
     const g = s.pack!.manifest.grid;
     const [x, y] = cellToXY(g, cell);
