@@ -45,7 +45,16 @@ export function goldenPlanResult(pack: LoadedSitePack): PlanResult {
   const g = m.grid;
   const dem = pack.rasters.dem;
   const hab = m.shelters.find((s) => s.kind === 'hab')!;
-  const picks = [...m.stations].sort((a, b) => cellDistM(g, hab.cell, a.cell) - cellDistM(g, hab.cell, b.cell)).slice(0, 4);
+  // Keep the fixture consistent with mockFields: only pick stations inside the mock safety envelope.
+  const f = mockFields(pack);
+  const shelterMax = ruleValue(DEFAULT_RULES, 'shelter_time_max_min');
+  const available = ruleValue(DEFAULT_RULES, 'eva_duration_max_min') - ruleValue(DEFAULT_RULES, 'egress_ingress_min');
+  const byDist = [...m.stations].sort((a, b) => cellDistM(g, hab.cell, a.cell) - cellDistM(g, hab.cell, b.cell));
+  const picks = byDist
+    .filter((s) => !f.blocked[s.cell])
+    .sort((a, b) => f.shelterMin[a.cell] - f.shelterMin[b.cell])
+    .slice(0, 4)
+    .sort((a, b) => cellDistM(g, hab.cell, a.cell) - cellDistM(g, hab.cell, b.cell));
   const v = DEFAULT_CREW.v0;
   const stops = ['HAB', ...picks.map((s) => s.id), 'HAB'];
   const cellOfId = (id: string) => (id === 'HAB' ? hab.cell : m.stations.find((s) => s.id === id)!.cell);
@@ -69,9 +78,9 @@ export function goldenPlanResult(pack: LoadedSitePack): PlanResult {
         tMin: tm,
         distHabM: dh,
         elevM: dem[c],
-        o2Pct: Math.max(0, 100 - (tm / 300) * 100),
-        walkbackMarginMin: Math.max(0, 300 - tm - (dh / (v * 0.5)) / 60),
-        shelterMarginMin: Math.max(0, 30 - Math.min(dh, cellDistM(g, m.shelters[1]?.cell ?? hab.cell, c)) / v / 60),
+        o2Pct: Math.max(0, 100 - (tm / available) * 100),
+        walkbackMarginMin: available - tm - f.walkbackMin[c],
+        shelterMarginMin: shelterMax - f.shelterMin[c],
         metW: 300 + (k % 5) * 20,
         heatAvgW: 310,
         inLos: dh < 1200,

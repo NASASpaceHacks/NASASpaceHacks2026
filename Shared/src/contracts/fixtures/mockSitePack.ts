@@ -111,10 +111,14 @@ export function mockSitePack(seed = 412, size = 600, cellM = 5): LoadedSitePack 
 
   const names = ['Boxwork ridge A', 'Sulfate contact', 'Butte flank', 'Vein field', 'Dark sand edge', 'Ridge notch', 'Layered outcrop', 'Float rock cluster', 'Upper bench', 'Fracture halo'];
   const stations: Station[] = names.map((name, i) => {
+    // Realistic EVA geometry: stations 300–1000 m from the hab or the rover (like the real gale-v1 stations).
+    const anchor = i % 3 === 2 ? [Math.floor(h * 0.48), Math.floor(w * 0.3)] : habRC;
     let r = 0, c = 0, tries = 0;
     do {
-      r = Math.floor(h * 0.15 + rnd() * h * 0.7);
-      c = Math.floor(w * 0.15 + rnd() * w * 0.7);
+      const ang = rnd() * Math.PI * 2;
+      const distCells = (300 + rnd() * 700) / cellM;
+      r = Math.min(h - 2, Math.max(1, Math.floor(anchor[0] + Math.sin(ang) * distCells)));
+      c = Math.min(w - 2, Math.max(1, Math.floor(anchor[1] + Math.cos(ang) * distCells)));
       tries++;
     } while (slope[r * w + c] > 12 && tries < 50);
     const cell = cellOf(grid, r, c);

@@ -415,6 +415,8 @@ export interface CoarseSafetyGrid {
   /** Minutes, uint16, 65535 = unreachable. Row-major, row 0 = north. */
   walkbackMin: number[];
   shelterMin: number[];
+  /** Optional (added at checkpoint 1): 1 = coarse cell mostly in habitat line of sight (comm), 0 = comm shadow. */
+  los?: number[];
 }
 
 export interface PlanPackage {
@@ -434,6 +436,8 @@ export interface PlanPackage {
   startLtstMin: number;
   sol: number;
   coarse: CoarseSafetyGrid;
+  /** Optional (added at checkpoint 1): the rule values this route was planned under, so the visor need not assume defaults. */
+  rules?: { id: RuleId; value: number; enabled: boolean }[];
   /** Ed25519 signature (hex) over the canonical body; empty in mocks. */
   sig: string;
 }

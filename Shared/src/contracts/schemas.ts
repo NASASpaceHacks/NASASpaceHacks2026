@@ -201,7 +201,9 @@ export const PlanPackageSchema = z.object({
     h: z.number().int().positive(),
     walkbackMin: z.array(z.number().int().min(0).max(65535)),
     shelterMin: z.array(z.number().int().min(0).max(65535)),
+    los: z.array(z.number().int().min(0).max(1)).optional(),
   }),
+  rules: z.array(z.object({ id: RuleIdSchema, value: num, enabled: z.boolean() })).optional(),
   sig: z.string(),
 });
 
