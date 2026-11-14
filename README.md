@@ -8,6 +8,7 @@ The habitat EVA officer plans a constraint-safe Marswalk on a correct Mars map b
 
 - **Design doc**: [`docs/designs/marswalk.md`](docs/designs/marswalk.md)
 - **Build agents + API specs**: [`docs/AGENTS.md`](docs/AGENTS.md)
+- **Explainer (start here)**: [`docs/EXPLAINER.md`](docs/EXPLAINER.md)
 - **Product walkthrough**: [`docs/WALKTHROUGH.md`](docs/WALKTHROUGH.md)
 - **Research tracks for humans**: [`Research/tracks/README.md`](Research/tracks/README.md)
 
