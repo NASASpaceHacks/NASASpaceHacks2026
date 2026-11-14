@@ -1,0 +1,118 @@
+# Marswalk flight rules (mirror of Shared/src/contracts/rules.ts DEFAULT_RULES)
+#
+# How FOD flight rules map to the planner's hard constraints
+# ---------------------------------------------------------
+# NASA Flight Operations Directorate (FOD) EVA planning uses a constraint list: "max traverse distance,
+# max distance from lander, lighting, max safe slope, max time without LOS to lander, consumables
+# redlines" (Caswell et al., ASCEND 2025, NTRS 20250006063). The planner enforces each as a HARD rule
+# (hard: true): a plan that breaks one is never returned as OK. Mapping:
+#   max safe slope            -> slope_max_deg (slope_soft_deg is a soft comfort penalty, not a rule)
+#   consumables redlines      -> eva_duration_max_min, egress_ingress_min, contingency_o2_min,
+#                                heat_avg_max_w
+#   max distance from lander  -> walk_radius_max_m (walking-only 2 km, from the 1 h contingency-O2 walkback)
+#   walkback / abort          -> walkback_speed_factor + contingency_o2_min (never planned into)
+#   time to shelter (SEP)     -> shelter_time_max_min
+#   max time without LOS      -> los_gap_max_min
+#   lighting                  -> daylight_min_sun_elev_deg
+#   keep-outs                 -> plume_keepout_m
+# assumption: true = team design parameter, not a published NASA number (shown as such in the UI).
+# enabled_default: the rule's default on/off state in the Admin view. This file is documentation;
+# the TypeScript constant is the source of truth. Keep them in sync.
+rules:
+  - id: slope_max_deg
+    label: "Max walking slope"
+    value: 20
+    unit: "deg"
+    hard: true
+    enabled_default: true
+    assumption: false
+    citation: "xEVA System ConOps EVA-EXP-0042 Rev B (NASA, 2020): suited crew up/down/cross slopes ≤20°; Artemis III EVA slope <20° (NTRS 20230005904)."
+  - id: slope_soft_deg
+    label: "Slope comfort limit (metabolic data edge)"
+    value: 16.7
+    unit: "deg"
+    hard: false
+    enabled_default: true
+    assumption: false
+    citation: "Norcross et al. 2010, NASA/TP-2010-216125 (suited metabolic data only up to 30% grade ≈ 16.7°)."
+  - id: eva_duration_max_min
+    label: "EVA duration (nominal)"
+    value: 360
+    unit: "min"
+    hard: true
+    enabled_default: true
+    assumption: false
+    citation: "xEVA System ConOps EVA-EXP-0042 Rev B: EVA 6 ± 2 h."
+  - id: egress_ingress_min
+    label: "Egress + ingress overhead"
+    value: 60
+    unit: "min"
+    hard: true
+    enabled_default: true
+    assumption: false
+    citation: "xEVA System ConOps EVA-EXP-0042 Rev B: ~1 h of each EVA for egress/ingress."
+  - id: contingency_o2_min
+    label: "Contingency O₂ reserve (never planned into)"
+    value: 60
+    unit: "min"
+    hard: true
+    enabled_default: true
+    assumption: false
+    citation: "xEVA System ConOps EVA-EXP-0042 Rev B: +1 h backup O₂ for off-nominal use only."
+  - id: walkback_speed_factor
+    label: "Contingency walkback speed factor"
+    value: 0.5
+    unit: "×v₀"
+    hard: true
+    enabled_default: true
+    assumption: true
+    citation: "Team assumption: degraded-crew return at half nominal speed (Apollo walkback-limit concept, Bellcomm TR-69-340-4)."
+  - id: shelter_time_max_min
+    label: "Max time to shelter (SEP)"
+    value: 30
+    unit: "min"
+    hard: true
+    enabled_default: true
+    assumption: false
+    citation: "Onboard dose-rate nowcast gives ≥30 min warning before peak SEP dose (arXiv:2502.02469); DRA 5.0 Addendum (NASA SP-2009-566-ADD): return crews to shelter on warning."
+  - id: los_gap_max_min
+    label: "Max time without habitat line-of-sight"
+    value: 10
+    unit: "min"
+    hard: true
+    enabled_default: true
+    assumption: true
+    citation: "FOD constraint \"maximum time without line of sight to lander\" (Caswell et al., ASCEND 2025, NTRS 20250006063). Value is a team design parameter."
+  - id: daylight_min_sun_elev_deg
+    label: "Min sun elevation (daylight only)"
+    value: 5
+    unit: "deg"
+    hard: true
+    enabled_default: true
+    assumption: true
+    citation: "DRA 5.0 Addendum (NASA SP-2009-566-ADD): no nominal night EVAs. Threshold is a team parameter."
+  - id: heat_avg_max_w
+    label: "Suit heat-rejection budget (15-min avg)"
+    value: 352
+    unit: "W"
+    hard: true
+    enabled_default: true
+    assumption: false
+    citation: "Future suits sized for 1200 BTU/h (352 W) average (NASA ICES-2026-127); SWME heat rejection 370 W in Mars conditions vs 810 W in vacuum (NTRS 20130014146)."
+  - id: walk_radius_max_m
+    label: "Max distance from habitat (walking)"
+    value: 2000
+    unit: "m"
+    hard: true
+    enabled_default: true
+    assumption: false
+    citation: "Tenets of Lunar EVA for Artemis III (NTRS 20230008183): ≤2 km from lander, based on 1 h emergency return on contingency O₂; xEVA ConOps walking-only 2 km radius."
+  - id: plume_keepout_m
+    label: "Lander plume-ejecta keep-out radius"
+    value: 1000
+    unit: "m"
+    hard: true
+    enabled_default: true
+    assumption: false
+    citation: "Hoffman et al., First Landing Site/Exploration Zone workshop (NTRS 20160002370): 1 km plume-ejecta hazard zone."
+

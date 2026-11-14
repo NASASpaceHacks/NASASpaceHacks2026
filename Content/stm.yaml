@@ -1,0 +1,95 @@
+# Marswalk Science Traceability Matrix (STM), Gale crater boxwork site (gale-v1)
+# Format follows NASA STMs: Goal -> Objective -> Measurement / crew action -> Station.
+# Every station value (0-100) is a team-assigned priority derived from the objectives it serves
+# (weights below); it is NOT a NASA ranking. Facts are cited to the Curiosity mission blog.
+version: 0
+status: draft v0 (C1); needs review by the team science lead
+scoring_rule: >
+  Values were assigned by judgment (C1 draft), guided by three factors: the weight of the highest
+  objective served, uniqueness (few other stations give the same measurement), and crew-actionability
+  (can a suited crew make the measurement in 10-30 min). No formula was fitted. The science lead should
+  re-score before the final pitch. This is a transparent team heuristic, not a calibrated model.
+challenge_link: >
+  Space Apps 2026 challenge asks for "new and exciting science" on a Marswalk; boxwork is the
+  challenge's own example. Curiosity found boxwork ridge/hollow terrain in 2025 and drilled a
+  hollow and an adjacent ridge as a pair.
+
+goals:
+  - id: G1
+    statement: Understand how Mars' ancient groundwater shaped Mount Sharp, and for how long it stayed habitable.
+    sources:
+      - "Curiosity blog sols 4618-4619: branching boxwork structures are likely groundwater-related. https://science.nasa.gov/blog/curiosity-blog-sols-4618-4619-the-boxwork-structures-continue-to-call-to-us"
+      - "Curiosity blog sols 4649-4654: hypothesis that fluid cementation formed the ridges and erosion removed the softer rock between. https://science.nasa.gov/blog/curiosity-blog-sols-4649-4654-ridges-hollows-and-nodules-oh-my"
+  - id: G2
+    statement: Choose and document the best samples for analysis now and for potential return (Mars Sample Return planning).
+    sources:
+      - "Curiosity blog sols 4867-4872: Atacama chosen as drillable, representative layered-sulfate target. https://science.nasa.gov/blog/curiosity-blog-sols-4867-4872-sand-fill-in-antofagasta-crater-and-finding-our-next-drill-target"
+      - "Team design: sample-selection stations are scored for representativeness and crew-actionability. No specific NASA sample-return requirement is cited here (not sourced)."
+  - id: G3
+    statement: Characterize the stratigraphic record and exotic material on Mount Sharp (units, contacts, debris-flow deposits, float rocks).
+    sources:
+      - "Curiosity blog sols 4804-4811: final boxwork phase examines where the boxwork unit meets neighbouring units. https://science.nasa.gov/blog/curiosity-blog-sols-4804-4811-kicking-off-the-final-phase-of-boxwork-exploration"
+
+objectives:
+  - id: OBJ-1
+    goal: G1
+    weight: 95
+    statement: Determine whether boxwork ridges and hollows differ in mineralogy, chemistry and texture, and so how boxwork formed.
+    rationale: "Ridges and hollows show only subtle chemical differences (blog sols 4695-4701), so mineralogy from a hollow/ridge drill pair is the discriminator (blog sols 4689-4694, 4716-4722)."
+    measurements:
+      - { id: M1a, crew_action: "Photograph ridge crest, hollow wall and floor with scale and sun-angle metadata", instrument_analog: "Mastcam/MAHLI imaging", output: "Geotagged image set" }
+      - { id: M1b, crew_action: "Mark and describe bedrock texture and nodules at contact", instrument_analog: "APXS/ChemCam context", output: "Field notes + hand-held photos" }
+    stations: [ST01, ST02, ST03, ST04, ST06]
+  - id: OBJ-2
+    goal: G1
+    weight: 85
+    statement: Map fluid-flow evidence (veins, polygons, nodules, fracture fills) as groundwater pathways.
+    rationale: "Polygons seen on the block beside Valle de la Luna, previously known only from layered sulfate units, not hollow floors (blog sols 4743-4749); branching structures likely groundwater-related (blog 4618-4619)."
+    measurements:
+      - { id: M2a, crew_action: "Image polygon fractures and veins at 1 m and 10 cm scale", instrument_analog: "MAHLI mosaic", output: "Close-up mosaic" }
+    stations: [ST01, ST02, ST03, ST04, ST07]
+  - id: OBJ-3
+    goal: G3
+    weight: 80
+    statement: Record stratigraphy and unit contacts (boxwork vs light-toned layered unit; sulfate layers; Gediz Vallis ridge deposits).
+    rationale: "Contacts and butte layering constrain relative age (blog 4825-4831, 4867-4872); Gediz Vallis ridge deposits are a recognised long-sought target (blog 3930-3931)."
+    measurements:
+      - { id: M3a, crew_action: "Panoramic imaging of exposed layers with a documented heading and position", instrument_analog: "Mastcam mosaic", output: "Annotated panorama" }
+    stations: [ST06, ST07, ST08, ST09, ST10, ST11, ST12]
+  - id: OBJ-4
+    goal: G2
+    weight: 75
+    statement: Select representative, drillable, well-documented sample sites and record their context.
+    rationale: "A hollow floor is usually sand-covered, so drillable hollow rock is scarce (blog 4689-4694); Atacama was picked as drillable and representative (blog 4867-4872)."
+    measurements:
+      - { id: M4a, crew_action: "Judge drillability (flat, hard, uncovered bedrock), photograph workspace, tag candidate", instrument_analog: "Preload-test workspace check", output: "Candidate-sample card" }
+    stations: [ST01, ST02, ST03, ST05, ST07, ST09, ST11, ST12]
+  - id: OBJ-5
+    goal: G3
+    weight: 70
+    statement: Identify exotic or float material (possible meteorite, ridge float rocks) for rapid classification.
+    rationale: "Thola may be a meteorite, possibly a chondrite; chemistry and reflectance decide if it is native to Mars (blog 4825-4831). Classification is unconfirmed."
+    measurements:
+      - { id: M5a, crew_action: "Photograph, scale and describe colour/texture of dark float rock; no sampling without approval", instrument_analog: "ChemCam reflectance/APXS", output: "Float-rock card" }
+    stations: [ST05, ST06, ST08, ST10, ST12]
+
+stations_summary:   # see stations.gale.json for coordinates, dwell and descriptions
+  ST01: { value: 80, objectives: [OBJ-1, OBJ-2, OBJ-4] }
+  ST02: { value: 95, objectives: [OBJ-1, OBJ-2, OBJ-4] }
+  ST03: { value: 90, objectives: [OBJ-1, OBJ-2, OBJ-4] }
+  ST04: { value: 70, objectives: [OBJ-1, OBJ-2] }
+  ST05: { value: 60, objectives: [OBJ-5, OBJ-4] }
+  ST06: { value: 75, objectives: [OBJ-1, OBJ-3, OBJ-5] }
+  ST07: { value: 85, objectives: [OBJ-3, OBJ-4, OBJ-2] }
+  ST08: { value: 65, objectives: [OBJ-3, OBJ-5] }
+  ST09: { value: 60, objectives: [OBJ-3, OBJ-4] }
+  ST10: { value: 70, objectives: [OBJ-3, OBJ-5] }
+  ST11: { value: 72, objectives: [OBJ-3, OBJ-4] }
+  ST12: { value: 92, objectives: [OBJ-3, OBJ-5, OBJ-4] }
+
+caveats:
+  - "Station values are heuristic team priorities, not published NASA values; they must not be quoted as such."
+  - "Station coordinates are Curiosity rover waypoints matched by sol to blog posts, accurate to roughly 10-20 m."
+  - "A suited crew is not Curiosity: instrument analogs are named only to show which measurement the crew action stands in for."
+  - "CheMin/SAM results for the boxwork drill samples were not reported in the posts reviewed; this STM claims none."
+  - "Science-aware selection reference: Candela & Wettergreen 2022, https://doi.org/10.1109/LRA.2022.3191949"
