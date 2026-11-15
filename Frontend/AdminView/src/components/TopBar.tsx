@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { isSendable, openDetails, setMode } from '../actions';
+import { isSendable, openDetails, setMode, switchSite } from '../actions';
 import { set, useConsole } from '../store';
 import { evaLtst, fmtLtst, marsTime } from '../lib/marsclock';
 import { dataSummary } from '../lib/science';
@@ -90,6 +90,34 @@ function SimMenu() {
   );
 }
 
+/** Site dropdown: native select, so keyboard and screen readers work (arrow keys / type-ahead, Enter). */
+function SitePicker({ fallback }: { fallback: string }) {
+  const sites = useConsole((s) => s.sites).filter((x) => x.available);
+  const siteId = useConsole((s) => s.siteId);
+  const uiMode = useConsole((s) => s.uiMode);
+  const switching = useConsole((s) => s.switchingTo);
+  if (sites.length < 2 || !siteId) return <span data-testid="site-name" className="truncate text-ink">{fallback}</span>;
+  const locked = uiMode !== 'plan' || !!switching;
+  return (
+    <label className="relative flex items-center" title={uiMode !== 'plan' ? 'Back to Plan to change site' : 'Site'}>
+      <span className="sr-only">Site</span>
+      <select
+        data-testid="site-select"
+        aria-label="Site"
+        value={switching ?? siteId}
+        disabled={locked}
+        onChange={(e) => void switchSite(e.target.value)}
+        className="h-9 max-w-[200px] cursor-pointer appearance-none truncate rounded-[8px] border border-line-2 bg-black py-0 pl-2.5 pr-7 text-[13px] text-ink outline-none hover:border-cyan focus-visible:border-cyan disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {sites.map((st) => (
+          <option key={st.id} value={st.id}>{st.name.replace(/\s*—.*$/, '')}</option>
+        ))}
+      </select>
+      <svg aria-hidden width="10" height="10" viewBox="0 0 10 10" className="pointer-events-none absolute right-2.5 text-cyan" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1.5 3.5 L5 7 L8.5 3.5" /></svg>
+    </label>
+  );
+}
+
 export function TopBar() {
   const pack = useConsole((s) => s.pack);
   const startLtst = useConsole((s) => s.startLtstMin);
@@ -132,8 +160,8 @@ export function TopBar() {
         }
       >
         <div tabIndex={0} className="flex min-w-0 items-baseline gap-2 whitespace-nowrap text-[13px] text-ink-2">
-          <span className="hidden truncate text-ink min-[1440px]:inline">{site}</span>
-          <span className="hidden text-dim min-[1440px]:inline">·</span>
+          <span className="hidden min-[1100px]:contents"><SitePicker fallback={site} /></span>
+          <span className="hidden text-dim min-[1100px]:inline">·</span>
           <span className="border border-line-2 px-1 font-display text-[10px] font-semibold uppercase tracking-[0.14em] text-mute">Scenario</span>
           <span className="num">Sol {m?.scenario.sol ?? '—'}</span>
           <span className="text-dim">·</span>

@@ -450,16 +450,40 @@ export class MockBackend implements Backend {
   }
 }
 
-/** Pick the backend: `?mock=1` forces mock; otherwise live when /api/health answers. */
-export async function detectBackend(): Promise<{ backend: Backend; reason: string }> {
+export interface SiteInfo {
+  id: string;
+  name: string;
+  centerLonLat: [number, number];
+  available: boolean;
+}
+
+/** Every site pack the hab server knows (GET /api/sitepacks); [] when it cannot be asked. */
+export async function fetchSites(): Promise<SiteInfo[]> {
+  try {
+    const list = await json<SiteInfo[]>('/api/sitepacks', undefined, 3000);
+    return Array.isArray(list) ? list.filter((x) => x?.id && x.centerLonLat) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Pick the backend: `?mock=1` forces mock; otherwise live when /api/health answers. `?site=<id>` picks the site. */
+export async function detectBackend(): Promise<{ backend: Backend; reason: string; siteId: string | null; sites: SiteInfo[] }> {
   const params = new URLSearchParams(location.search);
-  if (params.get('mock') === '1') return { backend: new MockBackend(), reason: 'Mock mode requested (?mock=1)' };
+  if (params.get('mock') === '1') return { backend: new MockBackend(), reason: 'Mock mode requested (?mock=1)', siteId: null, sites: [] };
   try {
     const h = await json<{ ok: boolean; siteId: string }>('/api/health', undefined, 2500);
-    if (h.ok && h.siteId) return { backend: new HttpBackend(h.siteId), reason: `Hab server online · ${h.siteId}` };
+    if (h.ok && h.siteId) {
+      const sites = await fetchSites();
+      const want = params.get('site');
+      const hit = want ? sites.find((x) => x.id === want && x.available) : undefined;
+      const siteId = hit ? hit.id : h.siteId;
+      const why = want && !hit ? ` (site "${want}" is not available — showing ${h.siteId})` : '';
+      return { backend: new HttpBackend(siteId), reason: `Hab server online · ${siteId}${why}`, siteId, sites };
+    }
     throw new Error('health not ok');
   } catch {
-    return { backend: new MockBackend(), reason: 'Hab server unreachable — running on the in-browser synthetic site' };
+    return { backend: new MockBackend(), reason: 'Hab server unreachable — running on the in-browser synthetic site', siteId: null, sites: [] };
   }
 }
 

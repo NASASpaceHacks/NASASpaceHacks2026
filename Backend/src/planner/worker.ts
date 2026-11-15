@@ -7,15 +7,20 @@ import { runPlanJob } from './job';
  * Planning worker: keeps engine `plan()` (sync, up to ~1.5 s on 1M cells) off the hab server's
  * event loop so heartbeats stay on time. The site pack arrives once via workerData.
  */
-const pack = workerData.pack as LoadedSitePack;
+const packs = new Map<string, LoadedSitePack>();
+const first = workerData.pack as LoadedSitePack;
+packs.set(first.manifest.id, first);
 const forceFallback = !!workerData.forceFallback;
 
 const port = parentPort!;
 const { caps } = await loadEngine();
 port.postMessage({ type: 'ready', caps });
 
-port.on('message', async (m: { id: number; req: PlanRequest; reqKey: string }) => {
+port.on('message', async (m: { id: number; req: PlanRequest; reqKey: string; packId: string; pack?: LoadedSitePack }) => {
   try {
+    if (m.pack) packs.set(m.packId, m.pack);
+    const pack = packs.get(m.packId);
+    if (!pack) throw new Error(`site pack ${m.packId} not loaded in worker`);
     const out = await runPlanJob(pack, m.req, m.reqKey, forceFallback);
     const f = out.fields;
     const buffers = new Set<ArrayBuffer>();

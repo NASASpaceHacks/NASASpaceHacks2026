@@ -32,9 +32,27 @@ export interface GaleStation {
   objectiveIds: string[];
 }
 
-const STM = stmJson as unknown as Stm;
+const BUNDLED = stmJson as unknown as Stm;
+let STM = BUNDLED;
 const GALE = galeStationsJson as unknown as GaleStation[];
 const OBJ = new Map(STM.objectives.map((o) => [o.id, o]));
+
+/** The visor follows the route's site: load that site's matrix (`<pack>/stm.json`); Gale falls back to the bundled one. */
+export async function loadSiteStm(packBase: string, siteId: string): Promise<void> {
+  let next: Stm | null = null;
+  try {
+    const r = await fetch(`${packBase}/stm.json`);
+    if (r.ok && (r.headers.get('content-type') ?? '').includes('json')) {
+      const j = (await r.json()) as Stm;
+      if (Array.isArray(j?.objectives)) next = j;
+    }
+  } catch {
+    /* fall back */
+  }
+  STM = next ?? (/^(gale|mock)/.test(siteId) ? BUNDLED : { ...BUNDLED, objectives: [] });
+  OBJ.clear();
+  STM.objectives.forEach((o) => OBJ.set(o.id, o));
+}
 
 /** Objectives a station serves, highest weight first. */
 export function objectivesFor(ids: string[]): StmObjective[] {

@@ -43,7 +43,7 @@ import { isobands, downsample, demContours, type Iso } from './contours';
 import { headingCue, pickLandmark } from './cues';
 import { buildMockScenario, MockHabLink, nextVersion } from './mock';
 import { Checkpoint, type DynState } from './persist';
-import { crewTasks, galeStation, objectivesFor, type CrewTask } from './science';
+import { crewTasks, galeStation, loadSiteStm, objectivesFor, type CrewTask } from './science';
 import { RouteModel, routeShelter, shelterLabel } from './route';
 import { departNow, estimatedXY, newSim, rebaseSim, simTick, type SimState } from './sim';
 
@@ -227,6 +227,7 @@ export class VisorController {
       const r = await fetch(`/sitepacks/${siteId}/manifest.json`);
       if (!r.ok) throw new Error(`manifest ${r.status}`);
       const manifest = (await r.json()) as SitePackManifest;
+      await loadSiteStm(`/sitepacks/${siteId}`, siteId);
       this.setPack(manifest, `/sitepacks/${siteId}`, null);
       void this.loadDem(manifest);
     } catch (e) {

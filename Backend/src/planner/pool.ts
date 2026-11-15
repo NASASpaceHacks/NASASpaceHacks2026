@@ -7,6 +7,7 @@ interface Pending {
   resolve: (r: PlanJobResult) => void;
   timer: ReturnType<typeof setTimeout>;
   reqKey: string;
+  pack: LoadedSitePack;
 }
 
 export interface PlannerOptions {
@@ -28,6 +29,8 @@ export class Planner {
   private worker: Worker | null = null;
   private pending = new Map<number, Pending>();
   private nextId = 1;
+  /** Pack ids the current worker already holds (the default pack arrives via workerData). */
+  private sent = new Set<string>();
   private closing = false;
   private respawning: Promise<void> | null = null;
 
@@ -59,13 +62,14 @@ export class Planner {
           clearTimeout(t);
           this.caps = m.caps!;
           this.worker = w;
+          this.sent = new Set([this.pack.manifest.id]);
           resolve();
         } else if (m.type === 'result') {
           const p = this.pending.get(m.id!);
           if (!p) return;
           clearTimeout(p.timer);
           this.pending.delete(m.id!);
-          p.resolve(m.ok ? m.out! : fallbackPlan(this.pack, p.reqKey, `planner worker error: ${m.error}`));
+          p.resolve(m.ok ? m.out! : fallbackPlan(p.pack, p.reqKey, `planner worker error: ${m.error}`));
         }
       });
       w.on('error', (e: Error) => {
@@ -78,7 +82,7 @@ export class Planner {
         this.worker = null;
         for (const [id, p] of this.pending) {
           clearTimeout(p.timer);
-          p.resolve(fallbackPlan(this.pack, p.reqKey, 'planner worker exited'));
+          p.resolve(fallbackPlan(p.pack, p.reqKey, 'planner worker exited'));
           this.pending.delete(id);
         }
         if (!this.closing) this.respawn();
@@ -92,19 +96,22 @@ export class Planner {
       .finally(() => (this.respawning = null));
   }
 
-  async plan(req: PlanRequest, reqKey: string): Promise<PlanJobResult> {
+  async plan(req: PlanRequest, reqKey: string, pack: LoadedSitePack = this.pack): Promise<PlanJobResult> {
     if (this.mode === 'worker' && !this.worker && this.respawning) await this.respawning;
     const w = this.worker;
-    if (this.mode === 'inline' || !w) return runPlanJob(this.pack, req, reqKey, this.opts.forceFallback);
+    if (this.mode === 'inline' || !w) return runPlanJob(pack, req, reqKey, this.opts.forceFallback);
     return new Promise((resolve) => {
       const id = this.nextId++;
       const timer = setTimeout(() => {
         this.pending.delete(id);
-        resolve(fallbackPlan(this.pack, reqKey, `engine timeout after ${this.opts.timeoutMs} ms`));
+        resolve(fallbackPlan(pack, reqKey, `engine timeout after ${this.opts.timeoutMs} ms`));
         void w.terminate(); // exit handler respawns
       }, this.opts.timeoutMs);
-      this.pending.set(id, { resolve, timer, reqKey });
-      w.postMessage({ id, req, reqKey });
+      this.pending.set(id, { resolve, timer, reqKey, pack });
+      const packId = pack.manifest.id;
+      const withPack = !this.sent.has(packId);
+      this.sent.add(packId);
+      w.postMessage({ id, req, reqKey, packId, ...(withPack ? { pack } : {}) });
     });
   }
 

@@ -11,6 +11,8 @@ import { expect, test, type Page } from '@playwright/test';
 type XY = [number, number];
 const SHOTS = fileURLToPath(new URL('../screens/ux5/', import.meta.url));
 mkdirSync(SHOTS, { recursive: true });
+const SHOTS_SITES = fileURLToPath(new URL('../screens/sites/', import.meta.url));
+mkdirSync(SHOTS_SITES, { recursive: true });
 const SHOTS6 = fileURLToPath(new URL('../screens/ux6/', import.meta.url));
 mkdirSync(SHOTS6, { recursive: true });
 
@@ -385,5 +387,102 @@ test.describe('habitat console · real mouse and keyboard', () => {
     await expect(page.getByTestId('dest-reason-ST01')).toHaveCount(0);
     const r1 = await shelter(page, 'ROVER1');
     expect(Math.hypot(r1[0] - r0[0], r1[1] - r0[1])).toBeGreaterThan(3);
+  });
+});
+
+// ───────────────────────────── multi-site ─────────────────────────────
+
+const SITE2 = process.env.UX_SITE2 ?? 'jezero-v1';
+type SiteRow = { id: string; name: string; centerLonLat: [number, number]; available: boolean };
+
+async function sites(page: Page) {
+  return (await (await page.request.get('/api/sitepacks')).json()) as SiteRow[];
+}
+
+/** First science target of a site pack (id + name), read from the pack the hab server serves. */
+async function firstTarget(page: Page, site: string) {
+  const m = (await (await page.request.get(`/sitepacks/${site}/manifest.json`)).json()) as { stations: { id: string; name: string }[] };
+  return m.stations[0];
+}
+
+const siteSelect = (page: Page) => page.getByTestId('site-select');
+
+/** Click a target on the map → place card → Directions → a verdict (GO, CAUTION or a clear STAY-IN explanation). */
+async function planToFirstTarget(page: Page, site: string) {
+  const t = await firstTarget(page, site);
+  await page.waitForFunction((id) => !!(window as unknown as { __mwTest?: { station(i: string): unknown } }).__mwTest?.station(id), t.id);
+  await page.waitForTimeout(400);
+  await click(page, await station(page, t.id));
+  await expect(page.getByTestId('place-card')).toBeVisible();
+  await page.getByTestId('place-directions').click();
+  await expect(verdict(page)).toBeVisible({ timeout: 45_000 });
+  return t;
+}
+
+test.describe('sites · picker, switching, deep link', () => {
+  test('15 · the hab server lists every site pack; the console shows them on the locator and in the top bar', async ({ page }) => {
+    const list = await sites(page);
+    expect(list.find((s) => s.id === 'gale-v1')).toMatchObject({ available: true });
+    const avail = list.filter((s) => s.available);
+    test.skip(avail.length < 2, 'only one site pack present');
+    await open(page);
+    for (const s of avail) await expect(page.getByTestId(`locator-site-${s.id}`)).toBeVisible();
+    await expect(page.getByTestId('locator-site-gale-v1')).toHaveAttribute('data-current', 'true');
+    await expect(siteSelect(page)).toHaveValue('gale-v1');
+    await expect(siteSelect(page).locator('option')).toHaveCount(avail.length);
+    await page.getByTestId('locator').screenshot({ path: `${SHOTS_SITES}picker.png` });
+    await page.screenshot({ path: `${SHOTS_SITES}gale.png` });
+  });
+
+  test('16 · click the other site on the locator → site name, study area and targets change → plan to a target → verdict', async ({ page }) => {
+    const avail = (await sites(page)).filter((s) => s.available);
+    test.skip(!avail.some((s) => s.id === SITE2), `${SITE2} is not present`);
+    await open(page);
+    const marker = page.getByTestId(`locator-site-${SITE2}`);
+    await expect(marker).toHaveAttribute('data-current', 'false');
+    // Hover alone does nothing; a click selects.
+    const b = (await marker.boundingBox())!;
+    await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 4 });
+    await page.waitForTimeout(250);
+    await expect(siteSelect(page)).toHaveValue('gale-v1');
+    await page.mouse.down();
+    await page.mouse.up();
+    await expect(siteSelect(page)).toHaveValue(SITE2, { timeout: 60_000 });
+    await expect(page).toHaveURL(new RegExp(`site=${SITE2}`));
+    await expect(page.getByTestId(`locator-site-${SITE2}`)).toHaveAttribute('data-current', 'true');
+    await expect(page.getByTestId('locator-site-gale-v1')).toHaveAttribute('data-current', 'false');
+    const name = (await sites(page)).find((s) => s.id === SITE2)!.name.replace(/\s*[—–-]\s+.*$/, '');
+    await expect(siteSelect(page).locator('option:checked')).toHaveText(name);
+    await expect(page.getByTestId('locator-gale')).toContainText(new RegExp(name.split(' ')[0], 'i'));
+    await expect(page.getByTestId('verdict')).toHaveCount(0); // plan and destinations were reset
+    const t = await planToFirstTarget(page, SITE2);
+    expect(t.id).toBeTruthy();
+    await page.screenshot({ path: `${SHOTS_SITES}${SITE2.replace(/-v\d+$/, '')}.png` });
+  });
+
+  test('17 · site dropdown by keyboard switches back to Gale and clears the route', async ({ page }) => {
+    const avail = (await sites(page)).filter((s) => s.available);
+    test.skip(!avail.some((s) => s.id === SITE2), `${SITE2} is not present`);
+    await page.goto(`/?site=${SITE2}`);
+    await expect(siteSelect(page)).toHaveValue(SITE2, { timeout: 60_000 });
+    await expect(page.getByTestId('directions')).toBeVisible({ timeout: 60_000 });
+    await siteSelect(page).focus();
+    await siteSelect(page).selectOption('gale-v1'); // the keyboard path of a native select: change event
+    await expect(siteSelect(page)).toHaveValue('gale-v1', { timeout: 60_000 });
+    await expect(page).toHaveURL(/site=gale-v1/);
+    await expect(page.getByTestId('locator-site-gale-v1')).toHaveAttribute('data-current', 'true');
+    await page.waitForFunction(() => !!(window as unknown as { __mwTest?: { station(i: string): unknown } }).__mwTest?.station('ST01'));
+  });
+
+  test('18 · deep link ?site=<other> opens that site; an unknown site falls back to the default', async ({ page }) => {
+    const avail = (await sites(page)).filter((s) => s.available);
+    test.skip(!avail.some((s) => s.id === SITE2), `${SITE2} is not present`);
+    await page.goto(`/?site=${SITE2}`);
+    await expect(siteSelect(page)).toHaveValue(SITE2, { timeout: 60_000 });
+    await expect(page.getByTestId('locator-site-' + SITE2)).toHaveAttribute('data-current', 'true');
+    await planToFirstTarget(page, SITE2);
+    await page.goto('/?site=nowhere-v9');
+    await expect(page.getByTestId('directions')).toBeVisible({ timeout: 60_000 });
+    await expect(siteSelect(page)).toHaveValue('gale-v1');
   });
 });

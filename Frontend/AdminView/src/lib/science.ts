@@ -21,9 +21,37 @@ export interface Stm {
   objectives: StmObjective[];
 }
 
-export const STM: Stm = stmJson as unknown as Stm;
+const BUNDLED_STM = stmJson as unknown as Stm;
+/** The current site's matrix. Mutated in place by `loadStm` when the site changes (Gale = bundled Content/stm.json). */
+export const STM: Stm = { ...BUNDLED_STM };
 export const objectiveById = new Map(STM.objectives.map((o) => [o.id, o]));
 export const goalById = new Map(STM.goals.map((g) => [g.id, g]));
+
+function installStm(s: Stm) {
+  STM.status = s.status ?? '';
+  STM.scoringRule = s.scoringRule ?? '';
+  STM.goals = s.goals ?? [];
+  STM.objectives = s.objectives ?? [];
+  objectiveById.clear();
+  goalById.clear();
+  STM.objectives.forEach((o) => objectiveById.set(o.id, o));
+  STM.goals.forEach((g) => goalById.set(g.id, g));
+}
+
+/** Load a site's science traceability matrix: `<pack>/stm.json`, else the bundled Gale one for gale-v1, else empty. */
+export async function loadStm(packBase: string, siteId: string): Promise<void> {
+  try {
+    const r = await fetch(`${packBase}/stm.json`);
+    const ct = r.headers.get('content-type') ?? '';
+    if (r.ok && ct.includes('json')) {
+      const j = (await r.json()) as Stm;
+      if (Array.isArray(j?.objectives)) return installStm(j);
+    }
+  } catch {
+    /* fall through */
+  }
+  installStm(/^(gale|mock)/.test(siteId) ? BUNDLED_STM : { status: `no science traceability matrix for ${siteId}`, scoringRule: '', goals: [], objectives: [] });
+}
 
 export type Coverage = 'full' | 'partial' | 'lost' | 'none';
 

@@ -3,6 +3,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import type { Cell, FieldSet, Station, LoadedSitePack, PlanEvent, PlanRequest, PlanResult, Rule, Telem } from '@mw/shared/contracts';
 import { DEFAULT_RULES } from '@mw/shared/contracts';
 import type { SafeZoneInputs, SafeZoneLimits } from '@mw/shared/map';
+import type { SiteInfo } from './api';
 import type {
   ActionKind,
   ConsoleAlert,
@@ -49,6 +50,11 @@ export interface ConsoleState {
   sourceLabel: string;
   sourceReason: string;
   pack: LoadedSitePack | null;
+  /** The site on screen (= pack.manifest.id once loaded) and every site the hab server offers. */
+  siteId: string | null;
+  sites: SiteInfo[];
+  /** A site switch is loading (id of the target). */
+  switchingTo: string | null;
 
   // Planning inputs
   rules: Rule[];
@@ -143,6 +149,9 @@ export const useConsole = create<ConsoleState>()(
     sourceLabel: '',
     sourceReason: '',
     pack: null,
+    siteId: null,
+    sites: [],
+    switchingTo: null,
 
     rules: DEFAULT_RULES.map((r) => ({ ...r })),
     stationOn: {},

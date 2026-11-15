@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import type { Server } from 'node:http';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,7 +37,7 @@ import { EventLog } from './eventlog';
 import { Hub } from './hub';
 import { loadOrCreateKey } from './keys';
 import { Planner } from './planner/pool';
-import { listSitePacks, loadSitePackSource } from './sitepack';
+import { listSitePacks, loadSitePackSource, type PackSource } from './sitepack';
 import { contentTypeFor, safeJoin, serveBytes, serveFile } from './static';
 
 export const BACKEND_DIR = fileURLToPath(new URL('../', import.meta.url));
@@ -79,6 +80,14 @@ interface CacheEntry {
   result: PlanResult;
   fields: FieldSet;
   engine: 'real' | 'fallback';
+  /** The pack this plan was made on. */
+  site: PackSource;
+}
+
+class SiteError extends Error {
+  constructor(public siteId: string) {
+    super(`unknown site "${siteId}"`);
+  }
 }
 
 class Lru<K, V> {
@@ -125,9 +134,31 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
   const packSrc = await loadSitePackSource(sitePacksDir, requested);
   const pack = packSrc.pack;
   const grid = pack.manifest.grid;
-  const nCells = grid.w * grid.h;
   log(`site pack ${packSrc.id} (${packSrc.source}${packSrc.reason ? `: ${packSrc.reason}` : ''}) ${grid.w}×${grid.h} @ ${grid.cellM} m`);
   for (const w of packSrc.warnings) log(`site pack warning: ${w}`);
+
+  // ───────────── sites: the default pack is loaded now, every other SitePacks/<id> lazily on first use ─────────────
+  const sites = new Map<string, Promise<PackSource | null>>();
+  const defaultSite = Promise.resolve<PackSource | null>(packSrc);
+  sites.set(packSrc.id, defaultSite);
+  sites.set(requested, defaultSite);
+  /** The pack for a site id (cached); null when there is no such site. */
+  const getSite = (id: string): Promise<PackSource | null> => {
+    let p = sites.get(id);
+    if (!p) {
+      p = !/^[\w.-]+$/.test(id) || id === '..' || !existsSync(join(sitePacksDir, id, 'manifest.json'))
+        ? Promise.resolve(null)
+        : loadSitePackSource(sitePacksDir, id).then((src) => {
+            log(`site pack ${src.id} loaded on demand (${src.source}${src.reason ? `: ${src.reason}` : ''})`);
+            return src.source === 'disk' ? src : null; // a broken pack is "missing", never swapped for the mock
+          });
+      if (!/^[\w.-]+$/.test(id)) return p;
+      sites.set(id, p);
+      p.then((v) => v === null && sites.get(id) === p && sites.delete(id)); // re-check the disk on the next request
+    }
+    return p;
+  };
+  const noSite = (c: Context, id: string) => bad(c, `unknown site "${id}" — GET /api/sitepacks lists the available sites`, { siteId: id }, 404);
 
   const key = await loadOrCreateKey(varDir);
   const evlog = new EventLog(join(varDir, 'events.jsonl'));
@@ -241,6 +272,8 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
   };
 
   async function doPlan(input: PlanRequest, cause: 'plan' | 'event' | 'replay'): Promise<CacheEntry> {
+    const site = await getSite(input.siteId);
+    if (!site) throw new SiteError(input.siteId);
     const req = plannerDefaults(input);
     const rk = requestKey(req);
     const known = reqKeyIndex.get(rk);
@@ -249,8 +282,8 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
       if (cause === 'plan' && !route) baseReqHash = hit.result.reqHash;
       return hit;
     }
-    const out = await planner.plan(req, rk);
-    const entry: CacheEntry = { req, result: out.result, fields: out.fields, engine: out.engine };
+    const out = await planner.plan(req, rk, site.pack);
+    const entry: CacheEntry = { req, result: out.result, fields: out.fields, engine: out.engine, site };
     const h = out.result.reqHash;
     cache.set(h, entry);
     reqKeyIndex.set(rk, h);
@@ -278,12 +311,13 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
     if (hit) return hit;
     const req = reqLog.get(reqHash);
     if (!req) return null;
-    const entry = await doPlan(req, 'replay');
+    const entry = await doPlan(req, 'replay').catch((e) => (e instanceof SiteError ? null : Promise.reject(e)));
+    if (!entry) return null;
     cache.set(reqHash, entry);
     return entry;
   }
 
-  const cellsInGrid = (cells: number[]) => cells.every((c) => Number.isInteger(c) && c >= 0 && c < nCells);
+  const cellsInGrid = (cells: number[], g = grid) => cells.every((c) => Number.isInteger(c) && c >= 0 && c < g.w * g.h);
 
   await plannerReady;
   log(`planner: ${planner.mode}; engine exports ${JSON.stringify(planner.caps)}`);
@@ -296,6 +330,7 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
     cors({ origin: '*', exposeHeaders: ['Content-Range', 'Accept-Ranges', 'Content-Length', 'ETag', 'X-Grid-W', 'X-Grid-H', 'X-DType'] }),
   );
   app.onError((err, c) => {
+    if (err instanceof SiteError) return noSite(c, err.siteId);
     log(`error ${c.req.method} ${c.req.path}: ${err.stack ?? err.message}`);
     return c.json({ error: err.message }, 500);
   });
@@ -348,7 +383,10 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
     if (!parsed.success) return bad(c, 'invalid PlanRequest', { issues: zIssues(parsed.error) });
     const req = parsed.data as PlanRequest;
     const cells = [req.hab, ...req.shelters.map((s) => s.cell), ...req.stations.map((s) => s.cell), ...(req.resume ? [req.resume.cell] : [])];
-    if (!cellsInGrid(cells)) return bad(c, `cell outside the ${grid.w}×${grid.h} grid`);
+    const site = await getSite(req.siteId);
+    if (!site) return noSite(c, req.siteId);
+    const g = site.pack.manifest.grid;
+    if (!cellsInGrid(cells, g)) return bad(c, `cell outside the ${g.w}×${g.h} grid of ${site.id}`);
     const entry = await doPlan(req, 'plan');
     return c.json(entry.result);
   });
@@ -387,6 +425,7 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
       const nextSeq = seq + 1;
       const parent = route?.id;
       const api = mainEngine.api;
+      const grid = entry.site.pack.manifest.grid;
       let pkg: PlanPackage | undefined;
       if (api.toPlanPackage) {
         try {
@@ -460,10 +499,12 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
     const parsed = HabEventRequestSchema.safeParse(await jsonBody(c));
     if (!parsed.success) return bad(c, 'invalid event', { issues: zIssues(parsed.error) });
     const ev = parsed.data;
-    if (ev.type === 'HAZARD' && !cellsInGrid(ev.cells)) return bad(c, `hazard cell outside the ${grid.w}×${grid.h} grid`);
     const baseHash = baseReqHash;
-    const base = baseHash ? (await getEntry(baseHash))?.req : undefined;
-    if (!baseHash || !base) return bad(c, 'no plan to replan from — POST /api/plan first', {}, 409);
+    const baseEntry = baseHash ? await getEntry(baseHash) : null;
+    const base = baseEntry?.req;
+    if (!baseHash || !base || !baseEntry) return bad(c, 'no plan to replan from — POST /api/plan first', {}, 409);
+    const eg = baseEntry.site.pack.manifest.grid;
+    if (ev.type === 'HAZARD' && !cellsInGrid(ev.cells, eg)) return bad(c, `hazard cell outside the ${eg.w}×${eg.h} grid of ${baseEntry.site.id}`);
 
     if (ev.type === 'SEP_NOWCAST') {
       // Safety first: warn the crew immediately over the surface link (held and flushed if the link is
@@ -488,7 +529,7 @@ export async function createHabServer(o: HabServerOptions = {}): Promise<HabServ
           : { t: 'HAZARD', cells: ev.cells, ...(ev.note ? { note: ev.note } : {}) };
     let resume = base.resume;
     const telem = lastTelem;
-    if (telem && telem.cell < nCells) {
+    if (telem && telem.cell < eg.w * eg.h && (!route || route.siteId === base.siteId)) {
       const reached = route ? route.stops.filter((s) => s.arriveMin <= telem.t && s.id !== 'HAB').map((s) => s.id) : [];
       resume = {
         elapsedMin: telem.t,

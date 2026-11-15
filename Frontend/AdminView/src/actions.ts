@@ -1,8 +1,9 @@
-import type { Cell, LinkMsg, Station, PlanEvent, PlanRequest, PlanResult, Rule, RuleId, SitePackManifest } from '@mw/shared/contracts';
+import type { Cell, LoadedSitePack, LinkMsg, Station, PlanEvent, PlanRequest, PlanResult, Rule, RuleId, SitePackManifest } from '@mw/shared/contracts';
 import { DEFAULT_CREW, cellToXY, xyToCell } from '@mw/shared/contracts';
 import { stageFromShelter } from '@mw/shared/engine';
 import { maskAreaKm2, safeZoneMask } from '@mw/shared/map';
-import { detectBackend, type Backend } from './api';
+import { HttpBackend, detectBackend, type Backend } from './api';
+import { loadStm } from './lib/science';
 import { marsTime } from './lib/marsclock';
 import { baseInfo, defaultBase, relabel, shelterById, shortName } from './lib/base';
 import { engineConst } from './lib/engine';
@@ -39,40 +40,15 @@ export async function boot() {
   const step = (s: string) => set((st) => ({ bootSteps: [...st.bootSteps, s] }));
   try {
     step('Contacting hab server');
-    const { backend: b, reason } = await detectBackend();
+    const { backend: b, reason, siteId: siteId0, sites } = await detectBackend();
     backend = b;
     set({ sourceLabel: b.label, sourceReason: reason });
     step(reason);
-    // The recommended plan: base = rover if present, scenario start time, every station. On the hab
-    // server it starts solving as soon as the manifest is read (zero clicks, verdict in ≤ 3 s).
-    const recommended = (m: SitePackManifest) => {
-      const stationOn: Record<string, boolean> = {};
-      // Route builder: nothing is chosen until the officer picks destinations.
-      const shelterCells: Record<string, Cell> = {};
-      m.shelters.forEach((s) => (shelterCells[s.id] = s.cell));
-      const evaBase = (m.shelters.find((s) => s.kind === 'rover') ?? m.shelters.find((s) => s.kind === 'hab') ?? m.shelters[0]).id;
-      return { stationOn, shelterCells, evaBase, startLtstMin: m.scenario.startLtstMin };
-    };
+    set({ sites, siteId: siteId0 });
     const pack = await b.loadPack(step);
     const m = pack.manifest;
-    const { stationOn, shelterCells } = recommended(m);
-    const rems = m.conditions.rems;
-    // Season for sun geometry: latest REMS Ls; else the engine's scenario default (keeps the
-    // console's daylight check consistent with the planner); else Ls now.
-    const lsDeg = rems?.length ? rems[rems.length - 1].ls : (engineConst('DEFAULT_LS_DEG') ?? marsTime(Date.now(), m.grid.centerLonLat[0]).lsDeg);
-    set({
-      pack,
-      mode: b.kind,
-      stationOn,
-      shelterCells,
-      // Live / in-browser engine: stage from the rover by default. The offline golden fixture always
-      // plans from the hab, so mock mode without ?engine=1 starts from Hab-1 to stay coherent.
-      evaBase: b.kind === 'mock' && new URLSearchParams(location.search).get('engine') !== '1'
-        ? (m.shelters.find((x) => x.kind === 'hab')?.id ?? defaultBase(pack))
-        : defaultBase(pack),
-      startLtstMin: m.scenario.startLtstMin,
-      lsDeg,
-    });
+    await loadStm(pack.base, m.id);
+    set({ pack, siteId: m.id, mode: b.kind, ...packState(b, pack) });
     step(`Site pack ready · ${m.grid.w}×${m.grid.h} cells at ${m.grid.cellM} m`);
     log(`${b.kind === 'live' ? 'Connected to hab server' : 'Mock mode'} — ${m.name}`, 'info', 'system');
     disconnect = b.connect({ onMsg: handleLinkMsg, onStatus: (s) => setLinkStatus(s) });
@@ -82,6 +58,101 @@ export async function boot() {
     }
   } catch (err) {
     set({ bootError: err instanceof Error ? err.message : String(err) });
+  }
+}
+
+/** Planning inputs a freshly loaded site starts with. */
+function packState(b: Backend, pack: LoadedSitePack) {
+  const m = pack.manifest;
+  // Route builder: nothing is chosen until the officer picks destinations.
+  const shelterCells: Record<string, Cell> = {};
+  m.shelters.forEach((s) => (shelterCells[s.id] = s.cell));
+  const rems = m.conditions.rems;
+  // Season for sun geometry: latest REMS Ls; else the engine's scenario default (keeps the
+  // console's daylight check consistent with the planner); else Ls now.
+  const lsDeg = rems?.length ? rems[rems.length - 1].ls : (engineConst('DEFAULT_LS_DEG') ?? marsTime(Date.now(), m.grid.centerLonLat[0]).lsDeg);
+  return {
+    stationOn: {} as Record<string, boolean>,
+    shelterCells,
+    // Live / in-browser engine: stage from the rover by default. The offline golden fixture always
+    // plans from the hab, so mock mode without ?engine=1 starts from Hab-1 to stay coherent.
+    evaBase: b.kind === 'mock' && new URLSearchParams(location.search).get('engine') !== '1' ? (m.shelters.find((x) => x.kind === 'hab')?.id ?? defaultBase(pack)) : defaultBase(pack),
+    startLtstMin: m.scenario.startLtstMin,
+    lsDeg,
+  };
+}
+
+/** Everything that belonged to the previous site: plan, destinations, events, route, telemetry, map UI. */
+const SITE_RESET = {
+  destinations: [] as string[],
+  customStops: [] as Station[],
+  mustVisit: {} as Record<string, boolean>,
+  events: [] as PlanEvent[],
+  hazards: [] as Cell[],
+  mapPopover: null,
+  pickOnMap: false,
+  ctxMenu: null,
+  planStatus: 'idle' as const,
+  planError: null,
+  plan: null,
+  planReq: null,
+  fields: null,
+  fieldsSource: null,
+  plannerLabel: '',
+  zone: null,
+  limits: null,
+  zoneAreaKm2: null,
+  losSource: null,
+  dirty: false,
+  uiMode: 'plan' as const,
+  fix: null,
+  sheet: null,
+  overlays: [] as OverlayId[],
+  selectedStation: null,
+  hoverStation: null,
+  hoverShelter: null,
+  hazardPick: false,
+  confirm: { stage: 'idle' as const },
+  route: null,
+  sentPlan: null,
+  telem: [],
+  requests: [],
+  busyEvent: null,
+  evidence: 'closed' as const,
+  details: { open: false, tab: 'report' as DetailsTab },
+};
+
+/** Switch the console to another site pack (live hab server only). Resets the plan and destinations, reloads the map. */
+export async function switchSite(id: string): Promise<boolean> {
+  const s = get();
+  if (!backend || backend.kind !== 'live' || s.switchingTo || id === s.siteId) return false;
+  if (!s.sites.some((x) => x.id === id && x.available)) return false;
+  const name = s.sites.find((x) => x.id === id)?.name ?? id;
+  set({ switchingTo: id });
+  try {
+    const b = new HttpBackend(id);
+    const pack = await b.loadPack();
+    await loadStm(pack.base, pack.manifest.id);
+    planToken++;
+    if (replanTimer) clearTimeout(replanTimer);
+    map?.cancelExplain();
+    backend = b;
+    set({ ...SITE_RESET, explain: { running: false, step: 0, caption: '', detail: '', areaFrom: 0, areaTo: 0 }, pack, siteId: pack.manifest.id, mode: b.kind, switchingTo: null, ...packState(b, pack) });
+    try {
+      const u = new URL(location.href);
+      u.searchParams.set('site', pack.manifest.id);
+      history.replaceState(history.state, '', u);
+    } catch {
+      /* URL is a convenience */
+    }
+    log(`Site → ${pack.manifest.name}`, 'info', 'system');
+    return true;
+  } catch (err) {
+    set({ switchingTo: null });
+    const msg = err instanceof Error ? err.message : String(err);
+    log(`Could not load ${name}: ${msg}`, 'warning');
+    pushAlert({ level: 'caution', title: `Could not load ${name}`, text: msg });
+    return false;
   }
 }
 
@@ -762,6 +833,7 @@ async function pollServer() {
   if (!st) return;
   setLinkStatus(st.visorLink);
   const s = get();
+  if (st.route && st.route.siteId !== s.siteId) return; // the crew's route is on another site: not this map's telemetry
   if (st.route && s.route && st.route.id === s.route.id && st.routeAcked && !s.route.acked) {
     handleLinkMsg({ type: 'ACK', id: st.route.id, seq: st.route.seq, accepted: true });
   }
