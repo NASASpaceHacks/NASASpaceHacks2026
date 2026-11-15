@@ -105,5 +105,35 @@
   "logo_mape_pct": 26.8,
   "notes": "Pandolf+Santee x g-ratio vs IST-2 Mark III suited VO2 (digitized Fig. 36 trend lines, Norcross 2010), 5 gravities x 4 grades, subject mass 80.7 kg, suit 121 kg, speed 0.765 m/s (paper range 0.56-0.97). Model underpredicts at 0.12-0.17 g (measured VO2 has a gravity-independent floor) and is within about +-14% at 0.22-0.32 g. 0.38 g is an extrapolation beyond the 0.32 g maximum; no data there."
  },
- "generatedUtc": "2026-11-14T18:47:26Z"
+ "v3": {
+  "scenarios": 200,
+  "scienceRatioMean": 1,
+  "scienceRatioMedian": 1,
+  "pctMarswalkBetter": 0,
+  "pctMarswalkEqualToNearestFirst": 100,
+  "pctNaiveUnsafe": 99.5,
+  "pctNaiveUnsafeEdge": 75,
+  "ruleViolationCounts": {
+   "walk_radius_max_m": 158,
+   "walkback_speed_factor": 182,
+   "shelter_time_max_min": 182,
+   "los_gap_max_min": 187,
+   "daylight_min_sun_elev_deg": 169,
+   "eva_duration_max_min": 182,
+   "slope_max_deg": 150,
+   "unsafe_edge_grade_gt_20deg": 150
+  },
+  "planP50Ms": 38.5,
+  "planP95Ms": 71.7,
+  "replanP50Ms": 8.5,
+  "replanP95Ms": 18.2,
+  "hab1": {
+   "scenarios": 60,
+   "stayIn": 60,
+   "pctNaiveUnsafe": 100
+  },
+  "manualPlanningRef": "no published figure found for hours of manual EVA traverse planning per EVA; only lead times (D-RATS 2010 planning began ~12 months before the field test; BASALT traverse targets were chosen months ahead from satellite imagery)",
+  "notes": "gale-v1 real DEM, base PR-1, 200 seeded scenarios (3-6 of 12 stations, start 08:00-11:00 LTST, sol 412 with assumed Ls 240). Nearest-first WITH the same safety check selected exactly the same station set as Marswalk in every scenario (ratio 1.0): in this tight-limit site the safety rules, not the stop-order optimisation, decide the outcome. The naive slope-only plan visits ALL requested targets and breaks >=1 hard rule in 99.5% of scenarios. Science values are the team STM heuristic. See v3_impact/README.md."
+ },
+ "generatedUtc": "2026-11-15T01:00:41Z"
 }

@@ -6,7 +6,7 @@ import { cellDistM } from '../contracts/grid';
 import { DEFAULT_RULES } from '../contracts/rules';
 import type { LoadedSitePack } from '../contracts/sitepack';
 import type { PlanRequest, PlanResult, Rule, RuleId } from '../contracts/types';
-import { computeFields, plan, stageFromShelter } from './index';
+import { computeFields, evaluateOrder, plan, stageFromShelter } from './index';
 
 const HARD_CHECKED: RuleId[] = ['slope_max_deg', 'walk_radius_max_m', 'shelter_time_max_min', 'walkback_speed_factor', 'los_gap_max_min',
   'daylight_min_sun_elev_deg', 'heat_avg_max_w', 'eva_duration_max_min'];
@@ -288,4 +288,22 @@ describe('property: every OK plan satisfies every hard rule (1,000 random small 
     console.log(`property: ${ok} OK plans of 1000 cases, all independently verified`);
     expect(ok).toBeGreaterThan(150); // the property is not vacuous
   }, 600_000);
+});
+
+describe('evaluateOrder', () => {
+  const pack = mockSitePack(412, 600);
+  const req = goldenPlanRequest(pack);
+  const res = plan(pack, req);
+  it('agrees with plan(): the planned order passes, with the same science value', () => {
+    expect(res.status).toBe('OK');
+    const ev = evaluateOrder(pack, req, res.order);
+    expect(ev.pass).toBe(true);
+    expect(ev.scienceValue).toBe(res.totals.scienceValue);
+    expect(ev.durationMin).toBeCloseTo(res.totals.durationMin, 6);
+  });
+  it('flags a fixed order that breaks a hard rule (all stations in one EVA)', () => {
+    const ev = evaluateOrder(pack, req, req.stations.map((s) => s.id));
+    expect(ev.pass).toBe(false);
+    expect(ev.failures.length > 0 || !!ev.reason).toBe(true);
+  });
 });

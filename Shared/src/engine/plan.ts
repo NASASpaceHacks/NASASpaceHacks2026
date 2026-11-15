@@ -774,3 +774,55 @@ export function stageFromShelter(req: PlanRequest, shelterId: string): PlanReque
   if (!s) throw new Error(`shelter ${shelterId} not in request`);
   return { ...req, hab: s.cell };
 }
+
+export interface OrderEval {
+  pass: boolean;
+  /** Hard rules broken by the fixed order (same simulator and checks as plan()). */
+  failures: { rule: RuleId; seg: number; worst: number; limit: number }[];
+  /** Set when the order could not be simulated (a station is outside the route mask: radius / shelter limits). */
+  reason?: string;
+  order: string[];
+  scienceValue: number;
+  /** Total EVA minutes including egress/ingress; NaN if not simulated. */
+  durationMin: number;
+  /** Walking time (min, incl. heat rests, excl. dwell) of each leg; the last is the return. */
+  legMin: number[];
+  segments: Segment[];
+}
+
+/**
+ * Evaluate a FIXED stop order (station ids, visited in this order, then back to the base) against the
+ * request's hard rules with the same simulator plan() uses. Legs default to the engine's
+ * cheapest routes inside the safety mask; pass `legs` (cell paths: base→s1, …, sn→base) to check an
+ * externally produced route instead (e.g. a slope-only planner's).
+ */
+export function evaluateOrder(pack: LoadedSitePack, req: PlanRequest, order: string[], legs?: number[][]): OrderEval {
+  return makeOrderEvaluator(pack, req)(order, legs);
+}
+
+/** Same as evaluateOrder but builds the request's route matrix once, for many orders. */
+export function makeOrderEvaluator(pack: LoadedSitePack, req: PlanRequest): (order: string[], legs?: number[][]) => OrderEval {
+  const R = resolve(pack, req);
+  const rv = R.rv;
+  const ls = lsFor(pack, req.sol) ?? DEFAULT_LS_DEG;
+  const tl = makeTimeline(R, req, rv, ls);
+  const core = buildCore(R, req, tl, rv);
+  const byId = new Map(req.stations.map((s) => [s.id, s]));
+  return (order, legs) => {
+    const value = order.reduce((a, id) => a + (byId.get(id)?.value ?? 0), 0);
+    const base = { order, scienceValue: value, durationMin: NaN, legMin: [] as number[], segments: [] as Segment[], failures: [] as OrderEval['failures'] };
+    let legCells = legs;
+    if (!legCells) {
+      const idx = order.map((id) => core.cands.findIndex((c) => c.id === id) + 1);
+      if (idx.some((j) => j === 0)) return { ...base, pass: false, reason: 'station outside the safe route mask (radius / shelter / walkback limits)' };
+      legCells = legPaths(core, idx, new Map()) ?? undefined;
+      if (!legCells) return { ...base, pass: false, reason: 'no route' };
+    }
+    const stops: SimStop[] = order.map((id) => {
+      const s = byId.get(id)!;
+      return { id, cell: s.cell, dwellMin: s.dwellMin, taskW: s.taskW ?? TASK_W_DEFAULT, value: s.value };
+    });
+    const sim = simulate({ R, tl, hp: core.hp, H0: core.H0, startLabel: core.startLabel, legs: legCells, stops, endLabel: 'HAB', checks: enforcedChecks(rv) });
+    return { ...base, pass: sim.pass, failures: sim.failures, durationMin: sim.tReturn + tl.ingressHalf, legMin: sim.segments.map((x) => x.t1Min - x.t0Min), segments: sim.segments };
+  };
+}
