@@ -69,6 +69,19 @@ export interface SimEnv {
   elevAt?: (x: number, y: number) => number;
   heatAdvisory: boolean;
   returning: boolean;
+  /**
+   * Crew is walking a local detour off this route (UserView_AR position model): time, O₂ and heat run at
+   * walking power, but along-route progress holds until the detour rejoins the route.
+   */
+  hold?: boolean;
+}
+
+/** Hold in place along the route while the crew walks elsewhere (a detour): heat accrues at walking power. */
+function holdWalking(sim: SimState, route: RouteModel, dt: number) {
+  const [i] = route.locate(sim.s);
+  sim.metW = route.edgeP[i];
+  sim.resting = false;
+  accumulateHeat(sim, sim.metW, dt);
 }
 
 /** mulberry32 step with explicit state (keeps SimState serialisable). */
@@ -260,6 +273,10 @@ export function simTick(sim: SimState, route: RouteModel, dtRealS: number, env: 
       break;
     }
     case 'WALK': {
+      if (env.hold) {
+        holdWalking(sim, route, dt);
+        break;
+      }
       const st = route.stops[sim.stopK];
       const target = st ? st.s : route.length;
       const left = walk(sim, route, target, 1, dt, pace);
@@ -291,6 +308,10 @@ export function simTick(sim: SimState, route: RouteModel, dtRealS: number, env: 
       break;
     }
     case 'RETURN': {
+      if (env.hold) {
+        holdWalking(sim, route, dt);
+        break;
+      }
       const target = sim.returnDir > 0 ? route.length : 0;
       walk(sim, route, target, sim.returnDir, dt, pace);
       sim.headingDeg = route.bearingAt(sim.s, sim.returnDir);

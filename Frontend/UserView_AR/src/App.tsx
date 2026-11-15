@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { VisorController } from '@mw/visor/src/core/visor';
 import { useVisor, type Snapshot } from '@mw/visor/src/state/store';
 import { fmtCountdown, fmtDist, hdg, pad } from '@mw/visor/src/ui/format';
+import { OFF_ROUTE_M, type NavModel, type NavView } from './nav';
 import { requestCompassPermission, useCamera, useCompass, useVoiceCommands, useWakeLock, type VoiceCommand, type VoiceState } from './sensors';
 
 /** Signed angle in (−180, 180]. */
@@ -167,20 +168,22 @@ function Corner({ t, heading, target }: { t: number; heading: number; target: Ta
 // ─────────────────────────── minimap ───────────────────────────
 
 /** North-up minimap: planned route dashed, the walked (actual) track solid, crew position + heading. */
-function MiniMap({ ctl, est, track, heading, nextId }: { ctl: VisorController; est: XY | null; track: XY[]; heading: number; nextId: string | null }) {
+function MiniMap({ ctl, est, track, heading, nextId, nav }: { ctl: VisorController; est: XY | null; track: XY[]; heading: number; nextId: string | null; nav: NavView | null }) {
   const route = ctl.route;
   if (!route || !est) return null;
   const SIZE = 100; // viewBox half-size in SVG units
   let tx = est[0], ty = est[1];
   const next = route.stops.find((st) => st.id === nextId);
   const tgt: XY = next ? [next.x, next.y] : [route.home.x, route.home.y];
-  const R = Math.min(1500, Math.max(150, Math.hypot(tgt[0] - tx, tgt[1] - ty) * 1.25));
+  const R = Math.min(1500, Math.max(150, Math.hypot(tgt[0] - tx, tgt[1] - ty) * 1.25, nav ? nav.errM * 3 : 0));
   const k = SIZE / R;
   const P = (x: number, y: number) => `${((x - tx) * k).toFixed(1)},${(-(y - ty) * k).toFixed(1)}`;
   const planned: string[] = [];
   for (let i = 0; i < route.n; i++) planned.push(P(route.xs[i], route.ys[i]));
   const actual = track.map(([x, y]) => P(x, y));
   const [hx, hy] = P(route.home.x, route.home.y).split(',').map(Number);
+  const det = nav?.detour ?? null;
+  const [truX, truY] = nav ? P(nav.truth[0], nav.truth[1]).split(',').map(Number) : [0, 0];
   return (
     <div className="minimap" aria-label="Route map">
       <svg viewBox={`${-SIZE} ${-SIZE} ${SIZE * 2} ${SIZE * 2}`}>
@@ -191,6 +194,8 @@ function MiniMap({ ctl, est, track, heading, nextId }: { ctl: VisorController; e
         <g clipPath="url(#mm-clip)">
           <circle r={SIZE / 2} className="mm-ring" />
           <path d={`M${planned.join(' L')}`} className="mm-plan" />
+          {det && det.old.length > 1 && <path d={`M${det.old.map(([x, y]) => P(x, y)).join(' L')}`} className="mm-old" />}
+          {det && det.remaining.length > 1 && <path d={`M${det.remaining.map(([x, y]) => P(x, y)).join(' L')}`} className="mm-detour" />}
           {actual.length > 1 && <path d={`M${actual.join(' L')}`} className="mm-actual" />}
           {route.stops.map((st) => {
             const [x, y] = P(st.x, st.y).split(',').map(Number);
@@ -198,6 +203,8 @@ function MiniMap({ ctl, est, track, heading, nextId }: { ctl: VisorController; e
             return <circle key={st.id} cx={x} cy={y} r={on ? 6 : 4} className={on ? 'mm-wp on' : 'mm-wp'} />;
           })}
           <rect x={hx - 5} y={hy - 5} width={10} height={10} className={nextId === null || nextId === route.home.name ? 'mm-home on' : 'mm-home'} />
+          {nav && <circle r={Math.max(2.5, nav.errM * k)} className="mm-unc" />}
+          {nav && <circle cx={truX} cy={truY} r={3} className="mm-true" />}
           <g transform={`rotate(${norm(heading).toFixed(0)})`}>
             <path d="M0,-10 L7,8 L0,4 L-7,8 Z" className="mm-me" />
           </g>
@@ -272,8 +279,12 @@ function Instruction({ ins }: { ins: Instr }) {
 
 // ─────────────────────────── app ───────────────────────────
 
-export function App({ ctl }: { ctl: VisorController }) {
+export function App({ ctl, nav: navModel }: { ctl: VisorController; nav: NavModel }) {
   const s = useVisor((st) => st.snap);
+  // Re-read on every snapshot (10 Hz): the position model steps inside the controller tick, before publish.
+  const nav = s.seq !== null ? navModel.view() : null;
+  const det = nav?.detour ?? null;
+  const offRoute = !!nav?.offRoute;
   const [started, setStarted] = useState(false);
   const [compassOn, setCompassOn] = useState(false);
   const cam = useCamera(started);
@@ -301,12 +312,16 @@ export function App({ ctl }: { ctl: VisorController }) {
   const relTo = (absDeg: number) => signed(absDeg - heading);
 
   const returning = s.display === 'RETURN_NOW' && s.ret;
-  const tone: Tone = returning ? 'ret' : s.autonomous || s.offRouteM > 25 ? 'warn' : 'go';
+  const tone: Tone = returning ? 'ret' : s.autonomous || offRoute ? 'warn' : 'go';
 
   let rel: number | null = null;
   let target: Target | null = null;
 
-  if (returning && s.ret) {
+  if (det && (returning || s.display === 'NAV')) {
+    // Walking a local A* detour: steer along it; distance and ETA are the detour's.
+    rel = relTo(det.steerDeg);
+    target = { name: returning && s.ret ? s.ret.target : det.targetName, distM: det.remainingM, bearing: det.steerDeg, etaMin: det.etaMin };
+  } else if (returning && s.ret) {
     const crs = s.ret.bearingDeg;
     rel = relTo(crs);
     target = { name: s.ret.target, distM: s.ret.distM, bearing: crs, etaMin: s.ret.etaMin };
@@ -322,7 +337,9 @@ export function App({ ctl }: { ctl: VisorController }) {
   if (!returning) retStart.current = null;
   else if (s.ret && (retStart.current === null || s.ret.distM > retStart.current)) retStart.current = s.ret.distM;
   let leg: Leg | null = null;
-  if (returning && s.ret && retStart.current) {
+  if (det && target) {
+    leg = { totalM: det.totalM, doneM: det.doneM };
+  } else if (returning && s.ret && retStart.current) {
     leg = { totalM: retStart.current, doneM: retStart.current - s.ret.distM };
   } else if (target && ctl.route && ctl.sim) {
     const stops = ctl.route.stops, k = ctl.sim.stopK;
@@ -353,7 +370,7 @@ export function App({ ctl }: { ctl: VisorController }) {
       act: checking ? { kind: 'none', text: 'Checking signature…' } : { kind: 'say', text: 'Accept route', run: () => void ctl.accept() },
     };
   } else if (returning && s.ret) {
-    ins = { title: `Return now to ${s.ret.target}`, detail: s.ret.reason, act: { kind: 'none', text: 'Follow the path' } };
+    ins = { title: `Return now to ${s.ret.target}`, detail: det ? `${s.ret.reason} · local reroute` : s.ret.reason, act: { kind: 'none', text: 'Follow the path' } };
   } else if (s.display === 'STATION' && s.station) {
     const st = s.station;
     const task = st.tasks.find((x) => x.active);
@@ -365,7 +382,7 @@ export function App({ ctl }: { ctl: VisorController }) {
       act: { kind: 'say', text: allDone ? 'Depart' : 'Task done', run: ctl.next },
     };
   } else if (s.display === 'NAV' && target) {
-    ins = { title: `Walk to ${target.name}`, act: { kind: 'none', text: 'Follow the path' } };
+    ins = { title: `Walk to ${target.name}`, detail: det ? 'Local reroute (amber on map)' : undefined, act: { kind: 'none', text: 'Follow the path' } };
   } else if (s.display === 'COMPLETE') {
     ins = { title: 'EVA complete', detail: `At ${s.homeName} · ${dist(s.odoM)} walked`, act: { kind: 'admin', text: 'Review the EVA report' } };
   }
@@ -381,8 +398,15 @@ export function App({ ctl }: { ctl: VisorController }) {
         <div className="top">
           <ProgressRail leg={leg} target={target} />
           {!returning && s.autonomous && <div className="chip tone-warn">LINK LOST · AUTONOMOUS</div>}
-          {!returning && !s.autonomous && s.offRouteM > 25 && s.display === 'NAV' && (
-            <div className="chip tone-warn">OFF ROUTE {Math.round(s.offRouteM)} M</div>
+          {!s.autonomous && offRoute && nav && (s.display === 'NAV' || returning) && (
+            <div className="chip tone-warn">OFF ROUTE {Math.round(nav.offRouteM)} M</div>
+          )}
+          {nav && nav.offRouteM <= OFF_ROUTE_M && nav.note && <div className={`note ${nav.note.kind}`}>{nav.note.text}</div>}
+          {nav && nav.offRouteM > OFF_ROUTE_M && nav.note?.kind === 'noroute' && <div className="note noroute">{nav.note.text}</div>}
+          {nav && (
+            <div className="pos-err">
+              Position error: ±{Math.round(nav.errM)} m · last fix {Math.floor(nav.lastFixMinAgo)} min ago
+            </div>
           )}
         </div>
 
@@ -393,12 +417,18 @@ export function App({ ctl }: { ctl: VisorController }) {
         {started && ins && <Instruction ins={ins} />}
       </div>
 
-      <MiniMap ctl={ctl} est={s.est} track={track.current.pts} heading={heading} nextId={s.next?.id ?? null} />
+      <MiniMap ctl={ctl} est={s.est} track={track.current.pts} heading={heading} nextId={s.next?.id ?? null} nav={nav} />
 
       {started && (
         <button className={`compass-toggle ${compass !== null ? 'on' : ''}`} onClick={() => setCompassOn((v) => !v)} aria-label="Toggle compass heading">
           {compass !== null ? 'COMPASS' : 'SIM HDG'}
         </button>
+      )}
+
+      {started && (
+        <div className="toolbar" aria-label="Demo controls">
+          <button onClick={() => navModel.pushOffRoute()} disabled={s.display !== 'NAV' && s.display !== 'RETURN_NOW'}>Push off route</button>
+        </div>
       )}
 
       {!started && (

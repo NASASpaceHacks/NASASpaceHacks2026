@@ -100,6 +100,32 @@ button { font: inherit; color: inherit; }
 .mm-n { font: 700 12px/1 var(--font-num); fill: var(--go-hi); text-anchor: middle; }
 .mm-scale { font: 600 10px/1 var(--font-num); fill: var(--ink); opacity: 0.7; text-anchor: end; }
 
+/* Position model: true position (faint), uncertainty circle, replaced route (faded dashed), local reroute (amber). */
+.mm-unc { fill: color-mix(in srgb, var(--warn) 14%, transparent); stroke: var(--warn); stroke-width: 1; stroke-dasharray: 3 2; }
+.mm-true { fill: rgba(255, 255, 255, 0.35); stroke: none; }
+.mm-old { fill: none; stroke: var(--go); stroke-width: 2; stroke-dasharray: 3 5; opacity: 0.35; stroke-linejoin: round; }
+.mm-detour { fill: none; stroke: var(--warn); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+
+/* ── position notes + error readout (top, under the rail) ── */
+.note {
+  max-width: min(560px, calc(100% - 24px)); text-align: center; padding: 6px 10px; border-radius: 8px;
+  font: 600 13px/1.3 var(--font-ui); background: var(--glass); border: 1px solid var(--glass-edge); color: var(--ink);
+}
+.note.reroute { border-color: var(--warn); color: var(--warn); }
+.note.noroute { border-color: var(--ret); color: var(--ret); font-weight: 700; }
+.pos-err { font: 500 11px/1 var(--font-num); opacity: 0.8; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); }
+
+/* ── demo toolbar (left, under the heading toggle) ── */
+.toolbar {
+  position: absolute; z-index: 3; display: flex; gap: 6px;
+  left: max(14px, env(safe-area-inset-left)); top: calc(max(10px, env(safe-area-inset-top)) + 86px);
+}
+.toolbar button {
+  font: 600 9px/1 var(--font-num); letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 6px; border-radius: 6px;
+  background: var(--glass); border: 1px solid var(--warn); color: var(--warn); opacity: 0.8;
+}
+.toolbar button:disabled { opacity: 0.3; }
+
 /* ── instruction (bottom-left; minimap sits bottom-right) ── */
 .instr {
   position: absolute; z-index: 2; left: max(14px, env(safe-area-inset-left)); bottom: max(14px, env(safe-area-inset-bottom));

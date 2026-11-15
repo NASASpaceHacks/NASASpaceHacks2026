@@ -15,7 +15,7 @@
     "dev:backend": "pnpm --filter ./Backend dev",
     "dev:admin": "pnpm --filter ./Frontend/AdminView dev",
     "dev:visor": "pnpm --filter ./Frontend/UserView dev",
-"dev:ar": "pnpm --filter ./Frontend/UserView_AR dev",
+    "dev:ar": "pnpm --filter ./Frontend/UserView_AR dev",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "vitest run",
     "ci": "pnpm typecheck && vitest run",
