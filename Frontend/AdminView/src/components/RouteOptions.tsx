@@ -88,9 +88,9 @@ export function RouteOptionsPanel({ anchorSelector }: { anchorSelector: string }
   const rows = compare?.rows ?? [];
 
   return (
-    <div ref={ref} data-testid="route-options-panel" role="dialog" aria-label="Route options" className={cx('absolute left-[404px] top-3 z-40 max-h-[calc(100%-96px)] overflow-y-auto border border-line-2 bg-black', 'w-[640px] max-w-[calc(100%-420px)] phone:fixed phone:inset-0 phone:left-0 phone:top-0 phone:z-[70] phone:max-h-none phone:w-auto phone:max-w-none')} onClick={(e) => e.stopPropagation()}>
+    <div ref={ref} data-testid="route-options-panel" role="dialog" aria-label="Route priorities" className={cx('absolute left-[404px] top-3 z-40 max-h-[calc(100%-96px)] overflow-y-auto border border-line-2 bg-black', 'w-[640px] max-w-[calc(100%-420px)] phone:fixed phone:inset-0 phone:left-0 phone:top-0 phone:z-[70] phone:max-h-none phone:w-auto phone:max-w-none')} onClick={(e) => e.stopPropagation()}>
       <div className="flex items-center border-b border-line px-3 py-2">
-        <span className="eyebrow !text-[11px]">Route options</span>
+        <span className="eyebrow !text-[11px]">Route priorities</span>
         <button aria-label="Close route options" onClick={() => openRouteOptions(false)} className="ml-auto h-7 w-7 text-[15px] text-mute hover:text-cyan phone:h-11 phone:w-11">✕</button>
       </div>
 

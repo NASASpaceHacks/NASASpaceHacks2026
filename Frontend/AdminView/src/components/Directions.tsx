@@ -180,8 +180,9 @@ export function DirectionsCard() {
         <div className="flex items-center gap-3 px-3 py-2 text-[13.5px] phone:gap-5 phone:[&>button]:flex phone:[&>button]:h-10 phone:[&>button]:items-center">
           {dests.length > 0 && !adding && dests.length < 8 && <button data-testid="add-stop" onClick={() => { focusInput.current = true; setAdding(true); }} className="text-cyan hover:underline">+ Add stop</button>}
           <button data-testid="suggest-stops" onClick={() => void suggestStops()} className="text-cyan hover:underline">Suggest best stops</button>
-          <button data-testid="route-options" data-route-options-anchor aria-haspopup="dialog" aria-expanded={optionsOpen} onClick={() => openRouteOptions(!optionsOpen)} className="max-w-[120px] truncate text-cyan hover:underline">
-            {isDefaultPrefs(prefs) ? 'Options' : `Options · ${prefsLabel(prefs)}`}
+          <button data-testid="route-options" data-route-options-anchor aria-haspopup="dialog" aria-expanded={optionsOpen} onClick={() => openRouteOptions(!optionsOpen)} className="inline-flex max-w-[190px] items-center gap-1.5 text-cyan hover:underline" title="Route priorities: what the route should favour (weights)">
+            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden className="shrink-0"><path d="M2 4h7M13 4h1M2 12h2M8 12h6" stroke="currentColor" strokeWidth="1.5" fill="none" /><circle cx="11" cy="4" r="2" stroke="currentColor" strokeWidth="1.5" fill="none" /><circle cx="6" cy="12" r="2" stroke="currentColor" strokeWidth="1.5" fill="none" /></svg>
+            <span className="truncate">{isDefaultPrefs(prefs) ? 'Priorities' : `Priorities · ${prefsLabel(prefs)}`}</span>
           </button>
           {dests.length > 0 && <button onClick={() => { clearDestinations(); setAdding(false); }} className="ml-auto text-mute hover:text-ink">Clear</button>}
         </div>
