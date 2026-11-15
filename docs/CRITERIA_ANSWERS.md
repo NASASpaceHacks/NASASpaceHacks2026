@@ -22,7 +22,7 @@ What exactly is new (we searched NASA tools, papers and 135 Space Apps 2026 repo
 | **Explains** the verdict and offers a way out | NASA's review says tool usability and explanation are under-evaluated; peers give a verdict plus a chatbot | Binding constraint, why each stop was dropped, the red stretch on the map where it fails, "Closest safe point" / "Move rover closer" |
 | Crew-side **execution without Earth** | AEGIS/EMSS: "Current state: empowering ground-based flight controllers"; Joint AR: "a seamless suit-integrated AR solution does not yet exist" | Signed ~11 KB route pushed over the local link; the visor runs its own safety core and goes autonomous within ~3 s of link loss |
 | **Three-tier space weather** for Mars | 20 of 135 peers name DONKI, mostly as a static feed | Real WSA-ENLIL Mars arrival forecasts (go/no-go) → light-delayed flare alerts → onboard nowcast as the only "return now" trigger |
-| **Checked three ways** | Rare in peers | Reproduces Curiosity RAD shielding (MAE 2.0 pp), calibrated on NASA suited data (MAPE 10.6% at 0.22–0.32 g), engine vs independent checker vs blind AI judges (all three agree on 23 of 24 walks; the one difference is a safe-side engine NO-GO) |
+| **Checked against NASA data** | Rare in peers | Dose within 4% of Curiosity's measured RAD dose (V5); reproduces RAD terrain shielding (MAE 2.0 pp), calibrated on NASA suited data (MAPE 10.6% at 0.22–0.32 g), engine vs independent checker vs blind AI judges (all three agree on 23 of 24 walks; the one difference is a safe-side engine NO-GO) |
 
 **Limit to state:** AEGIS, SEXTANT and Joint AR have real users or field tests; we have neither. Our novelty is the combination, the verification step and the crew-side handoff, not any single algorithm.
 
@@ -85,7 +85,7 @@ Each gap is quoted from a NASA source, with what we did about it (`existing-solu
 | THEMIS thermal inertia (Mars Odyssey) | Terrain factor in walking energy and suit heat | Mapping TI → effort is our assumption, labelled "Indicative" | Medium |
 | Curiosity traverse + waypoints (MSL) | Real science stops; DEM truth check; RAD parking positions for V1 | σ 0.19 m check | **Deep** (as reference) |
 | Curiosity Mastcam/Navcam raw images (MSL) | Point-of-view photo at each stop (console + visor) | Matched to stationary rover positions | Display |
-| RAD results (MSL; Hassler 2014, Guo 2015/2026) | Route dose estimate, with terrain shielding from the DEM sky-view (Guo 2026 two-term model); e.g. terrain shields 8.6% of the dose on the default plan | V1 reproduces the published shielding ratios with the same method: MAE 2.0 pp, r 0.94; the pack's sky-view raster is within 0.9 pp (MAE) of a full-resolution reference | Medium |
+| RAD (MSL): measured dose (PDS PPI RDR) + published models (Hassler 2014, Guo 2015/2026); REMS pressure (PDS) | Route dose estimate, with terrain shielding from the DEM sky-view (Guo 2026 two-term model; e.g. 8.6% on the default plan). Reference pressure set from measured REMS (910 Pa at the scenario season) | **V5:** at measured pressure the model is within 4% of Curiosity's measured year-1 dose (198.8 vs 207.8 µGy/day, 131 sols sampled, SEP days removed). **V1:** shielding method reproduces the published ratios (MAE 2.0 pp). Measured dose at this season spans 167–296 µGy/day over the solar cycle, so route doses are ±30% | **Deep** (measured-data comparison) |
 | REMS weather (MSL) / MEDA (M2020) | Latest air and ground temperature, pressure, UV in the Weather tab (labelled as the latest reading, not the scenario sol); season for sun geometry when the feed has the scenario sol | — | Light |
 | CRISM summary parameters (MRO; FRT000058A3, 2007, 18 m) | Minerals layer (polyhydrated sulfate SINDEX2; hydration BD1900_2); sulfate signal shown at each science stop | Co-registered to HiRISE: the product sat ~270 m off and was shifted (confirmed by the DEM hillshade within ~35 m; residual ≤30 m). Tiers are relative to the area; a signature, not an abundance | Medium |
 | CCMC DONKI WSA-ENLIL + flares | Go/no-go banner from real CME arrival forecasts at Mars | 33 events in the pack | Medium |
@@ -93,9 +93,9 @@ Each gap is quoted from a NASA source, with what we did about it (`existing-solu
 | MOLA (MGS), Viking MDIM 2.1 | Datum, far heading cue; locator map | — | Light |
 | Jezero: HiRISE TRN DTM + ortho, M20 traverse, Mastcam-Z/Navcam, MEDA | Same pipeline, second site | DEM vs 220 Perseverance waypoints: σ 0.07 m | Same |
 
-Coverage of the challenge's data kinds: **optical, topographic, thermal** fully used; **spectral** (CRISM sulfate and hydration signal, indicative), **radiation** (literature dose model with terrain shielding, V1 reproduction), **atmospheric** (rover weather shown; season) and **geophysical** (datum, ephemeris) partly; **space weather** in addition. Chemical: none.
+Coverage of the challenge's data kinds: **optical, topographic, thermal** fully used; **spectral** (CRISM sulfate and hydration signal, indicative), **radiation** (dose model checked against measured RAD data, with terrain shielding), **atmospheric** (rover weather shown; season) and **geophysical** (datum, ephemeris) partly; **space weather** in addition. Chemical: none.
 
-**Done since the data audit:** terrain shielding wired into the dose; REMS/MEDA readings shown; CRISM mineral layer (adds spectral). **In progress:** our dose model compared with measured Curiosity RAD data.
+**Done since the data audit:** terrain shielding wired into the dose; REMS/MEDA readings shown; CRISM mineral layer (adds spectral); dose model compared with measured Curiosity RAD data (V5) and its reference pressure set from measured REMS.
 
 **Limits to state:** THEMIS→effort and the dose constants are assumptions (labelled); REMS is the outreach feed; the scenario sol (412) predates the REMS feed, so the season falls back to an assumed Ls 240.
 
@@ -107,7 +107,7 @@ Coverage of the challenge's data kinds: **optical, topographic, thermal** fully 
 |---|---|---|---|---|---|
 | 1 | Impact | "Who benefits, and how much?" | Big answer 2 | v3 numbers; NASA quotes | Simulation only |
 | 2 | Creativity / originality | "What's new? What exists?" | Big answers 1, 3, 4 | Comparison table; peer survey | Combination is new, parts are known |
-| 3 | Scientifically & technically sound | "Why should I trust the numbers?" | "Cited models, checked against NASA data three ways, exact search, 122 unit tests and 26 real-input tests." | V1 MAE 2.0 pp; V2 MAPE 10.6% (0.22–0.32 g); A* 0.000% gap vs an independent oracle on 80 real-terrain cases; stop selection = brute force on 320 cases; V4: all three agree on 23/24 | 0.38 g is an extrapolation (data stop at 0.32 g; error 36% at 0.12–0.17 g); V1 metric chosen post hoc; the AI check shows consistency, not truth; the engine can miss a valid path and say NO-GO (W02, 0.2 min over; safe-side) |
+| 3 | Scientifically & technically sound | "Why should I trust the numbers?" | "Cited models, checked against measured NASA data (Curiosity radiation, NASA suited-walking tests), exact search, 122 unit tests and 26 real-input tests." | V1 MAE 2.0 pp; V2 MAPE 10.6% (0.22–0.32 g); V5 dose within 4% of measured RAD (year 1); A* 0.000% gap vs an independent oracle on 80 real-terrain cases; stop selection = brute force on 320 cases; V4: all three agree on 23/24 | 0.38 g is an extrapolation (data stop at 0.32 g; error 36% at 0.12–0.17 g); V1 metric chosen post hoc; the AI check shows consistency, not truth; the engine can miss a valid path and say NO-GO (W02, 0.2 min over; safe-side) |
 | 4 | Credible data | "Is this real data?" | "Every layer is NASA/USGS data with product IDs, resolution and checksums in the app's Sources tab; anything scenario is labelled SCENARIO." | Sources tab; manifest provenance + sha256; DEM σ 0.19 m | Station science values are team priorities |
 | 5 | Belief | "Did you really build this?" | "Try it. Every number on screen comes from code in the repo, with history and tests." | Live demo; repo history; `pnpm test:ux`; Validation scripts | Public link still to publish (needs team OK) |
 | 6 | Feasible, functional, practical | "Would it work on Mars?" | "It runs offline on a laptop, plans in milliseconds, the route fits in 11 KB, and the visor brings the astronaut home with no link. A second Mars site works with no code changes." | Timings; package gate; autonomy test; Jezero | Visor is a screen UI, not suit hardware; networking is local Wi-Fi |
@@ -147,6 +147,6 @@ Coverage of the challenge's data kinds: **optical, topographic, thermal** fully 
 
 ## What would raise the score further
 1. Publish the no-login demo link (criteria 5, 6; required for global judging). Needs the team's OK.
-2. Land the measured-RAD comparison (criteria 3, 4).
+2. ~~Measured-RAD comparison~~ done (V5).
 3. ~~Visor in the same navigator look~~ done (12).
 4. Presentation block: video, slides, rehearsal with this file (9–12).

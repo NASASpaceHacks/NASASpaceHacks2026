@@ -13,3 +13,4 @@
 | Rover drive-route planning | "Move rover closer" currently suggests a spot only | Needs rover mobility limits |
 | Update old `qa/e2e/demo-flow.spec.ts` | It still expects a plan at load | Do after UI direction sign-off |
 | **Try more than one path before NO-GO** | V4 found one safe-side miss (W02): the engine's heat-aware route broke the radio limit by 0.2 min while the shortest-time path passed | Evaluate the shortest-time path (and later a radio-aware path) through the simulator before declaring a stop unreachable. Engine change: re-run v3/v4 after |
+| Solar-cycle (Φ) input for the dose | V5: measured dose at Ls 240 spans 167–296 µGy/day across the solar cycle; one Φ can't cover it | Derive Φ per epoch from RAD/neutron-monitor data; today's single present-day point (sol 4180) is too thin |

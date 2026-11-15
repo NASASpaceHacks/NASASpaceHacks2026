@@ -52,3 +52,6 @@ qa/screens/ux4/*.png
 qa/screens/ux5/*.png
 qa/screens/ux6/*.png
 qa/screens/sites/*.png
+
+# V5 RAD/REMS downloads (re-created by Validation/v5_rad_dose/fetch.py)
+Validation/v5_rad_dose/data/
