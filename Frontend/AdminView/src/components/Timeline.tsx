@@ -93,7 +93,7 @@ export function Timeline() {
   const deltaTone = delta === null ? '' : delta.offRouteM > 60 || delta.deltaMin < -10 ? 'text-red' : delta.deltaMin < -2 ? 'text-caution' : 'text-ok';
 
   return (
-    <div data-testid="timeline" className="relative flex h-full flex-col px-5 pb-2.5 pt-2.5" aria-label="EVA timeline">
+    <div data-testid="timeline" className="relative flex h-full flex-col px-5 pb-2.5 pt-2.5 phone:min-w-[680px]" aria-label="EVA timeline">
       <div className="flex items-center gap-4">
         <span className="eyebrow">EVA timeline</span>
         <span className="num text-[11.5px] text-mute" title={`The timeline counts Earth time from the start of the EVA (+h:mm). Mars local time: starts ${fmtLtst(start)}, ends ${fmtLtst(evaLtst(start, plan.totals.durationMin))}. A Mars clock minute is about 2.7 % longer than an Earth minute.`}>Starts {fmtLtst(start)} Mars local · ends {pet(plan.totals.durationMin)}</span>

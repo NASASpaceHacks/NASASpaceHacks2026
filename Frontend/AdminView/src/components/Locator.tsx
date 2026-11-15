@@ -86,19 +86,22 @@ function SiteMarkers({ frame, w, h, sites, ctxs, current }: { frame: Frame; w: n
 }
 
 /** "Where on Mars": two fixed real-image views side by side — Mars (box on Gale) → Gale crater (box on the study area). Collapse/expand only. */
+/** Phone layout: same query as the `phone` Tailwind variant. */
+const isPhone = () => typeof matchMedia === 'function' && matchMedia('(max-width: 767px), (max-height: 500px) and (pointer: coarse)').matches;
+
 export function Locator() {
   const pack = useConsole((s) => s.pack);
   const live = useConsole((s) => s.uiMode === 'live');
   const [ctx, setCtx] = useState<Context | null>(null);
   const sites = useConsole((s) => s.sites);
   const siteId = useConsole((s) => s.siteId);
-  const [open0, setOpen] = useState(true);
+  const [open0, setOpen] = useState(() => !isPhone());
   // A context menu open → the inset stays folded (it would compete with the menu); it comes back as it was.
   const menu = useConsole((s) => !!s.ctxMenu);
   const open = open0 && !menu;
   // Never sit on top of route content: fold to the header once a destination, place card or route exists, reopen when cleared.
   const busy = useConsole((s) => s.destinations.length > 0 || !!s.mapPopover || !!s.plan || !!s.attemptPin || !!s.attemptPlan);
-  useEffect(() => { setOpen(!busy); }, [busy]);
+  useEffect(() => { setOpen(!busy && !isPhone()); }, [busy]);
   const [siteCtx, setSiteCtx] = useState<Record<string, Context>>({});
 
   useEffect(() => {
@@ -136,13 +139,13 @@ export function Locator() {
     <div
       data-testid="locator"
       data-open={open}
-      className={cx('absolute right-3 z-20 border border-line-2 bg-black', live ? 'bottom-[196px]' : 'bottom-[152px]')}
+      className={cx(open && 'phone:z-[31]', 'absolute right-3 z-20 border border-line-2 bg-black phone:bottom-[172px]', live ? 'bottom-[196px]' : 'bottom-[152px]')}
       style={{ maxWidth: 'calc(100% - 24px)' }}
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex items-center justify-between gap-2 px-2 py-1">
         <span className="eyebrow !text-[11px]">Where on Mars</span>
-        <button aria-label={open ? 'Collapse locator' : 'Expand locator'} aria-expanded={open} data-testid="locator-toggle" onClick={() => setOpen(!open0)} className="num h-5 w-5 text-[12px] text-cyan">{open ? '–' : '+'}</button>
+        <button aria-label={open ? 'Collapse locator' : 'Expand locator'} aria-expanded={open} data-testid="locator-toggle" onClick={() => setOpen(!open0)} className="num h-5 w-5 text-[12px] text-cyan phone:h-8 phone:w-8">{open ? '–' : '+'}</button>
       </div>
       {open && (
         <>

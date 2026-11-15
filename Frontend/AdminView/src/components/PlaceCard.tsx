@@ -33,7 +33,7 @@ function Btn({ children, primary, onClick, testId }: { children: ReactNode; prim
     <button
       data-testid={testId}
       onClick={onClick}
-      className={primary ? 'h-10 bg-cyan px-3 text-[14px] font-bold uppercase tracking-[0.12em] text-black hover:bg-white' : 'h-10 border border-cyan bg-black px-3 text-[14px] font-bold uppercase tracking-[0.1em] text-cyan hover:bg-cyan/10'}
+      className={primary ? 'h-10 phone:h-11 bg-cyan px-3 text-[14px] font-bold uppercase tracking-[0.12em] text-black hover:bg-white' : 'h-10 phone:h-11 border border-cyan bg-black px-3 text-[14px] font-bold uppercase tracking-[0.1em] text-cyan hover:bg-cyan/10'}
     >
       {children}
     </button>
@@ -100,11 +100,11 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
       data-testid="place-card"
       data-kind={station ? 'station' : 'terrain'}
       style={{ left: pos.left, top: pos.top, width: 316 }}
-      className="absolute z-[35] border border-line-2 bg-black p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
+      className="absolute z-[35] border border-line-2 bg-black p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.6)] phone:bottom-0! phone:left-0! phone:right-0! phone:top-auto! phone:max-h-[75%] phone:w-auto! phone:landscape:left-auto! phone:landscape:max-h-full phone:landscape:w-[380px]! phone:overflow-y-auto phone:border-x-0 phone:border-b-0 phone:pb-[max(14px,env(safe-area-inset-bottom))]"
       onPointerDown={(e) => e.stopPropagation()}
       onContextMenu={(e) => e.preventDefault()}
     >
-      <button aria-label="Close" data-testid="place-close" onClick={() => set({ mapPopover: null })} className="absolute right-1.5 top-1.5 h-7 w-7 text-mute hover:text-ink">✕</button>
+      <button aria-label="Close" data-testid="place-close" onClick={() => set({ mapPopover: null })} className="absolute right-1.5 top-1.5 h-7 w-7 text-mute hover:text-ink phone:right-0 phone:top-0 phone:h-11 phone:w-11">✕</button>
       {station ? (
         <div className="flex gap-3 pr-5">
           <div className="min-w-0 flex-1">
@@ -147,7 +147,7 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
         </div>
       )}
       {mine?.verdict === 'NO-GO' && (
-        <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13.5px]">
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13.5px] phone:[&>button]:min-h-11">
           <Btn testId="place-fix-closest" primary onClick={() => void fixFromPin('closest')}>Closest safe spot</Btn>
           {mine.rule !== 'slope_max_deg' && <button data-testid="place-fix-rover" onClick={() => void fixFromPin('rover')} className="text-cyan hover:underline">Move rover closer</button>}
         </div>

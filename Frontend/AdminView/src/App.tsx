@@ -148,20 +148,22 @@ export function App() {
   return (
     <div className="grid h-full w-full min-w-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden">
       <TopBar />
-      <div className="relative grid min-h-0 min-w-0 grid-cols-[minmax(0,1fr)] min-[900px]:grid-cols-[minmax(0,1fr)_clamp(320px,28vw,420px)]">
-        <div className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_clamp(96px,15vh,128px)]">
-          <div className="relative min-h-0 min-w-0 overflow-hidden">
+      <div className="relative grid min-h-0 min-w-0 grid-cols-[minmax(0,1fr)] phone:block min-[900px]:grid-cols-[minmax(0,1fr)_clamp(320px,28vw,420px)]">
+        <div className="contents phone:flex phone:h-full phone:flex-col phone:overflow-y-auto phone:overflow-x-hidden" data-testid="phone-scroll">
+        <div className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_clamp(96px,15vh,128px)] phone:contents">
+          <div className="relative min-h-0 min-w-0 shrink-0 overflow-hidden phone:h-[58dvh] phone:landscape:h-[calc(100dvh-72px)]">
             <MapView />
             <AlertBanner />
             <ActionSheet />
           </div>
-          <div className="min-h-0 overflow-hidden bg-panel">
+          <div className="min-h-0 overflow-hidden bg-panel phone:order-3 phone:h-[128px] phone:shrink-0 phone:overflow-x-auto phone:border-t phone:border-line">
             <Timeline />
           </div>
         </div>
-        <aside className="absolute inset-x-0 bottom-0 z-40 h-[46%] min-h-0 min-w-0 overflow-hidden border-t border-line-2 bg-panel min-[900px]:static min-[900px]:z-auto min-[900px]:h-auto min-[900px]:border-t-0" data-testid="side-panel" data-mode={uiMode}>
+        <aside className="absolute inset-x-0 bottom-0 z-40 h-[46%] min-h-0 min-w-0 overflow-hidden border-t border-line-2 bg-panel min-[900px]:static min-[900px]:z-auto min-[900px]:h-auto min-[900px]:border-t-0 phone:static phone:order-2 phone:z-auto phone:h-auto phone:shrink-0 phone:overflow-visible" data-testid="side-panel" data-mode={uiMode}>
           {uiMode === 'live' ? <LivePanel /> : <PlanPanel />}
         </aside>
+        </div>
         <SendSheet />
         <Details />
       </div>

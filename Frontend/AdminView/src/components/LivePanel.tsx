@@ -166,8 +166,8 @@ function UnsentChange() {
 
 export function LivePanel() {
   return (
-    <div className="flex h-full flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-4">
+    <div className="flex h-full flex-col phone:h-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-4 phone:overflow-visible">
         <div className="flex flex-col gap-4">
           <CrewCard />
           <UnsentChange />

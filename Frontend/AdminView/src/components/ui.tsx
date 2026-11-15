@@ -65,7 +65,7 @@ export function SectionHead({ children, right, className }: { children: ReactNod
 }
 
 export function Kbd({ children, className }: { children: ReactNode; className?: string }) {
-  return <kbd className={cx('num inline-flex h-[17px] min-w-[17px] items-center justify-center rounded-[3px] border border-white/20 px-1 text-[10px] opacity-75', className)}>{children}</kbd>;
+  return <kbd className={cx('phone:hidden num inline-flex h-[17px] min-w-[17px] items-center justify-center rounded-[3px] border border-white/20 px-1 text-[10px] opacity-75', className)}>{children}</kbd>;
 }
 
 export type ToneKey = 'ok' | 'watch' | 'act';

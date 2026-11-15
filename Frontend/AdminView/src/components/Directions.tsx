@@ -100,7 +100,7 @@ export function DirectionsCard() {
   const rows = dests.map((id) => all.find((x) => x.id === id)).filter((x): x is NonNullable<typeof x> => !!x);
   return (
     <>
-    <div data-testid="directions" className="absolute left-3 top-3 z-30 w-[380px] max-w-[min(380px,calc(100%-32px))] max-h-[calc(100%-96px)] overflow-y-auto overflow-x-hidden border border-line-2 bg-black" onClick={(e) => e.stopPropagation()}>
+    <div data-testid="directions" className="absolute left-3 top-3 z-30 w-[380px] max-w-[min(380px,calc(100%-32px))] max-h-[calc(100%-96px)] phone:left-2 phone:right-2 phone:top-2 phone:max-h-[calc(100%-16px)] phone:w-auto phone:max-w-none phone:landscape:right-auto phone:landscape:w-[400px] overflow-y-auto overflow-x-hidden border border-line-2 bg-black" onClick={(e) => e.stopPropagation()}>
       <div className="flex items-center gap-2 border-b border-line px-3 py-2">
         <span className="num flex h-[22px] w-[22px] items-center justify-center border border-cyan text-[11px] text-cyan">A</span>
         <span className="eyebrow !text-[11px]">From</span>
@@ -120,7 +120,7 @@ export function DirectionsCard() {
               </div>
               {reason && !live && <WayForward destId={st.id} where="row" className="mt-1.5" />}
             </div>
-            {!live && <button aria-label={`Remove ${clean(st.name)}`} data-testid={`dest-remove-${st.id}`} onClick={() => removeDestination(st.id)} className="h-7 w-7 shrink-0 text-[15px] text-mute hover:text-cyan">✕</button>}
+            {!live && <button aria-label={`Remove ${clean(st.name)}`} data-testid={`dest-remove-${st.id}`} onClick={() => removeDestination(st.id)} className="h-7 w-7 shrink-0 text-[15px] text-mute hover:text-cyan phone:h-11 phone:w-11">✕</button>}
           </div>
         );
       })}
@@ -145,7 +145,7 @@ export function DirectionsCard() {
               onBlur={() => setTimeout(() => setFocus(false), 150)}
               onKeyDown={onKey}
               placeholder={picking ? 'Click a spot on the map' : rows.length ? 'Add a stop' : 'Choose destination'}
-              className={cx('h-8 min-w-0 flex-1 border bg-black px-2 text-[15px] text-ink focus:border-cyan focus:outline-none', picking ? 'border-cyan placeholder:text-cyan' : 'border-line-2 placeholder:text-dim')}
+              className={cx('h-8 min-w-0 flex-1 border bg-black px-2 text-[15px] text-ink focus:border-cyan focus:outline-none phone:h-10 phone:text-[16px]', picking ? 'border-cyan placeholder:text-cyan' : 'border-line-2 placeholder:text-dim')}
             />
           </div>
           {focus && hits.length > 0 && (
@@ -157,7 +157,7 @@ export function DirectionsCard() {
                     onMouseDown={(e) => e.preventDefault()}
                     onMouseMove={() => { if (actRef.current !== i) setAct(i); }}
                     onClick={h.pick}
-                    className={cx('flex w-full items-start gap-2 border-b border-line px-2.5 py-1.5 text-left', i === act ? 'bg-cyan/15' : '')}
+                    className={cx('flex w-full items-start gap-2 border-b border-line px-2.5 py-1.5 text-left phone:min-h-11 phone:py-2', i === act ? 'bg-cyan/15' : '')}
                   >
                     {h.kind === 'map' ? (
                       <svg className="mt-0.5 shrink-0 text-cyan" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden><circle cx="8" cy="8" r="5" /><path d="M8 0.5v4M8 11.5v4M0.5 8h4M11.5 8h4" /></svg>
@@ -177,7 +177,7 @@ export function DirectionsCard() {
       )}
 
       {!live && (
-        <div className="flex items-center gap-3 px-3 py-2 text-[13.5px]">
+        <div className="flex items-center gap-3 px-3 py-2 text-[13.5px] phone:gap-5 phone:[&>button]:flex phone:[&>button]:h-10 phone:[&>button]:items-center">
           {dests.length > 0 && !adding && dests.length < 8 && <button data-testid="add-stop" onClick={() => { focusInput.current = true; setAdding(true); }} className="text-cyan hover:underline">+ Add stop</button>}
           <button data-testid="suggest-stops" onClick={() => void suggestStops()} className="text-cyan hover:underline">Suggest best stops</button>
           <button data-testid="route-options" data-route-options-anchor aria-haspopup="dialog" aria-expanded={optionsOpen} onClick={() => openRouteOptions(!optionsOpen)} className="max-w-[120px] truncate text-cyan hover:underline">
@@ -247,13 +247,13 @@ function FromField({ shelters, value, disabled, onPick }: { shelters: ShelterOpt
         onClick={() => { setOpen((o) => !o); setAct(Math.max(0, shelters.findIndex((s) => s.id === value))); }}
         onKeyDown={onKey}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        className="flex h-8 w-full items-center border border-line-2 bg-black px-2 text-left text-[15px] text-ink hover:border-cyan focus:border-cyan focus:outline-none disabled:opacity-60"
+        className="flex h-8 w-full items-center border border-line-2 bg-black px-2 text-left text-[15px] text-ink phone:h-10 hover:border-cyan focus:border-cyan focus:outline-none disabled:opacity-60"
       >
         <span className="flex-1 truncate">{cur ? label(cur) : 'Choose a base'}</span>
         <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden className="text-mute"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg>
       </button>
       {open && (
-        <ul role="listbox" aria-label="Bases" data-testid="from-options" className="absolute left-0 right-0 top-[34px] z-40 border border-line-2 bg-black">
+        <ul role="listbox" aria-label="Bases" data-testid="from-options" className="absolute left-0 right-0 top-[34px] z-40 border border-line-2 bg-black phone:top-[46px]">
           {shelters.map((s, i) => (
             <li key={s.id} role="option" aria-selected={s.id === value}>
               <button
@@ -262,7 +262,7 @@ function FromField({ shelters, value, disabled, onPick }: { shelters: ShelterOpt
                 onMouseDown={(e) => e.preventDefault()}
                 onMouseMove={() => { if (actRef.current !== i) setAct(i); }}
                 onClick={() => pick(s.id)}
-                className={cx('flex h-9 w-full items-center gap-2 px-2.5 text-left text-[15px]', i === act ? 'bg-cyan/15 text-ink' : 'text-ink-2')}
+                className={cx('flex h-9 w-full items-center gap-2 px-2.5 text-left text-[15px] phone:h-11', i === act ? 'bg-cyan/15 text-ink' : 'text-ink-2')}
               >
                 <span className={cx('h-2.5 w-2.5 shrink-0', s.kind === 'hab' ? 'bg-ok' : 'bg-ink')} />
                 {label(s)}

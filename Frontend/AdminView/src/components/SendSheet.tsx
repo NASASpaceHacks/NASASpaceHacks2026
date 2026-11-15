@@ -39,7 +39,7 @@ export function SendSheet() {
   return (
     <AnimatePresence>
       {open && (
-        <motion.div key="send" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="absolute inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/70 px-6 py-6">
+        <motion.div key="send" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="absolute inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/70 px-6 py-6 phone:bg-panel phone:p-0">
           <motion.div initial={{ y: 14, opacity: 0.6 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 10, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="w-[min(680px,100%)]">
             <Brief />
           </motion.div>
@@ -98,7 +98,7 @@ function Brief() {
           <PrefsLine className="mt-0.5 block text-[12.5px] text-mute" />
         </div>
         {!sent && (
-          <button onClick={() => setMode('plan')} className="ml-auto flex h-9 shrink-0 items-center gap-2 rounded-[6px] px-3 text-[12px] text-mute hover:bg-raised hover:text-ink" aria-label="Back to plan">
+          <button onClick={() => setMode('plan')} className="ml-auto flex h-9 shrink-0 items-center gap-2 rounded-[6px] px-3 text-[12px] text-mute hover:bg-raised hover:text-ink phone:h-11 phone:bg-raised phone:text-[13px]" aria-label="Back to plan">
             Back to plan <Kbd>Esc</Kbd>
           </button>
         )}

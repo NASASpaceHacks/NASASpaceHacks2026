@@ -5,6 +5,9 @@
  * Pure black, 1 px grey frames, square corners. Colour only for meaning:
  * green nominal, white-with-dashed-frame caution, magenta planned route, red warning, cyan interactive.
  */
+/* Phone layout: narrow screens, or a touch device held landscape. Laptops and desktops never match. */
+@custom-variant phone (@media (max-width: 767px), (max-height: 500px) and (pointer: coarse));
+
 @theme {
   --color-bg: #000000;
   --color-panel: #05070a;

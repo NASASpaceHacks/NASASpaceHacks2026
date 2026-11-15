@@ -36,7 +36,7 @@ function ExplainCard() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="pointer-events-none absolute left-4 top-4 z-20 w-[min(600px,calc(100%-330px))] min-w-[380px]"
+          className="pointer-events-none absolute left-4 top-4 z-20 w-[min(600px,calc(100%-330px))] min-w-[380px] phone:left-2 phone:right-2 phone:top-2 phone:z-40 phone:w-auto phone:min-w-0"
         >
           <div className="overflow-hidden rounded-[4px] border border-line-2 bg-black">
             <div className="flex items-stretch border-b border-line">
@@ -146,16 +146,17 @@ function LayersButton() {
         data-testid="layers-button"
         onClick={() => set((s) => ({ layersOpen: !s.layersOpen, simOpen: false }))}
         aria-expanded={open}
-        className={cx('flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] ring-1 ring-white/20 transition-colors', open ? 'bg-[#1c2026]/95 text-ink' : 'bg-black text-ink-2 hover:text-ink')}
+        aria-label="Layers"
+        className={cx('relative flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] ring-1 ring-white/20 transition-colors phone:w-11 phone:justify-center phone:px-0', open ? 'bg-[#1c2026]/95 text-ink' : 'bg-black text-ink-2 hover:text-ink')}
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" aria-hidden>
           <path d="M8 2 L14.5 5.5 L8 9 L1.5 5.5 Z" />
           <path d="M1.5 8.5 L8 12 L14.5 8.5" />
         </svg>
-        Layers
-        {n > 0 && <span data-testid="layers-count" className="num border border-cyan px-1.5 text-[11px] text-cyan">{n} on</span>}
+        <span className="phone:hidden">Layers</span>
+        {n > 0 && <span data-testid="layers-count" className="num border border-cyan px-1.5 text-[11px] text-cyan phone:absolute phone:right-1 phone:top-1 phone:h-2.5 phone:w-2.5 phone:overflow-hidden phone:bg-cyan phone:p-0 phone:text-transparent">{n} on</span>}
       </button>
-      <Popover open={open} onClose={() => set({ layersOpen: false })} label="Map layers" className="right-0 top-[52px]">
+      <Popover open={open} onClose={() => set({ layersOpen: false })} label="Map layers" className="right-0 top-[52px] phone:fixed phone:inset-x-2 phone:bottom-2 phone:right-2 phone:top-auto phone:z-50">
         <LayersPanel />
       </Popover>
     </div>
@@ -206,18 +207,22 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
         </div>
       )}
 
-      <div className="absolute right-4 top-4 z-30 flex items-start gap-2">
+      <div className="absolute right-4 top-4 z-30 flex items-start gap-2 phone:bottom-[64px] phone:right-3 phone:top-auto phone:flex-col phone:items-end">
         <button
           data-testid="why-area"
           onClick={() => { if (hasZone) void explainSafeZone(); }}
           aria-disabled={!hasZone}
           className={cx(
-            'flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] ring-1 ring-white/20 transition-colors',
+            'flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] ring-1 ring-white/20 transition-colors phone:w-11 phone:justify-center phone:px-0',
             explaining ? 'bg-cyan/20 text-cyan' : 'bg-black text-ink-2 hover:text-ink',
           )}
           title="Watch the safe area shrink one flight rule at a time (S)"
+          aria-label={explaining ? 'Stop' : 'Why this area?'}
         >
-          {explaining ? 'Stop' : 'Why this area?'}
+          <svg aria-hidden width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" className="hidden phone:block">
+            {explaining ? <rect x="5" y="5" width="8" height="8" fill="currentColor" /> : <><circle cx="9" cy="9" r="7" /><path d="M7 7.2 C7 5.6 11 5.6 11 7.6 C11 9 9 9 9 10.6 M9 12.7 V13" strokeLinecap="round" /></>}
+          </svg>
+          <span className="phone:hidden">{explaining ? 'Stop' : 'Why this area?'}</span>
         </button>
         <LayersButton />
       </div>
@@ -238,10 +243,10 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
       </AnimatePresence>
 
       <ShelterTip />
-      <div className="pointer-events-none absolute bottom-3 left-3 right-[72px] z-10 flex flex-col items-start gap-1">
+      <div className="pointer-events-none absolute bottom-3 left-3 right-[72px] z-10 phone:right-16 flex flex-col items-start gap-1">
         <div className="flex max-w-full flex-wrap items-end gap-3">
-        <div className="pointer-events-auto flex max-w-full flex-col gap-1 bg-black/90 px-2.5 pb-1.5 pt-1.5">
-          <div className="text-[11px] leading-snug text-mute" data-testid="map-caption">{caption}</div>
+        <div className="pointer-events-auto flex max-w-full flex-col gap-1 bg-black/90 px-2.5 pb-1.5 pt-1.5 phone:max-w-[72%]">
+          <div className="text-[11px] leading-snug text-mute phone:text-[10px]" data-testid="map-caption">{caption}</div>
           {keyOn && (
             <div className="flex items-center gap-2 text-[11px] leading-snug text-ink-2" data-testid="map-key">
               <svg width="26" height="8" viewBox="0 0 26 8" aria-hidden><line x1="1" y1="4" x2="25" y2="4" stroke="rgba(0,0,0,0.7)" strokeWidth="4" /><line x1="1" y1="4" x2="25" y2="4" stroke="#fff" strokeWidth="1.5" strokeDasharray="6 4" /></svg>
@@ -259,7 +264,7 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
         </div>
       </div>
 
-      <div className={cx('absolute right-4 z-10 flex flex-col overflow-hidden rounded-[10px] bg-black', sheet ? 'top-[72px]' : 'bottom-4')}>
+      <div className={cx('absolute right-4 z-10 flex flex-col overflow-hidden rounded-[10px] bg-black phone:bottom-3 phone:right-3 phone:top-auto', sheet ? 'top-[72px]' : 'bottom-4')}>
         {live && (
           <button title={follow ? 'Following the crew: click to stop' : 'Follow the crew'} aria-pressed={follow} onClick={() => set((s) => ({ follow: !s.follow }))} className={cx('flex h-10 w-10 items-center justify-center text-[11px]', follow ? 'text-ok' : 'text-mute hover:text-ink')}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden><circle cx="8" cy="8" r="2.4" fill={follow ? 'currentColor' : 'none'} /><path d="M8 1.5 V4 M8 12 V14.5 M1.5 8 H4 M12 8 H14.5" strokeLinecap="round" /></svg>
@@ -270,7 +275,7 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
           { l: '−', t: 'Zoom out', f: () => getMap()?.zoomBy(-1) },
           { l: '⤢', t: 'Fit to route (Z)', f: () => getMap()?.fitRoute() },
         ].map((b) => (
-          <button key={b.t} title={b.t} aria-label={b.t} onClick={b.f} className="num flex h-10 w-10 items-center justify-center text-[16px] text-ink-2 hover:bg-raised hover:text-ink">
+          <button key={b.t} title={b.t} aria-label={b.t} onClick={b.f} className={cx('num flex h-10 w-10 items-center justify-center text-[16px] text-ink-2 hover:bg-raised hover:text-ink phone:h-11 phone:w-11', (b.l === '+' || b.l === '−') && 'phone:hidden')}>
             {b.l}
           </button>
         ))}

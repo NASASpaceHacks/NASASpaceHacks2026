@@ -49,7 +49,7 @@ export function Details() {
                 <div className="font-display text-[17px] font-semibold uppercase tracking-[0.14em] text-ink">Details</div>
                 <div className="text-[11.5px] text-mute">Rules, margins, sources and evidence behind the plan.</div>
               </div>
-              <button onClick={closeDetails} className="ml-auto flex h-9 items-center gap-1.5 rounded-[6px] px-3 text-[12px] text-mute hover:bg-raised hover:text-ink" aria-label="Close details">
+              <button onClick={closeDetails} className="ml-auto flex h-9 items-center gap-1.5 rounded-[6px] px-3 text-[12px] text-mute hover:bg-raised hover:text-ink phone:h-11 phone:bg-raised phone:px-4 phone:text-[13px]" aria-label="Close details">
                 Close <Kbd>Esc</Kbd>
               </button>
             </div>

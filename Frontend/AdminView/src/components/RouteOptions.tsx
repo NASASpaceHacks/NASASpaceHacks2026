@@ -88,10 +88,10 @@ export function RouteOptionsPanel({ anchorSelector }: { anchorSelector: string }
   const rows = compare?.rows ?? [];
 
   return (
-    <div ref={ref} data-testid="route-options-panel" role="dialog" aria-label="Route options" className={cx('absolute left-[404px] top-3 z-40 max-h-[calc(100%-96px)] overflow-y-auto border border-line-2 bg-black', 'w-[640px] max-w-[calc(100%-420px)]')} onClick={(e) => e.stopPropagation()}>
+    <div ref={ref} data-testid="route-options-panel" role="dialog" aria-label="Route options" className={cx('absolute left-[404px] top-3 z-40 max-h-[calc(100%-96px)] overflow-y-auto border border-line-2 bg-black', 'w-[640px] max-w-[calc(100%-420px)] phone:fixed phone:inset-0 phone:left-0 phone:top-0 phone:z-[70] phone:max-h-none phone:w-auto phone:max-w-none')} onClick={(e) => e.stopPropagation()}>
       <div className="flex items-center border-b border-line px-3 py-2">
         <span className="eyebrow !text-[11px]">Route options</span>
-        <button aria-label="Close route options" onClick={() => openRouteOptions(false)} className="ml-auto h-7 w-7 text-[15px] text-mute hover:text-cyan">✕</button>
+        <button aria-label="Close route options" onClick={() => openRouteOptions(false)} className="ml-auto h-7 w-7 text-[15px] text-mute hover:text-cyan phone:h-11 phone:w-11">✕</button>
       </div>
 
       <div className="px-3 pb-1 pt-3">
@@ -154,7 +154,7 @@ export function RouteOptionsPanel({ anchorSelector }: { anchorSelector: string }
         </div>
         {compare?.status === 'done' && rows.length > 0 && (
           <div className="mt-2 overflow-x-auto">
-            <table data-testid="compare-table" className="w-full border-collapse text-left text-[12.5px]">
+            <table data-testid="compare-table" className="w-full border-collapse text-left text-[12.5px] phone:min-w-[620px]">
               <thead>
                 <tr className="text-[11px] text-dim">
                   {['Route', 'Verdict', 'Stops · science', 'Time', 'Distance', 'Steepest', 'Longest radio gap', 'Spare'].map((h, i) => <th key={h} className={cx('pb-1 pr-2 font-normal', i > 1 && 'text-right')}>{h}</th>)}

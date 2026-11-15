@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { CRISM_RAMP, LOS_RAMP, ROUGH_RAMP, SLOPE_RAMP, TIME_RAMP, TI_RAMP, elevationRamp, type Ramp } from '@mw/shared/map';
 import type { Provenance } from '@mw/shared/contracts';
 import { toggleOverlay, toggleVector } from '../actions';
-import { OVERLAY_LIMIT, useConsole } from '../store';
+import { OVERLAY_LIMIT, set, useConsole } from '../store';
 import { roverWxFor } from '../lib/weather';
 import { sourceRows, type SourceRow } from '../lib/science';
 import { demRange } from '../lib/layers';
@@ -147,10 +147,11 @@ export function LayersPanel() {
   const nOn = overlays.filter((o) => o !== 'safezone').length;
 
   return (
-    <div data-testid="layers-panel" className="flex max-h-[min(680px,calc(100vh-180px))] w-[380px] flex-col">
+    <div data-testid="layers-panel" className="flex max-h-[min(680px,calc(100vh-180px))] w-[380px] flex-col phone:max-h-[70dvh] phone:w-full">
       <div className="flex items-baseline justify-between px-4 py-2.5">
         <span className="eyebrow !text-[12px]">Layers</span>
         <span className={cx('num text-[11px]', nOn >= OVERLAY_LIMIT ? 'text-ink' : 'text-dim')} data-testid="layers-limit">{nOn}/{OVERLAY_LIMIT} colour layers</span>
+        <button aria-label="Close layers" data-testid="layers-close" onClick={() => set({ layersOpen: false })} className="hidden h-11 w-11 items-center justify-center self-center text-[15px] text-mute phone:flex">✕</button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto pb-2">
         <Group title="Mars data" rows={mars} />

@@ -289,8 +289,8 @@ export function PlanPanel() {
   const sendable = isSendable(plan);
   const differs = !!route && !!plan && route.reqHash !== plan.reqHash;
   return (
-    <div className="flex h-full flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4 pt-4">
+    <div className="flex h-full flex-col phone:h-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4 pt-4 phone:overflow-visible">
         <div className="flex flex-col gap-6">
           <section>
             <SectionHead n={1} title="Start time" />
@@ -301,7 +301,7 @@ export function PlanPanel() {
         </div>
       </div>
       {plan?.status !== 'STAY_IN' && (
-        <div className="shrink-0 bg-panel px-4 pb-4 pt-3">
+        <div className="shrink-0 bg-panel px-4 pb-4 pt-3 phone:sticky phone:bottom-0 phone:z-20 phone:border-t phone:border-line-2 phone:pb-[max(12px,env(safe-area-inset-bottom))]">
           {differs && <div className="mb-2 text-[11.5px] text-caution">This plan differs from route v{route!.seq} the crew has.</div>}
           <Button data-testid="review-send" variant="primary" size="xl" className="w-full" disabled={!has || !sendable || status !== 'ready'} onClick={primaryAction}>
             Review &amp; send <span aria-hidden>→</span> <Kbd>⏎</Kbd>

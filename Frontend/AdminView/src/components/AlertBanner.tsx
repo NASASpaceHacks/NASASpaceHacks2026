@@ -22,7 +22,7 @@ export function AlertBanner() {
   const shown = expanded ? open : open.slice(0, 1);
   if (!open.length) return null;
   return (
-    <div className="pointer-events-none absolute left-0 right-[290px] top-0 z-30 flex flex-col items-start gap-1.5 pl-4 pt-4" data-testid="alerts">
+    <div className="pointer-events-none absolute left-0 right-[290px] top-0 z-30 flex flex-col items-start gap-1.5 pl-4 pt-4 phone:right-2 phone:pl-2 phone:pt-2" data-testid="alerts">
       <AnimatePresence initial={false}>
         {shown.map((a) => {
           const L = LEVEL[a.level];
