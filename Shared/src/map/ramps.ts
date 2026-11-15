@@ -69,6 +69,35 @@ export const TI_RAMP: Ramp = {
   ],
 };
 
+/**
+ * Elevation overlay between `lo` and `hi` metres: deep blue (low) → blue → cyan → white (high).
+ * No yellow/orange (the console's palette reserves warm colours); lightness rises monotonically.
+ */
+export function elevationRamp(lo: number, hi: number): Ramp {
+  const at = (t: number) => lo + (hi - lo) * t;
+  return {
+    id: 'elevation',
+    stops: [
+      [at(0), [18, 28, 92, 0.62]],
+      [at(0.35), [36, 104, 206, 0.55]],
+      [at(0.7), [110, 214, 240, 0.5]],
+      [at(1), [255, 255, 255, 0.58]],
+    ],
+  };
+}
+
+/** Surface roughness (m, std-dev of detrended 1 m heights per 5 m cell): smooth = clear, rough = pale blue → white. */
+export const ROUGH_RAMP: Ramp = {
+  id: 'rough',
+  stops: [
+    [0, [150, 175, 255, 0]],
+    [0.03, [150, 175, 255, 0]],
+    [0.08, [130, 165, 255, 0.38]],
+    [0.2, [195, 212, 255, 0.62]],
+    [0.5, [255, 255, 255, 0.85]],
+  ],
+};
+
 /** Elevation tint for the hillshade base when no orthoimage is present (normalised 0..1). */
 export const DEM_TINT: [number, [number, number, number]][] = [
   [0, [58, 34, 24]],

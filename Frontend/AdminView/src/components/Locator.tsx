@@ -15,66 +15,68 @@ const pos = (f: { lonMin: number; lonMax: number; latMin: number; latMax: number
   return { x: ((l - f.lonMin) / (f.lonMax - f.lonMin)) * 100, y: ((f.latMax - lat) / (f.latMax - f.latMin)) * 100 };
 };
 
-/** "Where on Mars" inset: real global image with a box at the site; hover/click shows the regional view with the study area. */
+type Box = { lonMin: number; lonMax: number; latMin: number; latMax: number };
+
+/** One fixed view: a real image with a cyan box on the next view's area (never smaller than `minPx`). */
+function View({ base, frame, box, h, caption, alt, testId, minPx = 6 }: { base: string; frame: Frame; box: Box; h: number; caption: string; alt: string; testId: string; minPx?: number }) {
+  const w = Math.round((h * (frame.lonMax - frame.lonMin)) / (frame.latMax - frame.latMin));
+  const p0 = pos(frame, box.lonMin, box.latMax);
+  const p1 = pos(frame, box.lonMax, box.latMin);
+  const bx = ((p0.x + p1.x) / 2 / 100) * w, by = ((p0.y + p1.y) / 2 / 100) * h;
+  const bw = Math.max(((p1.x - p0.x) / 100) * w, minPx), bh = Math.max(((p1.y - p0.y) / 100) * h, minPx);
+  return (
+    <figure data-testid={testId} className="m-0 shrink-0">
+      <figcaption className="pb-1 font-display text-[11px] uppercase tracking-[0.1em] text-ink-2">{caption}</figcaption>
+      <div className="relative overflow-hidden ring-1 ring-line-2" style={{ width: w, height: h }}>
+        <img src={`${base}/context/${frame.file}`} alt={alt} width={w} height={h} className="block h-full w-full select-none object-fill" draggable={false} />
+        <div className="absolute border-[1.5px] border-cyan" style={{ left: bx - bw / 2, top: by - bh / 2, width: bw, height: bh }} />
+      </div>
+    </figure>
+  );
+}
+
+/** "Where on Mars": two fixed real-image views side by side — Mars (box on Gale) → Gale crater (box on the study area). Collapse/expand only. */
 export function Locator() {
   const pack = useConsole((s) => s.pack);
   const live = useConsole((s) => s.uiMode === 'live');
   const [ctx, setCtx] = useState<Context | null>(null);
   const [open, setOpen] = useState(true);
-  const [hover, setHover] = useState(false);
-  const [pinned, setPinned] = useState(false);
 
   useEffect(() => {
     if (!pack) return;
-    let live = true;
+    let alive = true;
     fetch(`${pack.base}/context/context.json`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((j) => { if (live && j?.global && j?.regional && j?.aoi) setCtx(j as Context); })
+      .then((j) => { if (alive && j?.global && j?.regional && j?.aoi) setCtx(j as Context); })
       .catch(() => {});
-    return () => { live = false; };
+    return () => { alive = false; };
   }, [pack]);
 
   if (!pack || !ctx) return null;
-  const expanded = open && (hover || pinned);
-  const f = expanded ? ctx.regional : ctx.global;
-  const w = expanded ? 236 : 200;
-  const a = ctx.aoi;
-  const p0 = pos(f, a.lonMin, a.latMax);
-  const p1 = pos(f, a.lonMax, a.latMin);
-  const bw = Math.max(p1.x - p0.x, 0);
-  const bh = Math.max(p1.y - p0.y, 0);
-  const small = !expanded;
-  const c = pos(f, (a.lonMin + a.lonMax) / 2, (a.latMin + a.latMax) / 2);
-  const credit = f.credit ?? f.source ?? '';
+  const H = 92;
+  const credit = ctx.global.credit ?? ctx.global.source ?? '';
+  const site = ctx.labels?.find((l) => /gale/i.test(l.name))?.name ?? 'Gale crater';
 
   return (
     <div
       data-testid="locator"
-      className={cx("absolute right-3 z-20 border border-line-2 bg-black", live ? "bottom-[196px]" : "bottom-[152px]")}
-      style={{ width: w, maxWidth: 'calc(100% - 24px)' }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      data-open={open}
+      className={cx('absolute right-3 z-20 border border-line-2 bg-black', live ? 'bottom-[196px]' : 'bottom-[152px]')}
+      style={{ maxWidth: 'calc(100% - 24px)' }}
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex items-center justify-between gap-2 px-2 py-1">
         <span className="eyebrow !text-[11px]">Where on Mars</span>
-        <button aria-label={open ? 'Collapse locator' : 'Expand locator'} aria-expanded={open} onClick={() => setOpen((o) => !o)} className="num h-5 w-5 text-[12px] text-cyan">{open ? '–' : '+'}</button>
+        <button aria-label={open ? 'Collapse locator' : 'Expand locator'} aria-expanded={open} data-testid="locator-toggle" onClick={() => setOpen((o) => !o)} className="num h-5 w-5 text-[12px] text-cyan">{open ? '–' : '+'}</button>
       </div>
       {open && (
         <>
-          <button className="relative block w-full cursor-zoom-in" aria-label="Toggle regional view" onClick={() => setPinned((v) => !v)}>
-            <img src={`${pack.base}/context/${f.file}`} alt={expanded ? 'Regional view of Gale crater' : 'Mars global map'} className="block w-full select-none" draggable={false} />
-            <div className="absolute border border-cyan" style={small ? { left: `${c.x}%`, top: `${c.y}%`, width: 8, height: 8, transform: 'translate(-50%,-50%)' } : { left: `${p0.x}%`, top: `${p0.y}%`, width: `${bw}%`, height: `${bh}%` }} />
-            {expanded && (
-              <span className="absolute font-display text-[11px] font-semibold uppercase tracking-[0.1em] text-cyan" style={{ left: `${p0.x + bw}%`, top: `${p0.y}%`, transform: 'translate(4px,-100%)' }}>{a.label ?? 'Study area'}</span>
-            )}
-            {expanded && ctx.labels?.map((l) => {
-              const q = pos(f, l.lon, l.lat);
-              if (q.x < 0 || q.x > 100 || q.y < 0 || q.y > 100) return null;
-              return <span key={l.name} className="absolute whitespace-nowrap text-[10px] text-white" style={{ left: `${q.x}%`, top: `${q.y}%`, transform: 'translate(-50%,-50%)', textShadow: '0 0 3px #000, 0 0 3px #000' }}>{l.name}</span>;
-            })}
-          </button>
-          <div className={cx('px-2 py-1 text-[9.5px] leading-snug text-dim')}>{credit}</div>
+          <div className="flex items-end gap-1.5 px-2">
+            <View base={pack.base} frame={ctx.global} box={ctx.regional} h={H} caption="Mars" alt="Mars global map with a box on Gale crater" testId="locator-mars" />
+            <span aria-hidden className="pb-[38px] text-[12px] text-cyan">→</span>
+            <View base={pack.base} frame={ctx.regional} box={ctx.aoi} h={H} caption={site} alt="Regional view of Gale crater with the study area" testId="locator-gale" minPx={5} />
+          </div>
+          <div className="max-w-[300px] px-2 py-1 text-[9.5px] leading-snug text-dim">{credit}</div>
         </>
       )}
     </div>

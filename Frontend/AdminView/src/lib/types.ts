@@ -3,11 +3,10 @@ import type { LinkStatus } from './engine';
 
 export type { LinkStatus };
 
-export type OverlayId = 'safezone' | 'shelter' | 'walkback' | 'los' | 'slope' | 'ti';
+/** Raster overlays (at most OVERLAY_LIMIT at once). `safezone` = the shading used by "Why this area?". */
+export type OverlayId = 'safezone' | 'elevation' | 'slope' | 'rough' | 'ti' | 'walkback' | 'shelter' | 'los';
 /** Vector map features. `outline` = the single clean safe-area outline; `stationDetail` = value labels + left-out marks. */
-export type VectorId = 'outline' | 'contours' | 'keepouts' | 'traverse' | 'stations' | 'stationDetail' | 'route' | 'shelters' | 'imagery';
-/** Map presets: `calm` is the default (imagery, route, stops, base/rover, crew, safe-area outline). */
-export type PresetId = 'calm' | 'safety' | 'science' | 'radio' | 'terrain';
+export type VectorId = 'outline' | 'contours' | 'keepouts' | 'traverse' | 'stations' | 'stationDetail' | 'route' | 'shelters' | 'imagery' | 'relief';
 /** The console's three modes (top stepper): ① Plan → ② Send → ③ EVA live. */
 export type UiMode = 'plan' | 'send' | 'live';
 /** Details drawer sections (expert depth, on demand). */

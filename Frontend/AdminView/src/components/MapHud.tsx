@@ -1,7 +1,7 @@
 import { useEffect, useState, type RefObject } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { closeSheet, explainSafeZone, getMap, startHazardPick } from '../actions';
-import { PRESETS, set, useConsole } from '../store';
+import { set, useConsole } from '../store';
 import { objectiveById, stationImage, whyItMatters } from '../lib/science';
 import { shortName } from '../lib/base';
 import { LayersPanel } from './Layers';
@@ -135,7 +135,7 @@ function StationTip() {
 
 function LayersButton() {
   const open = useConsole((s) => s.layersOpen);
-  const preset = useConsole((s) => s.preset);
+  const n = useConsole((s) => s.overlays.filter((o) => o !== 'safezone').length);
   return (
     <div className="relative">
       <button
@@ -150,7 +150,7 @@ function LayersButton() {
           <path d="M1.5 8.5 L8 12 L14.5 8.5" />
         </svg>
         Layers
-        {preset !== 'calm' && <span className="rounded-full bg-caution/15 px-2 py-0.5 text-[11px] text-caution">{PRESETS[preset].label}</span>}
+        {n > 0 && <span data-testid="layers-count" className="num border border-cyan px-1.5 text-[11px] text-cyan">{n} on</span>}
       </button>
       <Popover open={open} onClose={() => set({ layersOpen: false })} label="Map layers" className="right-0 top-[52px]">
         <LayersPanel />

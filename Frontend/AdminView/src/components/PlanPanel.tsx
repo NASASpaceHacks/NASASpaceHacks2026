@@ -6,6 +6,7 @@ import { fmtLtst } from '../lib/marsclock';
 import { dropReason, verdictOf, type Verdict } from '../lib/plain';
 import { LtstScrubber, stayInSentence, stayInWhy } from './PlanParts';
 import { Button, Kbd, Popover, Tip, ToneMark, cx } from './ui';
+import { WayForward, useLeftOut } from './WayForward';
 
 const VERDICT_STYLE: Record<Verdict['status'], { word: string; ink: string; glow: string }> = {
   GO: { word: 'GO', ink: 'text-ok', glow: 'border-ok' },
@@ -25,6 +26,8 @@ function VerdictCard() {
   const error = useConsole((s) => s.planError);
   const base = useBaseInfo();
   const [why, setWhy] = useState(false);
+  const leftOut = useLeftOut();
+  const first = leftOut[0];
   const v = useMemo(
     () => (plan && base ? verdictOf({ plan, pack, base, rules, events, startLtstMin: start, lsDeg: ls, lightMin: light }) : null),
     [plan, pack, base, rules, events, start, ls, light],
@@ -63,6 +66,14 @@ function VerdictCard() {
 
       {nogo ? (
         <>
+          {first && (
+            <div className="mt-3 border-l-2 border-red pl-3">
+              <div data-testid="verdict-dest-reason" className="text-[14px] leading-snug text-ink">
+                <span className="num text-red">{first.letter}</span> {first.name}: <span className="text-red">{first.reason}</span>
+              </div>
+              <WayForward destId={first.id} where="verdict" className="mt-2" />
+            </div>
+          )}
           {sentence && <div data-testid="stayin-reason" className="mt-3 text-[14px] leading-snug text-ink-2">{sentence}</div>}
           {plan.binding && <div data-testid="stayin-binding" className="sr-only">{relabel(pack, base, plan.binding.text)}</div>}
           {rover && (
@@ -91,6 +102,14 @@ function VerdictCard() {
               </Tip>
             </li>
           ))}
+          {first && (
+            <li className="mt-1 border-l-2 border-red pl-3" data-line="left-out">
+              <div data-testid="verdict-dest-reason" className="text-[14px] leading-snug text-ink">
+                Left out: <span className="num text-red">{first.letter}</span> {first.name}: <span className="text-red">{first.reason}</span>
+              </div>
+              <WayForward destId={first.id} where="verdict" className="mt-1.5" />
+            </li>
+          )}
         </ul>
       )}
     </section>

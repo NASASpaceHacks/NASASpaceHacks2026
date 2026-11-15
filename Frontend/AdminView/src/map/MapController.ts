@@ -1,7 +1,7 @@
 import OlMap from 'ol/Map';
 import View from 'ol/View';
 import Feature from 'ol/Feature';
-import { Point, Polygon } from 'ol/geom';
+import { LineString, Point, Polygon } from 'ol/geom';
 import type { FeatureLike } from 'ol/Feature';
 import Translate from 'ol/interaction/Translate';
 import { Circle as CircleStyle, Fill, Icon, Text } from 'ol/style';
@@ -22,7 +22,9 @@ import {
   SLOPE_RAMP,
   TIME_RAMP,
   TI_RAMP,
+  ROUGH_RAMP,
   DEM_TINT,
+  elevationRamp,
   attachCursorReadout,
   canvasImageSource,
   createCanvasFieldLayer,
@@ -65,6 +67,39 @@ import {
 } from '@mw/shared/map';
 import type { OverlayId, VectorId } from '../lib/types';
 import { toVars, type ExplainStep } from '../lib/zone';
+import { demRange } from '../lib/layers';
+
+/** A "way forward" suggestion drawn on the map (closest safe point, or a rover parking spot). */
+export interface MapSuggestion {
+  kind: 'closest' | 'rover';
+  xy: [number, number];
+  label: string;
+  /** Closest point: the original destination, joined to the suggestion by a dashed line. */
+  from?: [number, number];
+}
+
+const ROVER_GHOST_SVG =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><rect x="8" y="8" width="14" height="14" transform="rotate(45 15 15)" fill="rgba(0,0,0,0.6)" stroke="#00e5ff" stroke-width="2" stroke-dasharray="3 2"/><circle cx="15" cy="15" r="2.5" fill="#00e5ff"/></svg>',
+  );
+
+function suggestStyle(f: FeatureLike): Style | Style[] {
+  if (f.get('link')) return new Style({ stroke: new Stroke({ color: 'rgba(0,229,255,0.9)', width: 1.5, lineDash: [4, 4] }) });
+  const rover = f.get('kind') === 'rover';
+  const label = new Text({
+    text: String(f.get('label') ?? ''),
+    font: '600 13px "Barlow Condensed", sans-serif',
+    offsetX: 18,
+    offsetY: rover ? 0 : 18, // below the destination's own label
+    textAlign: 'left',
+    fill: new Fill({ color: '#00e5ff' }),
+    stroke: new Stroke({ color: 'rgba(0,0,0,0.9)', width: 3 }),
+  });
+  return rover
+    ? new Style({ image: new Icon({ src: ROVER_GHOST_SVG, width: 30, height: 30 }), text: label, zIndex: 6 })
+    : new Style({ image: new CircleStyle({ radius: 9, fill: new Fill({ color: 'rgba(0,0,0,0.55)' }), stroke: new Stroke({ color: '#00e5ff', width: 2.5 }) }), text: label, zIndex: 6 });
+}
 
 /** A route stop drawn as a lettered, draggable marker (B, C… — A is the start base). */
 export interface DestMarker {
@@ -156,6 +191,8 @@ export class MapController {
   private destLayer = new VectorLayer({ source: new VectorSource(), zIndex: 40, style: destStyle });
   private destTranslate: Translate;
   private pickMode = false;
+  /** Way-forward suggestion (closest safe point / rover parking spot). */
+  private suggestLayer = new VectorLayer({ source: new VectorSource(), zIndex: 41, style: suggestStyle });
   private aoi: VectorLayer<VectorSource>;
   private shelters: ReturnType<typeof createSheltersLayer>;
   private prevZone: SafeZoneInputs | null = null;
@@ -193,6 +230,11 @@ export class MapController {
       });
       // Static field overlays straight from the site pack.
       this.fieldLayers.slope = createFieldLayer({ grid: g, projection: this.proj, bands: [{ data: pack.rasters.slope }], style: rampStyle(SLOPE_RAMP), visible: false, className: 'mw-f-slope' });
+      const [lo, hi] = demRange(pack);
+      this.fieldLayers.elevation = createFieldLayer({ grid: g, projection: this.proj, bands: [{ data: pack.rasters.dem }], style: rampStyle(elevationRamp(lo, hi)), visible: false, className: 'mw-f-elevation' });
+      if (pack.rasters.rough) {
+        this.fieldLayers.rough = createFieldLayer({ grid: g, projection: this.proj, bands: [{ data: pack.rasters.rough }], style: rampStyle(ROUGH_RAMP), visible: false, className: 'mw-f-rough' });
+      }
       if (pack.rasters.ti) {
         this.fieldLayers.ti = createFieldLayer({ grid: g, projection: this.proj, bands: [{ data: pack.rasters.ti }], style: rampStyle(TI_RAMP), visible: false, className: 'mw-f-ti' });
       }
@@ -245,7 +287,7 @@ export class MapController {
       layers: [
         ...(this.imagery ? [this.imagery] : []),
         (this.hillshade ?? this.hillCanvas)!,
-        ...(['ti', 'slope'] as OverlayId[]).map((k) => this.fieldLayers[k]).filter((x): x is WebGLTileLayer => !!x),
+        ...(['elevation', 'ti', 'rough', 'slope'] as OverlayId[]).map((k) => this.fieldLayers[k]).filter((x): x is WebGLTileLayer => !!x),
         this.aoi,
         this.keepouts,
         this.hazards,
@@ -257,6 +299,7 @@ export class MapController {
         this.shelters.layer,
         this.astronaut,
         this.destLayer,
+        this.suggestLayer,
       ],
       view: new View({
         projection: this.proj,
@@ -482,6 +525,51 @@ export class MapController {
     this.routeLayer.setVisible(v.route);
     this.shelters.layer.setVisible(v.shelters);
     this.imagery?.setVisible(v.imagery);
+    (this.hillshade ?? this.hillCanvas)?.setVisible(v.relief || !this.imagery || !v.imagery);
+  }
+
+  /** Show (or clear) a way-forward suggestion on the map. */
+  setSuggestion(sg: MapSuggestion | null) {
+    const src = this.suggestLayer.getSource()!;
+    src.clear(true);
+    if (!sg) return;
+    const feats: Feature[] = [];
+    if (sg.from) feats.push(new Feature({ geometry: new LineString([sg.from, sg.xy]), link: true }));
+    const f = new Feature({ geometry: new Point(sg.xy), kind: sg.kind, label: sg.label });
+    f.setId('suggestion');
+    feats.push(f);
+    src.addFeatures(feats);
+  }
+
+  /** Pan/zoom (only if needed) so these points are on screen, clear of the side cards. */
+  reveal(pts: [number, number][]) {
+    const size = this.map.getSize();
+    if (!size || !pts.length) return;
+    const inView = pts.every((p) => {
+      const px = this.map.getPixelFromCoordinate(p);
+      return px && px[0] > 400 && px[0] < size[0] - 80 && px[1] > 60 && px[1] < size[1] - 80;
+    });
+    const view = this.map.getView();
+    // Two nearby points (closest safe point vs the pin): zoom in until they sit ~120 px apart.
+    if (pts.length === 2) {
+      const dm = Math.hypot(pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]);
+      const res = view.getResolution() ?? 1;
+      if (dm / res < 60) {
+        view.animate({ center: [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2], resolution: Math.max(0.3, Math.min(res, dm / 120)), duration: 400 });
+        return;
+      }
+    }
+    if (inView) return;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [x, y] of pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+    const pad = 200;
+    this.map.getView().fit([x0 - pad, y0 - pad, x1 + pad, y1 + pad], { padding: [80, 80, 120, 420], duration: 400, maxZoom: this.map.getView().getZoom() });
+  }
+
+  /** Map coordinates of the suggestion marker (for the test geometry hook). */
+  suggestionXY(): number[] | null {
+    const f = this.suggestLayer.getSource()!.getFeatureById('suggestion');
+    return f ? (f.getGeometry() as Point).getCoordinates() : null;
   }
 
   setOverlays(ids: OverlayId[], opacity: Record<OverlayId, number>) {

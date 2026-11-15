@@ -14,7 +14,6 @@ import type {
   LogEntry,
   LogLevel,
   OverlayId,
-  PresetId,
   RequestMsg,
   UiMode,
   VectorId,
@@ -29,6 +28,18 @@ export interface ExplainState {
   detail: string;
   areaFrom: number;
   areaTo: number;
+}
+
+/** "Way forward" for a destination that can't be included: closest safe point, or a rover parking spot. */
+export interface FixState {
+  destId: string;
+  kind: 'closest' | 'rover';
+  status: 'searching' | 'found' | 'none';
+  cell?: Cell;
+  /** closest: metres short of the original destination · rover: metres from the rover's current spot. */
+  distM?: number;
+  /** Plain reason when nothing was found. */
+  note?: string;
 }
 
 export interface ConsoleState {
@@ -81,7 +92,8 @@ export interface ConsoleState {
   // Display
   /** Top stepper: ① Plan → ② Send → ③ EVA live. */
   uiMode: UiMode;
-  preset: PresetId;
+  /** NO-GO way forward (search in progress / suggestion shown on the map). */
+  fix: FixState | null;
   overlays: OverlayId[];
   opacity: Record<OverlayId, number>;
   vectors: Record<VectorId, boolean>;
@@ -120,18 +132,6 @@ export interface ConsoleState {
 }
 
 export const OVERLAY_LIMIT = 3;
-
-/** Calm default: imagery, route, numbered stops, base/rover, crew and one safe-area outline. */
-const CALM_VECTORS: Partial<Record<VectorId, boolean>> = { outline: true, contours: false, keepouts: false, traverse: false, stationDetail: false, route: true, stations: true, shelters: true };
-
-/** Map presets behind the Layers button. Each brings its own one-line legend. */
-export const PRESETS: Record<PresetId, { label: string; overlays: OverlayId[]; vectors: Partial<Record<VectorId, boolean>>; hint: string; legend: string }> = {
-  calm: { label: 'Calm', overlays: [], vectors: CALM_VECTORS, hint: 'Route, stops, base, crew and the safe area', legend: 'Cyan outline = safe area (every hard rule met). Small steep patches inside it are left out of the outline.' },
-  safety: { label: 'Safety', overlays: ['safezone', 'shelter'], vectors: { ...CALM_VECTORS, contours: true, keepouts: true }, hint: 'Safe area, minutes to shelter, keep-out zones', legend: 'Dark = outside the safe area · blue = minutes to shelter (lines every 10 min, red = limit) · red hatch = keep-out.' },
-  science: { label: 'Science', overlays: ['ti'], vectors: { ...CALM_VECTORS, traverse: true, stationDetail: true }, hint: 'Station values, left-out stops, Curiosity traverse', legend: 'Number next to a stop = science value · red × = left out · dotted line = Curiosity traverse · colour = loose sand → rock.' },
-  radio: { label: 'Radio', overlays: ['los'], vectors: CALM_VECTORS, hint: 'Where the crew can talk to Hab-1 or the rover', legend: 'Cyan = in radio contact with the hab mast or the rover relay · darker = longer out of contact.' },
-  terrain: { label: 'Terrain', overlays: ['slope'], vectors: CALM_VECTORS, hint: 'Slope: where walking gets hard or unsafe', legend: 'Amber from 16.7° (walking gets costly) · red above 20° (too steep for suited crew).' },
-};
 
 let logId = 1;
 
@@ -174,10 +174,11 @@ export const useConsole = create<ConsoleState>()(
     dirty: false,
 
     uiMode: 'plan',
-    preset: 'calm',
+    fix: null,
     overlays: [],
-    opacity: { safezone: 1, shelter: 0.9, walkback: 0.85, los: 0.9, slope: 0.7, ti: 0.6 },
-    vectors: { outline: true, contours: false, keepouts: false, traverse: false, stations: true, stationDetail: false, route: true, shelters: true, imagery: true },
+    opacity: { safezone: 1, elevation: 0.8, slope: 0.85, rough: 0.85, ti: 0.75, shelter: 0.9, walkback: 0.85, los: 0.9 },
+    // Calm default: imagery (+ lighting), route, science targets, base and rover, safe-area outline.
+    vectors: { outline: true, contours: false, keepouts: false, traverse: false, stations: true, stationDetail: false, route: true, shelters: true, imagery: true, relief: true },
     details: { open: false, tab: 'report' },
     layersOpen: false,
     simOpen: false,

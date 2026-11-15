@@ -84,7 +84,8 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
       {station ? (
         <div className="flex gap-3 pr-5">
           <div className="min-w-0 flex-1">
-            <div className="text-[15px] font-semibold leading-tight text-ink" data-testid="place-title">{clean(station.name)}</div>
+            <div className="eyebrow !text-[10.5px]" data-testid="place-kind">Science target</div>
+            <div className="mt-0.5 text-[15px] font-semibold leading-tight text-ink" data-testid="place-title">{clean(station.name)}</div>
             <div className="mt-1 text-[12.5px] text-mute" data-testid="place-value">Science value {Math.round(station.value)} of 100 · {station.dwellMin} min stop</div>
           </div>
           {img && <img src={`${pack.base}/${img.file}`} alt="" data-testid="place-photo" className="h-14 w-14 shrink-0 object-cover ring-1 ring-line" />}

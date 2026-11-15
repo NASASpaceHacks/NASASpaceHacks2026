@@ -1,64 +1,63 @@
-import { useMemo, useState, type JSX } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { LOS_RAMP, SLOPE_RAMP, TIME_RAMP, TI_RAMP, rampCss, type Ramp } from '@mw/shared/map';
+import { useMemo } from 'react';
+import { LOS_RAMP, ROUGH_RAMP, SLOPE_RAMP, TIME_RAMP, TI_RAMP, elevationRamp, type Ramp } from '@mw/shared/map';
 import type { Provenance } from '@mw/shared/contracts';
-import { applyPreset, setOpacity, toggleOverlay, toggleVector } from '../actions';
-import { OVERLAY_LIMIT, PRESETS, useConsole } from '../store';
+import { toggleOverlay, toggleVector } from '../actions';
+import { OVERLAY_LIMIT, useConsole } from '../store';
 import { sourceRows, type SourceRow } from '../lib/science';
-import type { OverlayId, PresetId, VectorId } from '../lib/types';
-import { Badge, Kbd, SectionHead, Switch, cx } from './ui';
+import { demRange } from '../lib/layers';
+import { fmtLtst, sunAtLtst } from '../lib/marsclock';
+import type { OverlayId, VectorId } from '../lib/types';
+import { Badge, SectionHead, Switch, cx } from './ui';
 
-interface OverlayMeta {
-  id: OverlayId;
-  label: string;
+interface LegendSpec {
+  ramp: Ramp;
+  min: number;
+  max: number;
+  ticks: [number, string][];
+  /** A highlighted threshold drawn under the ramp (e.g. the 20° slope limit). */
+  mark?: { at: number; label: string };
+}
+
+interface LayerRow {
+  key: string;
+  name: string;
   what: string;
-  ramp?: Ramp;
-  min?: number;
-  max?: number;
-  ticks?: [number, string][];
-  raster?: string;
+  source: string;
+  unit?: string;
+  on: boolean;
+  toggle: () => void;
+  legend?: LegendSpec;
+  badge?: string;
+  /** Raster overlay (counts toward the limit). */
+  overlay?: boolean;
 }
 
-function overlayMeta(limits: { shelter: number; walkback: number; los: number; slope: number }): OverlayMeta[] {
-  return [
-    { id: 'safezone', label: 'Safe area shading', what: 'Darkens ground outside the safe area (every hard flight rule met at once).' },
-    { id: 'shelter', label: 'Minutes to shelter', what: `Minutes to the nearest hab or pressurized rover; hidden beyond ${limits.shelter} min.`, ramp: TIME_RAMP, min: 0, max: Math.min(60, limits.shelter), ticks: [[0, '0'], [limits.shelter / 2, `${limits.shelter / 2}`], [limits.shelter, `${limits.shelter} min`]] },
-    { id: 'walkback', label: 'Walk-back time', what: `Time out plus a slow (half-pace) walk back to the base; hidden beyond ${Math.round(limits.walkback)} min.`, ramp: { id: 'wb', stops: TIME_RAMP.stops.map(([v, c]) => [v * (limits.walkback / 30), c]) }, min: 0, max: limits.walkback, ticks: [[0, '0'], [limits.walkback, `${Math.round(limits.walkback)} min`]] },
-    { id: 'los', label: 'Radio contact', what: 'Cyan = radio line of sight to the hab mast or the pressurized-rover relay. Shadow deepens with the round trip spent out of contact, timed on the terrain.', ramp: LOS_RAMP, min: 0, max: 30, ticks: [[0, 'LOS'], [limits.los, `${limits.los} min`], [30, '30']] },
-    { id: 'slope', label: 'Slope', what: 'Amber from the 16.7° metabolic-data edge; red above the 20° suited-crew limit.', ramp: SLOPE_RAMP, min: 0, max: 35, ticks: [[0, '0°'], [16.7, '16.7'], [20, '20°'], [35, '35°']], raster: 'slope' },
-    { id: 'ti', label: 'Thermal inertia', what: 'Low values suggest loose sand (slower, costlier walking). Indicative.', ramp: TI_RAMP, min: 50, max: 700, ticks: [[50, 'sand'], [400, '400'], [700, 'rock']], raster: 'ti' },
-  ];
+function provLine(p: Provenance[] | Provenance | undefined): string {
+  const a = Array.isArray(p) ? p[0] : p;
+  if (!a) return '';
+  const inst = a.instrument.split(/\s*[,(]/)[0];
+  const mission = a.mission.replace('Mars Reconnaissance Orbiter', 'MRO').replace(/ \+ .*$/, ' + others');
+  return `${mission} · ${inst}${a.resolutionM ? ` · ${a.resolutionM} m` : ''}`;
 }
 
-const VECTORS: { id: VectorId; label: string; legend: string }[] = [
-  { id: 'outline', label: 'Safe-area outline', legend: 'Cyan line around ground that meets every hard rule (small steep patches inside are left out).' },
-  { id: 'route', label: 'Route', legend: 'Amber line with arrows, in walking order.' },
-  { id: 'stations', label: 'Stops', legend: 'Numbered = in the plan · hollow = left out.' },
-  { id: 'stationDetail', label: 'Station values & left-out marks', legend: 'Science value next to each stop; red × = left out by a rule.' },
-  { id: 'contours', label: 'Minutes-to-shelter lines', legend: 'Dashed lines every 10 min; red = the shelter limit.' },
-  { id: 'keepouts', label: 'Keep-out zones', legend: 'Red hatch: plume or hazard zones the route may not enter.' },
-  { id: 'traverse', label: 'Curiosity traverse', legend: 'Dotted line: the rover\'s real drive path.' },
-  { id: 'shelters', label: 'Hab + rover', legend: 'Cyan square = Hab-1 · diamond = pressurized rover (drag to move).' },
-];
+/** Legend gradient: the map ramp's colours, made more opaque so they read on the black panel. */
+function legendCss(r: Ramp, vmin: number, vmax: number): string {
+  const span = vmax - vmin || 1;
+  const inside = r.stops.filter(([v]) => v >= vmin && v <= vmax);
+  const parts = (inside.length > 1 ? inside : r.stops).map(([v, [cr, cg, cb, a]]) => `rgba(${cr},${cg},${cb},${Math.min(1, a * 1.7).toFixed(2)}) ${Math.max(0, Math.min(100, ((v - vmin) / span) * 100)).toFixed(1)}%`);
+  return `linear-gradient(90deg, ${parts.join(', ')})`;
+}
 
-function Legend({ meta }: { meta: OverlayMeta }) {
-  if (meta.id === 'safezone') {
-    return (
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10.5px] text-mute">
-        <span className="flex items-center gap-1.5"><span className="h-2.5 w-3.5 rounded-[1px] border border-ok bg-ok/20" />Safe</span>
-        <span className="flex items-center gap-1.5"><span className="h-2.5 w-3.5 rounded-[1px] bg-[#0a0b0e] ring-1 ring-line-2" />Excluded</span>
-        <span className="flex items-center gap-1.5"><span className="h-2.5 w-3.5 rounded-[1px] bg-caution/60" />Rule being applied</span>
-      </div>
-    );
-  }
-  if (!meta.ramp) return null;
-  const { min = 0, max = 1 } = meta;
+function Legend({ l }: { l: LegendSpec }) {
+  const pct = (v: number) => `${((v - l.min) / (l.max - l.min || 1)) * 100}%`;
   return (
-    <div>
-      <div className="h-2 rounded-[1px] ring-1 ring-line" style={{ background: rampCss(meta.ramp, min, max) }} />
-      <div className="num relative mt-1 h-3 text-[9.5px] text-dim">
-        {meta.ticks?.map(([v, t]) => (
-          <span key={t} className="absolute -translate-x-1/2 whitespace-nowrap first:translate-x-0 last:-translate-x-full" style={{ left: `${((v - min) / (max - min)) * 100}%` }}>
+    <div className="mt-1.5" data-testid="layer-legend">
+      <div className="relative h-2.5 ring-1 ring-line-2" style={{ backgroundImage: legendCss(l.ramp, l.min, l.max), backgroundColor: '#000' }}>
+        {l.mark && <span className="absolute -top-0.5 h-3.5 w-[2px] bg-red" style={{ left: pct(l.mark.at) }} />}
+      </div>
+      <div className="num relative mt-1 h-3 text-[10px] text-mute">
+        {l.ticks.map(([v, t], i) => (
+          <span key={t} className={cx('absolute whitespace-nowrap', i === 0 ? '' : i === l.ticks.length - 1 ? '-translate-x-full' : '-translate-x-1/2', l.mark && v === l.mark.at && 'text-red')} style={{ left: pct(v) }}>
             {t}
           </span>
         ))}
@@ -67,140 +66,99 @@ function Legend({ meta }: { meta: OverlayMeta }) {
   );
 }
 
-function provLine(p: Provenance[] | undefined): string {
-  if (!p?.length) return '';
-  const a = p[0];
-  return `${a.mission} · ${a.instrument}${a.resolutionM ? ` · ${a.resolutionM} m` : ''}`;
-}
-
-function SymbolLegend() {
-  const rows: [JSX.Element, string][] = [
-    [<rect key="h" x="2.5" y="2.5" width="11" height="11" fill="#00e5ff" stroke="#0b0d10" strokeWidth="1.5" />, 'Hab (primary shelter)'],
-    [<rect key="r" x="3.5" y="3.5" width="9" height="9" transform="rotate(45 8 8)" fill="#E9E4D8" stroke="#0b0d10" strokeWidth="1.5" />, 'Pressurized rover · drag to move'],
-    [<g key="p"><circle cx="8" cy="8" r="6" fill="#000" stroke="#ff2bd6" strokeWidth="1.5" /><text x="8" y="11" textAnchor="middle" fontSize="8" fill="#0b0d10" fontFamily="var(--font-mono)">1</text></g>, 'Station in plan (stop order)'],
-    [<g key="d"><circle cx="8" cy="8" r="5.5" fill="#0b0d10" stroke="#ff3b30" strokeWidth="1.5" /><text x="8" y="11" textAnchor="middle" fontSize="9" fill="#ff3b30">×</text></g>, 'Station dropped by a rule'],
-    [<path key="rt" d="M1 12 L15 4" stroke="#ff2bd6" strokeWidth="2.5" strokeLinecap="round" />, 'Route with direction arrows'],
-    [<path key="iso" d="M1 10 C5 4, 11 14, 15 6" stroke="#00e5ff" strokeWidth="1.2" strokeDasharray="2 2" fill="none" />, 'Minutes to shelter (red = limit)'],
-    [<g key="ko"><rect x="2" y="2" width="12" height="12" fill="none" stroke="#ff3b30" strokeDasharray="3 2" /><path d="M2 10 L6 14 M2 6 L10 14 M2 2 L14 14 M6 2 L14 10 M10 2 L14 6" stroke="#ff3b30" strokeOpacity="0.6" /></g>, 'Keep-out zone'],
-    [<g key="ev"><circle cx="8" cy="8" r="6.5" fill="rgba(79,209,224,0.12)" stroke="#00e5ff" strokeDasharray="2 2" /><circle cx="8" cy="8" r="3" fill="#00e5ff" /></g>, 'EV1 position · 2σ uncertainty'],
-  ];
+function Row({ r }: { r: LayerRow }) {
   return (
-    <div className="mt-2.5 grid grid-cols-1 gap-1.5">
-      {rows.map(([icon, label]) => (
-        <div key={label} className="flex items-center gap-2.5 text-[11px] text-mute">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden className="shrink-0">{icon}</svg>
-          {label}
+    <div data-testid={`layer-${r.key}`} data-on={r.on} className="py-2">
+      <div className="flex items-start gap-2.5">
+        <span className="mt-[3px]"><Switch on={r.on} onChange={r.toggle} label={r.name} /></span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline gap-2">
+            <button onClick={r.toggle} className={cx('text-left text-[13.5px] leading-tight', r.on ? 'text-ink' : 'text-ink-2 hover:text-ink')}>{r.name}</button>
+            {r.unit && <span className="num text-[10.5px] text-dim">{r.unit}</span>}
+            {r.badge && <Badge className="ml-auto">{r.badge}</Badge>}
+          </div>
+          <div className="mt-0.5 text-[11.5px] leading-snug text-mute">{r.what}</div>
+          <div className="mt-0.5 truncate text-[10.5px] text-dim" title={r.source}>{r.source}</div>
+          {r.on && r.legend && <Legend l={r.legend} />}
         </div>
-      ))}
+      </div>
     </div>
   );
 }
 
-/** Layers popover content: presets (each with a one-line legend), then every layer on demand. */
+function Group({ title, sub, rows }: { title: string; sub?: string; rows: LayerRow[] }) {
+  if (!rows.length) return null;
+  return (
+    <div className="border-t border-line px-4 pb-1 pt-2.5">
+      <div className="eyebrow !text-[11px]">{title}{sub && <span className="ml-2 normal-case tracking-normal text-dim">{sub}</span>}</div>
+      {rows.map((r) => <Row key={r.key} r={r} />)}
+    </div>
+  );
+}
+
+/** Layers panel: real data layers in groups, each with what it shows, its source, units and (when on) its legend. */
 export function LayersPanel() {
-  const preset = useConsole((s) => s.preset);
   const overlays = useConsole((s) => s.overlays);
-  const opacity = useConsole((s) => s.opacity);
   const vectors = useConsole((s) => s.vectors);
   const limits = useConsole((s) => s.limits);
-  const fieldsSource = useConsole((s) => s.fieldsSource);
   const pack = useConsole((s) => s.pack);
-  const [all, setAll] = useState(false);
+  const start = useConsole((s) => s.startLtstMin);
+  const ls = useConsole((s) => s.lsDeg);
+  const evaBase = useConsole((s) => s.evaBase);
+  if (!pack) return null;
+  const m = pack.manifest;
+  const R = m.rasters;
   const lim = {
     shelter: limits && Number.isFinite(limits.shelterMax) ? limits.shelterMax : 30,
-    walkback: limits && Number.isFinite(limits.walkbackMax) ? limits.walkbackMax : 300,
+    walkback: limits && Number.isFinite(limits.walkbackMax) ? Math.round(limits.walkbackMax) : 300,
     los: limits && Number.isFinite(limits.losGapMax) ? limits.losGapMax : 10,
     slope: limits && Number.isFinite(limits.slopeMax) ? limits.slopeMax : 20,
   };
-  const metas = overlayMeta(lim).filter((m) => !m.raster || pack?.rasters[m.raster]);
-  const engineCredit = fieldsSource === 'server' ? 'Marswalk engine (hab server)' : fieldsSource === 'engine' ? 'Marswalk engine (in-browser)' : 'Distance estimate (engine offline)';
-  const presetIds = Object.keys(PRESETS) as PresetId[];
+  const [lo, hi] = demRange(pack);
+  const sun = sunAtLtst(ls, start, m.grid.centerLonLat[1]);
+  const base = m.shelters.find((s) => s.id === evaBase);
+  const baseName = base ? (/\(([^)]+)\)\s*$/.exec(base.name)?.[1] ?? base.id) : 'the base';
+  const ov = (id: OverlayId) => ({ on: overlays.includes(id), toggle: () => toggleOverlay(id), overlay: true });
+  const vec = (id: VectorId) => ({ on: vectors[id], toggle: () => toggleVector(id) });
+  const engine = 'Marswalk engine · from the DTM and the flight rules';
+
+  const mars: LayerRow[] = [
+    ...(m.imagery.length ? [{ key: 'imagery', name: 'Colour imagery', what: 'True-colour photo of the ground (base map).', source: provLine(m.imagery[0].provenance), ...vec('imagery') }] : []),
+    { key: 'relief', name: 'Lighting at EVA start', what: `Sun direction/elevation at the planned start time (${fmtLtst(start)}: from ${Math.round(sun.azDeg)}°, ${Math.round(sun.elevDeg)}° up), shaded from the DTM normals.`, source: provLine(R.normals?.provenance ?? R.dem?.provenance), ...vec('relief') },
+    { key: 'elevation', name: 'Elevation', unit: 'm', what: 'Height above the Mars datum: dark blue = low, white = high.', source: provLine(R.dem?.provenance), legend: { ramp: elevationRamp(lo, hi), min: lo, max: hi, ticks: [[lo, `${lo} m`], [(lo + hi) / 2, `${Math.round((lo + hi) / 2)}`], [hi, `${hi} m`]] }, ...ov('elevation') },
+    { key: 'slope', name: 'Slope', unit: '°', what: `How steep the ground is. Red = ${lim.slope}° and steeper (NASA suited-walking limit).`, source: provLine(R.slope?.provenance), legend: { ramp: SLOPE_RAMP, min: 0, max: 35, ticks: [[0, '0°'], [10, '10°'], [lim.slope, `${lim.slope}°`], [35, '35°']], mark: { at: lim.slope, label: `${lim.slope}°` } }, ...ov('slope') },
+    ...(R.rough ? [{ key: 'rough', name: 'Surface roughness', unit: 'm', what: 'Metre-scale bumpiness (rocks, ridges) inside each 5 m cell, from the 1 m DTM. White = rough.', source: provLine(R.rough.provenance), legend: { ramp: ROUGH_RAMP, min: 0, max: 0.5, ticks: [[0, '0 m'], [0.2, '0.2'], [0.5, '0.5 m']] as [number, string][] }, ...ov('rough') }] : []),
+    ...(R.ti ? [{ key: 'ti', name: 'Thermal inertia', unit: 'J m⁻² K⁻¹ s⁻½', what: 'Loose sand (low) ↔ rock (high): sand makes walking slower and costlier.', source: provLine(R.ti.provenance), badge: R.ti.indicative ? 'Indicative' : undefined, legend: { ramp: TI_RAMP, min: 50, max: 700, ticks: [[50, 'sand 50'], [400, '400'], [700, '700 rock']] as [number, string][] }, ...ov('ti') }] : []),
+  ];
+  const safety: LayerRow[] = [
+    { key: 'outline', name: 'Safe walking area', what: 'Outline of ground that meets every hard flight rule at once.', source: engine, ...vec('outline') },
+    { key: 'walkback', name: 'Walk-back time', unit: 'min', what: `Time out plus a slow (half-pace) walk back to ${baseName}; hidden beyond ${lim.walkback} min.`, source: engine, legend: { ramp: { id: 'wb', stops: TIME_RAMP.stops.map(([v, c]) => [v * (lim.walkback / 30), c]) }, min: 0, max: lim.walkback, ticks: [[0, '0'], [lim.walkback / 2, `${Math.round(lim.walkback / 2)}`], [lim.walkback, `${lim.walkback} min`]] }, ...ov('walkback') },
+    { key: 'shelter', name: 'Time to shelter', unit: 'min', what: `Walking minutes to the nearest hab or pressurized rover; hidden beyond the ${lim.shelter}-min limit.`, source: engine, legend: { ramp: TIME_RAMP, min: 0, max: lim.shelter, ticks: [[0, '0'], [lim.shelter / 2, `${lim.shelter / 2}`], [lim.shelter, `${lim.shelter} min`]] }, ...ov('shelter') },
+    { key: 'los', name: 'Radio coverage (line of sight to Hab-1 / PR-1)', unit: 'min', what: 'Cyan = direct radio line of sight to the hab mast or rover relay; darker = longer out of contact (round trip).', source: `${engine} (terrain viewshed)`, legend: { ramp: LOS_RAMP, min: 0, max: 30, ticks: [[0, 'in contact'], [lim.los, `${lim.los} min`], [30, '30 min']] }, ...ov('los') },
+  ];
+  const features: LayerRow[] = [
+    { key: 'stations', name: 'Science targets', what: `${m.stations.length} real Curiosity sites, ranked by science priority.`, source: 'MSL (Curiosity) mission sites', ...vec('stations') },
+    ...(m.traverse ? [{ key: 'traverse', name: 'Curiosity traverse', what: "The rover's real drive path (dotted line).", source: provLine(m.traverse.provenance as Provenance | Provenance[]), ...vec('traverse') }] : []),
+    { key: 'keepouts', name: 'Keep-out zones', what: 'Red hatch: landing-plume and hazard zones a route may not enter.', source: 'Scenario (mission rules)', ...vec('keepouts') },
+    { key: 'shelters', name: 'Habitat & rover', what: 'Square = Hab-1 · diamond = pressurized rover PR-1 (drag to move).', source: 'Scenario placements', ...vec('shelters') },
+  ];
+  const nOn = overlays.filter((o) => o !== 'safezone').length;
 
   return (
-    <div className="flex max-h-[min(640px,calc(100vh-200px))] w-[340px] flex-col">
-      <div className="p-3">
-        <div className="eyebrow px-1 pb-2">Map view</div>
-        <div className="grid grid-cols-5 gap-1" role="radiogroup" aria-label="Map view">
-          {presetIds.map((p, i) => (
-            <button
-              key={p}
-              role="radio"
-              aria-checked={preset === p}
-              data-testid={`preset-${p}`}
-              onClick={() => applyPreset(p)}
-              title={`${PRESETS[p].hint} (${i})`}
-              className={cx('flex h-11 flex-col items-center justify-center rounded-[6px] font-display text-[11px] uppercase tracking-[0.1em] transition-colors', preset === p ? 'bg-cyan/15 text-cyan' : 'text-ink-2 hover:bg-raised hover:text-ink')}
-            >
-              {PRESETS[p].label}
-              <span className="num text-[9px] opacity-50">{i}</span>
-            </button>
-          ))}
-        </div>
-        <div data-testid="preset-legend" className="mt-2.5 rounded-[6px] bg-sunk/70 px-3 py-2 text-[12px] leading-snug text-ink-2">
-          <span className="text-ink">{PRESETS[preset].hint}.</span> {PRESETS[preset].legend}
-        </div>
+    <div data-testid="layers-panel" className="flex max-h-[min(680px,calc(100vh-180px))] w-[380px] flex-col">
+      <div className="flex items-baseline justify-between px-4 py-2.5">
+        <span className="eyebrow !text-[12px]">Layers</span>
+        <span className={cx('num text-[11px]', nOn >= OVERLAY_LIMIT ? 'text-ink' : 'text-dim')} data-testid="layers-limit">{nOn}/{OVERLAY_LIMIT} colour layers</span>
       </div>
-      <button onClick={() => setAll((v) => !v)} className="flex items-center justify-between px-4 py-2.5 text-left text-[12px] text-mute hover:text-ink" aria-expanded={all}>
-        <span>All layers</span>
-        <span className="num">{all ? '−' : '+'}</span>
-      </button>
-      {all && (
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-          <div className="eyebrow pb-1 pt-1">Overlays <span className="num normal-case tracking-normal text-dim">· up to {OVERLAY_LIMIT}</span></div>
-          {metas.map((m) => {
-            const on = overlays.includes(m.id);
-            const prov = m.raster ? pack?.manifest.rasters[m.raster]?.provenance : undefined;
-            const indicative = m.raster ? pack?.manifest.rasters[m.raster]?.indicative : false;
-            return (
-              <div key={m.id} className="py-2">
-                <div className="flex items-center gap-2.5">
-                  <Switch on={on} onChange={() => toggleOverlay(m.id)} label={m.label} tone={m.id === 'safezone' || m.id === 'los' ? 'cyan' : 'amber'} />
-                  <span className={cx('text-[12.5px]', on ? 'text-ink' : 'text-ink-2')}>{m.label}</span>
-                  {indicative && <Badge tone="ochre">Indicative</Badge>}
-                </div>
-                <AnimatePresence initial={false}>
-                  {on && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.16 }} className="overflow-hidden">
-                      <div className="flex flex-col gap-2 pl-[38px] pt-2">
-                        <div className="text-[11px] leading-snug text-mute">{m.what}</div>
-                        <Legend meta={m} />
-                        <div className="flex items-center gap-2">
-                          <span className="label !text-[9px] w-12">Opacity</span>
-                          <input className="mw-range" type="range" min={0.1} max={1} step={0.05} value={opacity[m.id]} onChange={(e) => setOpacity(m.id, Number(e.target.value))} aria-label={`${m.label} opacity`} />
-                          <span className="num w-8 text-right text-[10px] text-mute">{Math.round(opacity[m.id] * 100)}</span>
-                        </div>
-                        <div className="text-[10.5px] text-dim">{prov ? provLine(prov) : engineCredit}</div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-          <div className="eyebrow pb-1 pt-3">Map features</div>
-          {VECTORS.filter((v) => v.id !== 'traverse' || pack?.manifest.traverse).map((v) => (
-            <div key={v.id} className="py-1.5">
-              <label className="flex cursor-pointer items-center gap-2.5 text-[12.5px] text-ink-2 hover:text-ink">
-                <Switch size="sm" on={vectors[v.id]} onChange={() => toggleVector(v.id)} label={v.label} />
-                {v.label}
-              </label>
-              {vectors[v.id] && <div className="pl-[34px] pt-0.5 text-[11px] leading-snug text-dim">{v.legend}</div>}
-            </div>
-          ))}
-          {!!pack?.manifest.imagery.length && (
-            <label className="flex cursor-pointer items-center gap-2.5 py-1.5 text-[12.5px] text-ink-2 hover:text-ink">
-              <Switch size="sm" on={vectors.imagery} onChange={() => toggleVector('imagery')} label="Orthoimage" />
-              {pack.manifest.imagery[0].label}
-            </label>
-          )}
-          <div className="eyebrow pb-1 pt-3">Map key</div>
-          <SymbolLegend />
-          <div className="mt-3 flex items-center gap-2 text-[10.5px] text-dim"><Kbd>0</Kbd>–<Kbd>4</Kbd> map views</div>
-        </div>
-      )}
+      <div className="min-h-0 flex-1 overflow-y-auto pb-2">
+        <Group title="Mars data" rows={mars} />
+        <Group title="Safety analysis" sub="computed by Marswalk" rows={safety} />
+        <Group title="Mission features" rows={features} />
+      </div>
     </div>
   );
 }
+
 
 const KIND_ORDER = ['optical', 'topographic', 'thermal', 'atmospheric', 'radiation', 'space weather', 'traverse', 'imagery'];
 

@@ -11,6 +11,8 @@ import { expect, test, type Page } from '@playwright/test';
 type XY = [number, number];
 const SHOTS = fileURLToPath(new URL('../screens/ux5/', import.meta.url));
 mkdirSync(SHOTS, { recursive: true });
+const SHOTS6 = fileURLToPath(new URL('../screens/ux6/', import.meta.url));
+mkdirSync(SHOTS6, { recursive: true });
 
 const geo = <T>(page: Page, expr: string) => page.evaluate(expr) as Promise<T>;
 const station = (page: Page, id: string) => geo<XY>(page, `window.__mwTest.station(${JSON.stringify(id)})`);
@@ -142,7 +144,7 @@ test.describe('habitat console · real mouse and keyboard', () => {
     await drag(page, b0, to);
     await expect(page.getByTestId('dest-ST01')).toHaveCount(0);
     await expect(page.getByTestId('dest-P1')).toBeVisible();
-    await expect(page.getByTestId('dest-P1')).toContainText('Dropped pin');
+    await expect(page.getByTestId('dest-P1')).toContainText('Target of opportunity');
     const b1 = (await dest(page, 'B'))!;
     expect(Math.hypot(b1[0] - to[0], b1[1] - to[1])).toBeLessThan(8);
     // The map did not pan while the marker was dragged.
@@ -264,5 +266,124 @@ test.describe('habitat console · real mouse and keyboard', () => {
     await expect(page.getByTestId('directions')).toBeInViewport();
     await click(page, await find(page, 'flat'));
     await expect(page.getByTestId('place-card')).toBeInViewport();
+  });
+
+  test('12 · Layers: real data layers; Elevation and Slope show legends; at most 3 colour layers', async ({ page }) => {
+    await open(page);
+    await page.getByTestId('layers-button').click();
+    const panel = page.getByTestId('layers-panel');
+    await expect(panel).toBeVisible();
+    await expect(panel).not.toContainText('Calm');
+    for (const g of ['Mars data', 'Safety analysis', 'Mission features']) await expect(panel).toContainText(g);
+    for (const k of ['imagery', 'relief', 'elevation', 'slope', 'rough', 'ti', 'outline', 'walkback', 'shelter', 'los', 'stations', 'traverse', 'keepouts', 'shelters']) {
+      await expect(page.getByTestId(`layer-${k}`)).toBeVisible();
+    }
+    await expect(page.getByTestId('layer-ti')).toContainText('Indicative');
+    await expect(page.getByTestId('layer-ti')).toContainText('THEMIS');
+    await expect(page.getByTestId('layer-imagery')).toHaveAttribute('data-on', 'true');
+    await expect(page.getByTestId('layer-elevation').getByTestId('layer-legend')).toHaveCount(0);
+    await page.screenshot({ path: `${SHOTS6}layers-panel.png` });
+    // Elevation on → its colour ramp with min/max in metres.
+    await page.getByTestId('layer-elevation').getByRole('switch').click();
+    const elev = page.getByTestId('layer-elevation').getByTestId('layer-legend');
+    await expect(elev).toBeVisible();
+    await expect(elev).toContainText(/-\d+ m.*-\d+ m/);
+    await expect(page.locator('.mw-f-elevation')).toBeVisible();
+    await page.screenshot({ path: `${SHOTS6}elevation-on.png` });
+    // Slope on → legend with the 20° limit marked.
+    await page.getByTestId('layer-elevation').getByRole('switch').click();
+    await page.getByTestId('layer-slope').getByRole('switch').click();
+    const slope = page.getByTestId('layer-slope').getByTestId('layer-legend');
+    await expect(slope).toBeVisible();
+    await expect(slope).toContainText('20°');
+    await expect(page.getByTestId('layers-count')).toHaveText('1 on');
+    await page.screenshot({ path: `${SHOTS6}slope-on.png` });
+    // A 4th colour layer switches the oldest one off.
+    for (const k of ['rough', 'ti', 'shelter']) await page.getByTestId(`layer-${k}`).getByRole('switch').click();
+    await expect(page.getByTestId('layers-limit')).toHaveText('3/3 colour layers');
+    await expect(page.getByTestId('layer-slope')).toHaveAttribute('data-on', 'false');
+    await page.keyboard.press('Escape');
+    await expect(panel).toHaveCount(0);
+  });
+
+  test('13 · locator: Mars → Gale crater, both always shown; hover never switches; click collapses', async ({ page }) => {
+    await open(page);
+    const loc = page.getByTestId('locator');
+    await expect(page.getByTestId('locator-mars')).toBeVisible();
+    await expect(page.getByTestId('locator-gale')).toBeVisible();
+    await expect(page.getByTestId('locator-mars')).toContainText('Mars');
+    await expect(page.getByTestId('locator-gale')).toContainText('Gale');
+    await expect(loc).toContainText('Viking');
+    const box0 = (await loc.boundingBox())!;
+    const src0 = await loc.locator('img').evaluateAll((els) => els.map((e) => (e as HTMLImageElement).src));
+    // Hover over each view: nothing switches or resizes.
+    for (const t of ['locator-mars', 'locator-gale']) {
+      const b = (await page.getByTestId(t).boundingBox())!;
+      await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 4 });
+      await page.waitForTimeout(250);
+      expect(await loc.locator('img').evaluateAll((els) => els.map((e) => (e as HTMLImageElement).src))).toEqual(src0);
+      const box1 = (await loc.boundingBox())!;
+      expect([box1.width, box1.height]).toEqual([box0.width, box0.height]);
+    }
+    await loc.screenshot({ path: `${SHOTS6}locator.png` });
+    await page.mouse.move(box0.x - 200, box0.y - 200);
+    await page.getByTestId('locator-toggle').click();
+    await expect(page.getByTestId('locator-mars')).toHaveCount(0);
+    await page.getByTestId('locator-toggle').click();
+    await expect(page.getByTestId('locator-gale')).toBeVisible();
+  });
+
+  test('14 · NO-GO destination → "Closest safe point" → GO', async ({ page }) => {
+    await open(page);
+    const pr1 = await shelter(page, 'ROVER1');
+    const steep = (await find(page, 'steep', pr1, 260)) ?? (await find(page, 'steep'));
+    await page.mouse.click(steep[0], steep[1], { button: 'right' });
+    await page.getByTestId('map-context-menu').getByRole('menuitem', { name: 'Directions to here' }).click();
+    await expect(page.getByTestId('dest-reason-P1')).toBeVisible();
+    await expect(page.getByTestId('dest-reason-P1')).toContainText(/too steep/);
+    await expect(page.getByTestId('verdict-dest-reason')).toContainText(/too steep/);
+    await expect(page.getByTestId('fix-closest-P1')).toBeVisible();
+    await expect(page.getByTestId('verdict-fix-closest')).toBeVisible();
+    await page.screenshot({ path: `${SHOTS6}nogo-options.png` });
+    await page.getByTestId('fix-closest-P1').click();
+    const msg = page.getByTestId('fix-msg-P1');
+    await expect(msg).toHaveAttribute('data-status', 'found', { timeout: 60_000 });
+    await expect(msg).toHaveText(/^Closest safe point: \d+ m short of your pin\.$/);
+    await expect.poll(() => geo<XY | null>(page, 'window.__mwTest.suggestion()')).not.toBeNull();
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: `${SHOTS6}closest-safe-point.png` });
+    await page.getByTestId('fix-accept-P1').click();
+    await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+    await expect(page.locator('[data-testid^="dest-reason-"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid^="dest-P"]').first()).toContainText('Closest safe point');
+    await expect.poll(() => geo<XY | null>(page, 'window.__mwTest.suggestion()')).toBeNull();
+  });
+
+  test('15 · NO-GO from Hab-1 → "Move rover closer" → GO (or a clear message)', async ({ page }) => {
+    await open(page);
+    await page.getByTestId('from-select').click();
+    await page.getByTestId('from-opt-HAB').click();
+    await searchTo(page, 'Alta');
+    await expect(page.getByTestId('stayin-card')).toBeVisible();
+    await expect(page.getByTestId('dest-reason-ST01')).toBeVisible();
+    await expect(page.getByTestId('stage-from-rover')).toBeVisible(); // still offered
+    await page.getByTestId('verdict-fix-rover').click();
+    const msg = page.getByTestId('fix-msg-ST01');
+    await expect(msg).toHaveAttribute('data-status', /^(found|none)$/, { timeout: 75_000 });
+    if ((await msg.getAttribute('data-status')) === 'none') {
+      await expect(msg).toHaveText(/rover spot|park/);
+      return;
+    }
+    await expect(msg).toContainText("The rover's own drive route isn't planned by Marswalk.");
+    await expect.poll(() => geo<XY | null>(page, 'window.__mwTest.suggestion()')).not.toBeNull();
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: `${SHOTS6}rover-suggestion.png` });
+    const r0 = await shelter(page, 'ROVER1');
+    await page.getByTestId('verdict-fix-accept').click();
+    await expect(page.getByTestId('from-select')).toContainText('PR-1');
+    await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+    await expect(page.getByTestId('dest-reason-ST01')).toHaveCount(0);
+    const r1 = await shelter(page, 'ROVER1');
+    expect(Math.hypot(r1[0] - r0[0], r1[1] - r0[1])).toBeGreaterThan(3);
   });
 });

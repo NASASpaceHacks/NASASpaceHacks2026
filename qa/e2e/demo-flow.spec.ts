@@ -6,7 +6,7 @@ import { expect, test, type Page } from '@playwright/test';
  * The live pitch demo, end to end, on the real gale-v1 site pack with the real engine, driven through
  * the redesigned habitat console (① Plan → ② Send → ③ EVA live; docs/designs/console-ux.md):
  *   1 recommended plan on load, 0 clicks (rover-staged, GO) · 1b Hab-1 NO-GO explained → "Start from
- *   rover instead" · 1c rover drag · calm map + Layers presets · 2 "Why this area?" on the engine LOS
+ *   rover instead" · 1c rover drag · calm map + Layers panel · 2 "Why this area?" on the engine LOS
  *   field · 3 Review & send → Send to crew (package size) · 4 visor verifies Ed25519, A → ACK → EVA live
  *   (≤ 3 clicks) · 5 sim walks, crew card + timeline NOW · 6 ST04 station card, margins over time ·
  *   7 Radiation spike → v2 in 2 clicks → RETURN guidance · 8 drop link → AUTONOMOUS → restore → resync ·
@@ -170,18 +170,17 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     expect(log).toMatch(/Replanned after rover move: \d+ stations from PR-1/);
   });
 
-  await test.step('1d. Layers: presets bring their own legend; every layer is still reachable', async () => {
+  await test.step('1d. Layers: real data layers in groups; a layer shows its legend when on', async () => {
     await con.getByTestId('layers-button').click();
-    await con.getByTestId('preset-safety').click();
-    expect(await con$(con, (s) => ({ o: s.overlays, c: s.vectors.contours, k: s.vectors.keepouts }))).toEqual({ o: ['safezone', 'shelter'], c: true, k: true });
-    await expect(con.getByTestId('preset-legend')).toContainText(/minutes to shelter/);
+    await con.getByTestId('layer-shelter').getByRole('switch').click();
+    expect(await con$(con, (s) => s.overlays)).toEqual(['shelter']);
+    await expect(con.getByTestId('layer-shelter').getByTestId('layer-legend')).toContainText(/min/);
     await con.waitForTimeout(500);
     await shot(con, `${UX}03-layers-open.png`);
-    await con.getByText('All layers').click();
-    for (const l of ['Radio contact', 'Slope', 'Walk-back time', 'Keep-out zones', 'Curiosity traverse']) await expect(con.getByRole('dialog', { name: 'Map layers' }).getByText(l, { exact: true }).first()).toBeVisible();
+    for (const l of ['Radio coverage (line of sight to Hab-1 / PR-1)', 'Slope', 'Walk-back time', 'Keep-out zones', 'Curiosity traverse']) await expect(con.getByTestId('layers-panel').getByText(l, { exact: true }).first()).toBeVisible();
+    await con.getByTestId('layer-shelter').getByRole('switch').click(); // back to the calm view
     await con.keyboard.press('Escape');
-    await con.keyboard.press('0'); // back to the calm view
-    expect(await con$(con, (s) => [s.preset, s.overlays.length, s.layersOpen])).toEqual(['calm', 0, false]);
+    expect(await con$(con, (s) => [s.overlays.length, s.layersOpen])).toEqual([0, false]);
   });
 
   // ── 2 ────────────────────────────────────────────────────────────────────────────────────────────

@@ -66,7 +66,7 @@ export function Timeline() {
   if (!model || !plan) {
     return (
       <div className="flex h-full items-center px-5 text-[12.5px] text-mute">
-        {status === 'planning' ? 'Planning the walk…' : plan?.status === 'STAY_IN' ? 'No walk to show: nothing is safe from this base.' : 'No route yet'}
+        {status === 'planning' ? 'Planning the walk…' : plan?.status === 'STAY_IN' ? 'No walk to show: the chosen stops can’t be reached safely from this base.' : 'No route yet'}
       </div>
     );
   }

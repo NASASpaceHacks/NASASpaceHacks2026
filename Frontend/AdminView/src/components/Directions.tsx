@@ -6,6 +6,7 @@ import { landmarksIn } from '../lib/places';
 import { whyItMatters } from '../lib/science';
 import { useConsole } from '../store';
 import { cx } from './ui';
+import { WayForward } from './WayForward';
 
 const clean = (n: string) => n.replace(/\s*\([^)]*\)\s*$/, '');
 
@@ -58,7 +59,7 @@ export function DirectionsCard() {
     const targets: Hit[] = [...pack.manifest.stations]
       .filter((s) => !dests.includes(s.id))
       .sort((a, b) => b.value - a.value)
-      .map((s) => ({ key: s.id, kind: 'target' as const, title: clean(s.name), sub: `${s.id} · science value ${Math.round(s.value)} · ${whyItMatters(s as never)}`, pick: () => { addDestination(s.id); done(); } }));
+      .map((s) => ({ key: s.id, kind: 'target' as const, title: clean(s.name), sub: `Science target · value ${Math.round(s.value)} · ${s.dwellMin} min on site · ${whyItMatters(s as never)}`, pick: () => { addDestination(s.id); done(); } }));
     const marks: Hit[] = landmarks.map((l) => ({ key: `L-${l.name}`, kind: 'landmark' as const, title: l.name, sub: `Landmark · ${l.note}`, pick: () => { addPlace(l.cell, l.name); done(); } }));
     const bases: Hit[] = shelters
       .filter((s) => s.id !== evaBase)
@@ -111,8 +112,9 @@ export function DirectionsCard() {
             <div className="min-w-0 flex-1">
               <div className="truncate text-[15px] leading-tight text-ink">{clean(st.name)}</div>
               <div className={cx('text-[12.5px] leading-tight', reason ? 'text-red' : 'text-mute')} data-testid={reason ? `dest-reason-${st.id}` : undefined}>
-                {reason ? `Can't go here safely: ${reason}` : st.id.startsWith('ST') ? `${st.id} · science value ${Math.round(st.value)}` : 'Your stop'}
+                {reason ? `Can't go here safely: ${reason}` : st.id.startsWith('ST') ? `Science target · value ${Math.round(st.value)} · ${st.dwellMin} min on site` : 'Your stop'}
               </div>
+              {reason && !live && <WayForward destId={st.id} where="row" className="mt-1.5" />}
             </div>
             {!live && <button aria-label={`Remove ${st.id}`} data-testid={`dest-remove-${st.id}`} onClick={() => removeDestination(st.id)} className="h-7 w-7 shrink-0 text-[15px] text-mute hover:text-cyan">✕</button>}
           </div>

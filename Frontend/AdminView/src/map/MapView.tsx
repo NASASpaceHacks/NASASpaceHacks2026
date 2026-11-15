@@ -123,6 +123,22 @@ export function MapView() {
       if (px && (Math.abs(px[0] - p.px[0]) > 0.5 || Math.abs(px[1] - p.px[1]) > 0.5)) set({ mapPopover: { ...p, px: [px[0], px[1]] } });
     });
     ctrl.setHazards(s0.hazards);
+    // Way-forward suggestion (closest safe point / rover parking spot) on the map.
+    const syncFix = () => {
+      const f = get().fix;
+      if (!f || f.status !== 'found' || f.cell === undefined) return ctrl.setSuggestion(null);
+      const s = get();
+      const g0 = pack.manifest.grid;
+      const xy = cellToXY(g0, f.cell) as [number, number];
+      const st = [...pack.manifest.stations, ...s.customStops].find((x) => x.id === f.destId);
+      const m = (f.distM ?? 0) >= 1000 ? `${((f.distM ?? 0) / 1000).toFixed(1)} km` : `${f.distM} m`;
+      ctrl.setSuggestion(
+        f.kind === 'closest'
+          ? { kind: 'closest', xy, from: st ? [st.x, st.y] : undefined, label: `Closest safe point · ${m} short of ${f.destId.startsWith('P') ? 'your pin' : 'the target'}` }
+          : { kind: 'rover', xy, label: 'Suggested rover position (drive route not planned)' },
+      );
+      ctrl.reveal([xy, ...(st ? [[st.x, st.y] as [number, number]] : [])]);
+    };
 
     const subs = [
       useConsole.subscribe((s) => [s.startLtstMin, s.lsDeg] as const, applySun, { equalityFn: (a, b) => a[0] === b[0] && a[1] === b[1] }),
@@ -137,6 +153,7 @@ export function MapView() {
         equalityFn: (a, b) => a.every((v, i) => v === b[i]),
       }),
       useConsole.subscribe((s) => s.pickOnMap, (on) => ctrl.setPickMode(on)),
+      useConsole.subscribe((s) => s.fix, syncFix),
       useConsole.subscribe((s) => s.evaBase, (id) => ctrl.setBaseA(id)),
       useConsole.subscribe((s) => s.hazards, (h) => ctrl.setHazards(h)),
       useConsole.subscribe((s) => s.shelterCells, (cells) => Object.entries(cells).forEach(([id, c]) => ctrl.setShelter(id, c))),
@@ -167,6 +184,10 @@ export function MapView() {
       shelter: (id: string) => {
         const sh = pack.manifest.shelters.find((x) => x.id === id);
         return sh ? toClient(cellToXY(g, get().shelterCells[id] ?? sh.cell)) : null;
+      },
+      suggestion: () => {
+        const xy = ctrl.suggestionXY();
+        return xy ? toClient(xy) : null;
       },
       dest: (letter: string) => {
         const d = destMarkers().list.find((x) => x.letter === letter);

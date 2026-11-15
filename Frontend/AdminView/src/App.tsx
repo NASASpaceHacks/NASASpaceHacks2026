@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { applyPreset, boot, closeDetails, closeSheet, dismissMapUi, explainSafeZone, generatePlan, getMap, openDetails, openSheet, primaryAction, setMode, shutdown, startHazardPick } from './actions';
+import { boot, closeDetails, closeSheet, dismissMapUi, explainSafeZone, generatePlan, getMap, openDetails, openSheet, primaryAction, setMode, shutdown, startHazardPick } from './actions';
 import { get, set, useConsole } from './store';
 import { TopBar, Mark } from './components/TopBar';
 import { MapView } from './map/MapView';
@@ -13,7 +13,6 @@ import { SendSheet } from './components/SendSheet';
 import { ActionSheet } from './components/ActionSheet';
 import { AlertBanner } from './components/AlertBanner';
 import { Details } from './components/Details';
-import type { PresetId } from './lib/types';
 
 const SHORTCUTS: [string, string][] = [
   ['⏎', 'Primary action: Review & send · Send to crew'],
@@ -21,14 +20,11 @@ const SHORTCUTS: [string, string][] = [
   ['D', 'Details: report, rules, margins, sources'],
   ['S', 'Why this area? (safe-area explanation)'],
   ['E', 'Evidence: what we measure and assume'],
-  ['0–4', 'Map view: Calm · Safety · Science · Radio · Terrain'],
   ['G', 'Re-plan now'],
   ['H', 'EVA live: hazard reported (click the map)'],
   ['Z', 'Zoom to the route'],
   ['F', 'Fit the whole site'],
 ];
-
-const PRESET_KEYS: PresetId[] = ['calm', 'safety', 'science', 'radio', 'terrain'];
 
 function useShortcuts() {
   useEffect(() => {
@@ -68,7 +64,6 @@ function useShortcuts() {
       if (k === 'f') return getMap()?.fit();
       if (k === 'z') return getMap()?.fitRoute();
       if (k === 'h' && s.uiMode === 'live' && !s.sheet) return openSheet('hazard');
-      if (/^[0-4]$/.test(k)) return applyPreset(PRESET_KEYS[Number(k)]);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);

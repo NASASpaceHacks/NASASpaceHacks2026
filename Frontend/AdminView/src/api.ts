@@ -33,6 +33,8 @@ export interface Backend {
   /** Start solving a request now; a later identical `plan(req)` reuses the answer (first plan on load). */
   prefetchPlan?(req: PlanRequest): void;
   plan(req: PlanRequest): Promise<PlanBundle>;
+  /** Solve a "what if" request (no fields fetched): used to test way-forward candidates. */
+  tryPlan(req: PlanRequest): Promise<PlanResult>;
   /** Fire an operational event. `req` is the current request including accumulated events. */
   event(e: ConsoleEvent, req: PlanRequest): Promise<PlanBundle>;
   confirm(bundle: PlanBundle, req: PlanRequest, seq: number): Promise<ConfirmResult>;
@@ -242,6 +244,10 @@ export class HttpBackend implements Backend {
     return this.bundle(result, req);
   }
 
+  async tryPlan(req: PlanRequest): Promise<PlanResult> {
+    return json<PlanResult>('/api/plan', { method: 'POST', body: JSON.stringify(req) }, 20000);
+  }
+
   async event(e: ConsoleEvent, req: PlanRequest): Promise<PlanBundle> {
     const result = await json<PlanResult>('/api/events', { method: 'POST', body: JSON.stringify(e) }, 20000);
     return this.bundle(result, req);
@@ -310,6 +316,10 @@ export class MockBackend implements Backend {
     this.pack = mockSitePack(412, 600);
     this.visor.setPack(this.pack);
     return this.pack;
+  }
+
+  async tryPlan(req: PlanRequest): Promise<PlanResult> {
+    return (await this.plan(req)).result;
   }
 
   async plan(req: PlanRequest): Promise<PlanBundle> {

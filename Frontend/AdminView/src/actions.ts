@@ -6,10 +6,10 @@ import { detectBackend, type Backend } from './api';
 import { marsTime } from './lib/marsclock';
 import { baseInfo, defaultBase, relabel, shelterById, shortName } from './lib/base';
 import { engineConst } from './lib/engine';
-import type { ActionKind, ConsoleEvent, DetailsTab, LinkCtl, OverlayId, PlanBundle, PresetId, UiMode, VectorId } from './lib/types';
+import type { ActionKind, ConsoleEvent, DetailsTab, LinkCtl, OverlayId, PlanBundle, UiMode, VectorId } from './lib/types';
 import { buildZone, explainSteps, losGapSource, zoneLimits } from './lib/zone';
 import type { MapController } from './map/MapController';
-import { OVERLAY_LIMIT, PRESETS, get, log, pushAlert, set } from './store';
+import { OVERLAY_LIMIT, get, log, pushAlert, set } from './store';
 
 /**
  * "Must visit" pin: the request carries no hard must-visit field (contract frozen), so a pinned station
@@ -301,7 +301,7 @@ export function addPlace(cell: Cell, name = 'Dropped pin'): string {
   let n = 1;
   while (s.customStops.some((c) => c.id === `P${n}`)) n++;
   const [x, y] = cellToXY(g, cell);
-  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? `Dropped pin ${n}` : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
+  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? `Target of opportunity ${n}` : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
   set({ customStops: [...s.customStops, st], mapPopover: null });
   addDestination(st.id);
   return st.id;
@@ -320,7 +320,7 @@ function newPlace(cell: Cell, name = 'Dropped pin'): Station {
   let n = 1;
   while (s.customStops.some((c) => c.id === `P${n}`)) n++;
   const [x, y] = cellToXY(g, cell);
-  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? `Dropped pin ${n}` : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
+  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? `Target of opportunity ${n}` : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
   set({ customStops: [...s.customStops, st] });
   return st;
 }
@@ -347,7 +347,7 @@ export function moveDestination(id: string, cell: Cell) {
   const [x, y] = cellToXY(g, cell);
   const custom = s.customStops.find((c) => c.id === id);
   if (custom) {
-    const name = /^Dropped pin/.test(custom.name) ? custom.name : `Dropped pin ${id.slice(1)}`;
+    const name = /^Target of opportunity/.test(custom.name) ? custom.name : `Target of opportunity ${id.slice(1)}`;
     set({ customStops: s.customStops.map((c) => (c.id === id ? { ...c, cell, x, y, name } : c)), mapPopover: null, ctxMenu: null });
     scheduleReplan(`Replanned: ${id} moved`, 30);
     return;
@@ -355,6 +355,23 @@ export function moveDestination(id: string, cell: Cell) {
   const st = newPlace(cell);
   set({ mustVisit: { ...get().mustVisit, [st.id]: true } });
   applyDestinations(s.destinations.map((d) => (d === id ? st.id : d)), `Replanned: ${id} moved`);
+}
+
+/** Way forward: replace a destination with another spot (e.g. the closest safe point) and re-plan. */
+export function replaceDestination(id: string, cell: Cell, name: string) {
+  const s = get();
+  if (!s.destinations.includes(id)) return;
+  const g = s.pack!.manifest.grid;
+  const [x, y] = cellToXY(g, cell);
+  const custom = s.customStops.find((c) => c.id === id);
+  if (custom) {
+    set({ customStops: s.customStops.map((c) => (c.id === id ? { ...c, cell, x, y, name } : c)), mapPopover: null, ctxMenu: null });
+    scheduleReplan(`Replanned: ${id} moved to the closest safe point`, 10);
+    return;
+  }
+  const st = newPlace(cell, name);
+  set({ mustVisit: { ...get().mustVisit, [st.id]: true } });
+  applyDestinations(s.destinations.map((d) => (d === id ? st.id : d)), `Replanned: ${id} → closest safe point`);
 }
 
 /** "Choose on map" from the To field: crosshair, and the next map click sets that field. */
@@ -443,11 +460,6 @@ export function setStartLtst(min: number) {
 const fmtStart = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(Math.round(min % 60)).padStart(2, '0')}`;
 
 // ───────────────────────────── Display ─────────────────────────────
-
-export function applyPreset(p: PresetId) {
-  const pr = PRESETS[p];
-  set((s) => ({ preset: p, overlays: [...pr.overlays], vectors: { ...s.vectors, ...pr.vectors } }));
-}
 
 export function toggleOverlay(id: OverlayId) {
   set((s) => {
