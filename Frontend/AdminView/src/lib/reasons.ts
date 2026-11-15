@@ -24,7 +24,7 @@ export function useDestReason(): (id: string) => string | null {
       const at = [attemptPlan, attemptPin].find((a) => a?.destId === id && a.failure);
       if (at?.failure) return at.failure.reason;
       const st = [...pack.manifest.stations, ...customs].find((x) => x.id === id);
-      return dropReason(d, rules, st ? { pack, baseCell: base.cell, stopCell: st.cell } : undefined);
+      return dropReason(d, rules, st ? { pack, baseCell: base.cell, stopCell: st.cell, baseName: base.short } : undefined);
     },
     [plan, pack, base, rules, customs, attemptPlan, attemptPin],
   );

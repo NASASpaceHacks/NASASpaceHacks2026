@@ -185,7 +185,17 @@ export function MapView() {
       ctrl.reveal([xy, ...(st ? [[st.x, st.y] as [number, number]] : [])]);
     };
 
+    // Directions / add stop / clear: once the plan for the new stops arrives, zoom to the route (a NO-GO fits its own attempt).
+    let fitDests = get().destinations;
+    const fitOnNewStops = (plan: unknown, prev: unknown) => {
+      const dests = get().destinations;
+      if (!plan || plan === prev || dests === fitDests) return;
+      fitDests = dests;
+      if (dests.length) setTimeout(() => { if (!get().attemptPlan && !get().attemptPin) ctrl.fitRoute(450); }, 150);
+    };
+
     const subs = [
+      useConsole.subscribe((s) => s.plan, fitOnNewStops),
       useConsole.subscribe((s) => [s.startLtstMin, s.lsDeg] as const, applySun, { equalityFn: (a, b) => a[0] === b[0] && a[1] === b[1] }),
       useConsole.subscribe((s) => [s.overlays, s.opacity] as const, ([o, op]) => ctrl.setOverlays(o, op), { equalityFn: (a, b) => a[0] === b[0] && a[1] === b[1] }),
       useConsole.subscribe((s) => s.vectors, (v) => ctrl.setVectors(v)),
@@ -201,7 +211,7 @@ export function MapView() {
       useConsole.subscribe((s) => s.fix, syncFix),
       useConsole.subscribe((s) => [s.attemptPin, s.attemptPlan] as const, ([pin, pl], [, prevPl]) => {
         ctrl.setAttempt(pin ?? pl);
-        if (!pin && pl && pl !== prevPl) setTimeout(() => ctrl.fitRoute(450, [...pl.legs.flat(), ...(pl.failure?.runs.flat() ?? []), ...(pl.failure ? [pl.failure.labelCell] : [])]), 120); // after the plan's own first fit
+        if (!pin && pl && pl !== prevPl) setTimeout(() => ctrl.fitRoute(450, [...pl.legs.flat(), ...(pl.failure?.runs.flat() ?? [])], pl.failure ? [pl.failure.labelCell] : []), 120); // after the plan's own first fit
       }, { equalityFn: (a, b) => a[0] === b[0] && a[1] === b[1] }),
       useConsole.subscribe((s) => s.evaBase, (id) => ctrl.setBaseA(id)),
       useConsole.subscribe((s) => s.hazards, (h) => ctrl.setHazards(h)),

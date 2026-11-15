@@ -98,7 +98,7 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     await expect(con.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
     await expect(con.getByTestId('verdict-headline')).toHaveText(new RegExp(`^${s.order.length} stops · \\d h \\d\\d min`));
     for (const line of ['spare', 'weather', 'daylight', 'heat', 'limit']) await expect(con.locator(`[data-line="${line}"]`)).toBeVisible();
-    await expect(con.locator('[data-line="spare"]')).toContainText(/before the walk-back deadline/);
+    await expect(con.locator('[data-line="spare"]')).toContainText(/airlock \d\d:\d\d · latest safe return \d\d:\d\d/);
     await expect(con.locator('[data-line="limit"]')).toContainText(/^Limits: /);
     // Calm default map: no shading, contours, hatching or value labels until the officer asks.
     expect(s.overlays).toEqual([]);

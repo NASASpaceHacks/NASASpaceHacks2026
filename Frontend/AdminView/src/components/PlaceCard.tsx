@@ -118,8 +118,10 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
         <>
           <div className="pr-6 text-[16px] font-semibold leading-tight text-ink" data-testid="place-title">{custom ? custom.name : 'Dropped pin'}</div>
           {pv && (
-            <div className="num mt-1 text-[12px] leading-snug text-ink-2" data-testid="place-coords">
-              {lat(pv.lat)} {lon(pv.lon)} · elev {Number.isFinite(pv.elevM) ? Math.round(pv.elevM) : '—'} m · slope {Number.isFinite(pv.slopeDeg) ? Math.round(pv.slopeDeg) : '—'}°
+            <div className="num mt-1 flex flex-wrap gap-x-3 text-[12px] leading-snug text-ink-2" data-testid="place-coords">
+              <span className="whitespace-nowrap">{lat(pv.lat)} {lon(pv.lon)}</span>
+              <span className="whitespace-nowrap">elev {Number.isFinite(pv.elevM) ? Math.round(pv.elevM) : '—'} m</span>
+              <span className="whitespace-nowrap">slope {Number.isFinite(pv.slopeDeg) ? Math.round(pv.slopeDeg) : '—'}°</span>
             </div>
           )}
         </>

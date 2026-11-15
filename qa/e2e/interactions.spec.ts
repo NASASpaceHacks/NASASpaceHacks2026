@@ -72,7 +72,7 @@ test.describe('habitat console · real mouse and keyboard', () => {
     await expect(card).toBeVisible();
     await expect(card).toHaveAttribute('data-kind', 'terrain');
     await expect(page.getByTestId('place-title')).toHaveText('Dropped pin');
-    await expect(page.getByTestId('place-coords')).toHaveText(/^\d+\.\d{4}°[NS] \d+\.\d{4}°[EW] · elev -?\d+ m · slope \d+°$/);
+    await expect(page.getByTestId('place-coords')).toHaveText(/^\d+\.\d{4}°[NS] \d+\.\d{4}°[EW]\s*elev -?\d+ m\s*slope \d+°$/);
     await expect(page.getByTestId('place-safety')).toBeVisible();
     await page.screenshot({ path: `${SHOTS}place-card.png` });
     await page.getByTestId('place-directions').click();
@@ -356,10 +356,9 @@ test.describe('habitat console · real mouse and keyboard', () => {
     const steepReason = /too steep|on \d+° ground \(limit 20°\)|steeper than 20°/;
     await expect(page.getByTestId('dest-reason-P1')).toContainText(steepReason);
     await expect(page.getByTestId('verdict-dest-reason')).toContainText(steepReason);
-    await expect(page.getByTestId('fix-closest-P1')).toBeVisible();
+    // The closest-safe search starts by itself for a single destination.
     await expect(page.getByTestId('verdict-fix-closest')).toBeVisible();
     await page.screenshot({ path: `${SHOTS6}nogo-options.png` });
-    await page.getByTestId('fix-closest-P1').click();
     const msg = page.getByTestId('fix-msg-P1');
     await expect(msg).toHaveAttribute('data-status', 'found', { timeout: 60_000 });
     await expect(msg).toHaveText(/^Closest safe point: \d+ m short of your pin\.$/);

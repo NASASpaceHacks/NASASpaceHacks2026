@@ -86,6 +86,39 @@ const ROVER_GHOST_SVG =
     '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><rect x="8" y="8" width="14" height="14" transform="rotate(45 15 15)" fill="rgba(0,0,0,0.6)" stroke="#00e5ff" stroke-width="2" stroke-dasharray="3 2"/><circle cx="15" cy="15" r="2.5" fill="#00e5ff"/></svg>',
   );
 
+let attemptMap: OlMap | null = null;
+/** Markers the failure label must not cover: [x, y, extra height below the marker] in map coordinates. */
+let attemptObstacles: () => [number, number, number][] = () => [];
+
+/** Where the failure label sits around its stop: right, left, above, below; the first that covers no marker (else the one covering fewest). */
+function attemptSlot(f: FeatureLike): { align: 'left' | 'right' | 'center'; ox: number; oy: number } {
+  const g = (f as Feature).getGeometry?.() as Point | undefined;
+  const size = attemptMap?.getSize();
+  const at = g && attemptMap ? attemptMap.getPixelFromCoordinate(g.getCoordinates()) : null;
+  const right = { align: 'left' as const, ox: 24, oy: -12 };
+  if (!at || !size || !attemptMap) return right;
+  const w = String(f.get('label') ?? '').length * 7.4 + 18, h = 22;
+  // Box of each candidate, relative to the stop's pixel: [x0, y0, x1, y1].
+  const cands = [
+    { ...right, box: [24, -23, 24 + w, -1] },
+    { align: 'right' as const, ox: -24, oy: -12, box: [-24 - w, -23, -24, -1] },
+    { align: 'center' as const, ox: 0, oy: -50, box: [-w / 2, -61, w / 2, -39] },
+    { align: 'center' as const, ox: 0, oy: 34, box: [-w / 2, 23, w / 2, 45] },
+  ];
+  const marks = attemptObstacles().flatMap(([x, y, below]) => {
+    const px = attemptMap!.getPixelFromCoordinate([x, y]);
+    return px ? [[px[0] - at[0] - 15, px[1] - at[1] - 15, px[0] - at[0] + 15, px[1] - at[1] + 15 + below]] : [];
+  });
+  let best = cands[0], bestScore = Infinity;
+  for (const c of cands) {
+    const [x0, y0, x1, y1] = c.box;
+    let score = marks.filter((m) => x0 < m[2] && x1 > m[0] && y0 < m[3] && y1 > m[1]).length * 10;
+    if (at[0] + x0 < 8 || at[0] + x1 > size[0] - 8 || at[1] + y0 < 8 || at[1] + y1 > size[1] - 8) score += 5;
+    if (score < bestScore) (best = c, (bestScore = score));
+  }
+  return best;
+}
+
 function attemptStyle(f: FeatureLike): Style | Style[] {
   const k = f.get('k');
   if (k === 'leg') return new Style({ stroke: new Stroke({ color: 'rgba(255,43,214,0.45)', width: 3, lineDash: [7, 6], lineCap: 'round' }), zIndex: 1 });
@@ -98,7 +131,8 @@ function attemptStyle(f: FeatureLike): Style | Style[] {
     text: new Text({
       text: String(f.get('label') ?? ''),
       font: '700 14px "Barlow Condensed", sans-serif',
-      offsetY: -22,
+      // Beside the stop or pin (never on it): the lettered circle is 12 px, the pin 26 px wide and 36 tall.
+      ...(({ align, ox, oy }) => ({ textAlign: align, offsetX: ox, offsetY: oy }))(attemptSlot(f)),
       fill: new Fill({ color: '#ffffff' }),
       backgroundFill: new Fill({ color: 'rgba(0,0,0,0.88)' }),
       backgroundStroke: new Stroke({ color: '#ff3b30', width: 1.5 }),
@@ -144,26 +178,33 @@ const PIN_SVG =
   );
 
 function destStyle(f: FeatureLike): Style | Style[] {
+  if (!f.get('pin') && !f.get('dest')) return [];
   if (f.get('pin')) return new Style({ image: new Icon({ src: PIN_SVG, anchor: [0.5, 1], width: 26, height: 36, declutterMode: 'obstacle' }), zIndex: 10 });
   const bad = !!f.get('bad');
   const dragging = !!f.get('dragging');
   const color = bad ? '#ff3b30' : '#ff2bd6';
+  return new Style({
+    image: new CircleStyle({ radius: dragging ? 14 : 12, fill: new Fill({ color: '#000' }), stroke: new Stroke({ color, width: 2.5 }), declutterMode: 'obstacle' }),
+    text: new Text({ text: String(f.get('letter')), font: '700 13px "Barlow Condensed", sans-serif', fill: new Fill({ color: '#fff' }), declutterMode: 'none' }),
+    zIndex: 5,
+  });
+}
+
+/** A stop's name beside its letter. Lower priority than every marker, the start base and the failure label: it drops out instead of covering them. */
+function destNameStyle(f: FeatureLike): Style | Style[] {
+  if (!f.get('dest')) return [];
+  const bad = !!f.get('bad');
   const nm = String(f.get('name') ?? '');
   return [
-    new Style({
-      image: new CircleStyle({ radius: dragging ? 14 : 12, fill: new Fill({ color: '#000' }), stroke: new Stroke({ color, width: 2.5 }), declutterMode: 'obstacle' }),
-      text: new Text({ text: String(f.get('letter')), font: '700 13px "Barlow Condensed", sans-serif', fill: new Fill({ color: '#fff' }), declutterMode: 'none' }),
-      zIndex: 5,
-    }),
     new Style({
       text: new Text({
         text: nm.length > 26 ? `${nm.slice(0, 25)}…` : nm,
         font: '600 13px "Barlow Condensed", sans-serif',
-        offsetX: 18,
-        textAlign: 'left',
+        offsetY: 26, // under the letter: the route usually leaves a stop sideways
+        textAlign: 'center',
         fill: new Fill({ color: bad ? '#ff8a80' : '#ffffff' }),
         stroke: new Stroke({ color: 'rgba(0,0,0,0.85)', width: 3 }),
-        declutterMode: 'obstacle',
+        declutterMode: 'declutter',
       }),
       zIndex: 4,
     }),
@@ -215,6 +256,8 @@ export class MapController {
   private astronaut = createAstronautLayer();
   /** Route stops (lettered, draggable) and the temporary dropped pin. */
   private destLayer = new VectorLayer({ source: new VectorSource(), zIndex: 40, declutter: 'labels', style: destStyle });
+  /** Stop names: same source, a layer below the bases (30) and the failure label (39) so those always win. */
+  private destNameLayer = new VectorLayer({ source: this.destLayer.getSource()!, zIndex: 25, declutter: 'labels', style: destNameStyle });
   private destTranslate: Translate;
   private pickMode = false;
   /** Way-forward suggestion (closest safe point / rover parking spot). */
@@ -308,7 +351,7 @@ export class MapController {
     this.shelters.translate.on('translateend', () => this.cursor('grab'));
 
     const span = Math.max(ext[2] - ext[0], ext[3] - ext[1]);
-    const pad = span * 0.03;
+    const pad = 0; // never pan or zoom past the study area (no black void)
     this.map = new OlMap({
       target,
       controls: [],
@@ -330,6 +373,7 @@ export class MapController {
         this.shelters.layer,
         this.astronaut,
         this.attemptLayer,
+        this.destNameLayer,
         this.destLayer,
         this.suggestLayer,
       ],
@@ -344,6 +388,13 @@ export class MapController {
       }),
     });
 
+    attemptMap = this.map;
+    attemptObstacles = () => [
+      ...this.shelters.layer.getSource()!.getFeatures().map((f) => [...(f.getGeometry() as Point).getCoordinates(), 18] as [number, number, number]),
+      ...this.pack.manifest.stations.map((q) => [q.x, q.y, 0] as [number, number, number]),
+      ...this.extraStations.map((q) => [q.x, q.y, 0] as [number, number, number]),
+      ...this.destLayer.getSource()!.getFeatures().filter((f) => f.get('dest')).map((f) => [...(f.getGeometry() as Point).getCoordinates(), 0] as [number, number, number]),
+    ];
     this.offReadout = attachCursorReadout(this.map, g, { dem: pack.rasters.dem, slope: pack.rasters.slope }, (r) => this.cb.onReadout(r));
 
     this.map.on('singleclick', (e) => {
@@ -482,12 +533,27 @@ export class MapController {
     this.map.getView().fit([x0, y0, x0 + w, y0 + h], { padding: [0, 0, 0, 0], duration });
   }
 
-  /** Pixels to keep clear when fitting a route: the Directions card on the left, labels on the right, the scale strip below. */
+  /** Pixels to keep clear when fitting a route [top, right, bottom, left]: the Directions card on the left, the buttons and inset on the right, the scale strip below. */
   private fitPadding(): [number, number, number, number] {
     const vp = this.map.getViewport()?.getBoundingClientRect() ?? new DOMRect(0, 0, 1000, 700);
     const card = document.querySelector('[data-testid="directions"]')?.getBoundingClientRect();
-    const left = card && card.right > vp.left && card.right < vp.left + vp.width * 0.7 ? card.right - vp.left + 24 : 60;
-    return [90, 230, 90, left + 100];
+    const left = card && card.right > vp.left && card.right < vp.left + vp.width * 0.7 ? card.right - vp.left + 40 : 60;
+    return [110, 140, 120, left];
+  }
+
+  /** The most zoomed-out view allowed: the study area fills the map (no black void), as `fit` shows it. */
+  private coverResolution(): number {
+    const size = this.map.getSize();
+    const [ax0, ay0, ax1, ay1] = gridExtent(this.pack.manifest.grid);
+    return size && size[0] && size[1] ? Math.min((ax1 - ax0) / size[0], (ay1 - ay0) / size[1]) : Infinity;
+  }
+
+  /** Start base and the stop markers: what must stay in view when a route is too long to fit. */
+  private keyPoints(): [number, number][] {
+    const pts: [number, number][] = [];
+    for (const f of this.shelters.layer.getSource()!.getFeatures()) if (f.get('isA')) pts.push((f.getGeometry() as Point).getCoordinates() as [number, number]);
+    for (const f of this.destLayer.getSource()!.getFeatures()) if (f.get('dest') || f.get('pin')) pts.push((f.getGeometry() as Point).getCoordinates() as [number, number]);
+    return pts;
   }
 
   zoomBy(d: number) {
@@ -591,8 +657,11 @@ export class MapController {
     const out = a.legs[0] ?? [];
     if (out.length >= 2) src.addFeature(new Feature({ geometry: new LineString(routeCoords(g, out)), k: 'leg' }));
     const onOut = new Set(out);
+    // Whole-walk rules have no place on the route: mark them at the stop, not at the start.
+    const wholeWalk = ['eva_duration_max_min', 'heat_avg_max_w', 'walkback_speed_factor'].includes(a.failure.rule);
+    const stopCell = out.length ? out[out.length - 1] : a.failure.labelCell;
     const runs: number[][] = [];
-    for (const run of a.failure.runs) {
+    for (const run of wholeWalk ? [[stopCell]] : a.failure.runs) {
       if (!run.some((c) => onOut.has(c))) { runs.push(run); continue; } // return leg only: keep
       let cur: number[] = [];
       for (const c of run) {
@@ -605,7 +674,7 @@ export class MapController {
       if (run.length >= 2) src.addFeature(new Feature({ geometry: new LineString(routeCoords(g, run)), k: 'bad' }));
       else src.addFeature(new Feature({ geometry: new Point(cellToXY(g, run[0])), k: 'point' }));
     }
-    const xy = cellToXY(g, a.failure.labelCell);
+    const xy = cellToXY(g, wholeWalk ? stopCell : a.failure.labelCell);
     this.attemptLabelXY = xy;
     src.addFeature(new Feature({ geometry: new Point(xy), k: 'label', label: a.failure.short }));
   }
@@ -774,20 +843,43 @@ export class MapController {
 
   private routeCells: number[] = [];
 
-  /** Zoom to the current route and its stations (falls back to the whole AOI). */
-  fitRoute(duration = 450, cells: number[] = this.routeCells) {
+  /**
+   * Zoom to the current route, clear of the cards. Short routes zoom in; long ones never zoom out past the
+   * cover level (no black void): then the base, the stop(s) and `keep` (e.g. the failure label) stay in view
+   * and the route may run off-screen.
+   */
+  fitRoute(duration = 450, cells: number[] = this.routeCells, keep: number[] = []) {
     const g = this.pack.manifest.grid;
-    if (!cells.length) return this.fit(duration);
-    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    for (const c of cells) {
-      const [x, y] = cellToXY(g, c);
-      if (x < x0) x0 = x;
-      if (x > x1) x1 = x;
-      if (y < y0) y0 = y;
-      if (y > y1) y1 = y;
+    const size = this.map.getSize();
+    if (!cells.length || !size || !size[0]) return this.fit(duration);
+    const bounds = (pts: number[][]) => {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const [x, y] of pts) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+      return [x0, y0, x1, y1];
+    };
+    const key = [...this.keyPoints(), ...keep.map((c) => cellToXY(g, c) as [number, number])];
+    const [x0, y0, x1, y1] = bounds([...cells.map((c) => cellToXY(g, c)), ...key]);
+    const pad = Math.max(60, 0.05 * Math.max(x1 - x0, y1 - y0));
+    const [pt, pr, pb, pl] = this.fitPadding();
+    const availW = Math.max(120, size[0] - pl - pr), availH = Math.max(120, size[1] - pt - pb);
+    const view = this.map.getView();
+    const resFit = Math.max((x1 - x0 + 2 * pad) / availW, (y1 - y0 + 2 * pad) / availH);
+    const res = Math.max(view.getMinResolution(), Math.min(resFit, this.coverResolution()));
+    let [cx, cy] = [(x0 + x1) / 2, (y0 + y1) / 2];
+    if (resFit > res && key.length) {
+      // Doesn't fit at this zoom: centre on the base, stop(s) and label instead of the whole route.
+      const [kx0, ky0, kx1, ky1] = bounds(key);
+      [cx, cy] = [(kx0 + kx1) / 2, (ky0 + ky1) / 2];
     }
-    const pad = Math.max(100, 0.05 * Math.max(x1 - x0, y1 - y0));
-    this.map.getView().fit([x0 - pad, y0 - pad, x1 + pad, y1 + pad], { padding: this.fitPadding(), duration });
+    // Put that point in the middle of the free area (not the middle of the map).
+    const center = [cx - ((pl - pr) / 2) * res, cy + ((pt - pb) / 2) * res];
+    // Keep the window inside the study area (no black void), whatever the route does.
+    const [ax0, ay0, ax1, ay1] = gridExtent(g);
+    const clamp = (v: number, lo: number, hi: number) => (lo > hi ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, v)));
+    center[0] = clamp(center[0], ax0 + (size[0] * res) / 2, ax1 - (size[0] * res) / 2);
+    center[1] = clamp(center[1], ay0 + (size[1] * res) / 2, ay1 - (size[1] * res) / 2);
+    if (duration > 0) view.animate({ center, resolution: res, duration });
+    else { view.setResolution(res); view.setCenter(center); }
   }
 
   setPlan(plan: PlanResult | null, stateOf: (id: string) => { state: StationState; order?: number }) {

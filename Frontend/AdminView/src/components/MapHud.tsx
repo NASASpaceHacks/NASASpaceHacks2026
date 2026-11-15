@@ -146,7 +146,7 @@ function LayersButton() {
         data-testid="layers-button"
         onClick={() => set((s) => ({ layersOpen: !s.layersOpen, simOpen: false }))}
         aria-expanded={open}
-        className={cx('flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] transition-colors', open ? 'bg-[#1c2026]/95 text-ink' : 'bg-black text-ink-2 hover:text-ink')}
+        className={cx('flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] ring-1 ring-white/20 transition-colors', open ? 'bg-[#1c2026]/95 text-ink' : 'bg-black text-ink-2 hover:text-ink')}
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" aria-hidden>
           <path d="M8 2 L14.5 5.5 L8 9 L1.5 5.5 Z" />
@@ -212,7 +212,7 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
           onClick={() => { if (hasZone) void explainSafeZone(); }}
           aria-disabled={!hasZone}
           className={cx(
-            'flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] transition-colors',
+            'flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] ring-1 ring-white/20 transition-colors',
             explaining ? 'bg-cyan/20 text-cyan' : 'bg-black text-ink-2 hover:text-ink',
           )}
           title="Watch the safe area shrink one flight rule at a time (S)"

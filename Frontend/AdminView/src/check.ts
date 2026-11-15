@@ -23,7 +23,7 @@ export function attemptFor(req: PlanRequest, destId: string, source: 'pin' | 'pl
   if (!s.pack) return null;
   try {
     const at = attemptRoute(s.pack, req, destId);
-    return summarizeAttempt(s.pack, s.rules, at, destId, source, preferRule);
+    return summarizeAttempt(s.pack, s.rules, at, destId, source, preferRule, baseInfo(s.pack, s.evaBase, s.shelterCells).short);
   } catch (err) {
     console.warn('[console] attempted route failed', err);
     return null;
@@ -74,7 +74,7 @@ async function runPin() {
   const d = r.dropped.find((x2) => x2.id === id);
   const attempt = attemptFor(req, id, 'pin', d?.rule ?? r.binding?.rule);
   const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
-  const text = attempt?.failure ? cap(attempt.failure.reason) : d ? cap(dropReason(d, s.rules, { pack: s.pack, baseCell: baseInfo(s.pack, s.evaBase, s.shelterCells).cell, stopCell: pop.cell })) : (r.notes[r.notes.length - 1] ?? 'no safe plan');
+  const text = attempt?.failure ? cap(attempt.failure.reason) : d ? cap(dropReason(d, s.rules, { pack: s.pack, baseCell: baseInfo(s.pack, s.evaBase, s.shelterCells).cell, stopCell: pop.cell, baseName: baseInfo(s.pack, s.evaBase, s.shelterCells).short })) : (r.notes[r.notes.length - 1] ?? 'no safe plan');
   set({ pinCheck: { cell: pop.cell, destId: id, status: 'done', verdict: 'NO-GO', text, rule: d?.rule ?? attempt?.failure?.rule ?? r.binding?.rule }, attemptPin: attempt?.failure ? attempt : null });
 }
 

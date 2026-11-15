@@ -28,7 +28,11 @@ function VerdictCard() {
   const base = useBaseInfo();
   const [why, setWhy] = useState(false);
   const leftOut = useLeftOut();
-  const first = leftOut[0];
+  // Worst first: the stop that misses its limit by the most leads, and gets the way-forward buttons.
+  const sorted = useMemo(() => [...leftOut].sort((a, b) => b.deficit - a.deficit), [leftOut]);
+  const first = sorted[0];
+  const more = sorted.slice(1);
+  const dests = useConsole((s) => s.destinations);
   const attempt = useConsole((s) => s.attemptPlan);
   const v = useMemo(
     () => (plan && base ? verdictOf({ plan, pack, base, rules, events, startLtstMin: start, lsDeg: ls, lightMin: light }) : null),
@@ -65,6 +69,7 @@ function VerdictCard() {
         {st.word}
       </div>
       <div className="mt-0.5 break-words text-[clamp(14px,1.2vw,16px)] font-medium text-ink" data-testid="verdict-headline">{v.headline}</div>
+      {v.breakdown && <div className="mt-0.5 text-[12.5px] text-mute" data-testid="verdict-breakdown">{v.breakdown}</div>}
 
       {nogo ? (
         <>
@@ -78,7 +83,12 @@ function VerdictCard() {
                   {attempt.failure.marks}
                 </div>
               )}
-              <WayForward destId={first.id} where="verdict" className="mt-2" />
+              {more.map((m) => (
+                <div key={m.id} data-testid="verdict-dest-reason-more" className="mt-1 text-[13.5px] leading-snug text-ink-2">
+                  <span className="num text-red">{m.letter}</span> {m.name}: {m.reason}
+                </div>
+              ))}
+              <WayForward destId={first.id} where="verdict" auto={dests.length === 1} className="mt-2" />
             </div>
           )}
           {sentence && <div data-testid="stayin-reason" className="mt-3 text-[14px] leading-snug text-ink-2">{sentence}</div>}
@@ -114,6 +124,11 @@ function VerdictCard() {
               <div data-testid="verdict-dest-reason" className="text-[14px] leading-snug text-ink">
                 Left out: <span className="num text-red">{first.letter}</span> {first.name}: <span className="text-red">{first.reason}</span>
               </div>
+              {more.map((m) => (
+                <div key={m.id} data-testid="verdict-dest-reason-more" className="mt-1 text-[13.5px] leading-snug text-ink-2">
+                  Left out: <span className="num text-red">{m.letter}</span> {m.name}: {m.reason}
+                </div>
+              ))}
               <WayForward destId={first.id} where="verdict" className="mt-1.5" />
             </li>
           )}

@@ -50,7 +50,7 @@ export const RULE_PLAIN: Record<RuleId, string> = {
 };
 
 /** Where a dropped stop is, so a distance or slope rule can be stated in its own unit. */
-export interface DropCtx { pack: LoadedSitePack; baseCell: number; stopCell: number }
+export interface DropCtx { pack: LoadedSitePack; baseCell: number; stopCell: number; baseName?: string }
 
 const kmText = (m: number) => `${(m / 1000).toFixed(1)} km`;
 
@@ -73,11 +73,11 @@ export function dropReason(d: { rule: RuleId; deficitMin: number; text: string }
     case 'walk_radius_max_m': {
       if (!ctx) return 'beyond walking range of the base';
       const dist = cellDistM(ctx.pack.manifest.grid, ctx.baseCell, ctx.stopCell);
-      return `${kmText(dist)} from the base (limit ${kmText(ruleVal(rules, 'walk_radius_max_m', 2000))})`;
+      return `${kmText(dist)} from ${ctx.baseName ?? 'the base'} (limit ${kmText(ruleVal(rules, 'walk_radius_max_m', 2000))})`;
     }
     case 'shelter_time_max_min': {
       const lim = ruleVal(rules, 'shelter_time_max_min', 30);
-      return by ? `${Math.round(d.deficitMin + lim)} min from shelter (limit ${lim})` : 'too far from shelter';
+      return by ? `${Math.round(d.deficitMin + lim)} min from the nearest shelter (limit ${lim} min)` : 'too far from shelter';
     }
     case 'los_gap_max_min': return by ? `out of radio contact ${n} min too long` : 'out of radio contact too long';
     case 'eva_duration_max_min': return by ? `doesn't fit the EVA time (+${n} min)` : "doesn't fit the EVA time";
@@ -147,6 +147,8 @@ export interface VerdictLine {
 export interface Verdict {
   status: 'GO' | 'CAUTION' | 'NO-GO';
   headline: string;
+  /** Where the headline's time goes: airlock, walking, stops (same total). */
+  breakdown?: string;
   lines: VerdictLine[];
   spareMin: number;
   deadlineLtst: number | null;
@@ -181,13 +183,25 @@ export function verdictOf(args: {
     ? `Return to ${p.segments[p.segments.length - 1] ? endName(p, base) : base.short} · ${hm(back - (p.segments[0]?.t0Min ?? 0))}`
     : `${p.order.length} stop${p.order.length === 1 ? '' : 's'} · ${hm(p.totals.durationMin)} · ${(p.totals.distM / 1000).toFixed(1)} km`;
 
+  let breakdown: string | undefined;
+  if (!ret && p.segments.length) {
+    const t0 = p.segments[0].t0Min;
+    const stops = p.stops.reduce((a, st) => a + (st.departMin - st.arriveMin), 0);
+    const outside = back - t0;
+    const airlock = p.totals.durationMin - outside;
+    const rests = restsOf(p);
+    breakdown = `Airlock ${hm(airlock)} · walking ${hm(Math.max(0, outside - stops))}${rests.min >= 1 ? ` (incl. ${hm(rests.min)} rests)` : ''} · at stops ${hm(stops)}`;
+  }
+
   if (p.status !== 'OK' && !ret) return { status: 'NO-GO', headline: `No safe walk from ${base.short}`, lines, spareMin: NaN, deadlineLtst: null };
 
   if (Number.isFinite(spare)) {
+    const backAt = fmtLtst(evaLtst(startLtstMin, back));
+    const latest = dl !== null ? fmtLtst(evaLtst(startLtstMin, dl)) : null;
     lines.push({
       key: 'spare', tone: spare < 15 ? 'act' : spare < 30 ? 'watch' : 'ok',
-      text: `Back ${hm(spare)} before the walk-back deadline`,
-      sub: dl !== null ? `Back at ${base.short} ${fmtLtst(evaLtst(startLtstMin, back))}; the latest safe return is ${fmtLtst(evaLtst(startLtstMin, dl))} (Mars local time).` : undefined,
+      text: latest ? `Back at the ${base.short} airlock ${backAt} · latest safe return ${latest}` : `Back ${hm(spare)} before the EVA time limit`,
+      sub: `${hm(spare)} to spare (Earth minutes). Clock times are Mars local time, where a minute is 2.7 % longer, so the clock gap reads a little shorter. The latest safe return is when the crew must reach the airlock door.`,
     });
   }
   const sw = spaceWeatherLine(pack, startLtstMin, events, args.lightMin);
@@ -220,7 +234,7 @@ export function verdictOf(args: {
   }
 
   const worst = lines.some((l) => l.tone === 'act') || lines.some((l) => l.key !== 'limit' && l.tone === 'watch');
-  return { status: worst ? 'CAUTION' : 'GO', headline, lines, spareMin: spare, deadlineLtst: dl !== null ? evaLtst(startLtstMin, dl) : null };
+  return { status: worst ? 'CAUTION' : 'GO', headline, breakdown, lines, spareMin: spare, deadlineLtst: dl !== null ? evaLtst(startLtstMin, dl) : null };
 }
 
 function endName(p: PlanResult, base: BaseInfo): string {

@@ -1,6 +1,7 @@
 import type { BurndownPoint, Check, GridSpec, LoadedSitePack, Rule, RuleId, Segment } from '@mw/shared/contracts';
 import { cellDistM } from '@mw/shared/contracts';
 import type { AttemptResult } from '@mw/shared/engine';
+import { hm } from './plain';
 
 /**
  * The walk a NO-GO would have been: out and back to the stop over the cheapest walkable path, simulated with
@@ -67,6 +68,7 @@ export function summarizeAttempt(
   destId: string,
   source: 'pin' | 'plan',
   preferRule?: RuleId,
+  baseName = 'the base',
 ): AttemptView | null {
   const sim = at.sim;
   if (!sim || !at.los) return null;
@@ -167,27 +169,28 @@ export function summarizeAttempt(
         const first = (legs[0] ?? []).find((c) => cellDistM(g, base, c) > limit) ?? pick.atCell;
         failure = {
           rule: pick.rule, runs: point(first), labelCell: first, worst: w, limit, atMin: pick.atMin,
-          short: `${dist(w)} from the base (limit ${dist(limit)})`,
-          sentence: `The stop is ${dist(w)} from the base (limit ${dist(limit)})`,
-          reason: `${dist(w)} from the base (limit ${dist(limit)})`,
+          short: `${dist(w)} from ${baseName} (limit ${dist(limit)})`,
+          sentence: `The stop is ${dist(w)} from ${baseName} (limit ${dist(limit)})`,
+          reason: `${dist(w)} from ${baseName} (limit ${dist(limit)})`,
         };
         break;
       }
       case 'shelter_time_max_min':
         failure = {
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
-          short: `${Math.round(w)} min from shelter (limit ${limit})`,
-          sentence: `The farthest point is ${Math.round(w)} min from shelter (limit ${limit} min)`,
-          reason: `${Math.round(w)} min from shelter (limit ${limit})`,
+          short: `${Math.round(w)} min from shelter (limit ${limit} min)`,
+          sentence: `The farthest point is ${Math.round(w)} min from the nearest shelter (limit ${limit} min)`,
+          reason: `${Math.round(w)} min from the nearest shelter (limit ${limit} min)`,
         };
         break;
       case 'walkback_speed_factor': {
         const over = Math.max(1, Math.round(-pick.margin));
         failure = {
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
-          short: `Walk-back ${over} min too long`,
-          sentence: `The slow walk back from the stop would be ${over} min past the deadline`,
-          reason: `the slow walk back would be ${over} min past the deadline`,
+          // worst = time walked so far + the slow (contingency) walk back from here; limit = all walking time available.
+          short: `Out + slow walk back ${hm(w)} (limit ${hm(pick.limit)})`,
+          sentence: `Walking out and then walking back at contingency pace takes ${hm(w)}; the walking time available is ${hm(pick.limit)} (${over} min short)`,
+          reason: `walking out plus a slow walk back takes ${hm(w)} (limit ${hm(pick.limit)})`,
         };
         break;
       }
@@ -200,12 +203,15 @@ export function summarizeAttempt(
         };
         break;
       case 'eva_duration_max_min': {
-        const over = Math.max(1, Math.round(-pick.margin));
+        const evaLimit = pick.limit;
+        const restMin = segs.reduce((a, s) => a + s.restMin, 0);
+        const restTxt = restMin >= 1 ? `, including ${hm(restMin)} of cooling rests` : '';
         failure = {
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
-          short: `${over} min over the EVA time`,
-          sentence: `The walk runs ${over} min past the EVA time limit`,
-          reason: `the walk runs ${over} min past the EVA time limit`,
+          // worst = EVA end time including the airlock; limit = the EVA time limit (airlock included).
+          short: `EVA ${hm(w)} (limit ${hm(evaLimit)})`,
+          sentence: `The whole EVA, airlock included, would take ${hm(w)} (limit ${hm(evaLimit)})${restTxt}`,
+          reason: `the EVA would take ${hm(w)} with the airlock (limit ${hm(evaLimit)})${restTxt}`,
         };
         break;
       }

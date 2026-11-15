@@ -69,7 +69,7 @@ export function Timeline() {
   if (!model || !plan) {
     return (
       <div className="flex h-full items-center px-5 text-[12.5px] text-mute">
-        {status === 'planning' ? 'Planning the walk…' : plan?.status === 'STAY_IN' ? (attempt?.failure ? 'Not safe · dashed: the walk that was checked · red: where it breaks a rule' : 'Not safe · no walk to show from this base') : 'No route yet'}
+        {status === 'planning' ? 'Planning the walk…' : plan?.status === 'STAY_IN' ? (attempt?.failure ? 'Not safe · pink line: the walk that was checked · red: where it breaks a rule' : 'Not safe · no walk to show from this base') : 'No route yet'}
       </div>
     );
   }
@@ -93,7 +93,7 @@ export function Timeline() {
     <div data-testid="timeline" className="relative flex h-full flex-col px-5 pb-2.5 pt-2.5" aria-label="EVA timeline">
       <div className="flex items-center gap-4">
         <span className="eyebrow">EVA timeline</span>
-        <span className="num text-[11.5px] text-mute" title="Walk times are in Earth minutes; a Mars clock minute is about 2.7 % longer, so the clock span is a little shorter than the walk time.">Mars local time · {fmtLtst(start)} → {fmtLtst(evaLtst(start, plan.totals.durationMin))}</span>
+        <span className="num text-[11.5px] text-mute" title="Clock times are Mars local time. Durations are Earth minutes; a Mars clock minute is about 2.7 % longer, so the clock span is a little shorter than the walk time.">Mars clock · {fmtLtst(start)} → {fmtLtst(evaLtst(start, plan.totals.durationMin))}{endsAtBase && plan.totals.durationMin > back ? ` · ends after ${Math.round(plan.totals.durationMin - back)} min of airlock entry` : ''}</span>
         {live && (
           <span data-testid="timeline-delta" className={cx('num ml-1 text-[12.5px] font-medium', deltaTone || 'text-mute')}>
             {lastT === null ? 'Waiting for the crew to start' : `NOW ${fmtLtst(evaLtst(start, lastT))} · ${deltaText ?? '—'}`}
@@ -132,10 +132,10 @@ export function Timeline() {
           )}
           {/* spare time before the walk-back deadline */}
           {spare > 0 && (
-            <div className="mw-spare absolute inset-y-[6px] flex items-center justify-end rounded-r-[4px] pr-2" style={{ left: x(back), width: w(back, dl) }} title={`Spare time to get home: ${hm(spare)} before the walk-back deadline ${fmtLtst(evaLtst(start, dl))}`}>
+            <div className="mw-spare absolute inset-y-[6px] flex items-center justify-end rounded-r-[4px] pr-2" style={{ left: x(back), width: w(back, dl) }} title={`Back at the airlock ${fmtLtst(evaLtst(start, back))}; the latest safe return is ${fmtLtst(evaLtst(start, dl))} (Mars clock). ${hm(spare)} to spare (Earth minutes).`}>
               <span className="num truncate text-right text-[11.5px] leading-tight text-ok">
-                <span className="font-medium">{hmShort(spare)} before deadline</span>
-                {px(back + half, dl) > 190 && <span className="text-ok/70"> {fmtLtst(evaLtst(start, dl))}</span>}
+                <span className="font-medium">{hmShort(spare)} spare</span>
+                {px(back + half, dl) > 190 && <span className="text-ok/70"> · latest return {fmtLtst(evaLtst(start, dl))}</span>}
               </span>
             </div>
           )}

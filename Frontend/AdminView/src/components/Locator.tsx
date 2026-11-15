@@ -92,7 +92,10 @@ export function Locator() {
   const [ctx, setCtx] = useState<Context | null>(null);
   const sites = useConsole((s) => s.sites);
   const siteId = useConsole((s) => s.siteId);
-  const [open, setOpen] = useState(true);
+  const [open0, setOpen] = useState(true);
+  // A context menu open → the inset stays folded (it would compete with the menu); it comes back as it was.
+  const menu = useConsole((s) => !!s.ctxMenu);
+  const open = open0 && !menu;
   // Never sit on top of route content: fold to the header once a destination, place card or route exists, reopen when cleared.
   const busy = useConsole((s) => s.destinations.length > 0 || !!s.mapPopover || !!s.plan || !!s.attemptPin || !!s.attemptPlan);
   useEffect(() => { setOpen(!busy); }, [busy]);
@@ -139,7 +142,7 @@ export function Locator() {
     >
       <div className="flex items-center justify-between gap-2 px-2 py-1">
         <span className="eyebrow !text-[11px]">Where on Mars</span>
-        <button aria-label={open ? 'Collapse locator' : 'Expand locator'} aria-expanded={open} data-testid="locator-toggle" onClick={() => setOpen((o) => !o)} className="num h-5 w-5 text-[12px] text-cyan">{open ? '–' : '+'}</button>
+        <button aria-label={open ? 'Collapse locator' : 'Expand locator'} aria-expanded={open} data-testid="locator-toggle" onClick={() => setOpen(!open0)} className="num h-5 w-5 text-[12px] text-cyan">{open ? '–' : '+'}</button>
       </div>
       {open && (
         <>
