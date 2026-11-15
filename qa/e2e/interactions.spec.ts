@@ -353,7 +353,7 @@ test.describe('habitat console · real mouse and keyboard', () => {
     await page.mouse.click(steep[0], steep[1], { button: 'right' });
     await page.getByTestId('map-context-menu').getByRole('menuitem', { name: 'Directions to here' }).click();
     await expect(page.getByTestId('dest-reason-P1')).toBeVisible();
-    const steepReason = /too steep|on \d+° ground \(limit 20°\)|steeper than 20°/;
+    const steepReason = /too steep|on \d+° ground \(limit 20°|steeper than 20°/;
     await expect(page.getByTestId('dest-reason-P1')).toContainText(steepReason);
     await expect(page.getByTestId('verdict-dest-reason')).toContainText(steepReason);
     // The closest-safe search starts by itself for a single destination.

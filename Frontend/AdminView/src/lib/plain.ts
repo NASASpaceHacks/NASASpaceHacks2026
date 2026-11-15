@@ -1,6 +1,6 @@
 import type { FieldSet, LoadedSitePack, PlanEvent, PlanRequest, PlanResult, Rule, RuleId, Telem } from '@mw/shared/contracts';
 import { cellDistM } from '@mw/shared/contracts';
-import { evaLtst, fmtLtst, marsTime, sunAtLtst } from './marsclock';
+import { evaLtst, evaMinAt, fmtLtst, marsTime, sunAtLtst } from './marsclock';
 import { enlilRuns, forecastCheck, mergeDuplicates, nextLtstUtcMs, FORECAST_WINDOW_H } from './spaceweather';
 import { relabel, type BaseInfo } from './base';
 
@@ -19,6 +19,21 @@ export function hm(min: number): string {
   return h ? `${h} h ${String(m % 60).padStart(2, '0')} min` : `${m} min`;
 }
 
+/** Elapsed time since the start of the EVA, the way spacewalk timelines read: 61 → "+1:01". */
+export function pet(min: number): string {
+  if (!Number.isFinite(min)) return '—';
+  const m = Math.max(0, Math.round(min));
+  return `+${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
+}
+
+/** Unit a rule's margin is stated in. */
+const MARGIN_UNIT: Partial<Record<RuleId, string>> = {
+  shelter_time_max_min: 'min', walk_radius_max_m: 'm', heat_avg_max_w: 'W', slope_max_deg: '°', slope_soft_deg: '°',
+  eva_duration_max_min: 'min', los_gap_max_min: 'min', daylight_min_sun_elev_deg: '°', contingency_o2_min: 'min', egress_ingress_min: 'min', plume_keepout_m: 'm',
+  walkback_speed_factor: 'min',
+};
+const marginText = (id: RuleId, v: number) => (MARGIN_UNIT[id] === 'min' ? hm(v) : `${v < 10 ? v.toFixed(1) : Math.round(v)} ${MARGIN_UNIT[id] ?? ''}`.trim());
+
 /** Short form for tight places: "1 h 57", "42 min". */
 export function hmShort(min: number): string {
   if (!Number.isFinite(min)) return '—';
@@ -26,6 +41,9 @@ export function hmShort(min: number): string {
   const h = Math.floor(m / 60);
   return h ? `${h} h ${String(m % 60).padStart(2, '0')}` : `${m} min`;
 }
+
+/** A rule's name for the screen: spells out SEP once. */
+export const ruleLabel = (label: string) => label.replace('(SEP)', '(radiation storm, SEP)');
 
 const rule = (rules: Rule[], id: RuleId) => rules.find((r) => r.id === id);
 const ruleVal = (rules: Rule[], id: RuleId, d: number) => {
@@ -68,7 +86,7 @@ export function dropReason(d: { rule: RuleId; deficitMin: number; text: string }
       const lim = ruleVal(rules, 'slope_max_deg', 20);
       const at = ctx ? ctx.pack.rasters.slope?.[ctx.stopCell] : undefined;
       if (at === undefined) return 'too steep to reach';
-      return Number.isFinite(at) && at > lim ? `the spot is on ${Math.round(at)}° ground (limit ${lim}°)` : `every way there crosses ground steeper than ${lim}°`;
+      return Number.isFinite(at) && at > lim ? `the spot is on ${Math.round(at)}° ground (limit ${lim}°, ${Math.max(1, Math.round(at - lim))}° over)` : `every way there crosses ground steeper than ${lim}°`;
     }
     case 'walk_radius_max_m': {
       if (!ctx) return 'beyond walking range of the base';
@@ -179,29 +197,33 @@ export function verdictOf(args: {
   const dl = deadlineT(p);
   const spare = dl !== null ? dl - back : (p.margins.eva_duration_max_min?.min ?? NaN);
   const ret = p.order.length === 0 && p.segments.length > 0;
+  const lastSeg = p.segments[p.segments.length - 1];
+  const roundTrip = !!lastSeg && (lastSeg.to === 'HAB' || lastSeg.to === base.id);
   const headline = ret
     ? `Return to ${p.segments[p.segments.length - 1] ? endName(p, base) : base.short} · ${hm(back - (p.segments[0]?.t0Min ?? 0))}`
-    : `${p.order.length} stop${p.order.length === 1 ? '' : 's'} · ${hm(p.totals.durationMin)} · ${(p.totals.distM / 1000).toFixed(1)} km`;
+    : `${p.order.length} stop${p.order.length === 1 ? '' : 's'} · ${hm(p.totals.durationMin)} · ${(p.totals.distM / 1000).toFixed(1)} km${roundTrip ? ' round trip' : ''}`;
 
   let breakdown: string | undefined;
   if (!ret && p.segments.length) {
-    const t0 = p.segments[0].t0Min;
-    const stops = p.stops.reduce((a, st) => a + (st.departMin - st.arriveMin), 0);
-    const outside = back - t0;
-    const airlock = p.totals.durationMin - outside;
-    const rests = restsOf(p);
-    breakdown = `Airlock ${hm(airlock)} · walking ${hm(Math.max(0, outside - stops))}${rests.min >= 1 ? ` (incl. ${hm(rests.min)} rests)` : ''} · at stops ${hm(stops)}`;
+    // Whole minutes that add up exactly to the headline duration: airlock out + walking + at stops + airlock in.
+    const total = Math.round(p.totals.durationMin);
+    const out = Math.round(p.segments[0].t0Min);
+    const inn = Math.round(p.totals.durationMin - back);
+    const stops = Math.round(p.stops.reduce((a, st) => a + (st.departMin - st.arriveMin), 0));
+    const walking = Math.max(0, total - out - inn - stops);
+    breakdown = `Airlock out ${hm(out)} · walking ${hm(walking)} · at stops ${hm(stops)} · airlock in ${hm(inn)}`;
   }
 
   if (p.status !== 'OK' && !ret) return { status: 'NO-GO', headline: `No safe walk from ${base.short}`, lines, spareMin: NaN, deadlineLtst: null };
 
   if (Number.isFinite(spare)) {
-    const backAt = fmtLtst(evaLtst(startLtstMin, back));
-    const latest = dl !== null ? fmtLtst(evaLtst(startLtstMin, dl)) : null;
+    const backR = Math.round(back);
+    const latestR = dl !== null ? Math.round(dl) : null;
+    const spareR = latestR !== null ? latestR - backR : spare;
     lines.push({
       key: 'spare', tone: spare < 15 ? 'act' : spare < 30 ? 'watch' : 'ok',
-      text: latest ? `Back at the ${base.short} airlock ${backAt} · latest safe return ${latest}` : `Back ${hm(spare)} before the EVA time limit`,
-      sub: `${hm(spare)} to spare (Earth minutes). Clock times are Mars local time, where a minute is 2.7 % longer, so the clock gap reads a little shorter. The latest safe return is when the crew must reach the airlock door.`,
+      text: latestR !== null ? `Back at the airlock at ${pet(backR)} · latest safe return ${pet(latestR)} · ${hm(spareR).replace(/ /g, '\u00a0')}\u00a0spare` : `Back ${hm(spare)} before the EVA time limit`,
+      sub: `Times are elapsed from the start of the EVA (+h:mm, Earth time). ${pet(latestR ?? backR)} minus ${pet(backR)} is ${hm(spareR)}. Mars local time: back at the airlock ${fmtLtst(evaLtst(startLtstMin, back))}${dl !== null ? `, latest safe return ${fmtLtst(evaLtst(startLtstMin, dl))}` : ''}. The latest safe return is when the crew must reach the airlock door.`,
     });
   }
   const sw = spaceWeatherLine(pack, startLtstMin, events, args.lightMin);
@@ -212,7 +234,7 @@ export function verdictOf(args: {
   const endLtst = evaLtst(startLtstMin, p.totals.durationMin);
   if (dusk !== null) {
     const left = dusk - endLtst;
-    lines.push({ key: 'daylight', tone: left < 0 ? 'act' : left < 30 ? 'watch' : 'ok', text: `Daylight until ${fmtLtst(dusk)}`, sub: `Sun above ${minEl}° until ${fmtLtst(dusk)}; the crew is back in by ${fmtLtst(endLtst)}.` });
+    lines.push({ key: 'daylight', tone: left < 0 ? 'act' : left < 30 ? 'watch' : 'ok', text: `Daylight until ${fmtLtst(dusk)} Mars local (${pet(evaMinAt(startLtstMin, dusk))})`, sub: `Sun above ${minEl}° until ${fmtLtst(dusk)} Mars local; the crew is back in by ${fmtLtst(endLtst)} (${pet(p.totals.durationMin)}).` });
   }
 
   const heat = ruleVal(rules, 'heat_avg_max_w', 352);
@@ -230,7 +252,7 @@ export function verdictOf(args: {
     const what = `${lim.head[0].toLowerCase()}${lim.head.slice(1)}`;
     lines.push(tight
       ? { key: 'limit', tone: 'watch', text: `Limits: ${what}`, sub: lim.detail }
-      : { key: 'limit', tone: 'ok', neutral: true, text: `Tightest margin: ${what} (plenty of room)`, sub: lim.detail });
+      : { key: 'limit', tone: 'ok', neutral: true, text: `Tightest margin: ${what}, ${bm ? `${marginText(p.binding!.rule, bm.min)} to spare ` : ''}(plenty of room)`, sub: lim.detail });
   }
 
   const worst = lines.some((l) => l.tone === 'act') || lines.some((l) => l.key !== 'limit' && l.tone === 'watch');

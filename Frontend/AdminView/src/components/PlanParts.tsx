@@ -7,6 +7,7 @@ import { type BaseInfo } from '../lib/base';
 import { set, useConsole } from '../store';
 import { evaLtst, fmtLtst, sunAtLtst } from '../lib/marsclock';
 import { fmtRule } from '../lib/format';
+import { ruleLabel } from '../lib/plain';
 import { STM, goalById, objectiveById, objectiveCoverage, stationImage, whyItMatters, type Coverage } from '../lib/science';
 import { MineralLine } from './PlaceCard';
 import { Badge, SectionHead, Switch, Tip, cx } from './ui';
@@ -261,12 +262,12 @@ export function stayInSentence(base: BaseInfo): string | null {
 function RuleRow({ r }: { r: Rule }) {
   return (
     <div className={cx('flex items-center gap-2.5 border-b border-line/60 py-2 last:border-0', !r.enabled && 'opacity-50')}>
-      <Switch size="sm" on={r.enabled} onChange={(v) => updateRule(r.id, { enabled: v })} label={`Enable ${r.label}`} />
+      <Switch size="sm" on={r.enabled} onChange={(v) => updateRule(r.id, { enabled: v })} label={`Enable ${ruleLabel(r.label)}`} />
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-1.5">
           <RuleEvidence r={r} />
-          <Tip className="min-w-0" content={<><div className="text-ink">{r.label}</div><div className="mt-1.5">{r.citation}</div></>} side="left" width={320}>
-            <span className="block truncate text-[11.5px] text-ink-2 underline decoration-line-2 decoration-dotted underline-offset-[3px]">{r.label}</span>
+          <Tip className="min-w-0" content={<><div className="text-ink">{ruleLabel(r.label)}</div><div className="mt-1.5">{r.citation}</div></>} side="left" width={320}>
+            <span className="block truncate text-[11.5px] text-ink-2 underline decoration-line-2 decoration-dotted underline-offset-[3px]">{ruleLabel(r.label)}</span>
           </Tip>
           {r.assumption && !r.evidence && <Badge tone="ochre">Assumption</Badge>}
         </div>
@@ -288,7 +289,7 @@ function RuleRow({ r }: { r: Rule }) {
             if (Number.isFinite(v)) updateRule(r.id, { value: v });
           }}
           className="num h-6 w-[58px] rounded-[2px] border border-line-2 bg-sunk px-1.5 text-right text-[11px] text-ink focus:border-cyan/60 focus:outline-none"
-          aria-label={`${r.label} value`}
+          aria-label={`${ruleLabel(r.label)} value`}
           title={fmtRule(r.value, r.unit)}
         />
         <span className="num w-7 text-[10px] text-dim">{r.unit}</span>

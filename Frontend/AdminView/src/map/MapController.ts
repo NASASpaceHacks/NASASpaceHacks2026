@@ -119,6 +119,9 @@ function attemptSlot(f: FeatureLike): { align: 'left' | 'right' | 'center'; ox: 
   return best;
 }
 
+/** The walkable-area shading is a 5 m grid: below ~1 m/px (zoomed in on a route) it reads as blocky squares, so it steps aside. */
+const SAFE_SHADE_MIN_RES = 1;
+
 function attemptStyle(f: FeatureLike): Style | Style[] {
   const k = f.get('k');
   if (k === 'leg') return new Style({ stroke: new Stroke({ color: 'rgba(255,43,214,0.45)', width: 3, lineDash: [7, 6], lineCap: 'round' }), zIndex: 1 });
@@ -624,6 +627,7 @@ export class MapController {
       if (this.zone) {
         if (!this.safeCanvas) {
           this.safeCanvas = createCanvasFieldLayer(g, this.proj, this.safeColor());
+          this.safeCanvas.setMinResolution(SAFE_SHADE_MIN_RES);
           this.insertBelow(this.safeCanvas, this.aoi);
           this.setOverlays(this.overlayState.ids, this.overlayState.opacity);
         } else this.safeCanvas.setSource(canvasImageSource(g, this.proj, this.safeColor()));
@@ -766,6 +770,7 @@ export class MapController {
     }
     if (!this.safe) {
       this.safe = createFieldLayer({ grid: g, projection: this.proj, bands, style: safeZoneStyle({ ...this.vars, morph: 1 }), className: 'mw-f-safe' });
+      this.safe.setMinResolution(SAFE_SHADE_MIN_RES);
       this.insertBelow(this.safe, this.aoi);
     } else {
       setFieldBands(this.safe, g, this.proj, bands);

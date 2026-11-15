@@ -98,7 +98,7 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     await expect(con.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
     await expect(con.getByTestId('verdict-headline')).toHaveText(new RegExp(`^${s.order.length} stops · \\d h \\d\\d min`));
     for (const line of ['spare', 'weather', 'daylight', 'heat', 'limit']) await expect(con.locator(`[data-line="${line}"]`)).toBeVisible();
-    await expect(con.locator('[data-line="spare"]')).toContainText(/airlock \d\d:\d\d · latest safe return \d\d:\d\d/);
+    await expect(con.locator('[data-line="spare"]')).toContainText(/airlock at \+\d+:\d\d · latest safe return \+\d+:\d\d · .+ spare/);
     await expect(con.locator('[data-line="limit"]')).toContainText(/^Limits: /);
     // Calm default map: no shading, contours, hatching or value labels until the officer asks.
     expect(s.overlays).toEqual([]);
@@ -275,7 +275,7 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     await expect(con.getByTestId('crew-next')).toContainText(/^Next: /);
     for (const k of ['spare', 'shelter', 'o2', 'heat', 'link']) await expect(con.locator(`[data-testid="telemetry"] [data-key="${k}"]`)).toBeVisible();
     await expect(con.getByTestId('timeline-now')).toBeVisible();
-    await expect(con.getByTestId('timeline-delta')).toContainText(/NOW \d\d:\d\d · /);
+    await expect(con.getByTestId('timeline-delta')).toContainText(/NOW \+\d+:\d\d · /);
     const v = await vis$(vis, (s) => ({ display: s.display, next: s.next?.id, t: s.t }));
     console.log(`[5] TELEM flowing after ${timings.runToTelemMs} ms · visor ${v.display} → ${v.next} at T+${v.t.toFixed(1)} min`);
     expect(v.display).toBe('NAV');

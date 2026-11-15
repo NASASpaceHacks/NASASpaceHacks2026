@@ -157,11 +157,12 @@ export function summarizeAttempt(
         // 90 is the engine's marker for ground the map can't use at all (keep-out zone, no elevation data), not a slope.
         const unusable = w >= 90;
         const deg = Math.round(w);
+        const overTxt = `${Math.max(1, Math.round(w - limit))}° over`;
         failure = {
           rule: pick.rule, runs: runs.length ? runs : point(pick.atCell), labelCell: first[Math.floor(first.length / 2)], worst: w, limit, atMin: pick.atMin,
-          short: unusable ? "Ground the map can't use" : `Slope ${deg}° (limit ${limit}°)`,
-          sentence: unusable ? "The walk crosses ground the map can't use (a keep-out zone or no elevation data)" : `The ground reaches ${deg}° (limit ${limit}°)`,
-          reason: unusable ? "the walk crosses ground the map can't use (a keep-out zone or no elevation data)" : `the walk reaches ${deg}° ground (limit ${limit}°)`,
+          short: unusable ? "Ground the map can't use" : `Slope ${deg}° (limit ${limit}°, ${overTxt})`,
+          sentence: unusable ? "The walk crosses ground the map can't use (a keep-out zone or no elevation data)" : `The ground reaches ${deg}° (limit ${limit}°, ${overTxt})`,
+          reason: unusable ? "the walk crosses ground the map can't use (a keep-out zone or no elevation data)" : `the walk reaches ${deg}° ground (limit ${limit}°, ${overTxt})`,
         };
         break;
       }
@@ -205,13 +206,19 @@ export function summarizeAttempt(
       case 'eva_duration_max_min': {
         const evaLimit = pick.limit;
         const restMin = segs.reduce((a, s) => a + s.restMin, 0);
-        const restTxt = restMin >= 1 ? `, including ${hm(restMin)} of cooling rests` : '';
+        // Parts that add up to the headline: airlock + walking and stops + cooling rests (whole minutes, rounded once).
+        const outside = segs.length ? segs[segs.length - 1].t1Min - segs[0].t0Min : 0;
+        const totalM = Math.round(w);
+        const airlockM = Math.max(0, Math.round(w - outside));
+        const restsM = Math.min(Math.max(0, totalM - airlockM), Math.round(restMin));
+        const walkStopM = totalM - airlockM - restsM;
+        const restTxt = `: airlock ${hm(airlockM)}, walking and stops ${hm(walkStopM)}${restsM >= 1 ? `, cooling rests ${hm(restsM)}` : ''}`;
         failure = {
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
           // worst = EVA end time including the airlock; limit = the EVA time limit (airlock included).
-          short: `EVA ${hm(w)} (limit ${hm(evaLimit)})`,
-          sentence: `The whole EVA, airlock included, would take ${hm(w)} (limit ${hm(evaLimit)})${restTxt}`,
-          reason: `the EVA would take ${hm(w)} with the airlock (limit ${hm(evaLimit)})${restTxt}`,
+          short: `EVA ${hm(totalM)} (limit ${hm(evaLimit)})`,
+          sentence: `The whole EVA, airlock included, would take ${hm(totalM)} (limit ${hm(evaLimit)})${restTxt}`,
+          reason: `the EVA would take ${hm(totalM)} with the airlock (limit ${hm(evaLimit)})${restTxt}`,
         };
         break;
       }

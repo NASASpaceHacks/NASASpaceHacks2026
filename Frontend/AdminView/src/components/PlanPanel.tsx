@@ -28,8 +28,8 @@ function VerdictCard() {
   const base = useBaseInfo();
   const [why, setWhy] = useState(false);
   const leftOut = useLeftOut();
-  // Worst first: the stop that misses its limit by the most leads, and gets the way-forward buttons.
-  const sorted = useMemo(() => [...leftOut].sort((a, b) => b.deficit - a.deficit), [leftOut]);
+  // Same order as the Directions card (by letter), so both lists read alike.
+  const sorted = useMemo(() => [...leftOut].sort((a, b) => a.letter.localeCompare(b.letter)), [leftOut]);
   const first = sorted[0];
   const more = sorted.slice(1);
   const dests = useConsole((s) => s.destinations);

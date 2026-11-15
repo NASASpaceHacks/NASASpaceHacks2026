@@ -4,7 +4,7 @@ import { useConsole } from '../store';
 import { fmt } from '../lib/format';
 import { evaLtst, fmtLtst } from '../lib/marsclock';
 import { dropConsequence, objectiveCoverage } from '../lib/science';
-import { RULE_PLAIN, dropReason, hm, limitLine } from '../lib/plain';
+import { RULE_PLAIN, dropReason, hm, limitLine, ruleLabel } from '../lib/plain';
 import { Badge, Button, Empty, MarginBar, SectionHead, Stat, Tip } from './ui';
 import { RuleEvidence } from './Evidence';
 import { useDestReason } from '../lib/reasons';
@@ -86,7 +86,7 @@ export function ReportTab() {
         <SectionHead>{ok ? 'What limits this walk' : 'Why it failed'}</SectionHead>
         {ok && binding && (
           <div className="mt-2.5 rounded-[4px] border border-line-2 p-3.5">
-            <div className="font-display text-[19px] font-semibold leading-tight text-ink">{bindRule?.label ?? RULE_PLAIN[binding.rule]}</div>
+            <div className="font-display text-[19px] font-semibold leading-tight text-ink">{(bindRule ? ruleLabel(bindRule.label) : RULE_PLAIN[binding.rule])}</div>
             {lim && <div className="mt-1.5 text-[12.5px] leading-snug text-ink-2">{lim.head}. {lim.detail}</div>}
             <div className="mt-3 flex items-end gap-6">
               {bindMargin && <Stat label="Margin left" value={fmt.num(bindMargin.min, bindMargin.min < 10 ? 1 : 0)} unit={UNIT[binding.rule]} sub={`at +${Math.round(bindMargin.atMin)} min`} />}
@@ -99,13 +99,13 @@ export function ReportTab() {
           <div className="mt-2.5 rounded-[4px] border border-red/50 p-3.5" data-testid="report-why">
             {fail ? (
               <>
-                <div className="font-display text-[19px] font-semibold leading-tight text-red">{ruleOf(fail.rule)?.label ?? RULE_PLAIN[fail.rule]}</div>
+                <div className="font-display text-[19px] font-semibold leading-tight text-red">{ruleOf(fail.rule) ? ruleLabel(ruleOf(fail.rule)!.label) : RULE_PLAIN[fail.rule]}</div>
                 <div className="mt-1.5 text-[13px] leading-snug text-ink">{fail.sentence}, on the walk to {dest} and back. {fail.marks}</div>
               </>
             ) : first ? (
               <div className="text-[13px] leading-snug text-ink">{first.name}: {first.reason}.</div>
             ) : (
-              <div className="text-[13px] leading-snug text-ink">{binding ? (bindRule?.label ?? RULE_PLAIN[binding.rule]) : 'No walk from this base satisfies every hard rule.'}</div>
+              <div className="text-[13px] leading-snug text-ink">{binding ? (bindRule ? ruleLabel(bindRule.label) : RULE_PLAIN[binding.rule]) : 'No walk from this base satisfies every hard rule.'}</div>
             )}
             {bindRule && <div className="mt-2 text-[11px] leading-snug text-mute">{bindRule.citation}</div>}
           </div>
@@ -120,7 +120,7 @@ export function ReportTab() {
               <div className="mt-1 text-[12px] text-mute">The shortest walk from {base.short} to {dest} and back, checked against every hard rule.</div>
               <div className="mt-3 grid grid-cols-3 gap-x-3 gap-y-4">
                 <Stat label="Distance" value={(attempt.totals.distM / 1000).toFixed(2)} unit="km" sub="out and back" />
-                <Stat label="Time" value={hm(attempt.totals.durationMin)} sub={`${fmtLtst(startLtst)} → ${fmtLtst(evaLtst(startLtst, attempt.totals.durationMin + 30))}`} />
+                <Stat label="Time" value={hm(attempt.totals.durationMin)} sub="out and back, airlock not counted" />
                 <Stat label="Steepest ground" value={Math.round(attempt.totals.maxSlopeDeg)} unit="°" sub={`limit ${ruleOf('slope_max_deg')?.value ?? 20}°`} />
                 <Stat label="Out of radio contact" value={Math.round(attempt.totals.outOfContactMin)} unit="min" sub={`longest gap ${Math.round(attempt.totals.longestGapMin)} min`} tone={fail?.rule === 'los_gap_max_min' ? 'red' : undefined} />
                 <Stat label="Furthest from base" value={fmt.dist(attempt.totals.maxDistHabM)} sub={`limit ${fmt.dist(ruleOf('walk_radius_max_m')?.value ?? 2000)}`} />
@@ -150,7 +150,7 @@ export function ReportTab() {
           <SectionHead>Totals</SectionHead>
           <div className="mt-3 grid grid-cols-3 gap-x-3 gap-y-4">
             <Stat label="Distance" value={(plan.totals.distM / 1000).toFixed(2)} unit="km" sub={`max ${fmt.dist(plan.totals.maxDistHabM)} from ${base.short}`} />
-            <Stat label="Duration" value={fmt.dur(plan.totals.durationMin)} sub={`${fmtLtst(startLtst)} → ${fmtLtst(evaLtst(startLtst, plan.totals.durationMin))}`} />
+            <Stat label="Duration" value={fmt.dur(plan.totals.durationMin)} sub={`starts ${fmtLtst(startLtst)} Mars local, airlock included`} />
             <Stat label="Oxygen used" value={plan.totals.o2UsedPct.toFixed(0)} unit="%" sub="reserve not counted" />
             <Stat label="Energy" value={Math.round(plan.totals.energyKJ).toLocaleString()} unit="kJ" />
             <Stat label="Radiation dose" value={plan.totals.doseUSv.toFixed(0)} unit="µSv" sub={<Badge tone="ochre">Indicative</Badge>} />
@@ -168,7 +168,14 @@ export function ReportTab() {
       <section>
         <SectionHead>{ok ? 'Margin per rule' : 'Margin per rule on the attempted walk'}</SectionHead>
         <div className="mt-3 flex flex-col gap-3" data-testid="report-margins">
-          {margins.length === 0 && <div className="text-[12px] text-dim">No margins to show.</div>}
+          {margins.length === 0 && fail && (
+            <div className="flex items-baseline justify-between gap-2" data-testid="report-margin-fail">
+              <span className="text-[12px] text-ink-2">{ruleOf(fail.rule) ? ruleLabel(ruleOf(fail.rule)!.label) : RULE_PLAIN[fail.rule]}</span>
+              <span className="num text-[11.5px] text-red">{fail.short}</span>
+            </div>
+          )}
+          {margins.length === 0 && !fail && first && <div className="text-[12px] text-ink-2" data-testid="report-margin-fail">{first.name}: <span className="text-red">{first.reason}</span></div>}
+          {margins.length === 0 && !fail && !first && <div className="text-[12px] text-dim">No margins to show.</div>}
           {margins.map(([id, m]) => {
             const r = ruleOf(id);
             const limit = r?.value ?? 1;
@@ -179,7 +186,7 @@ export function ReportTab() {
                   <span className="flex min-w-0 items-center gap-1.5">
                     {r && <RuleEvidence r={r} />}
                     <Tip content={r?.citation ?? id} side="left" width={300}>
-                      <span className="text-[12px] text-ink-2">{r?.label ?? id}</span>
+                      <span className="text-[12px] text-ink-2">{r ? ruleLabel(r.label) : id}</span>
                     </Tip>
                   </span>
                   <span className={cx('num text-[11.5px]', over ? 'text-red' : 'text-ink')}>
@@ -206,7 +213,7 @@ export function ReportTab() {
                   <div className="flex items-baseline gap-2">
                     <span className="min-w-0 flex-1 truncate text-[12.5px] text-ink">{stationName(d.id)}</span>
                   </div>
-                  <div className="mt-1 text-[12px] text-ink-2">{reasonOf(d.id) ?? dropReason(d, rules)}{r ? <span className="text-dim"> · rule: {r.label}</span> : null}</div>
+                  <div className="mt-1 text-[12px] text-ink-2">{reasonOf(d.id) ?? dropReason(d, rules)}{r ? <span className="text-dim"> · rule: {ruleLabel(r.label)}</span> : null}</div>
                   <div className="mt-1 text-[11px] text-mute">{consequence}</div>
                 </div>
               );

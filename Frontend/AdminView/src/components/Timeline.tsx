@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { set, useConsole } from '../store';
 import { endpointLabel, useBaseInfo } from '../lib/base';
-import { evaLtst, evaMinAt, fmtLtst } from '../lib/marsclock';
-import { deadlineT, hm, hmShort, returnT, scheduleDelta } from '../lib/plain';
+import { evaLtst, fmtLtst } from '../lib/marsclock';
+import { deadlineT, hm, pet, returnT, scheduleDelta } from '../lib/plain';
 import { cx } from './ui';
 
 /**
@@ -73,7 +73,7 @@ export function Timeline() {
       </div>
     );
   }
-  const { half, back, dl, resumed, t1, label, order, tag, nameOf } = model;
+  const { back, dl, resumed, t1, label, order, tag, nameOf } = model;
   const x = (t: number) => `${(Math.max(0, Math.min(t1, t)) / t1) * 100}%`;
   const w = (a: number, b: number) => `${(Math.max(0, Math.min(t1, b) - Math.max(0, a)) / t1) * 100}%`;
   const firstSeg = plan.segments[0];
@@ -81,9 +81,12 @@ export function Timeline() {
     const last = plan.segments[plan.segments.length - 1];
     return !!last && (last.to === 'HAB' || last.to === base?.id);
   })();
-  // Hour ticks on the Mars clock, placed at their EVA minute (Mars minutes are 1.0275 Earth minutes).
-  const hours: { t: number; ltst: number }[] = [];
-  for (let h = Math.ceil(start / 60) * 60; evaMinAt(start, h) <= t1; h += 60) hours.push({ t: evaMinAt(start, h), ltst: h });
+  // Hour ticks in EVA elapsed time (Earth minutes from the start of the EVA).
+  const hours: { t: number }[] = [];
+  for (let h = 60; h <= t1; h += 60) hours.push({ t: h });
+  const outMin = firstSeg.from !== 'HERE' ? firstSeg.t0Min : 0;
+  const inMin = Math.max(0, plan.totals.durationMin - back);
+  const dlLabelPx = 175;
   const px = (a: number, b: number) => ((Math.min(t1, b) - Math.max(0, a)) / t1) * trackW;
   const spare = dl - back;
   const deltaText = delta === null ? null : delta.offRouteM > 60 ? `${Math.round(delta.offRouteM)} m off route` : Math.abs(delta.deltaMin) < 2 ? 'On plan' : delta.deltaMin > 0 ? `${Math.round(delta.deltaMin)} min ahead` : `${Math.round(-delta.deltaMin)} min behind`;
@@ -93,30 +96,30 @@ export function Timeline() {
     <div data-testid="timeline" className="relative flex h-full flex-col px-5 pb-2.5 pt-2.5" aria-label="EVA timeline">
       <div className="flex items-center gap-4">
         <span className="eyebrow">EVA timeline</span>
-        <span className="num text-[11.5px] text-mute" title="Clock times are Mars local time. Durations are Earth minutes; a Mars clock minute is about 2.7 % longer, so the clock span is a little shorter than the walk time.">Mars clock · {fmtLtst(start)} → {fmtLtst(evaLtst(start, plan.totals.durationMin))}{endsAtBase && plan.totals.durationMin > back ? ` · ends after ${Math.round(plan.totals.durationMin - back)} min of airlock entry` : ''}</span>
+        <span className="num text-[11.5px] text-mute" title={`The timeline counts Earth time from the start of the EVA (+h:mm). Mars local time: starts ${fmtLtst(start)}, ends ${fmtLtst(evaLtst(start, plan.totals.durationMin))}. A Mars clock minute is about 2.7 % longer than an Earth minute.`}>Starts {fmtLtst(start)} Mars local · ends {pet(plan.totals.durationMin)}</span>
         {live && (
           <span data-testid="timeline-delta" className={cx('num ml-1 text-[12.5px] font-medium', deltaTone || 'text-mute')}>
-            {lastT === null ? 'Waiting for the crew to start' : `NOW ${fmtLtst(evaLtst(start, lastT))} · ${deltaText ?? '—'}`}
+            {lastT === null ? 'Waiting for the crew to start' : `NOW ${pet(lastT)} · ${deltaText ?? '—'}`}
           </span>
         )}
         <span className="ml-auto flex items-center gap-4 text-[11px] text-mute">
           <span className="flex items-center gap-1.5"><span className="h-3 w-3 border border-magenta bg-black" />Stop</span>
           <span className="flex items-center gap-1.5"><span className="mw-rest h-3 w-3 rounded-[2px]" />Rest</span>
           <span className="flex items-center gap-1.5"><span className="h-3 w-[2px] bg-white" />Leave by</span>
-          <span className="flex items-center gap-1.5"><span className="h-3 w-0 border-l-2 border-dashed border-red" />Walk-back deadline</span>
+          <span className="flex items-center gap-1.5"><span className="h-3 w-0 border-l-2 border-dashed border-red" />Latest safe return</span>
         </span>
       </div>
 
       <div ref={trackRef} className="relative mt-2 flex-1">
         {/* hour grid */}
         {hours.map((h) => (
-          <div key={h.ltst} className="absolute bottom-[16px] top-0 w-px bg-line" style={{ left: x(h.t) }} />
+          <div key={h.t} className="absolute bottom-[16px] top-0 w-px bg-line" style={{ left: x(h.t) }} />
         ))}
 
         {/* leave-by ticks */}
         <div className="absolute inset-x-0 top-0 h-[18px]">
           {plan.bingo.filter((b) => b.id !== 'HAB' && order(b.id) > 0).map((b) => (
-            <div key={b.id} className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: x(b.tMin) }} title={`Leave ${nameOf(b.id)} by ${fmtLtst(b.ltstMin)}`}>
+            <div key={b.id} className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: x(b.tMin) }} title={`Leave ${nameOf(b.id)} by ${pet(b.tMin)} (${fmtLtst(b.ltstMin)} Mars local)`}>
               <span className="num text-[10px] leading-none text-white">{tag(b.id)}</span>
               <span className="mt-[2px] h-[7px] w-[1px] bg-white" />
             </div>
@@ -132,22 +135,21 @@ export function Timeline() {
           )}
           {/* spare time before the walk-back deadline */}
           {spare > 0 && (
-            <div className="mw-spare absolute inset-y-[6px] flex items-center justify-end rounded-r-[4px] pr-2" style={{ left: x(back), width: w(back, dl) }} title={`Back at the airlock ${fmtLtst(evaLtst(start, back))}; the latest safe return is ${fmtLtst(evaLtst(start, dl))} (Mars clock). ${hm(spare)} to spare (Earth minutes).`}>
+            <div className="mw-spare absolute inset-y-[6px] flex items-center justify-end rounded-r-[4px] pr-2" style={{ left: x(back), width: w(back, dl) }} title={`Back at the airlock at ${pet(back)} (${fmtLtst(evaLtst(start, back))} Mars local); latest safe return ${pet(dl)} (${fmtLtst(evaLtst(start, dl))} Mars local). ${hm(Math.round(dl) - Math.round(back))} spare.`}>
               <span className="num truncate text-right text-[11.5px] leading-tight text-ok">
-                <span className="font-medium">{hmShort(spare)} spare</span>
-                {px(back + half, dl) > 190 && <span className="text-ok/70"> · latest return {fmtLtst(evaLtst(start, dl))}</span>}
+                <span className="font-medium">{hm(Math.round(dl) - Math.round(back))} spare</span>
               </span>
             </div>
           )}
           {firstSeg.from !== 'HERE' && firstSeg.t0Min > 0.5 && (
-            <Block left={x(0)} width={w(0, firstSeg.t0Min)} tone="airlock" title={`Airlock out · ${Math.round(firstSeg.t0Min)} min`}>Airlock</Block>
+            <Block left={x(0)} width={w(0, firstSeg.t0Min)} tone="airlock" title={`Airlock out ${hm(outMin)} · +0:00 to ${pet(outMin)}`}>{px(0, outMin) >= 115 ? `Airlock out ${hm(outMin)}` : px(0, outMin) >= 60 ? `Airlock out\n${hm(outMin)}` : ''}</Block>
           )}
           {plan.segments.map((s, i) => {
             const restEnd = s.t1Min;
             const restStart = s.t1Min - s.restMin;
             return (
               <div key={i}>
-                <div className="absolute top-1/2 h-[4px] -translate-y-1/2 bg-magenta" style={{ left: x(s.t0Min), width: w(s.t0Min, s.t1Min) }} title={`Walk ${label(s.from, s.cells[0])} → ${label(s.to, s.cells[s.cells.length - 1])} · ${Math.round(s.t1Min - s.t0Min)} min · ${Math.round(s.distM)} m`} />
+                <div className="absolute top-1/2 h-[4px] -translate-y-1/2 bg-magenta" style={{ left: x(s.t0Min), width: w(s.t0Min, s.t1Min) }} title={`Walk ${label(s.from, s.cells[0])} → ${label(s.to, s.cells[s.cells.length - 1])} · ${Math.round(s.t1Min - s.t0Min)} min · ${Math.round(s.distM)} m · ${pet(s.t0Min)} to ${pet(s.t1Min)}`} />
                 {s.restMin > 0.05 && (
                   <div className="mw-rest absolute inset-y-[9px] rounded-[2px] border border-line-2" style={{ left: x(restStart), width: `max(4px, ${w(restStart, restEnd)})` }} title={`Rest${s.restMin >= 1 ? `s, ${Math.round(s.restMin)} min` : ', under a minute'} on this walk (suit heat)`} />
                 )}
@@ -164,7 +166,7 @@ export function Timeline() {
                 onClick={() => set({ selectedStation: st.id })}
                 className={cx('absolute inset-y-0 flex min-w-[6px] items-center gap-1 overflow-hidden px-1.5 text-left transition-colors', selected === st.id ? 'border border-cyan bg-cyan/20' : 'border border-magenta bg-black hover:bg-magenta/10')}
                 style={{ left: x(st.arriveMin), width: w(st.arriveMin, st.departMin) }}
-                title={`Stop ${n} · ${nameOf(st.id)} · ${dwell} min · arrive ${fmtLtst(evaLtst(start, st.arriveMin))}, leave ${fmtLtst(evaLtst(start, st.departMin))}${bingo ? ` · leave by ${fmtLtst(bingo.ltstMin)}` : ''}`}
+                title={`Stop ${n} · ${nameOf(st.id)} · ${dwell} min · arrive ${pet(st.arriveMin)} (${fmtLtst(evaLtst(start, st.arriveMin))} Mars local), leave ${pet(st.departMin)} (${fmtLtst(evaLtst(start, st.departMin))})${bingo ? ` · leave by ${fmtLtst(bingo.ltstMin)}` : ''}`}
               >
                 <span className="num text-[11px] font-semibold text-magenta">{n}</span>
                 {px(st.arriveMin, st.departMin) >= 50 && <span className="num truncate text-[11px] text-ink">{nameOf(st.id)}</span>}
@@ -173,12 +175,12 @@ export function Timeline() {
             );
           })}
           {endsAtBase && (
-            <Block left={x(back)} width={w(back, back + half)} tone="airlock" title={`Back in at ${base?.short} · airlock ${Math.round(half)} min`}>Back in</Block>
+            <Block left={x(back)} width={w(back, back + inMin)} tone="airlock" title={`Airlock in ${hm(inMin)} · ${pet(back)} to ${pet(back + inMin)} (back in at ${base?.short})`}>{px(back, back + inMin) >= 115 ? `Airlock in ${hm(inMin)}` : px(back, back + inMin) >= 60 ? `Airlock in\n${hm(inMin)}` : ''}</Block>
           )}
         </div>
 
         {/* walk-back deadline */}
-        <div className="pointer-events-none absolute bottom-[16px] top-[18px] border-l-2 border-dashed border-red" style={{ left: x(dl) }} title={`Walk-back deadline ${fmtLtst(evaLtst(start, dl))}`} />
+        <div className="pointer-events-none absolute bottom-[16px] top-[18px] border-l-2 border-dashed border-red" style={{ left: x(dl) }} title={`Latest safe return ${pet(dl)} (${fmtLtst(evaLtst(start, dl))} Mars local)`} />
 
         {/* now */}
         {lastT !== null && (
@@ -190,11 +192,11 @@ export function Timeline() {
 
         {/* axis */}
         <div className="absolute inset-x-0 bottom-0 h-[14px]">
-          <span className="num absolute left-0 text-[10px] text-mute">{fmtLtst(start)}</span>
-          {hours.filter((h) => h.t / t1 > 0.06).map((h) => (
-            <span key={h.ltst} className="num absolute -translate-x-1/2 text-[10px] text-dim" style={{ left: x(h.t) }}>{fmtLtst(h.ltst)}</span>
+          <span className="num absolute left-0 text-[10px] text-mute">{pet(0)}</span>
+          {hours.filter((h) => h.t / t1 > 0.06 && (dl - h.t) / t1 * trackW > dlLabelPx + 20).map((h) => (
+            <span key={h.t} className="num absolute -translate-x-1/2 text-[10px] text-dim" style={{ left: x(h.t) }}>{pet(h.t)}</span>
           ))}
-          <span className="num absolute -translate-x-1/2 whitespace-nowrap rounded-[3px] bg-black px-1 text-[10px] text-red" style={{ left: x(dl) }}>{fmtLtst(evaLtst(start, dl))}</span>
+          <span className="num absolute -translate-x-full whitespace-nowrap rounded-[3px] bg-black px-1 text-[10px] text-red" style={{ left: x(dl) }}>{pet(dl)} latest safe return</span>
         </div>
       </div>
     </div>
@@ -204,7 +206,7 @@ export function Timeline() {
 function Block({ left, width, tone, title, children }: { left: string; width: string; tone: 'airlock'; title: string; children: string }) {
   return (
     <div className={cx('absolute inset-y-[5px] flex items-center justify-center overflow-hidden rounded-[4px] px-1', tone === 'airlock' && 'border border-line-2 bg-black text-mute')} style={{ left, width }} title={title}>
-      <span className="truncate font-display text-[10px] uppercase tracking-[0.1em]">{children}</span>
+      <span className="whitespace-pre-line text-center font-display text-[9.5px] uppercase leading-[1.15] tracking-[0.05em]">{children}</span>
     </div>
   );
 }

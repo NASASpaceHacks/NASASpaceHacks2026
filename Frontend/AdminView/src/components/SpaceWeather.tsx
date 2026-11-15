@@ -148,7 +148,7 @@ function Nowcast() {
   const busy = useConsole((s) => s.busyEvent);
   const shelterMax = useConsole((s) => s.rules.find((r) => r.id === 'shelter_time_max_min')?.value ?? 30);
   return (
-    <Tier n={3} name="Nowcast (SEP)" lead="now, measured on site" tone="red" testId="tier-nowcast">
+    <Tier n={3} name="Nowcast (radiation storm, SEP)" lead="now, measured on site" tone="red" testId="tier-nowcast">
       <Button data-testid="sep-nowcast" variant="danger" className="w-full" onClick={() => {
         if (useConsole.getState().uiMode === 'live') { closeDetails(); openSheet('sep'); }
         else void fireEvent({ type: 'SEP_NOWCAST', leadMin: shelterMax }, 'SEP nowcast: onboard dose rate +25 %');

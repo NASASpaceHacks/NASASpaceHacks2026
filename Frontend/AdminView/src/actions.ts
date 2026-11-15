@@ -5,6 +5,7 @@ import { maskAreaKm2, safeZoneMask } from '@mw/shared/map';
 import { HttpBackend, detectBackend, type Backend } from './api';
 import { loadStm } from './lib/science';
 import { marsTime } from './lib/marsclock';
+import { ruleLabel } from './lib/plain';
 import { baseInfo, defaultBase, relabel, shelterById, shortName, stopName } from './lib/base';
 import { engineConst } from './lib/engine';
 import type { ActionKind, ConsoleEvent, DetailsTab, LinkCtl, OverlayId, PlanBundle, UiMode, VectorId } from './lib/types';
@@ -533,7 +534,7 @@ export function setAllStations(on: boolean) {
 
 export function updateRule(id: RuleId, patch: Partial<Rule>) {
   set((s) => ({ rules: s.rules.map((r) => (r.id === id ? { ...r, ...patch } : r)) }));
-  scheduleReplan(`Replanned: ${get().rules.find((r) => r.id === id)?.label ?? "a rule"} changed`, 450);
+  scheduleReplan(`Replanned: ${ruleLabel(get().rules.find((r) => r.id === id)?.label ?? 'a rule')} changed`, 450);
 }
 
 export function setStartLtst(min: number) {
