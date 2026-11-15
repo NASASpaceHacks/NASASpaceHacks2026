@@ -48,7 +48,7 @@ export function endpointLabel(pack: LoadedSitePack, base: BaseInfo, id: string, 
   if (id === 'HAB') return base.short;
   if (id === 'HERE') return 'EV1';
   const s = shelterById(pack, id);
-  return s ? shortName(s) : id;
+  return s ? shortName(s) : stopLabel(id); // a stop: its map letter + name, never the internal id
 }
 
 /** A stop's plain name (no parenthesised code), from the science targets and the user's own stops. */

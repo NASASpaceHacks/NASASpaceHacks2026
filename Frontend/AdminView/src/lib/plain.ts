@@ -294,7 +294,7 @@ export function thingsToWatch(p: PlanResult, rules: Rule[], label: (id: string) 
     out.push({ score: m.slope_max_deg.min / sl.value, text: `Steepest ground ${(sl.value - m.slope_max_deg.min).toFixed(0)}° ${whereAt(p, m.slope_max_deg.atMin, label)} (limit ${sl.value}°).` });
   }
   const first = [...p.bingo].filter((b) => b.id !== 'HAB').sort((a, b) => a.tMin - b.tMin)[0];
-  if (first) out.push({ score: 0.5, text: `Leave-by times are hard: first one is ${label(first.id)} at ${fmtLtst(first.ltstMin)}.` });
+  if (first) out.push({ score: 0.5, text: `Leave-by times are hard: first one is ${label(first.id)} at ${pet(first.tMin)} (${fmtLtst(first.ltstMin)} Mars local).` });
   return out.sort((a, b) => a.score - b.score).slice(0, 3).map((x) => x.text);
 }
 

@@ -3,9 +3,9 @@ import { AnimatePresence, motion } from 'motion/react';
 import { estimatePackageBytes } from '../api';
 import { confirmPush, setMode } from '../actions';
 import { useConsole } from '../store';
-import { endpointLabel, useBaseInfo } from '../lib/base';
+import { endpointLabel, stopLabel, stopName, useBaseInfo } from '../lib/base';
 import { evaLtst, fmtLtst } from '../lib/marsclock';
-import { hm, limitLine, thingsToWatch, verdictOf } from '../lib/plain';
+import { limitLine, pet, thingsToWatch, verdictOf } from '../lib/plain';
 import { Button, Kbd, cx } from './ui';
 
 /** Curiosity's typical daily uplink volume, the yardstick for the route package (design doc §5). */
@@ -84,7 +84,7 @@ function Brief() {
   const last = plan.segments[plan.segments.length - 1];
   const startName = plan.segments[0]?.from === 'HERE' ? 'EV1' : base.short;
   const endName = last ? label(last.to, last.cells[last.cells.length - 1]) : base.short;
-  const routeText = [startName, ...plan.order, endName].join(' → ');
+  const routeText = [startName, ...plan.order.map(stopLabel), endName].join(' → ');
   const back = last?.t1Min ?? 0;
 
   return (
@@ -93,7 +93,7 @@ function Brief() {
         <div className="min-w-0">
           <div className="eyebrow">Crew brief · route v{sent ? route!.seq : nextSeq}</div>
           <div data-testid="review-route" className="num mt-1.5 text-[15.5px] leading-snug text-ink">{routeText}</div>
-          <div className="mt-1 text-[13px] text-ink-2">{v.headline} · back at {endName} {fmtLtst(evaLtst(start, back))}</div>
+          <div className="mt-1 text-[13px] text-ink-2">{v.headline} · back at the {endName} airlock {pet(back)} <span className="text-mute">({fmtLtst(evaLtst(start, back))} Mars local)</span></div>
         </div>
         {!sent && (
           <button onClick={() => setMode('plan')} className="ml-auto flex h-9 shrink-0 items-center gap-2 rounded-[6px] px-3 text-[12px] text-mute hover:bg-raised hover:text-ink" aria-label="Back to plan">
@@ -105,7 +105,7 @@ function Brief() {
       <div className="flex flex-col gap-5 px-6 pb-5">
         {plan.stops.length > 0 && (
           <div>
-            <div className="eyebrow mb-2">Stops and leave-by times</div>
+            <div className="eyebrow mb-2">Stops and leave-by times · elapsed from EVA start</div>
             <table className="w-full table-fixed border-collapse text-left">
               <colgroup><col className="w-8" /><col /><col className="w-[64px]" /><col className="w-[64px]" /><col className="w-[76px]" /></colgroup>
               <thead>
@@ -124,10 +124,10 @@ function Brief() {
                   return (
                     <tr key={st.id} className="text-[13px]">
                       <td className="py-1"><span className="num inline-flex h-[22px] w-[22px] items-center justify-center border border-cyan bg-black text-[11px] font-semibold text-white">{i + 1}</span></td>
-                      <td className="truncate py-1 pr-3 text-ink">{s?.name.replace(/\s*\([^)]*\)\s*$/, '') ?? st.id}</td>
-                      <td className="num py-1 text-right text-ink-2">{fmtLtst(evaLtst(start, st.arriveMin))}</td>
-                      <td className="num py-1 text-right text-ink-2">{fmtLtst(evaLtst(start, st.departMin))}</td>
-                      <td className="num py-1 text-right text-ink">{b ? fmtLtst(b.ltstMin) : '—'}</td>
+                      <td className="truncate py-1 pr-3 text-ink">{s ? s.name.replace(/\s*\([^)]*\)\s*$/, '') : stopName(st.id)}</td>
+                      <td className="num py-1 text-right text-ink-2" title={`${fmtLtst(evaLtst(start, st.arriveMin))} Mars local`}>{pet(st.arriveMin)}</td>
+                      <td className="num py-1 text-right text-ink-2" title={`${fmtLtst(evaLtst(start, st.departMin))} Mars local`}>{pet(st.departMin)}</td>
+                      <td className="num py-1 text-right text-ink" title={b ? `${fmtLtst(b.ltstMin)} Mars local: the latest she can leave this stop and still get back safely` : undefined}>{b ? pet(b.tMin) : '—'}</td>
                     </tr>
                   );
                 })}
@@ -141,7 +141,7 @@ function Brief() {
             <div className="eyebrow mb-1.5">What limits this walk</div>
             <div className="text-[13.5px] leading-snug text-ink">{lim ? lim.head : plan.order.length ? 'Nothing close to a limit' : `Direct return to ${endName}`}</div>
             {lim?.detail && <div className="mt-1 text-[12px] leading-snug text-mute">{lim.detail}</div>}
-            <div className="mt-2 text-[12px] text-mute">Back <span className="text-ok">{hm(v.spareMin)}</span> before the walk-back deadline</div>
+            <div className="mt-2 text-[12px] text-mute">{v.lines.find((l) => l.key === 'spare')?.text}</div>
           </div>
           <div>
             <div className="eyebrow mb-1.5">Three things to watch</div>
