@@ -98,17 +98,20 @@ export function SimControls() {
 }
 
 /** Event log (Details → Log). */
+const BY: Record<string, string> = { hab: 'EVA officer', visor: 'Crew visor', server: 'Hab server', earth: 'Earth', system: 'Console' };
+
 export function EventLog() {
   const log = useConsole((s) => s.log);
-  const tone = { info: 'text-ink-2', ok: 'text-ok', caution: 'text-caution', warning: 'text-red' } as const;
+  const tone = { info: 'text-ink-2', ok: 'text-ok', caution: 'text-ink', warning: 'text-red' } as const;
   return (
-    <div className="max-h-[260px] overflow-y-auto rounded-[3px] border border-line bg-sunk/60">
-      {log.length === 0 && <div className="px-3 py-3 text-[11px] text-dim">Nothing logged yet.</div>}
+    <div data-testid="event-log" className="max-h-[420px] overflow-y-auto rounded-[3px] border border-line bg-sunk/60">
+      <div className="grid grid-cols-[64px_1fr_84px] gap-2 border-b border-line-2 px-2.5 py-1.5 text-[10px] uppercase tracking-[0.12em] text-dim"><span>Time</span><span>What happened</span><span>By</span></div>
+      {log.length === 0 && <div className="px-3 py-3 text-[12px] text-dim">Nothing has happened yet.</div>}
       {log.map((e) => (
-        <div key={e.id} className="grid grid-cols-[58px_44px_1fr] gap-2 border-b border-line/60 px-2.5 py-1.5 last:border-0">
-          <span className="num text-[10px] text-dim">{fmt.clock(e.utcMs)}</span>
-          <span className="font-display text-[9px] uppercase tracking-[0.1em] text-mute">{e.source}</span>
-          <span className={cx('text-[11px] leading-snug', tone[e.level])}>{e.text}</span>
+        <div key={e.id} className="grid grid-cols-[64px_1fr_84px] gap-2 border-b border-line/60 px-2.5 py-1.5 last:border-0">
+          <span className="num text-[11px] text-dim">{fmt.clock(e.utcMs)}</span>
+          <span className={cx('text-[12px] leading-snug', tone[e.level])}>{e.text}{e.tMin !== undefined ? <span className="text-dim"> (EVA +{Math.round(e.tMin)} min)</span> : null}</span>
+          <span className="text-[11px] text-mute">{BY[e.source] ?? e.source}</span>
         </div>
       ))}
     </div>

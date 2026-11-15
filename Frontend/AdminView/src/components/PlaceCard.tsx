@@ -4,6 +4,8 @@ import { baseInfo } from '../lib/base';
 import { previewCell } from '../lib/places';
 import { stationImage, whyItMatters } from '../lib/science';
 import { get, set, useConsole } from '../store';
+import { fixFromPin } from '../check';
+import { hm } from '../lib/plain';
 
 const clean = (n: string) => n.replace(/\s*\([^)]*\)\s*$/, '');
 const lat = (v: number) => `${Math.abs(v).toFixed(4)}°${v < 0 ? 'S' : 'N'}`;
@@ -62,11 +64,18 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
   const hasRoute = dests.length > 0;
   const target = station ? { stationId: station.id } : { cell: pop.cell };
   const img = station ? stationImage(pack.manifest, station) : null;
+  const pin = useConsole((s) => s.pinCheck);
+  const isPin = !station && !custom;
+  const stand = pv && Number.isFinite(pv.slopeDeg) ? ` (slope ${Math.round(pv.slopeDeg)}°)` : '';
+  // A dropped pin: "standing here" is only the ground under the pin. GO / NO-GO is the full walk check below.
   const safety = pv
-    ? pv.ok
-      ? `${pv.minutes !== null ? `~${Math.round(pv.minutes)} min walk from ${from} · ` : ''}safe to stand`
-      : `Can't go here: ${pv.reason}`
+    ? isPin
+      ? pv.ok ? `Safe to stand here${stand}` : `Can't go here: ${pv.reason}`
+      : pv.ok
+        ? `${pv.minutes !== null ? `~${Math.round(pv.minutes)} min walk from ${from} · ` : ''}safe to stand`
+        : `Can't go here: ${pv.reason}`
     : null;
+  const mine = isPin && pin && pin.cell === pop.cell ? pin : null;
 
   return (
     <div
@@ -101,9 +110,28 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
         </>
       )}
       {station && <div className="mt-2 line-clamp-2 text-[13px] leading-snug text-ink-2" data-testid="place-why">{whyItMatters(station as never)}</div>}
+      {isPin && (
+        <div
+          data-testid="place-verdict"
+          data-verdict={!mine || mine.status === 'checking' ? 'checking' : mine.verdict}
+          className={`mt-2 text-[14.5px] font-semibold leading-snug ${!mine || mine.status === 'checking' ? 'mw-pulse text-mute' : mine.verdict === 'GO' ? 'text-ok' : 'text-red'}`}
+        >
+          {!mine || mine.status === 'checking'
+            ? 'Checking…'
+            : mine.verdict === 'GO'
+              ? `GO · ${mine.walkMin !== undefined ? `~${Math.round(mine.walkMin)} min walk each way` : 'walk there and back'}${mine.spareMin !== undefined ? ` · back with ${hm(mine.spareMin)} spare` : ''}`
+              : `NO-GO · ${mine.text}`}
+        </div>
+      )}
       {safety && (
         <div data-testid="place-safety" data-ok={pv!.ok ? '1' : '0'} className={`mt-2 text-[13.5px] leading-snug ${pv!.ok ? 'text-ok' : 'text-red'}`}>
           {safety}
+        </div>
+      )}
+      {mine?.verdict === 'NO-GO' && (
+        <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[13.5px]">
+          <button data-testid="place-fix-closest" onClick={() => void fixFromPin('closest')} className="text-cyan hover:underline">Closest safe point</button>
+          {mine.rule !== 'slope_max_deg' && <button data-testid="place-fix-rover" onClick={() => void fixFromPin('rover')} className="text-cyan hover:underline">Move rover closer</button>}
         </div>
       )}
       <div className="mt-3 flex gap-2">

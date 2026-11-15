@@ -16,6 +16,9 @@ mkdirSync(SHOTS_SITES, { recursive: true });
 const SHOTS6 = fileURLToPath(new URL('../screens/ux6/', import.meta.url));
 mkdirSync(SHOTS6, { recursive: true });
 
+const SHOTS7 = fileURLToPath(new URL('../screens/ux7/', import.meta.url));
+mkdirSync(SHOTS7, { recursive: true });
+
 const geo = <T>(page: Page, expr: string) => page.evaluate(expr) as Promise<T>;
 const station = (page: Page, id: string) => geo<XY>(page, `window.__mwTest.station(${JSON.stringify(id)})`);
 const dest = (page: Page, letter: string) => geo<XY | null>(page, `window.__mwTest.dest(${JSON.stringify(letter)})`);
@@ -484,5 +487,143 @@ test.describe('sites · picker, switching, deep link', () => {
     await page.goto('/?site=nowhere-v9');
     await expect(page.getByTestId('directions')).toBeVisible({ timeout: 60_000 });
     await expect(siteSelect(page)).toHaveValue('gale-v1');
+  });
+
+  // ───────────── ux7: one verdict for a pin, where a NO-GO fails, readable Details ─────────────
+  const shadowSpot = (page: Page) => geo<XY | null>(page, 'window.__mwTest.shadow("ROVER1", 400)');
+  const attemptInfo = (page: Page) => geo<{ xy: XY | null; label: string } | null>(page, 'window.__mwTest.attempt()');
+
+  test('19 · pin on flat ground near PR-1 → card says GO with walk time and spare time', async ({ page }) => {
+    await open(page);
+    const pr1 = await shelter(page, 'ROVER1');
+    const spot = await find(page, 'flat', pr1, 90);
+    await click(page, spot);
+    const v = page.getByTestId('place-verdict');
+    await expect(v).toHaveAttribute('data-verdict', /^(GO|NO-GO)$/);
+    await expect(v).toHaveAttribute('data-verdict', 'GO');
+    await expect(v).toHaveText(/^GO · ~\d+ min walk each way · back with .+ spare$/);
+    await expect(page.getByTestId('place-safety')).toHaveText(/^Safe to stand here \(slope \d+°\)$/);
+    await page.screenshot({ path: `${SHOTS7}pin-go.png` });
+    await page.getByTestId('place-directions').click();
+    await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+  });
+
+  test('20 · pin in a radio shadow → NO-GO with the radio reason before any stop; the plan agrees; red stretch + label on the map', async ({ page }) => {
+    await open(page);
+    const spot = await shadowSpot(page);
+    expect(spot).not.toBeNull();
+    await click(page, spot!);
+    const card = page.getByTestId('place-card');
+    await expect(card).toBeVisible();
+    await expect(page.locator('[data-testid^="dest-P"]')).toHaveCount(0); // no stop added yet
+    const v = page.getByTestId('place-verdict');
+    await expect(v).toHaveAttribute('data-verdict', 'NO-GO');
+    await expect(v).toHaveText(/^NO-GO · No radio contact for \d+ min on the way \(limit \d+ min\)$/);
+    await expect(page.getByTestId('place-fix-closest')).toBeVisible();
+    // The attempted walk is already on the map: red stretch with its label.
+    await expect.poll(async () => (await attemptInfo(page))?.label ?? '').toMatch(/^No radio \d+ min \(limit \d+\)$/);
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: `${SHOTS7}pin-nogo.png` });
+    // Add the stop: the plan reaches the same verdict for the same reason.
+    await page.getByTestId('place-directions').click();
+    await expect(page.getByTestId('stayin-card')).toBeVisible();
+    await expect(page.getByTestId('verdict-dest-reason')).toContainText(/radio contact/i);
+    await expect(page.getByTestId('verdict-where')).toContainText(/No radio contact for \d+ min/);
+    await expect.poll(async () => (await attemptInfo(page))?.label ?? '').toMatch(/^No radio \d+ min \(limit \d+\)$/);
+    await page.waitForTimeout(900); // the map fits the attempted walk
+    const at = (await attemptInfo(page))!;
+    expect(at.xy).not.toBeNull();
+    await page.screenshot({ path: `${SHOTS7}nogo-highlight.png` });
+    // The label's spot is painted red on the map canvas (the highlighted stretch).
+    const red = await page.evaluate(([x, y]) => {
+      for (const cv of Array.from(document.querySelectorAll<HTMLCanvasElement>('.ol-viewport canvas'))) {
+        let ctx: CanvasRenderingContext2D | null = null;
+        try { ctx = cv.getContext('2d'); } catch { /* webgl canvas */ }
+        if (!ctx) continue;
+        const r = cv.getBoundingClientRect();
+        const k = cv.width / r.width;
+        const d = ctx.getImageData(Math.max(0, Math.round((x - r.left - 40) * k)), Math.max(0, Math.round((y - r.top - 40) * k)), Math.round(80 * k), Math.round(80 * k)).data;
+        for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] < 90 && d[i + 2] < 90 && d[i + 3] > 200) return true;
+      }
+      return false;
+    }, at.xy!);
+    expect(red).toBe(true);
+    // Radio layer: covered ground clear, shadow tinted; legend says what it is.
+    await page.getByTestId('layers-button').click();
+    await page.getByTestId('layer-los').getByRole('switch').click();
+    await expect(page.getByTestId('layer-los')).toContainText('Radio shadow: no line of sight to Hab-1 or PR-1');
+    await expect(page.getByTestId('layer-los').getByTestId('layer-legend')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(1200);
+    await page.screenshot({ path: `${SHOTS7}radio-layer.png` });
+  });
+
+  test('21 · Details → Report for a NO-GO: attempted totals, where it failed, no internal IDs', async ({ page }) => {
+    await open(page);
+    const spot = await shadowSpot(page);
+    await click(page, spot!);
+    await page.getByTestId('place-directions').click();
+    await expect(page.getByTestId('stayin-card')).toBeVisible();
+    await page.getByTestId('open-details').click();
+    const rep = page.getByTestId('report');
+    await expect(rep).toBeVisible();
+    await page.waitForTimeout(450); // drawer slide
+    await expect(page.getByTestId('report-verdict')).toHaveText('NO-GO');
+    const tried = page.getByTestId('report-tried');
+    await expect(tried).toContainText('What was tried');
+    await expect(tried).toContainText(/Distance/);
+    await expect(tried).not.toContainText(/\b0\.00 km/);
+    const km = await tried.innerText();
+    expect(Number(/(\d+\.\d+)\s*km/.exec(km)?.[1] ?? '0')).toBeGreaterThan(0);
+    await expect(page.getByTestId('report-why')).toContainText(/radio contact/i);
+    await expect(page.getByTestId('report-ways')).toBeVisible();
+    await expect(page.getByTestId('report-margins')).toContainText('over by');
+    const main = await rep.evaluate((el) => {
+      const c = el.cloneNode(true) as HTMLElement;
+      c.querySelector('[data-testid="report-technical"]')?.remove();
+      return c.innerText;
+    });
+    expect(main).not.toMatch(/dijkstra|pandolf|[0-9a-f]{12}|reqHash/i);
+    await expect(page.getByTestId('report-technical')).toContainText('Technical');
+    await page.waitForTimeout(350);
+    await page.screenshot({ path: `${SHOTS7}details-report-nogo.png` });
+    // Margins tab for a NO-GO shows the attempted walk's curves.
+    await page.getByTestId('details-tab-margins').click();
+    await expect(page.getByTestId('margins-attempted')).toBeVisible();
+    await expect(page.getByTestId('burndown-los')).toContainText('limit');
+  });
+
+  test('22 · Details → Report, Rules, Margins for an OK plan; Rules lists 12 rules with evidence chips', async ({ page }) => {
+    await open(page);
+    await searchTo(page, 'Alta');
+    await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+    await page.getByTestId('open-details').click();
+    await page.waitForTimeout(450);
+    await expect(page.getByTestId('report-verdict')).toHaveText('GO');
+    await expect(page.getByTestId('report')).toContainText('What limits this walk');
+    await expect(page.getByTestId('report-margins')).toContainText('to spare');
+    await page.waitForTimeout(350);
+    await page.screenshot({ path: `${SHOTS7}details-report-ok.png` });
+    await page.getByTestId('details-tab-rules').click();
+    const rules = page.getByTestId('rules');
+    await expect(rules.getByRole('switch')).toHaveCount(12);
+    await expect(rules.locator('[data-evidence]')).toHaveCount(12);
+    await expect(page.getByTestId('evidence-legend').locator('[data-evidence]')).toHaveCount(5);
+    await expect(page.getByTestId('rules-note')).toContainText('analysis only');
+    await page.waitForTimeout(350);
+    await page.screenshot({ path: `${SHOTS7}details-rules.png` });
+    await page.getByTestId('details-tab-margins').click();
+    for (const k of ['wb', 'sh', 'los', 'heat']) await expect(page.getByTestId(`burndown-${k}`)).toBeVisible();
+    await expect(page.getByTestId('burndown-wb')).toContainText('Spare time to get home');
+    await expect(page.getByTestId('burndown-sh')).toContainText('Minutes to shelter (limit 30)');
+    await expect(page.getByTestId('burndown-heat')).toContainText('Suit heat, 30-min average vs 352 W budget');
+    await page.waitForTimeout(350);
+    await page.screenshot({ path: `${SHOTS7}details-margins.png` });
+    await page.getByTestId('details-tab-weather').click();
+    await expect(page.getByTestId('weather-purpose')).toBeVisible();
+    await page.getByTestId('details-tab-science').click();
+    await expect(page.getByTestId('science-panel')).toContainText(/covered|lost|not chosen/);
+    await page.getByTestId('details-tab-log').click();
+    await expect(page.getByTestId('event-log')).not.toContainText('{');
   });
 });

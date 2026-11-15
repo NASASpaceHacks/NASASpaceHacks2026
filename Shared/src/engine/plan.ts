@@ -826,3 +826,45 @@ export function makeOrderEvaluator(pack: LoadedSitePack, req: PlanRequest): (ord
     return { ...base, pass: sim.pass, failures: sim.failures, durationMin: sim.tReturn + tl.ingressHalf, legMin: sim.segments.map((x) => x.t1Min - x.t0Min), segments: sim.segments };
   };
 }
+
+export interface AttemptResult {
+  /** Set when no walkable path to the stop exists at all (nothing to simulate). */
+  reason?: string;
+  sim?: SimOutput;
+  /** Comm line-of-sight field used by the check (1 = in contact), for locating radio gaps. */
+  los?: Uint8Array;
+  /** Cells of the out leg and the return leg. */
+  legs?: number[][];
+  /** Latest safe return (EVA min) and EVA time at which the request's limits end. */
+  deadlineMin?: number;
+}
+
+/**
+ * What a NO-GO walk would have looked like: the cheapest path base -> stop -> base found over all walkable
+ * ground (not limited to the safety mask), simulated with the same rules plan() applies. Lets the console
+ * show the attempted walk's real totals and WHERE it breaks a rule. Does not decide GO/NO-GO.
+ */
+export function attemptRoute(pack: LoadedSitePack, req: PlanRequest, stationId: string): AttemptResult {
+  const R = resolve(pack, req);
+  const rv = R.rv;
+  const st = req.stations.find((s) => s.id === stationId);
+  if (!st) return { reason: 'unknown stop' };
+  const ls = lsFor(pack, req.sol) ?? DEFAULT_LS_DEG;
+  const tl = makeTimeline(R, req, rv, ls);
+  const blocked = R.mask.slice();
+  blocked[R.hab] = 0;
+  blocked[st.cell] = 0;
+  const g: CostGrid = { ...R.grid, blocked };
+  const ps = getPathSearch(R.pathSearchId);
+  const out = ps.search(g, R.routeModel, R.ctx1, R.hab, st.cell);
+  const back = ps.search(g, R.routeModel, R.ctx1, st.cell, R.hab);
+  if (!out || !back) return { reason: 'no walkable path' };
+  const legs = [Array.from(out.cells), Array.from(back.cells)];
+  const hp: HeatParams = { budgetW: rv.heatMax, restW: REST_W, tauMin: HEAT_TAU_MIN };
+  const sim = simulate({
+    R, tl, hp, H0: Math.min(HEAT_INITIAL_W, rv.heatMax), startLabel: 'HAB', legs,
+    stops: [{ id: st.id, cell: st.cell, dwellMin: st.dwellMin, taskW: st.taskW ?? TASK_W_DEFAULT, value: st.value }],
+    endLabel: 'HAB', checks: enforcedChecks(rv),
+  });
+  return { sim, los: R.fields.los, legs, deadlineMin: tl.deadline };
+}

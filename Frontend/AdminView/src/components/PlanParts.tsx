@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import type { Rule, Station } from '@mw/shared/contracts';
 import { DEFAULT_CREW, cellDistM } from '@mw/shared/contracts';
 import { marsMetabolicW } from '@mw/shared/engine';
-import { setStartLtst, updateRule } from '../actions';
+import { getMap, setStartLtst, updateRule } from '../actions';
 import { type BaseInfo } from '../lib/base';
-import { useConsole } from '../store';
+import { set, useConsole } from '../store';
 import { evaLtst, fmtLtst, sunAtLtst } from '../lib/marsclock';
 import { fmtRule } from '../lib/format';
 import { STM, goalById, objectiveById, objectiveCoverage, stationImage, whyItMatters, type Coverage } from '../lib/science';
@@ -79,7 +79,7 @@ const COV_STYLE: Record<Coverage, { label: string; cls: string }> = {
   none: { label: 'No station', cls: 'text-dim border-line-2' },
 };
 
-/** Science coverage: which objectives this plan covers or loses (STM). */
+/** Science: goals → objectives → the stops that serve each, with covered / lost, linked to the targets on the map. */
 export function SciencePanel() {
   const pack = useConsole((s) => s.pack);
   const plan = useConsole((s) => s.plan);
@@ -87,42 +87,56 @@ export function SciencePanel() {
   if (!pack) return null;
   const offered = new Set(Object.entries(stationOn).filter(([, v]) => v).map(([k]) => k));
   const cov = objectiveCoverage(pack.manifest.stations, offered, plan);
+  const inPlan = new Set(plan?.order ?? []);
+  const nm = (n: string) => n.replace(/\s*\([^)]*\)\s*$/, '');
+  const show = (id: string) => {
+    const st = pack.manifest.stations.find((x) => x.id === id);
+    const map = getMap();
+    if (!st || !map) return;
+    set({ details: { open: false, tab: 'science' } });
+    map.reveal([[st.x, st.y]]);
+    setTimeout(() => {
+      const px = map.map.getPixelFromCoordinate([st.x, st.y]);
+      if (px) set({ mapPopover: { kind: 'station', id: st.id, cell: st.cell, px: [px[0], px[1]] } });
+    }, 450);
+  };
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4" data-testid="science-panel">
       {STM.goals.map((g) => (
         <div key={g.id}>
-          <Tip content={g.statement} side="left" width={300}>
-            <div className="flex items-baseline gap-2">
-              <span className="num text-[10.5px] text-mute">{g.id}</span>
-              <span className="line-clamp-1 text-[11.5px] text-ink-2">{g.statement}</span>
-            </div>
-          </Tip>
-          <div className="mt-1.5 flex flex-col gap-1 border-l border-line pl-3">
-            {cov.filter((c) => c.objective.goal === g.id).map((c) => (
-              <Tip
-                key={c.objective.id}
-                side="left"
-                width={320}
-                content={
-                  <>
-                    <div className="text-ink">{c.objective.statement}</div>
-                    <div className="mt-1.5 text-dim">{c.objective.rationale}</div>
-                    <div className="num mt-1.5 text-[10.5px] text-mute">Weight {c.objective.weight} · stations {c.candidates.join(', ') || '—'}</div>
-                  </>
-                }
-              >
-                <div className="flex w-full items-center gap-2">
-                  <span className="num w-11 shrink-0 text-[10.5px] text-mute">{c.objective.id}</span>
-                  <span className="min-w-0 flex-1 truncate text-[11px] text-ink-2">{c.objective.statement}</span>
-                  <span className="num shrink-0 text-[10px] text-dim">{c.planned.length}/{c.candidates.length}</span>
-                  <span className={cx('shrink-0 rounded-[2px] border px-1.5 font-display text-[9px] uppercase tracking-[0.1em]', COV_STYLE[c.coverage].cls)}>{COV_STYLE[c.coverage].label}</span>
+          <div className="text-[13px] font-medium leading-snug text-ink">{g.statement}</div>
+          <div className="mt-2 flex flex-col gap-2.5 border-l border-line pl-3">
+            {cov.filter((c) => c.objective.goal === g.id).map((c) => {
+              const serving = pack.manifest.stations.filter((st) => st.objectiveIds.includes(c.objective.id));
+              return (
+                <div key={c.objective.id}>
+                  <div className="flex items-start gap-2">
+                    <span className="min-w-0 flex-1 text-[12.5px] leading-snug text-ink-2">{c.objective.statement}</span>
+                    <span className={cx('shrink-0 rounded-[2px] border px-1.5 font-display text-[10px] uppercase tracking-[0.1em]', COV_STYLE[c.coverage].cls)}>{c.coverage === 'none' ? 'Not chosen' : COV_STYLE[c.coverage].label}</span>
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {serving.length === 0 && <span className="text-[11px] text-dim">No target at this site serves it.</span>}
+                    {serving.map((st) => {
+                      const state = inPlan.has(st.id) ? 'covered' : offered.has(st.id) ? 'lost' : 'not chosen';
+                      return (
+                        <button
+                          key={st.id}
+                          onClick={() => show(st.id)}
+                          title={`${nm(st.name)}: ${state}. Show on the map.`}
+                          className={cx('flex items-center gap-1.5 border px-1.5 py-0.5 text-[11.5px] hover:bg-cyan/10', state === 'covered' ? 'border-ok/50 text-ok' : state === 'lost' ? 'border-red/60 text-red' : 'border-line-2 text-mute')}
+                        >
+                          {nm(st.name)} <span className="text-[10px] opacity-80">{state}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </Tip>
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}
-      <div className="text-[10px] leading-snug text-dim">STM {STM.status}. Station values are a transparent team heuristic, not a calibrated model.</div>
+      <div className="text-[11px] leading-snug text-dim">Covered = on the walk. Lost = chosen but left out. Station values are a transparent team heuristic, not a calibrated model.</div>
     </div>
   );
 }
@@ -275,12 +289,14 @@ export function RulesSection() {
   const rules = useConsole((s) => s.rules);
   return (
     <section>
-      <SectionHead right={<span className="num text-[10px] text-dim">{rules.filter((r) => r.enabled && r.hard).length} hard</span>}>Flight rules</SectionHead>
-      <div className="mt-2 text-[11.5px] leading-snug text-mute">Every rule the planner keeps. Changing a value or switching a rule off re-plans at once.</div>
+      <SectionHead right={<span className="num text-[10px] text-dim">{rules.length} rules · {rules.filter((r) => r.enabled && r.hard).length} hard and on</span>}>Flight rules</SectionHead>
+      <div className="mt-2 text-[12px] leading-snug text-mute">Every rule the planner applies. A hard rule can never be broken by a GO plan; a soft rule is only a preference. Changing a value or switching a rule off re-plans at once.</div>
+      <div data-testid="rules-note" className="mt-1.5 text-[12px] leading-snug text-ink-2">Switching off a hard rule is for analysis only. A plan made that way is not a safe EVA plan.</div>
       <div className="mt-3 rounded-[6px] bg-sunk/60 px-3 py-2">
-        <div className="label mb-1.5 !text-[9px]">Evidence class · hover a chip for the source</div>
+        <div className="label mb-1.5 !text-[9px]">Evidence class: M measured · A analog · D NASA requirement · S simulated · E team assumption. Hover a chip or a rule name for the citation.</div>
         <EvidenceLegend compact />
       </div>
+      <div className="mt-3 flex items-center gap-2.5 border-b border-line-2 pb-1 text-[10px] uppercase tracking-[0.12em] text-dim"><span className="w-[34px]">On</span><span className="flex-1">Rule · evidence</span><span className="w-[34px]">Type</span><span className="w-[96px] text-right">Value</span></div>
       <div data-testid="rules" className="mt-1">
         {rules.map((r) => <RuleRow key={r.id} r={r} />)}
       </div>

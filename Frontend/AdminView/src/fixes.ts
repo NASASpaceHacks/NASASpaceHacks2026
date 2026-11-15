@@ -57,7 +57,7 @@ async function tryState(mod: Partial<ConsoleState>): Promise<PlanResult | null> 
 }
 
 /** The hab server remembers the last request as the base for operational events: point it back at the current plan. */
-async function restoreServerBase() {
+export async function restoreServerBase() {
   const s = get();
   const b = getBackend();
   if (b?.kind === 'live' && s.planReq) await b.tryPlan(s.planReq).catch(() => null);

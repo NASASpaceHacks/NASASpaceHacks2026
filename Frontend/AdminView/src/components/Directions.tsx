@@ -151,7 +151,7 @@ export function DirectionsCard() {
                   <button
                     data-testid={h.kind === 'map' ? 'choose-on-map' : `to-hit-${h.key}`}
                     onMouseDown={(e) => e.preventDefault()}
-                    onMouseEnter={() => setAct(i)}
+                    onMouseMove={() => { if (actRef.current !== i) setAct(i); }}
                     onClick={h.pick}
                     className={cx('flex w-full items-start gap-2 border-b border-line px-2.5 py-1.5 text-left', i === act ? 'bg-cyan/15' : '')}
                   >
@@ -251,7 +251,7 @@ function FromField({ shelters, value, disabled, onPick }: { shelters: ShelterOpt
                 type="button"
                 data-testid={`from-opt-${s.id}`}
                 onMouseDown={(e) => e.preventDefault()}
-                onMouseEnter={() => setAct(i)}
+                onMouseMove={() => { if (actRef.current !== i) setAct(i); }}
                 onClick={() => pick(s.id)}
                 className={cx('flex h-9 w-full items-center gap-2 px-2.5 text-left text-[15px]', i === act ? 'bg-cyan/15 text-ink' : 'text-ink-2')}
               >

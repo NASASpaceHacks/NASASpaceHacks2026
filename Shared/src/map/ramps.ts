@@ -46,14 +46,17 @@ export const SLOPE_RAMP: Ramp = {
   ],
 };
 
-/** Round-trip minutes outside hab line of sight: 0 = in LOS (cyan wash), longer gaps = deeper shadow. */
+/**
+ * Radio shadow: round-trip minutes outside hab / rover line of sight. 0 = in contact = fully transparent
+ * (no tint); anything out of contact gets a red-violet tint that deepens with the length of the gap.
+ */
 export const LOS_RAMP: Ramp = {
   id: 'los',
   stops: [
-    [0, [79, 209, 224, 0.2]],
-    [0.01, [8, 10, 16, 0.32]],
-    [10, [8, 10, 16, 0.62]],
-    [30, [8, 10, 16, 0.78]],
+    [0, [110, 30, 170, 0]],
+    [0.01, [110, 30, 170, 0.3]],
+    [10, [140, 24, 150, 0.45]],
+    [30, [170, 20, 120, 0.6]],
   ],
 };
 

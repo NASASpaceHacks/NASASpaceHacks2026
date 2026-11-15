@@ -312,7 +312,9 @@ export function resolve(pack: LoadedSitePack, req: PlanRequest, override?: { rul
   const fkey = `${rv.slopeMax}|${rv.plumeOn}|${hashString(hazards.join(','))}|${hab}|${shelterKey}|${modelId}|${crewKey(crew)}|${rv.wbFactor}`;
   let fields = lruGet(c.fields, fkey);
   if (!fields) {
-    const relayCells = shelters.filter((s) => s.kind === 'rover' && s.cell !== hab).map((s) => s.cell);
+    // Every masted shelter relays radio, whichever one is the EVA base: a walk staged from the rover still
+    // has the habitat mast in view where terrain allows (caches carry no radio).
+    const relayCells = shelters.filter((s) => s.kind !== 'cache' && s.cell !== hab).map((s) => s.cell);
     fields = computeInternalFields(pack, { w, h, cellM, mask, T1, TW, hab, shelterCells: shelters.map((s) => s.cell), relayCells, elev: baseGrid.elev });
     lruSet(c.fields, fkey, fields, 4);
   }
@@ -323,8 +325,8 @@ export function resolve(pack: LoadedSitePack, req: PlanRequest, override?: { rul
 }
 
 /**
- * Comm line of sight = union of the viewsheds from the hab mast and from each pressurized rover's
- * relay mast (both 3 m). TEAM ASSUMPTION: the pressurized rover carries a relay radio (precedent:
+ * Comm line of sight = union of the viewsheds from the EVA base and from every other masted shelter
+ * (habitat mast, pressurized-rover relay masts; all 3 m), so the result does not depend on which one is the base. TEAM ASSUMPTION: the pressurized rover carries a relay radio (precedent:
  * the Apollo 15–17 LRV carried the Lunar Communications Relay Unit for the EVA crew). The LOS-gap
  * rule uses this union. Single viewsheds are cached per mast cell, so dragging the rover only
  * recomputes the rover's viewshed.

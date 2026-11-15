@@ -83,8 +83,8 @@ export function Details() {
             {tab === 'report' && <ReportTab />}
             {tab === 'rules' && <div className="px-4 pb-6 pt-4"><RulesSection /></div>}
             {tab === 'margins' && <BurndownTab />}
-            {tab === 'weather' && <div className="px-4 pb-6 pt-4"><SectionHead right={<span className="text-[10px] text-dim">forecast · alert · nowcast</span>}>Space weather</SectionHead><div className="mt-3"><SpaceWeatherPanel /></div></div>}
-            {tab === 'science' && <div className="px-4 pb-6 pt-4"><SectionHead>Science coverage</SectionHead><div className="mt-3"><SciencePanel /></div></div>}
+            {tab === 'weather' && <div className="px-4 pb-6 pt-4"><SectionHead right={<span className="text-[10px] text-dim">forecast · alert · nowcast</span>}>Space weather</SectionHead><div className="mt-2 text-[12px] leading-snug text-mute" data-testid="weather-purpose">Why it matters: a solar storm can force the crew back to shelter. Three tiers: a days-ahead forecast, an Earth alert, and the on-board dose-rate warning that orders the return.</div><div className="mt-3"><SpaceWeatherPanel /></div></div>}
+            {tab === 'science' && <div className="px-4 pb-6 pt-4"><SectionHead>Science goals and the stops that cover them</SectionHead><div className="mt-3"><SciencePanel /></div></div>}
             {tab === 'sources' && (
               <div className="px-4 pb-6 pt-4">
                 <div className="mb-4 rounded-[6px] bg-sunk/70 px-3 py-2 text-[11.5px] text-mute">Data source: <span className="text-ink-2">{mode === 'mock' ? 'in-browser synthetic site (mock)' : 'hab server (live)'}</span>{sourceReason ? ` · ${sourceReason}` : ''}</div>

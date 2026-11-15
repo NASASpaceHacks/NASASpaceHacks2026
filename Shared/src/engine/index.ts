@@ -14,7 +14,7 @@ export * from './registry';
 
 export { buildCostGrid, keepoutMask, pointInRings } from './costGrid';
 export { computeFields, dijkstraField, viewshed, requestHash, mergeRules, MAST_HEIGHT_M, OBSERVER_HEIGHT_M } from './fields';
-export { plan, stageFromShelter, evaluateOrder, makeOrderEvaluator, type OrderEval, DEFAULT_LS_DEG, RULE_SHORT } from './plan';
+export { plan, stageFromShelter, evaluateOrder, attemptRoute, type AttemptResult, makeOrderEvaluator, type OrderEval, DEFAULT_LS_DEG, RULE_SHORT } from './plan';
 export { toPlanPackage, encodePackage, decodePackage, coarsen, COARSE_CELL_M, COARSE_UNREACHABLE, PACKAGE_MAX_BYTES } from './codec';
 export { marsTime, sunPosition, sunAtLtst, mars24, ltstAt, formatLtst, solarDeclination, planetographicLat, EARTH_MIN_PER_MARS_MIN } from './marstime';
 export { createSafetyCore, type SafetyCore, type SafetyState, type SafetyLimits } from './safetyCore';

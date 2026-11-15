@@ -68,6 +68,7 @@ import {
 import type { OverlayId, VectorId } from '../lib/types';
 import { toVars, type ExplainStep } from '../lib/zone';
 import { demRange } from '../lib/layers';
+import type { AttemptView } from '../lib/failure';
 
 /** A "way forward" suggestion drawn on the map (closest safe point, or a rover parking spot). */
 export interface MapSuggestion {
@@ -83,6 +84,28 @@ const ROVER_GHOST_SVG =
   encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><rect x="8" y="8" width="14" height="14" transform="rotate(45 15 15)" fill="rgba(0,0,0,0.6)" stroke="#00e5ff" stroke-width="2" stroke-dasharray="3 2"/><circle cx="15" cy="15" r="2.5" fill="#00e5ff"/></svg>',
   );
+
+function attemptStyle(f: FeatureLike): Style | Style[] {
+  const k = f.get('k');
+  if (k === 'leg') return new Style({ stroke: new Stroke({ color: 'rgba(255,43,214,0.45)', width: 3, lineDash: [7, 6], lineCap: 'round' }), zIndex: 1 });
+  if (k === 'bad') return [
+    new Style({ stroke: new Stroke({ color: 'rgba(0,0,0,0.85)', width: 9, lineCap: 'round', lineJoin: 'round' }), zIndex: 2 }),
+    new Style({ stroke: new Stroke({ color: '#ff3b30', width: 5, lineCap: 'round', lineJoin: 'round' }), zIndex: 3 }),
+  ];
+  if (k === 'point') return new Style({ image: new CircleStyle({ radius: 8, fill: new Fill({ color: 'rgba(255,59,48,0.35)' }), stroke: new Stroke({ color: '#ff3b30', width: 3 }) }), zIndex: 3 });
+  return new Style({
+    text: new Text({
+      text: String(f.get('label') ?? ''),
+      font: '700 14px "Barlow Condensed", sans-serif',
+      offsetY: -22,
+      fill: new Fill({ color: '#ffffff' }),
+      backgroundFill: new Fill({ color: 'rgba(0,0,0,0.88)' }),
+      backgroundStroke: new Stroke({ color: '#ff3b30', width: 1.5 }),
+      padding: [3, 6, 2, 6],
+    }),
+    zIndex: 5,
+  });
+}
 
 function suggestStyle(f: FeatureLike): Style | Style[] {
   if (f.get('link')) return new Style({ stroke: new Stroke({ color: 'rgba(0,229,255,0.9)', width: 1.5, lineDash: [4, 4] }) });
@@ -192,6 +215,8 @@ export class MapController {
   private destTranslate: Translate;
   private pickMode = false;
   /** Way-forward suggestion (closest safe point / rover parking spot). */
+  /** A NO-GO's attempted walk (dimmed) with the stretch that breaks the rule in red. */
+  private attemptLayer = new VectorLayer({ source: new VectorSource(), zIndex: 39, style: attemptStyle });
   private suggestLayer = new VectorLayer({ source: new VectorSource(), zIndex: 41, style: suggestStyle });
   private aoi: VectorLayer<VectorSource>;
   private shelters: ReturnType<typeof createSheltersLayer>;
@@ -298,6 +323,7 @@ export class MapController {
         this.stationsLayer,
         this.shelters.layer,
         this.astronaut,
+        this.attemptLayer,
         this.destLayer,
         this.suggestLayer,
       ],
@@ -528,6 +554,29 @@ export class MapController {
     (this.hillshade ?? this.hillCanvas)?.setVisible(v.relief || !this.imagery || !v.imagery);
   }
 
+  /** Draw (or clear) a NO-GO's attempted walk: dimmed route, the offending stretch in red, a short label. */
+  setAttempt(a: AttemptView | null) {
+    const src = this.attemptLayer.getSource()!;
+    src.clear(true);
+    this.attemptLabelXY = null;
+    if (!a || !a.failure) return;
+    const g = this.pack.manifest.grid;
+    for (const leg of a.legs) src.addFeature(new Feature({ geometry: new LineString(routeCoords(g, leg)), k: 'leg' }));
+    for (const run of a.failure.runs) {
+      if (run.length >= 2) src.addFeature(new Feature({ geometry: new LineString(routeCoords(g, run)), k: 'bad' }));
+      else src.addFeature(new Feature({ geometry: new Point(cellToXY(g, run[0])), k: 'point' }));
+    }
+    const xy = cellToXY(g, a.failure.labelCell);
+    this.attemptLabelXY = xy;
+    src.addFeature(new Feature({ geometry: new Point(xy), k: 'label', label: a.failure.short }));
+  }
+
+  private attemptLabelXY: number[] | null = null;
+  /** Map coordinates of the attempt label (for the test geometry hook). */
+  attemptXY(): number[] | null {
+    return this.attemptLabelXY;
+  }
+
   /** Show (or clear) a way-forward suggestion on the map. */
   setSuggestion(sg: MapSuggestion | null) {
     const src = this.suggestLayer.getSource()!;
@@ -687,11 +736,11 @@ export class MapController {
   private routeCells: number[] = [];
 
   /** Zoom to the current route and its stations (falls back to the whole AOI). */
-  fitRoute(duration = 450) {
+  fitRoute(duration = 450, cells: number[] = this.routeCells) {
     const g = this.pack.manifest.grid;
-    if (!this.routeCells.length) return this.fit(duration);
+    if (!cells.length) return this.fit(duration);
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    for (const c of this.routeCells) {
+    for (const c of cells) {
       const [x, y] = cellToXY(g, c);
       if (x < x0) x0 = x;
       if (x > x1) x1 = x;

@@ -4,6 +4,7 @@ import type { Cell, FieldSet, Station, LoadedSitePack, PlanEvent, PlanRequest, P
 import { DEFAULT_RULES } from '@mw/shared/contracts';
 import type { SafeZoneInputs, SafeZoneLimits } from '@mw/shared/map';
 import type { SiteInfo } from './api';
+import type { AttemptView } from './lib/failure';
 import type {
   ActionKind,
   ConsoleAlert,
@@ -41,6 +42,20 @@ export interface FixState {
   distM?: number;
   /** Plain reason when nothing was found. */
   note?: string;
+}
+
+/** Full check of a dropped pin (same rules and request as the plan): verdict + the attempted walk. */
+export interface PinCheck {
+  cell: Cell;
+  destId: string;
+  status: 'checking' | 'done';
+  verdict?: 'GO' | 'NO-GO';
+  /** Rule behind a NO-GO. */
+  rule?: string;
+  /** Plain text after the verdict word. */
+  text?: string;
+  walkMin?: number;
+  spareMin?: number;
 }
 
 export interface ConsoleState {
@@ -98,6 +113,10 @@ export interface ConsoleState {
   // Display
   /** Top stepper: ① Plan → ② Send → ③ EVA live. */
   uiMode: UiMode;
+  /** The attempted walk of a NO-GO plan (where it breaks the rule), and of a dropped pin that would be a NO-GO. */
+  attemptPlan: AttemptView | null;
+  attemptPin: AttemptView | null;
+  pinCheck: PinCheck | null;
   /** NO-GO way forward (search in progress / suggestion shown on the map). */
   fix: FixState | null;
   overlays: OverlayId[];
@@ -184,6 +203,9 @@ export const useConsole = create<ConsoleState>()(
 
     uiMode: 'plan',
     fix: null,
+    attemptPlan: null,
+    attemptPin: null,
+    pinCheck: null,
     overlays: [],
     opacity: { safezone: 1, elevation: 0.8, slope: 0.85, rough: 0.85, ti: 0.75, shelter: 0.9, walkback: 0.85, los: 0.9 },
     // Calm default: imagery (+ lighting), route, science targets, base and rover, safe-area outline.

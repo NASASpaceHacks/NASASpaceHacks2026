@@ -134,7 +134,7 @@ export function LayersPanel() {
     { key: 'outline', name: 'Safe walking area', what: 'Outline of ground that meets every hard flight rule at once.', source: engine, ...vec('outline') },
     { key: 'walkback', name: 'Walk-back time', unit: 'min', what: `Time out plus a slow (half-pace) walk back to ${baseName}; hidden beyond ${lim.walkback} min.`, source: engine, legend: { ramp: { id: 'wb', stops: TIME_RAMP.stops.map(([v, c]) => [v * (lim.walkback / 30), c]) }, min: 0, max: lim.walkback, ticks: [[0, '0'], [lim.walkback / 2, `${Math.round(lim.walkback / 2)}`], [lim.walkback, `${lim.walkback} min`]] }, ...ov('walkback') },
     { key: 'shelter', name: 'Time to shelter', unit: 'min', what: `Walking minutes to the nearest hab or pressurized rover; hidden beyond the ${lim.shelter}-min limit.`, source: engine, legend: { ramp: TIME_RAMP, min: 0, max: lim.shelter, ticks: [[0, '0'], [lim.shelter / 2, `${lim.shelter / 2}`], [lim.shelter, `${lim.shelter} min`]] }, ...ov('shelter') },
-    { key: 'los', name: 'Radio coverage (line of sight to Hab-1 / PR-1)', unit: 'min', what: 'Cyan = direct radio line of sight to the hab mast or rover relay; darker = longer out of contact (round trip).', source: `${engine} (terrain viewshed)`, legend: { ramp: LOS_RAMP, min: 0, max: 30, ticks: [[0, 'in contact'], [lim.los, `${lim.los} min`], [30, '30 min']] }, ...ov('los') },
+    { key: 'los', name: 'Radio shadow', unit: 'min', what: 'Radio shadow: no line of sight to Hab-1 or PR-1. Clear = in contact; red-violet = out of contact, deeper = longer round trip.', source: `${engine} (terrain viewshed)`, legend: { ramp: LOS_RAMP, min: 0, max: 30, ticks: [[0, 'in contact'], [lim.los, `${lim.los} min`], [30, '30 min']], mark: { at: lim.los, label: `${lim.los} min limit` } }, ...ov('los') },
   ];
   const features: LayerRow[] = [
     { key: 'stations', name: 'Science targets', what: `${m.stations.length} real Curiosity sites, ranked by science priority.`, source: 'MSL (Curiosity) mission sites', ...vec('stations') },
@@ -189,7 +189,10 @@ export function SourcesSection() {
               <div key={i} className="rounded-[3px] border border-line bg-sunk/60 p-2.5">
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-[12px] font-medium text-ink">{r.layer}</span>
-                  {r.indicative && <Badge tone="ochre">Indicative</Badge>}
+                  <span className="flex shrink-0 gap-1.5">
+                    {r.indicative && <Badge tone="ochre">Indicative</Badge>}
+                    <Badge tone={/synthetic|scenario|mock/i.test(`${r.prov.mission} ${r.prov.product}`) ? 'ochre' : 'cyan'}>{/synthetic|scenario|mock/i.test(`${r.prov.mission} ${r.prov.product}`) ? 'Scenario' : 'NASA data'}</Badge>
+                  </span>
                 </div>
                 <div className="mt-1 text-[11px] text-mute">{r.prov.mission} · {r.prov.instrument}</div>
                 <div className="num mt-1 text-[10.5px] text-mute">

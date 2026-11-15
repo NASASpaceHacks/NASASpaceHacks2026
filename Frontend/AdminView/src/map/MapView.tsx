@@ -10,6 +10,7 @@ import { MapHud } from '../components/MapHud';
 import { DirectionsCard } from '../components/Directions';
 import { PlaceCard, MapContextMenu } from '../components/PlaceCard';
 import { cellToXY, xyToCell as xyToCellSafe } from '@mw/shared/contracts';
+import { viewshed } from '@mw/shared/engine';
 import type { DestMarker } from './MapController';
 
 function stationStateFn(): (id: string) => { state: StationState; order?: number } {
@@ -154,6 +155,10 @@ export function MapView() {
       }),
       useConsole.subscribe((s) => s.pickOnMap, (on) => ctrl.setPickMode(on)),
       useConsole.subscribe((s) => s.fix, syncFix),
+      useConsole.subscribe((s) => [s.attemptPin, s.attemptPlan] as const, ([pin, pl], [, prevPl]) => {
+        ctrl.setAttempt(pin ?? pl);
+        if (!pin && pl && pl !== prevPl) setTimeout(() => ctrl.fitRoute(450, pl.legs.flat()), 120); // after the plan's own first fit
+      }, { equalityFn: (a, b) => a[0] === b[0] && a[1] === b[1] }),
       useConsole.subscribe((s) => s.evaBase, (id) => ctrl.setBaseA(id)),
       useConsole.subscribe((s) => s.hazards, (h) => ctrl.setHazards(h)),
       useConsole.subscribe((s) => s.shelterCells, (cells) => Object.entries(cells).forEach(([id, c]) => ctrl.setShelter(id, c))),
@@ -185,6 +190,11 @@ export function MapView() {
         const sh = pack.manifest.shelters.find((x) => x.id === id);
         return sh ? toClient(cellToXY(g, get().shelterCells[id] ?? sh.cell)) : null;
       },
+      attempt: () => {
+        const xy = ctrl.attemptXY();
+        const a = get().attemptPin ?? get().attemptPlan;
+        return xy ? { xy: toClient(xy), label: a?.failure?.short ?? '' } : null;
+      },
       suggestion: () => {
         const xy = ctrl.suggestionXY();
         return xy ? toClient(xy) : null;
@@ -192,6 +202,46 @@ export function MapView() {
       dest: (letter: string) => {
         const d = destMarkers().list.find((x) => x.letter === letter);
         return d ? toClient([d.x, d.y]) : null;
+      },
+      /** A visible, feature-free, flat spot about `targetM` metres from `shelterId` that has no radio line of sight (terrain viewshed, 3 m masts). */
+      shadow: (shelterId: string, targetM = 400) => {
+        const r = ctrl.map.getViewport()?.getBoundingClientRect();
+        const sh = pack.manifest.shelters.find((x) => x.id === shelterId);
+        if (!r || !sh) return null;
+        const st = get();
+        const dem = pack.rasters.dem;
+        const cellOf = (id: string) => st.shelterCells[id] ?? pack.manifest.shelters.find((x) => x.id === id)!.cell;
+        // Same rule as the engine: every masted shelter (habitat, rovers) relays radio.
+        const masts = new Set<number>(pack.manifest.shelters.filter((x) => x.kind !== 'cache').map((x) => cellOf(x.id)));
+        const los = new Uint8Array(g.w * g.h);
+        for (const m of masts) {
+          const v = viewshed(dem, g.w, g.h, g.cellM, m);
+          for (let i = 0; i < los.length; i++) if (v[i]) los[i] = 1;
+        }
+        const [sx, sy] = cellToXY(g, cellOf(shelterId));
+        let best: [number, number] | null = null;
+        let bd = Infinity;
+        for (let y = r.top + 60; y < r.bottom - 70; y += 4) {
+          for (let x = r.left + 420; x < r.right - 260; x += 4) {
+            const px = [x - r.left, y - r.top];
+            const c = ctrl.map.getCoordinateFromPixel(px);
+            if (!c) continue;
+            const dm = Math.hypot(c[0] - sx, c[1] - sy);
+            if (Math.abs(dm - targetM) > 150) continue;
+            let ok = true;
+            for (let dy = -2; dy <= 2 && ok; dy++) for (let dx = -2; dx <= 2 && ok; dx++) {
+              const cell = xyToCellSafe(g, c[0] + dx * g.cellM, c[1] + dy * g.cellM);
+              ok = cell >= 0 && pack.rasters.slope[cell] < 8 && los[cell] === 0;
+            }
+            if (!ok || ctrl.map.getFeaturesAtPixel(px, { hitTolerance: 16 }).length) continue;
+            const score = Math.abs(dm - targetM);
+            if (score < bd) {
+              bd = score;
+              best = [Math.round(x), Math.round(y)];
+            }
+          }
+        }
+        return best;
       },
       /** A visible, feature-free spot: 'steep' (> 24°) or 'flat' (< 6°), optionally within `withinPx` of a client point. */
       find: (kind: 'steep' | 'flat', near?: [number, number], withinPx = 200) => {

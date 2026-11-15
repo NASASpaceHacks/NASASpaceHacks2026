@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { boot, closeDetails, closeSheet, dismissMapUi, explainSafeZone, generatePlan, getMap, openDetails, openSheet, primaryAction, setMode, shutdown, startHazardPick } from './actions';
 import { get, set, useConsole } from './store';
+import './check';
 import { TopBar, Mark } from './components/TopBar';
 import { MapView } from './map/MapView';
 import { Button, Kbd } from './components/ui';

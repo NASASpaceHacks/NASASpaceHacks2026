@@ -28,6 +28,7 @@ function VerdictCard() {
   const [why, setWhy] = useState(false);
   const leftOut = useLeftOut();
   const first = leftOut[0];
+  const attempt = useConsole((s) => s.attemptPlan);
   const v = useMemo(
     () => (plan && base ? verdictOf({ plan, pack, base, rules, events, startLtstMin: start, lsDeg: ls, lightMin: light }) : null),
     [plan, pack, base, rules, events, start, ls, light],
@@ -71,6 +72,11 @@ function VerdictCard() {
               <div data-testid="verdict-dest-reason" className="text-[14px] leading-snug text-ink">
                 <span className="num text-red">{first.letter}</span> {first.name}: <span className="text-red">{first.reason}</span>
               </div>
+              {attempt?.failure && (
+                <div data-testid="verdict-where" className="mt-1 text-[13.5px] leading-snug text-ink-2">
+                  The walk there and back: <span className="text-red">{attempt.failure.sentence}</span>. The stretch is marked red on the map.
+                </div>
+              )}
               <WayForward destId={first.id} where="verdict" className="mt-2" />
             </div>
           )}
@@ -254,7 +260,7 @@ function RouteSection() {
       {dropped.length > 0 && (
         <ul className="mt-2 flex flex-col gap-1 px-1 text-[12.5px] text-red/90" data-testid="dropped-list">
           {dropped.map((d) => (
-            <li key={d.id}>{d.id} ({nameOf(d.id)}) can't be reached safely: {dropReason(d, rules)}</li>
+            <li key={d.id}>{nameOf(d.id)} can't be reached safely: {dropReason(d, rules)}</li>
           ))}
         </ul>
       )}
