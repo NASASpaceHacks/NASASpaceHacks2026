@@ -1,0 +1,39 @@
+{
+  "global": {
+    "file": "mars_global.jpg",
+    "lonMin": -180,
+    "lonMax": 180,
+    "latMin": -90,
+    "latMax": 90,
+    "credit": "NASA/USGS Viking MDIM 2.1 colour mosaic via JPL Mars Trek",
+    "source": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/{z}/{row}/{col}.jpg (z=7 regional, z=2 global)"
+  },
+  "regional": {
+    "file": "jezero_regional.jpg",
+    "lonMin": 75.8001708984375,
+    "lonMax": 79.398193359375,
+    "latMax": 20.1983642578125,
+    "latMin": 16.600341796875,
+    "credit": "NASA/USGS Viking MDIM 2.1 colour mosaic via JPL Mars Trek",
+    "source": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/{z}/{row}/{col}.jpg (z=7 regional, z=2 global)"
+  },
+  "aoi": {
+    "lonMin": 77.34748208389664,
+    "lonMax": 77.43643169917564,
+    "latMin": 18.423797094377594,
+    "latMax": 18.508150118668173,
+    "label": "Study area 5 × 5 km"
+  },
+  "labels": [
+    {
+      "name": "Jezero crater",
+      "lon": 77.58,
+      "lat": 18.38
+    },
+    {
+      "name": "Octavia E. Butler Landing",
+      "lon": 77.4509,
+      "lat": 18.4446
+    }
+  ]
+}

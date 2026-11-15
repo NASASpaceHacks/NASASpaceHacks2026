@@ -1,0 +1,225 @@
+[
+  {
+    "id": "JZ01",
+    "name": "Cannery Passage: crater floor / delta contact",
+    "lon": 77.405186,
+    "lat": 18.449405,
+    "value": 65,
+    "objectiveIds": [
+      "OBJ-1"
+    ],
+    "dwellMin": 25,
+    "description": "Crew walks the Cannery Passage loop at the foot of the delta front, digs shallow trenches through the regolith and photographs any exposed contact between crater-floor rock and the lowest delta sediments, with heading and scale. Why: the Delta Front Campaign began on sol 415 and first explored the crater floor/delta contact along the Cannery Passage loop (sols 415-421); the contact is not well resolved at the surface because of regolith cover and highly eroded outcrops, while subsurface radar suggests the delta progrades over the crater-floor units (Williams et al., LPSC 2023). A crew that can trench is well placed to find it.",
+    "citation": "https://ntrs.nasa.gov/api/citations/20230000588/downloads/Williams%20et%20al_LPSC%202023%20Delta%20Front%20Overview%20abstract_v5.pdf",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 415 (last localization: sol 415, site 23, drive 824) - rover position, not the target itself; error ~10-20 m. Sol basis: sol 415 is the first sol of the Cannery Passage loop (sols 415-421); the contact is a zone, not a point target.",
+    "sol": 415,
+    "distFromAoiCentreM": 1232,
+    "elevM": -2540.278
+  },
+  {
+    "id": "JZ02",
+    "name": "Hawksbill Gap lower section: Devils Tanyard and Rose River Falls",
+    "lon": 77.406301,
+    "lat": 18.45751,
+    "value": 70,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-3"
+    ],
+    "dwellMin": 25,
+    "description": "Crew logs the lowest Hawksbill Gap members bed by bed, photographs the fractured Rose River Falls abrasion site, and hand-collects loose friable pieces for grain-size and texture description. Why: the lowest members (Devils Tanyard, Hughes River Gap) are interbedded very fine-to-medium sandstones and inferred siltstone with VISIR spectra attributed to Fe/Mg-bearing phyllosilicates, and Devils Tanyard had a strong crystalline hematite absorption; the rover's sol 452 abrasion attempt at Rose River Falls (Sunset Hill) fractured the outcrop, leaving it unsuitable for proximity science and coring (Williams et al., LPSC 2023). Crumbly rock that defeats a rover abrader can still be described and bagged by hand.",
+    "citation": "https://ntrs.nasa.gov/api/citations/20230000588/downloads/Williams%20et%20al_LPSC%202023%20Delta%20Front%20Overview%20abstract_v5.pdf",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 452 (last localization: sol 449, site 26, drive 0) - rover position, not the target itself; error ~10-20 m. Sol basis: abrasion attempt at Rose River Falls on sol 452.",
+    "sol": 452,
+    "distFromAoiCentreM": 948,
+    "elevM": -2534.778
+  },
+  {
+    "id": "JZ03",
+    "name": "Skinner Ridge: Swift Run + Skyland paired cores (Thornton Gap abrasion)",
+    "lon": 77.406168,
+    "lat": 18.458895,
+    "value": 80,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-3",
+      "OBJ-5"
+    ],
+    "dwellMin": 25,
+    "description": "Crew documents the layered Skinner Ridge cliff face, measures bed thickness, and photographs the Thornton Gap abrasion patch and both core holes with their workspace. Why: between sols 477-496 the rover abraded Thornton Gap and cored Swift Run and Skyland in lower Rockytop (Williams et al., LPSC 2023). Swift Run (collected sol 490) is a horizontally layered, medium-grained, resistant Shenandoah formation sandstone with iron-magnesium carbonates detected around lithic clasts; its duplicate Skyland (sol 495) is in the Three Forks depot (Herd et al. 2025, PNAS).",
+    "citation": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11745317/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 490 (last localization: sol 477, site 26, drive 1004) - rover position, not the target itself; error ~10-20 m. Sol basis: Swift Run sol 490; the same localization holds for Skyland (sol 495), so the pair is one station.",
+    "sol": 490,
+    "distFromAoiCentreM": 901,
+    "elevM": -2520.853
+  },
+  {
+    "id": "JZ04",
+    "name": "Wildcat Ridge (Hogwallow Flats): Hazeltop + Bearwallow paired cores",
+    "lon": 77.405925,
+    "lat": 18.458647,
+    "value": 95,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-3",
+      "OBJ-4",
+      "OBJ-5"
+    ],
+    "dwellMin": 35,
+    "description": "Crew images the Wildcat Ridge rock and its abrasion patch under controlled lighting (UV-lamp check as a SHERLOC analog), maps sulfate-bearing laminae and veins, and records the Hazeltop and Bearwallow core holes; contamination-controlled handling only. Why: NASA reports the rock likely formed when sediment was deposited in a drying saltwater lake, and SHERLOC made the mission's most abundant organic detections to date here, spatially correlated with sulfate minerals; organics can also form without life, so this is a potential biosignature, not proof (NASA release, 15 Sep 2022). Hazeltop (sol 509) and Bearwallow (sol 516) come from the siltstone/mudstone of Hogwallow Flats with soluble hydrated Mg and Fe sulfates; the abrasion patch is Berry Hollow (Herd et al. 2025; Williams et al., LPSC 2023). UNCERTAIN: Herd et al. 2025 state SHERLOC detected no Raman bands of carbonaceous material at any light-toned sulfate-rich outcrop, so the strength of the organic signal is unresolved.",
+    "citation": "https://www.nasa.gov/news-release/nasas-perseverance-rover-investigates-geologically-rich-mars-terrain/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 509 (last localization: sol 502, site 26, drive 1222) - rover position, not the target itself; error ~10-20 m. Sol basis: Hazeltop sol 509; the same localization holds for Bearwallow (sol 516), so the pair is one station.",
+    "sol": 509,
+    "distFromAoiCentreM": 896,
+    "elevM": -2523.168
+  },
+  {
+    "id": "JZ05",
+    "name": "Amalik outcrop (Enchanted Lake, Cape Nukshak): Shuyak + Mageik paired cores",
+    "lon": 77.40144,
+    "lat": 18.450726,
+    "value": 85,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-3",
+      "OBJ-5"
+    ],
+    "dwellMin": 30,
+    "description": "Crew documents the flat, laminated Amalik sandstone at hand-lens scale, photographs the Novarupta abrasion patch and both core holes, and notes any alteration textures. Why: the team returned to Enchanted Lake for the third sample pair and abraded Novarupta and cored Shuyak and Mageik at Amalik over sols 557-581; Amalik is unique in VISIR, most consistent with Mg-rich serpentine (Williams et al., LPSC 2023). Herd et al. 2025 describe the rocks as flat, laminated, fine-grained sandstones interpreted as fluvial, with detrital olivine and pyroxene, hydrated, with serpentine-like minerals and aqueously precipitated sulfates and carbonates. Shuyak (sol 575) is on the rover; Mageik (sol 579) is in the depot after a sealing anomaly (sealed sol 619 per NASA's sample list).",
+    "citation": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11745317/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 575 (last localization: sol 565, site 29, drive 0) - rover position, not the target itself; error ~10-20 m. Sol basis: Shuyak sol 575; the same localization holds for Mageik (sol 579), so the pair is one station; Enchanted Lake (first approached sol 422) lies within ~20 m of this spot and is folded in here.",
+    "sol": 575,
+    "distFromAoiCentreM": 1049,
+    "elevM": -2526.525
+  },
+  {
+    "id": "JZ06",
+    "name": "Hidden Harbor (Yori Pass): Kukaklek single core, Uganik Island abrasion",
+    "lon": 77.399154,
+    "lat": 18.453644,
+    "value": 80,
+    "objectiveIds": [
+      "OBJ-1",
+      "OBJ-3",
+      "OBJ-4",
+      "OBJ-5"
+    ],
+    "dwellMin": 25,
+    "description": "Crew traces the light-toned veins across the Hidden Harbor outcrop, photographs the Uganik Island abrasion patch and Kukaklek core hole, and compares the rock side by side with Wildcat Ridge imagery. Why: Yori Pass is the apparent lateral equivalent of the Hogwallow Flats sulfate unit, and the rover abraded Uganik Island and collected its first singleton core, Kukaklek, here over sols 606-627 (Williams et al., LPSC 2023). Veins on this outcrop and large grains in Uganik Island contain anhydrite, suggesting more pervasive post-depositional fluid flow; the rock is a somewhat coarser-grained sandstone (Herd et al. 2025).",
+    "citation": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11745317/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 623 (last localization: sol 609, site 30, drive 1172) - rover position, not the target itself; error ~10-20 m. Sol basis: Kukaklek collection sol 623 from its sample designation (Herd et al. 2025); NASA's sample list gives sol 631 as its sealing sol.",
+    "sol": 623,
+    "distFromAoiCentreM": 836,
+    "elevM": -2517.295
+  },
+  {
+    "id": "JZ07",
+    "name": "Observation Mountain megaripple: Atmo Mountain + Crosswind Lake regolith pair",
+    "lon": 77.401257,
+    "lat": 18.451331,
+    "value": 60,
+    "objectiveIds": [
+      "OBJ-5"
+    ],
+    "dwellMin": 15,
+    "description": "Crew scuffs and trenches the megaripple flank, photographs any surface crust and grain layering, and fills a sieved grain-size card. Why: the two regolith samples were collected from a large ripple named Observation Mountain near the base of Cape Nukshak (Williams et al., LPSC 2023); a megaripple was chosen because megaripples have poor particle sorting, and regolith samples would help address how martian soil forms, a major unknown (Herd et al. 2025). Atmo Mountain (sol 634) is on the rover; Crosswind Lake (sol 639) is in the depot.",
+    "citation": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11745317/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 634 (last localization: sol 632, site 31, drive 0) - rover position, not the target itself; error ~10-20 m. Sol basis: Atmo Mountain sol 634; the same localization holds for Crosswind Lake (sol 639), so the pair is one station.",
+    "sol": 634,
+    "distFromAoiCentreM": 1013,
+    "elevM": -2525.285
+  },
+  {
+    "id": "JZ08",
+    "name": "Three Forks sample depot (10 tubes)",
+    "lon": 77.407756,
+    "lat": 18.452627,
+    "value": 90,
+    "objectiveIds": [
+      "OBJ-5"
+    ],
+    "dwellMin": 30,
+    "description": "Crew walks the depot zigzag and, without touching the tubes, locates and photographs each one in place (orientation, dust cover, any movement since deposition) and records a precise position for it, as a recovery-reconnaissance pass. Why: Perseverance dropped 10 tubes here between 21 Dec 2022 (sol 653) and 28 Jan 2023 (sol 690), about 5-15 m apart in a zigzag on flat ground near the base of the delta, as a backup if the rover cannot deliver its samples to the NASA-ESA Mars Sample Return campaign (NASA depot map page; JPL release). The set holds rock cores, an atmospheric sample and a witness tube (JPL); NASA's sample list places samples 1, 2, 5, 7, 9, 11, 13, 15 and 18 in the depot, and Herd et al. 2025 count nine sample tubes plus one witness tube. UNCERTAIN: the status of the Mars Sample Return campaign after 2023 was not checked.",
+    "citation": "https://science.nasa.gov/resource/perseverances-three-forks-sample-depot-map/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 653 (last localization: sol 652, site 32, drive 148) - rover position, not the target itself; error ~10-20 m. Sol basis: first tube drop on sol 653; the rover's localizations during depot building (sols 652-690) span about 50 x 50 m, and individual tube positions are NOT in the waypoint file.",
+    "sol": 653,
+    "distFromAoiCentreM": 1189,
+    "elevM": -2545.263
+  },
+  {
+    "id": "JZ09",
+    "name": "Berea outcrop (upper fan): Melyn core, Solva abrasion",
+    "lon": 77.383988,
+    "lat": 18.470212,
+    "value": 75,
+    "objectiveIds": [
+      "OBJ-2",
+      "OBJ-3",
+      "OBJ-5"
+    ],
+    "dwellMin": 25,
+    "description": "Crew logs the alternating resistant and recessive layers at Berea, photographs the Solva abrasion patch and Melyn core hole, and counts grains/pebbles in the coarser layers on a gridded card. Why: Melyn (sol 749) is an upper-fan sedimentary core (NASA sample list) from the Tenby formation, where the layers correspond to resistant sandstones and recessive coarser-grained rocks; the paired Solva abrasion showed hydrated sulfates, carbonate, and possibly phyllosilicates and silica (Herd et al. 2025).",
+    "citation": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11745317/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 749 (last localization: sol 736, site 37, drive 0) - rover position, not the target itself; error ~10-20 m. Sol basis: Melyn collection sol 749 (also its sealing sol on NASA's sample list).",
+    "sol": 749,
+    "distFromAoiCentreM": 515,
+    "elevM": -2449.079
+  },
+  {
+    "id": "JZ10",
+    "name": "Emerald Lake (Onahu layer): Otis Peak conglomerate core",
+    "lon": 77.368194,
+    "lat": 18.482988,
+    "value": 78,
+    "objectiveIds": [
+      "OBJ-2",
+      "OBJ-3",
+      "OBJ-5"
+    ],
+    "dwellMin": 25,
+    "description": "Crew photographs the conglomerate at 1 m and 10 cm scale, measures clast size and roundness on a gridded card, notes clast rock types, and marks oriented clasts for a possible paleomagnetic conglomerate test. Why: two coring attempts at Onahu crumbled, so the team drove to Emerald Lake, a few tens of metres away in the same layer; conglomerate grains record the geology of source terrains, their size and roundness record erosion and transport, and a conglomerate test can help determine when the martian magnetic field was active (NASA Perseverance blog, 21 Jun 2023). The Otis Peak core (sol 822) is a poorly lithified conglomerate whose clasts are cemented by silica, sulfate and carbonate (Herd et al. 2025).",
+    "citation": "https://science.nasa.gov/blog/persevering-across-the-upper-fan-in-search-of-record-keeping-rocks/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 822 (last localization: sol 821, site 40, drive 132) - rover position, not the target itself; error ~10-20 m. Sol basis: Otis Peak collection sol 822 (Herd et al. 2025; sealed sol 832 per NASA's sample list). Naming: NASA's list gives the outcrop as Emerald Lake, Herd et al. Table 1 as Onahu.",
+    "sol": 822,
+    "distFromAoiCentreM": 1675,
+    "elevM": -2420.789
+  },
+  {
+    "id": "JZ11",
+    "name": "Dream Lake: Pilot Mountain core, Gabletop Mountain abrasion",
+    "lon": 77.36051,
+    "lat": 18.483805,
+    "value": 68,
+    "objectiveIds": [
+      "OBJ-2",
+      "OBJ-3",
+      "OBJ-5"
+    ],
+    "dwellMin": 20,
+    "description": "Crew compares the low-lying, recessive Dream Lake rock with the Emerald Lake conglomerate, photographs the Gabletop Mountain abrasion patch and Pilot Mountain core hole, and records grain size. Why: Pilot Mountain (sol 882) is a medium-grained, recessive rock of the Otis Peak formation; Herd et al. 2025 describe these rocks as poorly lithified granule and pebble conglomerates and sandstones, cemented by silica, sulfate and carbonate, indicating aqueous alteration.",
+    "citation": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11745317/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 882 (last localization: sol 872, site 43, drive 0) - rover position, not the target itself; error ~10-20 m. Sol basis: Pilot Mountain collection sol 882 from its sample designation (Herd et al. 2025); NASA's sample list gives sol 913 as its sealing sol.",
+    "sol": 882,
+    "distFromAoiCentreM": 2061,
+    "elevM": -2417.997
+  },
+  {
+    "id": "JZ12",
+    "name": "Hans Amundsen Memorial Workspace (Mandu Wall, margin unit): Pelican Point core",
+    "lon": 77.350694,
+    "lat": 18.483443,
+    "value": 88,
+    "objectiveIds": [
+      "OBJ-3",
+      "OBJ-4",
+      "OBJ-5"
+    ],
+    "dwellMin": 30,
+    "description": "Crew photographs carbonate coatings and cement in the Amherst Point abrasion patch, logs sorting and grain size, records the Pelican Point core hole and images the Mandu Wall exposure. Why: Pelican Point (sol 923) is a moderately to poorly sorted margin-unit sandstone; some carbonates in the paired Amherst Point abrasion are hydrated, the first time such carbonates were detected during the mission, and any organic material present is in low abundance (<0.1 wt%) (Herd et al. 2025). Farthest station from the AOI centre (~2.5 km).",
+    "citation": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11745317/",
+    "coordSource": "M20_waypoints.json, Perseverance position at sol 923 (last localization: sol 911, site 45, drive 0) - rover position, not the target itself; error ~10-20 m. Sol basis: Pelican Point collection sol 923.",
+    "sol": 923,
+    "distFromAoiCentreM": 2542,
+    "elevM": -2423.312
+  }
+]

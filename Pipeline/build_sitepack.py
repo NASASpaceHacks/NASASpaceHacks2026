@@ -2,10 +2,12 @@
 """Build a Marswalk site pack from real NASA data.
 
     Pipeline/.venv/bin/python Pipeline/build_sitepack.py gale-v1                 # all stages
+    Pipeline/.venv/bin/python Pipeline/build_sitepack.py jezero-v1               # second site (Perseverance, Jezero delta front)
     Pipeline/.venv/bin/python Pipeline/build_sitepack.py gale-v1 --steps stations   # just refresh stations from Content/
     Pipeline/.venv/bin/python Pipeline/build_sitepack.py gale-v1 --steps images,conditions --force
 
-The manifest is rewritten (with fresh sha256s) after every step, so a partially built pack is always valid.
+Sites and their sources live in mwpipe/common.py (SITES; gale-v1 uses the module defaults) and
+mwpipe/site_jezero.py. The manifest is rewritten (with fresh sha256s) after every step, so a partially built pack is always valid.
 Network results are cached in Pipeline/cache/ (git-ignored); --force re-runs steps whose outputs already exist.
 """
 from __future__ import annotations
@@ -23,7 +25,7 @@ from mwpipe.common import CACHE_DIR, SITEPACKS_DIR, SITES, load_manifest, write_
 STAGES = {
     1: ["terrain", "traverse", "siting"],   # siting is DEM-only; the schema needs exactly one hab
     2: ["ortho", "stations"],
-    3: ["ti", "landmarks", "images", "conditions"],
+    3: ["ti", "landmarks", "images", "conditions", "context"],
 }
 ALL_STEPS = [s for k in sorted(STAGES) for s in STAGES[k]] + ["qa"]
 SCENARIO = {"sol": 412, "startLtstMin": 580, "label": "Sol 412 — 09:40 LTST"}  # fictional crewed-mission sol
@@ -52,11 +54,12 @@ def step_done(step: str, pack: Path, m: dict) -> bool:
         "traverse": "traverse" in m,
         "ortho": any(i["id"] == "ortho" for i in m["imagery"]),
         "siting": any(s["kind"] == "hab" for s in m["shelters"]),
-        "stations": False,     # cheap; always refresh (picks up Content/stations.gale.json when it lands)
+        "stations": False,     # cheap; always refresh (Content/stations.<site>.json + stm → <pack>/stm.json)
         "ti": "ti" in r,
         "landmarks": any(l["id"] != "LZ1" for l in m["landmarks"]),
         "images": len(m["images"]) > 0,
         "conditions": "rems" in m["conditions"] and "spaceWeather" in m["conditions"],
+        "context": (pack / "context" / "context.json").exists(),
         "qa": False,
     }[step]
 
@@ -74,6 +77,15 @@ def run_step(step: str, site, pack: Path, m: dict) -> dict:
     if step in ("ti", "landmarks", "images", "conditions"):
         from mwpipe import context
         return getattr(context, f"build_{step}")(site, pack, m)
+    if step == "context":
+        from mwpipe import context_imagery
+        context_imagery.run(site.id)
+        extra = m.setdefault("_extraFiles", [])
+        for f in sorted((pack / "context").iterdir()):
+            rel = f"context/{f.name}"
+            if f.is_file() and rel not in extra:
+                extra.append(rel)
+        return m
     if step == "qa":
         from mwpipe import qa
         qa.run_qa(site, pack, m)

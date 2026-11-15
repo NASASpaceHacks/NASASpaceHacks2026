@@ -10,7 +10,7 @@ import hashlib
 import json
 import math
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
@@ -44,6 +44,12 @@ class Site:
     w: int = 1000
     h: int = 1000
     cell_m: float = 5.0
+    # Per-site sources and options (see SITES). An empty dict means the original gale-v1 behaviour: every module
+    # falls back to its Gale constants, so gale-v1 builds exactly as before.
+    cfg: dict = field(default_factory=dict, compare=False, hash=False, repr=False)
+
+    def opt(self, key: str, default=None):
+        return self.cfg.get(key, default)
 
     @property
     def proj4(self) -> str:
@@ -112,6 +118,15 @@ SITES = {
     "gale-v1": Site(id="gale-v1", name="Gale Crater — Mount Sharp boxwork",
                     lon=137.388, lat=-4.805, lon0=137.39, lat_ts=-4.8),
 }
+
+
+def _register_jezero() -> None:
+    # Imported lazily so common.py stays dependency-free; mwpipe/site_jezero.py holds the Jezero sources + provenance.
+    from .site_jezero import JEZERO
+    SITES[JEZERO.id] = JEZERO
+
+
+_register_jezero()
 
 
 def eqc_source_to_local(site: Site, src_transform, src_lon0: float = 0.0, src_lat_ts: float = 0.0):

@@ -128,7 +128,9 @@ def run_qa(site: Site, pack: Path, m: dict) -> dict:
                                          "p5": round(float(np.percentile(dz, 5)), 3), "p95": round(float(np.percentile(dz, 95)), 3)}
 
     # Ortho ↔ DEM co-registration: phase-correlate DEM hillshade (sun matched roughly to imagery) vs ortho luminance at 5 m.
-    ortho_p = CACHE_DIR / "ortho_1m.jpg"
+    from .ortho import ortho_cache_path
+    pre = site.opt("qa_prefix", "qa_")          # gale-v1: qa_overlay.png …; jezero-v1: qa_jezero_overlay.png …
+    ortho_p = ortho_cache_path(site)
     if ortho_p.exists():
         o = np.asarray(Image.open(ortho_p).convert("L"), dtype=np.float64)
         o5 = o.reshape(H, 5, W, 5).mean(axis=(1, 3))
@@ -152,17 +154,17 @@ def run_qa(site: Site, pack: Path, m: dict) -> dict:
 
         # Overlays: full AOI at 2.5 m/px, plus a 1 m zoom around the station cluster.
         full = Image.open(ortho_p).resize((2000, 2000), Image.LANCZOS)
-        _draw_overlay(full, site, m, 2.5, x0, y1, wp=wp).save(CACHE_DIR / "qa_overlay.png", optimize=True)
+        _draw_overlay(full, site, m, 2.5, x0, y1, wp=wp).save(CACHE_DIR / f"{pre}overlay.png", optimize=True)
         sx = np.median([s["x"] for s in m["stations"]]) if m["stations"] else hab["x"]
         sy = np.median([s["y"] for s in m["stations"]]) if m["stations"] else hab["y"]
         zx0 = float(np.clip(sx - 600, x0, x1 - 1200)); zy1 = float(np.clip(sy + 600, y0 + 1200, y1))
         box = (int(zx0 - x0), int(y1 - zy1), int(zx0 - x0) + 1200, int(y1 - zy1) + 1200)
         zoom = Image.open(ortho_p).crop(box)
-        _draw_overlay(zoom, site, m, 1.0, zx0, zy1, wp=wp).save(CACHE_DIR / "qa_zoom.png", optimize=True)
+        _draw_overlay(zoom, site, m, 1.0, zx0, zy1, wp=wp).save(CACHE_DIR / f"{pre}zoom.png", optimize=True)
         hsimg = Image.fromarray((hillshade(dem, cm) * 255).astype(np.uint8)).resize((2000, 2000), Image.BILINEAR)
-        _draw_overlay(hsimg, site, m, 2.5, x0, y1, wp=wp).save(CACHE_DIR / "qa_hillshade.png", optimize=True)
+        _draw_overlay(hsimg, site, m, 2.5, x0, y1, wp=wp).save(CACHE_DIR / f"{pre}hillshade.png", optimize=True)
         rep["zoomBox_xy"] = [zx0, zy1 - 1200, zx0 + 1200, zy1]
 
-    (CACHE_DIR / "qa_report.json").write_text(json.dumps(rep, indent=1) + "\n")
+    (CACHE_DIR / f"{site.opt('qa_prefix', 'qa_')}report.json").write_text(json.dumps(rep, indent=1) + "\n")
     print(json.dumps(rep, indent=1))
     return rep
