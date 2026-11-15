@@ -1,6 +1,6 @@
 # Marswalk (working name): pitch v0
 
-Status: draft v0 by C1. The team picks the final product name. Numbers marked [verify] come from the design doc and must be checked against `numbers.json` / the running app before the pitch. Quotes must be re-checked against the NTRS PDFs.
+Status: draft v0 by C1 (numbers corrected 2026-11-14; the full rewrite comes in the presentation block). **Take every number and claim from `docs/CRITERIA_ANSWERS.md`.** The team picks the final product name. Numbers marked [verify] come from the design doc and must be checked against `numbers.json` / the running app before the pitch. Quotes must be re-checked against the NTRS PDFs.
 
 ## Live pitch, 4:00 max (design doc section 14)
 
@@ -18,9 +18,9 @@ Screen: Gale crater map, Curiosity's real traverse overlaid.
 **Speaker 1:** "We built the missing tool, and we say where it is only calibrated, not validated."
 
 ### 0:45 Demo moment 1: Safe Zone (50 s)
-**Speaker 2:** "This is the habitat console. Layers from six NASA missions on one Mars grid, each credited. Watch the reachable area as I turn constraints on, one at a time."
+**Speaker 2:** "This is the habitat console. Layers from NASA missions (MRO HiRISE and CRISM, Mars Odyssey THEMIS, MGS MOLA, Curiosity) on one Mars grid, each credited. Watch the reachable area as I turn constraints on, one at a time."
 Actions: turn on slope limit, then walkback, then shelter time, then line of sight; the zone shrinks. The route snaps inside. Point at the binding constraint text ("limited by shelter time at St 3") and a dropped station ("St 7 dropped: walkback, -18 min").
-**Speaker 2:** "On foot, time to shelter limits the EVA before oxygen does." (A 30 minute shelter rule at 0.56 m/s is about a 1 km radius, so the pressurized rover is the safe haven. [verify])
+**Speaker 2:** "From the habitat, every boxwork stop is blocked by four limits at once: suit heat on the climb back, radio contact, time to shelter and distance. Even with unlimited suit cooling it still fails. Staged from the pressurized rover, it's a GO, which is how NASA's Mars plans use rovers." (`Validation/v3_impact/heat_sensitivity.json`)
 Action: drag the rover marker; the zone grows. Click CONFIRM.
 
 ### 1:35 Demo moment 2: Two devices, one link (45 s)
@@ -30,11 +30,11 @@ Actions: visor shows the glass cockpit (heading, next stop, walkback margin). At
 
 ### 2:20 Demo moment 3: Earth goes dark (40 s)
 **Speaker 2:** "A solar particle event nowcast arrives."
-Actions: trigger SEP nowcast; the plan reroutes in under one second [verify latency]; then cut the network.
+Actions: trigger SEP nowcast; the plan re-plans in about 8 ms (median 8.3 ms, `numbers.json` v3); then cut the network.
 **Speaker 3:** "The link is down. The visor is still guiding her home. Autonomy is the default, not the fallback."
 
 ### 3:00 Credibility (25 s)
-**Speaker 1:** "Chips on screen: validation items V1, V2, V6, V7 [replace with the real results], a benchmark of five or more planners where research winners need zero constraint violations, and a route that fits in about 6 KB while Curiosity's daily uplink is about 28 KB [verify both]."
+**Speaker 1:** "Checked against NASA data: our dose model is within 4% of Curiosity's measured year-one radiation, our walking-energy model within 11% of NASA suited tests, our terrain shielding reproduces Curiosity's published values within 2 points. Engine, an independent checker and blind AI reviewers agree on 23 of 24 walks. The whole route fits in about 11 KB; Curiosity's daily uplink is about 28 KB."
 Wording on screen: "calibrated" / "reproduces", never "validated".
 
 ### 3:25 Impact (35 s)
