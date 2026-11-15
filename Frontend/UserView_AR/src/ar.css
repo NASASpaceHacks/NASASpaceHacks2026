@@ -1,0 +1,150 @@
+/* Marswalk AR visor (phone). Camera passthrough + minimum glanceable cues. Dark green, static (no motion). */
+:root {
+  --go: #2fb36a;          /* primary dark green accent */
+  --go-hi: #7fe0a6;       /* legible green for numbers on dark glass */
+  --warn: #ffb627;
+  --ret: #ff5fb4;
+  --ink: #dff5e8;
+  --glass: rgba(4, 30, 17, 0.78);
+  --glass-edge: rgba(47, 179, 106, 0.55);
+  --font-num: ui-monospace, 'SF Mono', 'B612 Mono', Menlo, monospace;
+  --font-ui: -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body, #root {
+  margin: 0; height: 100%; background: #000; overflow: hidden;
+  overscroll-behavior: none; user-select: none; -webkit-user-select: none;
+  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+}
+body { color: var(--ink); font-family: var(--font-ui); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+
+.tone-go { --c: var(--go); --ch: var(--go-hi); }
+.tone-warn { --c: var(--warn); --ch: var(--warn); }
+.tone-ret { --c: var(--ret); --ch: var(--ret); }
+
+.root { position: fixed; inset: 0; }
+
+.cam { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s; }
+.cam.on { opacity: 1; }
+.cam-fallback {
+  position: absolute; inset: 0;
+  background: linear-gradient(#3a2a24 0%, #7a5444 42%, #8f5f45 50%, #5a3a2b 100%);
+}
+
+/* Visor rim, coloured by state. */
+.root::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--c) 70%, transparent), inset 0 0 50px color-mix(in srgb, var(--c) 14%, transparent);
+}
+
+.safe {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
+  padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  pointer-events: none;
+}
+.safe button { pointer-events: auto; }
+
+/* ── top: straight 0–100 leg-progress rail ── */
+.top { display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; padding-right: 0; }
+.rail {
+  width: min(640px, calc(100% - 16px)); margin-top: 6px; display: flex; align-items: center; gap: 10px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+.rail-lbl { font: 500 13px/1 var(--font-ui); white-space: nowrap; flex: none; }
+.rail-lbl.end { flex: 0 1 auto; max-width: 45%; overflow: hidden; text-overflow: ellipsis; opacity: 0.9; }
+.rail-lbl .num { font: 700 20px/1 var(--font-num); color: var(--ch); }
+.rail-track { position: relative; flex: 1; height: 3px; background: rgba(4, 30, 17, 0.7); border-radius: 2px; }
+.rail-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--c); border-radius: 2px; }
+.rail-me { position: absolute; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--ch); }
+
+/* ── corner readout (top-right, below the rail) ── */
+.corner {
+  position: absolute; z-index: 2; right: max(14px, env(safe-area-inset-right)); top: calc(max(10px, env(safe-area-inset-top)) + 40px);
+  display: flex; flex-direction: column; align-items: flex-end; gap: 5px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+.corner > div { display: flex; gap: 6px; align-items: baseline; }
+.lbl { font: 600 10px/1 var(--font-num); letter-spacing: 0.1em; opacity: 0.75; }
+.val { font: 600 15px/1 var(--font-num); color: var(--ch); }
+
+.banner { width: min(560px, 100%); text-align: center; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); }
+.banner-main { font: 800 20px/1.1 var(--font-ui); letter-spacing: 0.08em; color: var(--c); }
+.banner-sub { font: 500 13px/1.3 var(--font-ui); margin-top: 3px; opacity: 0.9; }
+.chip {
+  font: 700 12px/1 var(--font-num); letter-spacing: 0.08em; color: var(--c);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* ── ground course ribbon (static) ── */
+.ground { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+.rib-fill { fill: color-mix(in srgb, var(--c) 34%, transparent); }
+.rib-edge { fill: none; stroke: var(--c); stroke-width: 3; stroke-linejoin: round; }
+.rib-chev { fill: none; stroke: var(--ch); stroke-linecap: round; stroke-linejoin: round; opacity: 0.9; }
+.rib-head { fill: color-mix(in srgb, var(--c) 75%, transparent); stroke: var(--c); stroke-width: 2.5; stroke-linejoin: round; }
+
+/* ── minimap (bottom-right) ── */
+.minimap {
+  position: absolute; z-index: 2; pointer-events: none;
+  right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom));
+  width: min(34vw, 150px); aspect-ratio: 1;
+}
+.minimap svg { width: 100%; height: 100%; display: block; }
+.mm-bg { fill: var(--glass); stroke: var(--glass-edge); stroke-width: 2; }
+.mm-ring { fill: none; stroke: rgba(47, 179, 106, 0.22); stroke-width: 1; }
+.mm-plan { fill: none; stroke: var(--go); stroke-width: 2.5; stroke-dasharray: 6 5; stroke-linejoin: round; opacity: 0.9; }
+.mm-actual { fill: none; stroke: var(--go-hi); stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; }
+.mm-wp { fill: rgba(4, 30, 17, 0.9); stroke: var(--go); stroke-width: 2; }
+.mm-wp.on { fill: var(--go-hi); stroke: #04120a; }
+.mm-home { fill: rgba(4, 30, 17, 0.9); stroke: var(--go); stroke-width: 2; }
+.mm-home.on { fill: var(--go-hi); }
+.mm-me { fill: #ffffff; stroke: #04120a; stroke-width: 1.5; stroke-linejoin: round; }
+.mm-n { font: 700 12px/1 var(--font-num); fill: var(--go-hi); text-anchor: middle; }
+.mm-scale { font: 600 10px/1 var(--font-num); fill: var(--ink); opacity: 0.7; text-anchor: end; }
+
+/* ── action card (station / new route / status; not shown while navigating) ── */
+.action { display: flex; justify-content: flex-start; z-index: 2; padding-right: min(36vw, 162px); }
+.card {
+  width: min(420px, 100%); padding: 0; text-align: left; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+.instr-main { font: 700 22px/1.1 var(--font-ui); color: var(--ch); }
+.instr-sub {
+  font: 500 14px/1.35 var(--font-num); margin-top: 3px; opacity: 0.92;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.instr-sub.wrap { white-space: normal; }
+.instr-sub.tone-warn { color: var(--warn); }
+.btn {
+  display: block; width: 100%; margin-top: 10px; padding: 12px; border-radius: 10px; border: 0;
+  background: var(--go); color: #03140a; font-weight: 700; font-size: 17px; letter-spacing: 0.02em;
+}
+.btn:disabled { opacity: 0.5; }
+
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.dot.up { background: var(--go); }
+.dot.deg { background: var(--warn); }
+.dot.down { background: #ff4534; }
+
+.compass-toggle {
+  position: absolute; z-index: 3;
+  left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom));
+  font: 600 10px/1 var(--font-num); letter-spacing: 0.08em; padding: 7px 8px; border-radius: 8px;
+  background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.2); opacity: 0.75;
+}
+.compass-toggle.on { border-color: var(--go); color: var(--go-hi); }
+/* Keep the toggle clear of an action card. */
+.root:has(.action) .compass-toggle { display: none; }
+
+.start {
+  position: absolute; inset: 0; z-index: 10; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; background: rgba(0, 12, 6, 0.82);
+}
+.start-main { font: 700 28px/1 var(--font-ui); color: var(--go-hi); padding: 16px 26px; border: 2px solid var(--go); border-radius: 14px; }
+.start-sub { font: 500 14px/1 var(--font-ui); opacity: 0.7; }
+
+/* Landscape phone. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .minimap { width: min(30vh, 130px); }
+  .card { width: min(360px, 48vw); }
+}
