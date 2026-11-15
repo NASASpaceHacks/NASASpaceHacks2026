@@ -9,9 +9,17 @@ sites = [dict(site=r['site'], bg=r['bg'], measured_drop_pct=r['measured_drop_pct
               our_blocked_change_pp=r['our_dB_pp'], paper_blocked_change_pp=r['paper_dB_pp']) for r in v1['rows_dose']]
 sites.append(dict(site='Murray Buttes', measured_drop_pct=4.0, predicted_two_term_pct=v1['murray_buttes']['pred_two_term_ours'], note='held out; BG is proxy'))
 s3 = json.load(open(f'{H}/v3_impact/summary.json')); P = s3['stats']['PR1']; HB = s3['stats']['HAB1']
+so = json.load(open(f'{H}/v3_impact/summary_oversub.json')); O = so['overall']
+OV = dict(scenarios=O['scenarios'], candidates=so['candidates'], availableMinRange=so['availableMinRange'], meanValueA=round(O['meanValueA'],1), meanValueB=round(O['meanValueB'],1),
+  scienceRatioMean=round(O['scienceRatioMean'],3), scienceRatioMedian=round(O['scienceRatioMedian'],3), scienceRatioMax=round(O['scienceRatioMax'],3),
+  pctAGreater=O['pctAGreater'], pctEqual=O['pctEqual'], pctBGreater=O['pctBGreater'], meanStationsA=round(O['meanStationsA'],2), meanStationsB=round(O['meanStationsB'],2),
+  meanEvaMinA=round(O['meanEvaMinA'],1), meanEvaMinB=round(O['meanEvaMinB'],1), solveMsA_p50=round(O['solveMsA_p50'],1), solveMsA_p95=round(O['solveMsA_p95'],1),
+  byBucket={k: dict(n=v['scenarios'], ratioMean=round(v['scienceRatioMean'],3), ratioMedian=round(v['scienceRatioMedian'],3), pctAGreater=round(v['pctAGreater'],1), pctEqual=round(v['pctEqual'],1), pctBGreater=v['pctBGreater']) for k,v in so['byBucket'].items()},
+  notes='All 12 stations, base PR-1, available EVA time 120-240 min via EVA_CUT (330 - available), 200 seeded scenarios. B = nearest-first with the same hard-rule checker. Science values are the team STM heuristic; single site; B is a generous but not the only human baseline.')
 V3 = dict(scenarios=P['scenarios'], scienceRatioMean=P['scienceRatioMean'], scienceRatioMedian=P['scienceRatioMedian'], pctMarswalkBetter=P['pctMarswalkBetter'],
   pctMarswalkEqualToNearestFirst=P['pctEqual'], pctNaiveUnsafe=P['pctNaiveViolatesAny'], pctNaiveUnsafeEdge=P['pctNaiveUnsafeEdge'], ruleViolationCounts=P['ruleViolationCounts'],
   planP50Ms=round(P['planP50Ms'],1), planP95Ms=round(P['planP95Ms'],1), replanP50Ms=round(P['replanP50Ms'],1), replanP95Ms=round(P['replanP95Ms'],1),
+  oversubscribed=OV,
   hab1=dict(scenarios=HB['scenarios'], stayIn=HB['marswalkStayIn'], pctNaiveUnsafe=HB['pctNaiveViolatesAny']),
   manualPlanningRef='no published figure found for hours of manual EVA traverse planning per EVA; only lead times (D-RATS 2010 planning began ~12 months before the field test; BASALT traverse targets were chosen months ahead from satellite imagery)',
   notes='gale-v1 real DEM, base PR-1, 200 seeded scenarios (3-6 of 12 stations, start 08:00-11:00 LTST, sol 412 with assumed Ls 240). Nearest-first WITH the same safety check selected exactly the same station set as Marswalk in every scenario (ratio 1.0): in this tight-limit site the safety rules, not the stop-order optimisation, decide the outcome. The naive slope-only plan visits ALL requested targets and breaks >=1 hard rule in %.1f%% of scenarios. Science values are the team STM heuristic. See v3_impact/README.md.' % P['pctNaiveViolatesAny'])

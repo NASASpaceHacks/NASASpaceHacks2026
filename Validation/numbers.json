@@ -127,6 +127,55 @@
   "planP95Ms": 71.7,
   "replanP50Ms": 8.5,
   "replanP95Ms": 18.2,
+  "oversubscribed": {
+   "scenarios": 200,
+   "candidates": 12,
+   "availableMinRange": [
+    120,
+    240
+   ],
+   "meanValueA": 382.1,
+   "meanValueB": 366.1,
+   "scienceRatioMean": 1.05,
+   "scienceRatioMedian": 1.011,
+   "scienceRatioMax": 1.306,
+   "pctAGreater": 62.5,
+   "pctEqual": 37.5,
+   "pctBGreater": 0,
+   "meanStationsA": 4.79,
+   "meanStationsB": 4.64,
+   "meanEvaMinA": 196.9,
+   "meanEvaMinB": 185.2,
+   "solveMsA_p50": 105.1,
+   "solveMsA_p95": 124.8,
+   "byBucket": {
+    "120-160": {
+     "n": 65,
+     "ratioMean": 1.06,
+     "ratioMedian": 1,
+     "pctAGreater": 46.2,
+     "pctEqual": 53.8,
+     "pctBGreater": 0
+    },
+    "160-200": {
+     "n": 72,
+     "ratioMean": 1.037,
+     "ratioMedian": 1,
+     "pctAGreater": 44.4,
+     "pctEqual": 55.6,
+     "pctBGreater": 0
+    },
+    "200-240": {
+     "n": 63,
+     "ratioMean": 1.053,
+     "ratioMedian": 1.038,
+     "pctAGreater": 100,
+     "pctEqual": 0,
+     "pctBGreater": 0
+    }
+   },
+   "notes": "All 12 stations, base PR-1, available EVA time 120-240 min via EVA_CUT (330 - available), 200 seeded scenarios. B = nearest-first with the same hard-rule checker. Science values are the team STM heuristic; single site; B is a generous but not the only human baseline."
+  },
   "hab1": {
    "scenarios": 60,
    "stayIn": 60,
@@ -135,5 +184,5 @@
   "manualPlanningRef": "no published figure found for hours of manual EVA traverse planning per EVA; only lead times (D-RATS 2010 planning began ~12 months before the field test; BASALT traverse targets were chosen months ahead from satellite imagery)",
   "notes": "gale-v1 real DEM, base PR-1, 200 seeded scenarios (3-6 of 12 stations, start 08:00-11:00 LTST, sol 412 with assumed Ls 240). Nearest-first WITH the same safety check selected exactly the same station set as Marswalk in every scenario (ratio 1.0): in this tight-limit site the safety rules, not the stop-order optimisation, decide the outcome. The naive slope-only plan visits ALL requested targets and breaks >=1 hard rule in 99.5% of scenarios. Science values are the team STM heuristic. See v3_impact/README.md."
  },
- "generatedUtc": "2026-11-15T01:00:41Z"
+ "generatedUtc": "2026-11-15T02:11:29Z"
 }

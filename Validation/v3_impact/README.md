@@ -24,3 +24,29 @@ Real `SitePacks/gale-v1` terrain, default hard rules and crew. Seeded (20260) sc
 
 ## Manual planning time reference
 No published figure found for hours of manual EVA traverse planning per EVA. Only lead times: D-RATS 2010 planning began about 12 months before the field test (https://ui.adsabs.harvard.edu/abs/2013AcAau..90..254H/abstract); BASALT traverse targets (2-3 per EVA) were chosen months ahead by the science team from satellite imagery (https://pmc.ncbi.nlm.nih.gov/articles/PMC6442258). These are strategic lead times, not per-EVA replanning durations.
+
+## Oversubscribed family (G4b)
+Run: `pnpm tsx Validation/v3_impact/run_oversub.ts` (about 1 min). Outputs: `results_oversub.csv`, `summary_oversub.json`.
+
+Why: the first family (3-6 targets, full EVA) is not oversubscribed, so A == B there. Real EVAs usually have more science wanted than time (Caswell et al. 2025, NTRS 20250006063).
+
+### Method
+Same pack, rules, crew, base PR-1 (`stageFromShelter`), sol 412 (assumed Ls 240). 200 scenarios, seed 20261. Candidates: all 12 gale-v1 stations. Start time uniform 08:00-11:00 LTST. Available surface time drawn uniform 120-240 min and imposed with one `EVA_CUT` event. Engine arithmetic: nominal EVA 360 min minus 30 min egress/ingress = 330 surface min, so cut = 330 - available (a first attempt used 300 - available, which gave 150-270 min available; it was discarded and the run redone with the corrected formula before any analysis). A = `plan()`. B = nearest-first with the same hard-rule checker (`makeOrderEvaluator`), same as family 1. Reported EVA minutes include the 30 min egress/ingress.
+
+### Results (n=200, all Marswalk OK, nearest-first never empty)
+- Mean science value A 382.2 vs B 366.1. Ratio A/B: mean 1.050, median 1.011, min 1.000, max 1.306.
+- A > B in 62.5%, equal in 37.5%, B > A in 0% (consistent with A being optimal under the engine's rules; no counterexample found).
+- Stations visited: A 4.79 vs B 4.65 mean. EVA minutes used: A 196.9 vs B 185.2 mean.
+- Solve time: A p50 105 ms / p95 125 ms; B (many evaluator calls) p50 3.7 / p95 7.7 ms (B's route matrix is built outside the timed loop, so B ms understates a cold start).
+
+| Available min | n | mean A | mean B | ratio mean | ratio median | A>B | equal | B>A |
+|---|---|---|---|---|---|---|---|---|
+| 120-160 | 65 | 308.5 | 293.5 | 1.060 | 1.000 | 46% | 54% | 0% |
+| 160-200 | 72 | 389.8 | 377.4 | 1.037 | 1.000 | 44% | 56% | 0% |
+| 200-240 | 63 | 449.4 | 428.1 | 1.053 | 1.038 | 100% | 0% | 0% |
+
+### Caveats
+- Science values are the team's STM heuristic, not mission data; an "improvement" is in those units.
+- Nearest-first-with-checks is a reasonable but generous human baseline (it has a perfect rule checker). It is not the only possible human strategy (e.g. highest-value-first).
+- Gains are modest (mean +5%, median +1%) and concentrated in about 62% of cases; in the rest nearest-first is already optimal.
+- Single site (Gale), single base (PR-1), synthetic start/time draws, assumed Ls, one seed. Solve time is Node on one laptop.
