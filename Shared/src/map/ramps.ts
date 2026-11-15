@@ -73,6 +73,22 @@ export const TI_RAMP: Ramp = {
 };
 
 /**
+ * CRISM polyhydrated-sulfate parameter (SINDEX2, unitless index). Weak signal = clear, stronger = indigo -> violet -> lavender.
+ * Not red (danger) and no yellow/orange; lightness rises with the signal. Stops sit on this AOI's range (about 0.002-0.010).
+ */
+export const CRISM_RAMP: Ramp = {
+  id: 'crism',
+  stops: [
+    // Transparent up to the AOI median (0.0055), so only above-median sulfate signal tints the map;
+    // 0.0077 = 85th percentile ("strong" in the station cards), 0.0104 = 99th.
+    [0.0055, [96, 70, 190, 0]],
+    [0.0066, [118, 84, 214, 0.35]],
+    [0.0077, [176, 142, 242, 0.55]],
+    [0.0104, [236, 226, 255, 0.75]],
+  ],
+};
+
+/**
  * Elevation overlay between `lo` and `hi` metres: deep blue (low) → blue → cyan → white (high).
  * No yellow/orange (the console's palette reserves warm colours); lightness rises monotonically.
  */

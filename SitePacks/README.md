@@ -18,6 +18,7 @@ built from real NASA data by [`Pipeline/build_sitepack.py`](../Pipeline/README.m
 | `rough.bin` | 2.0 MB | u16 LE × 0.001, m | Std-dev of plane-detrended 1 m heights inside each 5 m cell |
 | `normals.bin` | 4.0 MB | i16 LE × 1/32767, 2 bands interleaved by pixel (nx, ny) | +y north, nx = −dz/dx, ny = −dz/dy. Identical to `surfaceNormals()` (max Δ 6e-5) |
 | `ti.bin` | 2.0 MB | u16 LE × 0.1, nodata 65535, J m⁻² K⁻¹ s⁻½ | THEMIS quantitative thermal inertia (100 m, bilinear to 5 m). **Indicative** |
+| `skyview.bin` | 2.0 MB | u16 LE × 0.0001, fraction | Visible-sky fraction (1 − obstructed fraction) for the terrain radiation-shielding term. Same horizon method and solid-angle definition as `Validation/v1_shielding` (Guo et al. 2026, MAE 2.0 pp). Horizon at 25 m spacing (360 rays, 5 m DEM samples, rays truncated at the 5 km pack edge), bilinearly upsampled to 5 m. Gale: MAE 0.9 pp (p95 3.5 pp, max 10.5 pp) vs a full-resolution 1 m / 0.25° computation at 60 random cells; Jezero: MAE 0.6 pp (p95 1.4, max 16.3 pp, at sharp cliffs). Built by `build_sitepack.py <site> --steps skyview`. **Indicative** |
 | `ortho.webp` | 4.9 MB | WebP q80, 5000 × 5000 px, 1 m | HiRISE colour basemap over the grid extent (`imagery[0]`, `extent` in projected m) |
 | `ortho_cog.tif` | 39.1 MB | Cloud-optimised GeoTIFF, JPEG q85 (YCbCr), 0.5 m, 512² tiles + overviews | Same imagery at 0.5 m, georeferenced in the site eqc (`imagery[1]`, id `ortho_hr`) |
 | `images/*.jpg` | 10 files, 2.6 MB | JPEG ≤ 1280 px | Curiosity Mastcam (raw Bayer, demosaicked to colour) and Navcam frames from stationary sols at each station's nearest rover stop |
@@ -26,7 +27,7 @@ built from real NASA data by [`Pipeline/build_sitepack.py`](../Pipeline/README.m
 Total ≈ 58 MB (budget < 100 MB, each file < 50 MB).
 
 ### What the manifest holds
-- **rasters**: `dem`, `slope`, `rough`, `normals`, `ti`. Each has its full provenance (mission, instrument, product, URL, licence, citation, native resolution, accuracy).
+- **rasters**: `dem`, `slope`, `rough`, `normals`, `ti`, `skyview` (plus the CRISM mineral rasters on gale-v1). Each has its full provenance (mission, instrument, product, URL, licence, citation, native resolution, accuracy).
 - **imagery**: `ortho` (WebP, 1 m) and `ortho_hr` (COG, 0.5 m).
 - **shelters**: `HAB` (fixed) and `ROVER1` (movable pressurized rover, 896 m from the hab).
 - **keepouts**: `PLUME-LZ1`, a 1 km plume-ejecta ring around landing pad LZ-1. The pad is 3.6 km from the hab, and the ring clears both shelters.
@@ -34,7 +35,7 @@ Total ≈ 58 MB (budget < 100 MB, each file < 50 MB).
   The matching science traceability matrix is shipped as `stm.json` (a copy of `Content/stm.json`).
 - **landmarks**: LZ-1, 6 unnamed DEM knobs, 5 named features from `Content/gazetteer.json` (rover-team names, `informal: true`), and the Aeolis Mons summit (IAU name, `informal: false`; highest MOLA sample within 0.45° of the IAU centre, 771 m) as a far heading cue.
 - **traverse**: Curiosity's track in projected metres (AOI ± 3 km, simplified to 0.25 m).
-- **conditions**: last 30 REMS sols. `spaceWeather` is absent in the current build because DONKI was rate-limited (see Pipeline/README).
+- **conditions**: `rems` holds the last 30 Curiosity REMS sols (4966–4995). `spaceWeather` holds 33 CCMC DONKI events (31 WSA-ENLIL CME runs with a Mars arrival, 2 flares). `jezero-v1` also holds 33 DONKI events (31 + 2) and 5 MEDA sols (see below).
 - **scenario**: `Sol 412 — 09:40 LTST`, a fictional crewed-mission sol.
 
 ## `jezero-v1`: Jezero Crater, western delta front
@@ -74,7 +75,7 @@ Total ≈ 42 MB, with every file pinned by sha256 in `files{}`.
   There is no gazetteer for this site yet.
 - **Conditions**:
   - MEDA: the mars.nasa.gov outreach feed stopped updating in April 2024. Only 5 sols carry data (sols 1129–1133, 2024-04-23…27), and each is dated in the pack.
-  - Space weather: DONKI, keyless CCMC API.
+  - Space weather: DONKI, keyless CCMC API (33 events: 31 WSA-ENLIL, 2 flares).
 - **QA**:
   - DEM vs Perseverance waypoint elevations: median 0.00 m, std 0.07 m (n = 220). The best-fit horizontal offset is 0 within a 0.5 m search, while a 5 m shift raises the std to 0.25–0.49 m.
   - Ortho vs DEM: 0.7 m E / 0.2 m N.

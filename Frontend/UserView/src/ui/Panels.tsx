@@ -4,12 +4,12 @@ import type { Snapshot } from '../state/store';
 import { ArcGauge, Bar, BearingDial, ClockCue } from './instruments/Instruments';
 import { fmtCountdown, fmtDist, fmtElapsed, fmtLtst, fmtMin } from './format';
 
-export function Frame({ x, y, w, h, label, children, tone }: { x: number; y: number; w: number; h: number; label?: string; children: ReactNode; tone?: 'amber' | 'red' }) {
-  const border = tone === 'red' ? 'var(--r)' : tone === 'amber' ? 'var(--a2)' : undefined;
+export function Frame({ x, y, w, h, label, children, tone }: { x: number; y: number; w: number; h: number; label?: string; children: ReactNode; tone?: 'caution' | 'red' }) {
+  const border = tone === 'red' ? 'var(--r)' : tone === 'caution' ? 'var(--k2)' : undefined;
   return (
     <div className="frame" style={{ left: x, top: y, width: w, height: h, borderColor: border }}>
       {label && (
-        <div className="tab lbl" style={{ color: tone === 'red' ? 'var(--r)' : tone === 'amber' ? 'var(--a)' : undefined }}>
+        <div className="tab lbl" style={{ color: tone === 'red' ? 'var(--r)' : tone === 'caution' ? 'var(--k)' : undefined }}>
           {label}
         </div>
       )}
@@ -21,7 +21,7 @@ export function Frame({ x, y, w, h, label, children, tone }: { x: number; y: num
 const STATE_LABEL: Record<Snapshot['display'], { text: string; color: string; fill?: boolean; blink?: boolean }> = {
   BOOT: { text: 'BOOT', color: 'var(--g3)' },
   WAITING_FOR_ROUTE: { text: 'STANDBY', color: 'var(--g2)' },
-  NEW_ROUTE: { text: 'NEW ROUTE', color: 'var(--a)', blink: true },
+  NEW_ROUTE: { text: 'NEW ROUTE', color: 'var(--c)', blink: true },
   NAV: { text: 'NAV', color: 'var(--g)' },
   STATION: { text: 'STATION', color: 'var(--g)' },
   RETURN_NOW: { text: 'RETURN NOW', color: 'var(--r)', fill: true, blink: true },
@@ -51,8 +51,8 @@ const Sep = () => <div style={{ width: 2, height: 56, background: 'var(--line)',
 export function TopBar({ s }: { s: Snapshot }) {
   const st = STATE_LABEL[s.display];
   const linkTxt = s.link === 'up' ? 'UP' : s.link === 'degraded' ? 'DEGRADED' : 'LOST';
-  const linkCol = s.link === 'up' ? 'var(--g)' : s.link === 'degraded' ? 'var(--a)' : 'var(--r)';
-  const o2Col = s.o2Pct < 15 ? 'var(--r)' : s.o2Pct < 30 ? 'var(--a)' : 'var(--w)';
+  const linkCol = s.link === 'up' ? 'var(--g)' : s.link === 'degraded' ? 'var(--k)' : 'var(--r)';
+  const o2Col = s.o2Pct < 15 ? 'var(--r)' : s.o2Pct < 30 ? 'var(--k)' : 'var(--w)';
   return (
     <div className="absolute flex items-center" style={{ left: 16, top: 0, width: 1888, height: 92, borderBottom: '2px solid var(--line)' }}>
       <div className="flex flex-col justify-center" style={{ width: 210 }}>
@@ -69,13 +69,13 @@ export function TopBar({ s }: { s: Snapshot }) {
       <Readout label="EVA elapsed" value={s.seq !== null ? `T+${fmtElapsed(s.t)}` : 'T+--:--'} />
       <Sep />
       {s.autonomous ? (
-        <div className="flex items-center hatch-amber" style={{ flex: 1, height: 74, border: '3px solid var(--a)', background: '#1c1300', padding: '0 18px', gap: 16, minWidth: 0 }}>
-          <span className="blink" style={{ flex: 'none', width: 20, height: 20, background: 'var(--a)', borderRadius: 2 }} />
+        <div className="flex items-center hatch-caution" style={{ flex: 1, height: 74, border: '3px solid var(--k)', background: '#0a0d12', padding: '0 18px', gap: 16, minWidth: 0 }}>
+          <span className="blink" style={{ flex: 'none', width: 20, height: 20, background: 'var(--k)', borderRadius: 2 }} />
           <div className="flex flex-col" style={{ minWidth: 0 }}>
-            <span style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 27, letterSpacing: '0.02em', color: 'var(--a)', lineHeight: '32px', whiteSpace: 'nowrap' }}>
+            <span style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 27, letterSpacing: '0.02em', color: 'var(--k)', lineHeight: '32px', whiteSpace: 'nowrap' }}>
               LINK LOST — AUTONOMOUS — LAST CONFIRMED ROUTE v{s.seq ?? '—'}
             </span>
-            <span className="lbl" style={{ fontSize: 16, color: 'var(--a)', whiteSpace: 'nowrap', letterSpacing: '0.08em' }}>
+            <span className="lbl" style={{ fontSize: 16, color: 'var(--k)', whiteSpace: 'nowrap', letterSpacing: '0.08em' }}>
               ONBOARD SAFETY CORE GUIDING · TELEM QUEUED {s.outbox} · DOWN {Math.floor(s.linkDownS)} S
             </span>
           </div>
@@ -111,7 +111,7 @@ export function TopBar({ s }: { s: Snapshot }) {
               <span className="lbl" style={{ fontSize: 18 }}>
                 Position <span style={{ textTransform: 'none' }}>1σ</span>
               </span>
-              <span className="num" style={{ fontSize: 30, color: s.sigmaM > 20 ? 'var(--a)' : 'var(--w)', lineHeight: '32px' }}>
+              <span className="num" style={{ fontSize: 30, color: s.sigmaM > 20 ? 'var(--k)' : 'var(--w)', lineHeight: '32px' }}>
                 ±{Math.round(s.sigmaM)}
                 <span className="lbl" style={{ fontSize: 18, marginLeft: 6 }}>
                   M DR
@@ -127,7 +127,7 @@ export function TopBar({ s }: { s: Snapshot }) {
               </span>
               <span className="num" style={{ fontSize: 30, color: linkCol, lineHeight: '32px' }}>
                 {linkTxt}
-                {s.outbox > 0 && <span style={{ fontSize: 20, color: 'var(--a)', marginLeft: 10 }}>Q{s.outbox}</span>}
+                {s.outbox > 0 && <span style={{ fontSize: 20, color: 'var(--k)', marginLeft: 10 }}>Q{s.outbox}</span>}
               </span>
             </div>
           </div>
@@ -171,7 +171,7 @@ function NextPanel({ s }: { s: Snapshot }) {
               cy={140}
               r={R}
               fill="none"
-              stroke={st.dwellCut ? 'var(--a)' : 'var(--g)'}
+              stroke={st.dwellCut ? 'var(--k)' : 'var(--g)'}
               strokeWidth={18}
               strokeDasharray={`${C * frac} ${C}`}
               transform="rotate(-90 140 140)"
@@ -188,14 +188,14 @@ function NextPanel({ s }: { s: Snapshot }) {
             <div className="lbl" style={{ fontSize: 20 }}>
               Station {st.index} of {st.total}
             </div>
-            <div className="num" style={{ fontSize: 76, lineHeight: '76px', color: 'var(--a)' }}>
+            <div className="num" style={{ fontSize: 76, lineHeight: '76px', color: 'var(--c)' }}>
               {st.id}
             </div>
             <div className="num" style={{ fontSize: 34, color: 'var(--w)' }}>
               TASKS {st.tasksDone}/{st.tasks.length}
             </div>
             {st.leaveByLtstMin !== null && (
-              <div className="num" style={{ fontSize: 26, color: st.dwellCut ? 'var(--a)' : 'var(--g2)' }}>
+              <div className="num" style={{ fontSize: 26, color: st.dwellCut ? 'var(--k)' : 'var(--g2)' }}>
                 {st.dwellCut ? 'DWELL CUT · ' : ''}LEAVE BY {fmtLtst(st.leaveByLtstMin)}
               </div>
             )}
@@ -217,7 +217,7 @@ function NextPanel({ s }: { s: Snapshot }) {
         {n ? (
           <>
             <div className="flex items-baseline" style={{ gap: 14 }}>
-              <span className="num" style={{ fontSize: 60, color: n.isHome ? 'var(--c)' : 'var(--a)', lineHeight: '62px' }}>
+              <span className="num" style={{ fontSize: 60, color: n.isHome ? 'var(--w)' : 'var(--c)', lineHeight: '62px' }}>
                 {n.id}
               </span>
               <span className="lbl" style={{ fontSize: 20 }}>
@@ -225,7 +225,7 @@ function NextPanel({ s }: { s: Snapshot }) {
               </span>
             </div>
             {s.offRouteM > 20 ? (
-              <div className="num blink" style={{ fontSize: 22, color: 'var(--a)', whiteSpace: 'nowrap' }}>
+              <div className="num blink" style={{ fontSize: 22, color: 'var(--k)', whiteSpace: 'nowrap' }}>
                 OFF ROUTE {Math.round(s.offRouteM)} M · REJOIN TRACK
               </div>
             ) : (
@@ -261,9 +261,9 @@ function NextPanel({ s }: { s: Snapshot }) {
                 <div className="lbl" style={{ fontSize: 18 }}>
                   Brg
                 </div>
-                <div className="num" style={{ fontSize: 36, lineHeight: '40px', color: 'var(--a)' }}>
+                <div className="num" style={{ fontSize: 36, lineHeight: '40px', color: 'var(--c)' }}>
                   {Math.round(n.relDeg / 30) % 12 || 12}
-                  <span className="lbl" style={{ fontSize: 20, marginLeft: 4, color: 'var(--a)' }}>
+                  <span className="lbl" style={{ fontSize: 20, marginLeft: 4, color: 'var(--c)' }}>
                     O&apos;CLK
                   </span>
                 </div>
@@ -290,13 +290,13 @@ function NextPanel({ s }: { s: Snapshot }) {
 
 function MarginsPanel({ s }: { s: Snapshot }) {
   const b = s.bingo;
-  const bingoCol = !b ? 'var(--g3)' : b.inMin < 0 ? 'var(--r)' : b.inMin < 10 ? 'var(--a)' : 'var(--w)';
+  const bingoCol = !b ? 'var(--g3)' : b.inMin < 0 ? 'var(--r)' : b.inMin < 10 ? 'var(--k)' : 'var(--w)';
   const wb = s.walkbackMarginMin;
   return (
     <Frame x={0} y={350} w={CW} h={262} label="Margins">
       <div className="absolute flex" style={{ left: 8, top: 26, gap: 4 }}>
-        <ArcGauge value={wb === null ? null : wb === -Infinity ? -999 : wb} max={240} label="Walkback mgn" unit="MIN" amberBelow={30} redBelow={10} size={232} />
-        <ArcGauge value={s.shelterMin} max={SHELTER_MAX_MIN * 1.2} label={`Shelter ≤${SHELTER_MAX_MIN}`} unit="MIN" amberBelow={SHELTER_MAX_MIN * 0.8} redBelow={SHELTER_MAX_MIN} limitAt={SHELTER_MAX_MIN} invert size={232} />
+        <ArcGauge value={wb === null ? null : wb === -Infinity ? -999 : wb} max={240} label="Walkback mgn" unit="MIN" cautionBelow={30} redBelow={10} size={232} />
+        <ArcGauge value={s.shelterMin} max={SHELTER_MAX_MIN * 1.2} label={`Shelter ≤${SHELTER_MAX_MIN}`} unit="MIN" cautionBelow={SHELTER_MAX_MIN * 0.8} redBelow={SHELTER_MAX_MIN} limitAt={SHELTER_MAX_MIN} invert size={232} />
       </div>
       <div className="absolute flex flex-col" style={{ left: 500, top: 30, width: 256, gap: 6 }}>
         <div className="lbl" style={{ fontSize: 20 }}>
@@ -331,7 +331,7 @@ function AdvisoryPanel({ s }: { s: Snapshot }) {
       : `${comm.inLos ? 'SHADOW' : 'LOS'} IN ${Math.max(1, Math.round(comm.changeInMin))} MIN`;
   const commWarn = comm.available && (!comm.inLos || (comm.changeInMin !== null && comm.changeInMin < 5));
   return (
-    <Frame x={0} y={632} w={CW} h={132} label="Advisory" tone={adv || rest ? 'amber' : undefined}>
+    <Frame x={0} y={632} w={CW} h={132} label="Advisory" tone={adv || rest ? 'caution' : undefined}>
       <div className="absolute flex items-center" style={{ left: 20, top: 24, gap: 26 }}>
         <div
           className={adv ? 'blink' : ''}
@@ -341,9 +341,9 @@ function AdvisoryPanel({ s }: { s: Snapshot }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            border: `3px solid ${adv || rest ? 'var(--a)' : 'var(--g3)'}`,
-            background: adv ? 'var(--a)' : 'transparent',
-            color: adv ? '#000' : rest ? 'var(--a)' : 'var(--g2)',
+            border: `3px solid ${adv || rest ? 'var(--k)' : 'var(--g3)'}`,
+            background: adv ? 'var(--k)' : 'transparent',
+            color: adv ? '#000' : rest ? 'var(--k)' : 'var(--g2)',
             fontFamily: 'var(--font-ui)',
             fontWeight: 800,
             fontSize: adv || rest ? 30 : 28,
@@ -357,7 +357,7 @@ function AdvisoryPanel({ s }: { s: Snapshot }) {
           <div className="lbl" style={{ fontSize: 17, whiteSpace: 'nowrap' }}>
             Heat 30-min avg
           </div>
-          <div className="num" style={{ fontSize: 38, lineHeight: '42px', color: adv ? 'var(--a)' : 'var(--w)' }}>
+          <div className="num" style={{ fontSize: 38, lineHeight: '42px', color: adv ? 'var(--k)' : 'var(--w)' }}>
             {s.seq !== null ? Math.round(s.heatAvgW) : '—'}
             <span className="lbl" style={{ fontSize: 18, marginLeft: 6 }}>
               / {HEAT_BUDGET_W} W
@@ -365,7 +365,7 @@ function AdvisoryPanel({ s }: { s: Snapshot }) {
           </div>
           <svg width={200} height={16}>
             <rect x={1} y={1} width={198} height={14} fill="none" stroke="var(--g3)" strokeWidth={2} />
-            <rect x={4} y={4} width={Math.max(0, Math.min(1, heatFrac)) * 192} height={8} fill={adv ? 'var(--a)' : 'var(--g)'} />
+            <rect x={4} y={4} width={Math.max(0, Math.min(1, heatFrac)) * 192} height={8} fill={adv ? 'var(--k)' : 'var(--g)'} />
             <line x1={4 + (1 / 1.3) * 192} y1={0} x2={4 + (1 / 1.3) * 192} y2={16} stroke="var(--r)" strokeWidth={3} />
           </svg>
         </div>
@@ -373,10 +373,10 @@ function AdvisoryPanel({ s }: { s: Snapshot }) {
           <div className="lbl" style={{ fontSize: 17 }}>
             Hab comm
           </div>
-          <div className="num" style={{ fontSize: 34, lineHeight: '40px', color: !comm.available ? 'var(--g3)' : comm.inLos ? 'var(--c)' : 'var(--a)' }}>
+          <div className="num" style={{ fontSize: 34, lineHeight: '40px', color: !comm.available ? 'var(--g3)' : comm.inLos ? 'var(--c)' : 'var(--k)' }}>
             {commMain}
           </div>
-          <div className="num" style={{ fontSize: 18, color: commWarn ? 'var(--a)' : 'var(--g2)', whiteSpace: 'nowrap' }}>
+          <div className="num" style={{ fontSize: 18, color: commWarn ? 'var(--k)' : 'var(--g2)', whiteSpace: 'nowrap' }}>
             {commSub}
           </div>
         </div>
@@ -392,7 +392,7 @@ function CuePanel({ s }: { s: Snapshot }) {
       <div className="absolute flex items-center" style={{ left: 18, top: 6, gap: 20 }}>
         <ClockCue rel={c ? c.relDeg : 0} kind={c ? c.kind : 'none'} size={100} />
         <div className="flex flex-col">
-          <div style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: c && c.text.length > 22 ? 34 : 42, color: c ? 'var(--a)' : 'var(--g3)', letterSpacing: '0.03em', lineHeight: '46px' }}>
+          <div style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: c && c.text.length > 22 ? 34 : 42, color: c ? 'var(--k)' : 'var(--g3)', letterSpacing: '0.03em', lineHeight: '46px' }}>
             {c ? c.text : 'NO TRACK'}
           </div>
           <div className="num" style={{ fontSize: 20, color: 'var(--g2)' }}>
@@ -438,12 +438,12 @@ export function KeyLegend({ keys }: { keys: KeyDef[] }) {
             background: 'transparent',
             border: 0,
             cursor: 'pointer',
-            color: !k.enabled ? 'var(--g4)' : k.on ? 'var(--a)' : 'var(--g)',
+            color: !k.enabled ? 'var(--g4)' : k.on ? 'var(--k)' : 'var(--g)',
             padding: '0 10px',
           }}
         >
           <span className="keycap">{k.k}</span>
-          <span style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 26, letterSpacing: '0.08em', color: !k.enabled ? 'var(--g4)' : k.on ? 'var(--a)' : 'var(--g2)' }}>
+          <span style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 26, letterSpacing: '0.08em', color: !k.enabled ? 'var(--g4)' : k.on ? 'var(--k)' : 'var(--g2)' }}>
             {k.label}
           </span>
         </button>

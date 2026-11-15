@@ -1,23 +1,25 @@
 @import 'tailwindcss';
 
-/* Marswalk EVA visor — glass-cockpit tokens. Pure black, phosphor green + amber vectors, ≥2 px strokes. */
+/* Marswalk EVA visor — glass-cockpit tokens. Pure black, console palette (ok green, cyan, magenta, red, ink), ≥2 px strokes. */
 :root {
   --bg: #000;
-  --g: #4dff94;
-  --g2: #33c46f;
-  --g3: #1d7a45;
-  --g4: #0f3d23;
-  --a: #ffb627;
-  --a2: #a8730b;
-  --a3: #3d2a05;
-  --r: #ff4534;
+  --g: #2dff6f;
+  --g2: #9aa3ad;
+  --g3: #3a4048;
+  --g4: #14301f;
+  --k: #e9edf2;
+  --k2: #c3cad2;
+  --k3: #2a3038;
+  --r: #ff3b30;
   --r3: #3a0d08;
-  --c: #4ee6ff;
-  --c3: #0b3a44;
-  --w: #f2fff7;
-  --line: #1f4a31;
-  --font-num: 'B612 Mono', 'SF Mono', 'JetBrains Mono', 'IBM Plex Mono', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
-  --font-ui: 'B612', 'DIN Alternate', 'Bahnschrift', 'Roboto Condensed', 'Arial Narrow', 'Helvetica Neue', system-ui, sans-serif;
+  --c: #00e5ff;
+  --m: #ff2bd6;
+  --shadow: #b02bff;
+  --c3: #064550;
+  --w: #e9edf2;
+  --line: #2a3038;
+  --font-num: 'Roboto Mono', 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  --font-ui: 'Barlow Condensed', 'DIN Alternate', 'Bahnschrift', 'Roboto Condensed', 'Arial Narrow', 'Helvetica Neue', system-ui, sans-serif;
   color-scheme: dark;
 }
 
@@ -136,7 +138,7 @@ body {
 }
 @keyframes pulseb {
   50% {
-    box-shadow: 0 0 0 6px rgba(255, 69, 52, 0.18), inset 0 0 40px rgba(255, 69, 52, 0.15);
+    box-shadow: 0 0 0 6px rgba(255, 59, 48, 0.18), inset 0 0 40px rgba(255, 59, 48, 0.15);
   }
 }
 .scan {
@@ -152,9 +154,9 @@ body {
 .ol-viewport canvas {
   image-rendering: auto;
 }
-.hatch-amber {
-  background-image: repeating-linear-gradient(-45deg, rgba(255, 182, 39, 0.16) 0 6px, transparent 6px 16px);
+.hatch-caution {
+  background-image: repeating-linear-gradient(-45deg, rgba(233, 237, 242, 0.22) 0 6px, transparent 6px 14px);
 }
 .hatch-red {
-  background-image: repeating-linear-gradient(-45deg, rgba(255, 69, 52, 0.22) 0 8px, transparent 8px 20px);
+  background-image: repeating-linear-gradient(-45deg, rgba(255, 59, 48, 0.22) 0 8px, transparent 8px 20px);
 }

@@ -15,7 +15,7 @@ describe('indicative surface dose (Guo 2015 pressure model × Hassler 2014 quali
     const d = doseRateUGyPerDay(750, 600);
     expect(doseEqRateUSvPerMin(-4500)).toBeCloseTo((d * 3.05) / 1440, 12);
     expect(skyShieldFactor(1)).toBe(1);
-    expect(skyShieldFactor(0.6)).toBeCloseTo(1 - 0.85 * 0.4, 12);
+    expect(skyShieldFactor(0.6)).toBeCloseTo(1 - 0.88 * 0.4, 2); // Guo 2026 two-term, slope (1-f)w - f ≈ 0.88
     expect(skyShieldFactor(undefined)).toBe(1);
     // ≈0.65 mSv/day on the Gale floor — consistent with RAD's 0.64 mSv/d (Hassler et al. 2014)
     expect(doseEqRateUSvPerMin(-4500) * 1440).toBeGreaterThan(560);

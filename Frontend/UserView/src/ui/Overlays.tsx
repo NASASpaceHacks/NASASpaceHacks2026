@@ -25,17 +25,17 @@ export function NewRouteModal({ s }: { s: Snapshot }) {
         >
           <motion.div
             className="absolute"
-            style={{ left: 440, top: 230, width: 1040, height: 600, background: '#000', border: '4px solid var(--a)', boxShadow: '0 0 0 2px #000, 0 0 60px rgba(255,182,39,0.25)' }}
+            style={{ left: 440, top: 230, width: 1040, height: 600, background: '#000', border: '4px solid var(--k)', boxShadow: '0 0 0 2px #000, 0 0 60px rgba(233,237,242,0.18)' }}
             initial={{ scale: 0.92, y: 30, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 1.04, opacity: 0 }}
             transition={{ duration: 0.4, ease }}
           >
-            <div className="absolute flex items-center hatch-amber" style={{ left: 0, top: 0, right: 0, height: 74, borderBottom: '3px solid var(--a)', padding: '0 30px', justifyContent: 'space-between' }}>
-              <span className="blink" style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 34, letterSpacing: '0.16em', color: 'var(--a)' }}>
+            <div className="absolute flex items-center hatch-caution" style={{ left: 0, top: 0, right: 0, height: 74, borderBottom: '3px solid var(--k)', padding: '0 30px', justifyContent: 'space-between' }}>
+              <span className="blink" style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 34, letterSpacing: '0.16em', color: 'var(--c)' }}>
                 ▲ INCOMING ROUTE
               </span>
-              <span className="lbl" style={{ fontSize: 20, color: 'var(--a)' }}>
+              <span className="lbl" style={{ fontSize: 20, color: 'var(--c)' }}>
                 FROM {p.author === 'earth' ? 'EARTH' : 'HAB'} · {p.parentSeq !== null ? `SUPERSEDES v${p.parentSeq}` : 'FIRST ROUTE'}
               </span>
               <span
@@ -43,8 +43,8 @@ export function NewRouteModal({ s }: { s: Snapshot }) {
                 style={{
                   fontSize: 18,
                   padding: '4px 10px',
-                  border: `2px solid ${p.sig === 'verified' ? 'var(--g)' : 'var(--a)'}`,
-                  color: p.sig === 'verified' ? 'var(--g)' : 'var(--a)',
+                  border: `2px solid ${p.sig === 'verified' ? 'var(--g)' : 'var(--k)'}`,
+                  color: p.sig === 'verified' ? 'var(--g)' : 'var(--k)',
                   background: '#000',
                 }}
               >
@@ -53,7 +53,7 @@ export function NewRouteModal({ s }: { s: Snapshot }) {
             </div>
             <div className="absolute" style={{ left: 40, top: 100 }}>
               <div style={{ fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 96, lineHeight: '100px', color: 'var(--w)', letterSpacing: '0.02em' }}>
-                NEW ROUTE <span style={{ color: 'var(--a)' }}>v{p.seq}</span>
+                NEW ROUTE <span style={{ color: 'var(--k)' }}>v{p.seq}</span>
               </div>
             </div>
             <div className="absolute" style={{ left: 40, top: 230, width: 960 }}>
@@ -88,7 +88,7 @@ export function NewRouteModal({ s }: { s: Snapshot }) {
                     <div className="lbl" style={{ fontSize: 20 }}>
                       First bingo
                     </div>
-                    <div className="num" style={{ fontSize: 34, color: 'var(--a)', lineHeight: '56px', whiteSpace: 'nowrap' }}>
+                    <div className="num" style={{ fontSize: 34, color: 'var(--k)', lineHeight: '56px', whiteSpace: 'nowrap' }}>
                       {p.bingo.toUpperCase()}
                     </div>
                   </div>
@@ -116,10 +116,10 @@ function Photo({ st }: { st: StationInfo }) {
   const img = st.image && failed !== st.image.url ? st.image : null;
   return (
     <div className="absolute" style={{ left: 566, top: 330, width: 508, height: 540 }}>
-      <div className="lbl" style={{ fontSize: 22, color: 'var(--a)', marginBottom: 8 }}>
+      <div className="lbl" style={{ fontSize: 22, color: 'var(--k)', marginBottom: 8 }}>
         What you&apos;ll see
       </div>
-      <div style={{ width: 508, height: 381, border: '3px solid var(--a2)', background: '#050505', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ width: 508, height: 381, border: '3px solid var(--k2)', background: '#050505', position: 'relative', overflow: 'hidden' }}>
         {img ? (
           <img src={img.url} alt={img.caption ?? `Curiosity ${img.camera} sol ${img.sol}`} onError={() => setFailed(img.url)} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'contrast(1.05)' }} />
         ) : (
@@ -179,10 +179,10 @@ export function StationCard({ s }: { s: Snapshot }) {
         >
           <div className="absolute flex flex-col" style={{ left: 30, top: 22, width: 1040 }}>
             <div className="flex items-center" style={{ gap: 18 }}>
-              <span className="num" style={{ fontSize: 30, color: '#000', background: 'var(--a)', padding: '2px 14px' }}>
+              <span className="num" style={{ fontSize: 30, color: '#000', background: 'var(--k)', padding: '2px 14px' }}>
                 {st.id}
               </span>
-              <span className="lbl" style={{ fontSize: 22, color: 'var(--a)' }}>
+              <span className="lbl" style={{ fontSize: 22, color: 'var(--k)' }}>
                 Station {st.index} of {st.total} · arrived · position fix
               </span>
               {st.value !== null && (
@@ -314,11 +314,11 @@ export function ReturnNow({ s }: { s: Snapshot }) {
               {r.source === 'alert' ? `${r.from === 'visor' ? 'ONBOARD' : 'HAB'} ALERT · ${r.code.replace(/_/g, ' ')}` : 'ONBOARD SAFETY CORE'}
             </span>
           </div>
-          <div className="absolute" style={{ left: 40, top: 128, width: 1800, fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 40, color: 'var(--a)', letterSpacing: '0.03em' }}>
+          <div className="absolute" style={{ left: 40, top: 128, width: 1800, fontFamily: 'var(--font-ui)', fontWeight: 800, fontSize: 40, color: 'var(--k)', letterSpacing: '0.03em' }}>
             {r.reason.toUpperCase()}
           </div>
           <div className="absolute" style={{ left: 70, top: 220 }}>
-            <BearingDial rel={r.relDeg} size={600} color="var(--a)" />
+            <BearingDial rel={r.relDeg} size={600} color="var(--c)" />
           </div>
           <div className="absolute flex flex-col" style={{ left: 760, top: 210, width: 1080 }}>
             <div className="lbl" style={{ fontSize: 26 }}>
@@ -330,7 +330,7 @@ export function ReturnNow({ s }: { s: Snapshot }) {
                 {fmtDist(r.distM).u}
               </span>
             </div>
-            <div className="num" style={{ fontSize: 44, color: 'var(--a)', marginTop: 4 }}>
+            <div className="num" style={{ fontSize: 44, color: 'var(--k)', marginTop: 4 }}>
               {clockText(r.relDeg) === 12 ? 'ON TRACK' : `TURN TO ${clockText(r.relDeg)} O'CLOCK`} · FOLLOW ROUTE BACK
             </div>
             <div className="grid" style={{ gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 20, marginTop: 40 }}>
@@ -385,7 +385,7 @@ export function WaitingOverlay({ s }: { s: Snapshot }) {
           <div className="lbl" style={{ fontSize: 24, marginTop: 10 }}>
             The hab pushes the confirmed route over the surface link
           </div>
-          <div className="num" style={{ fontSize: 24, marginTop: 18, color: s.link === 'up' ? 'var(--g)' : 'var(--a)' }}>
+          <div className="num" style={{ fontSize: 24, marginTop: 18, color: s.link === 'up' ? 'var(--g)' : 'var(--k)' }}>
             LINK {s.link === 'up' ? 'UP · LISTENING' : s.link === 'degraded' ? 'DEGRADED' : 'DOWN · RETRYING'}
           </div>
         </motion.div>
@@ -450,7 +450,7 @@ export function BootScreen({ s }: { s: Snapshot }) {
 // ───────────────────────────── toasts ─────────────────────────────
 
 export function Toasts({ s }: { s: Snapshot }) {
-  const col = { info: 'var(--g2)', ok: 'var(--g)', caution: 'var(--a)', warning: 'var(--r)' } as const;
+  const col = { info: 'var(--g2)', ok: 'var(--g)', caution: 'var(--k)', warning: 'var(--r)' } as const;
   return (
     <div className="absolute flex flex-col-reverse" style={{ left: 40, bottom: 132, gap: 10, zIndex: 35, width: 1000 }}>
       <AnimatePresence initial={false}>
@@ -485,9 +485,9 @@ export function MapLegend({ s }: { s: Snapshot }) {
     <div className="absolute flex items-center" style={{ left: 0, bottom: 0, right: 0, height: 44, padding: '0 16px', gap: 20, zIndex: 5, background: 'rgba(0,0,0,0.82)', borderTop: '2px solid var(--line)' }}>
       {item(<svg width={34} height={12}><line x1={2} y1={6} x2={32} y2={6} stroke="var(--g)" strokeWidth={6} strokeLinecap="round" /></svg>, 'Route')}
       {item(<svg width={34} height={12}><line x1={2} y1={6} x2={32} y2={6} stroke="var(--c)" strokeWidth={3} strokeDasharray="9 6" /></svg>, 'Safe zone')}
-      {s.comm.available && item(<div className="hatch-amber" style={{ width: 30, height: 16, border: '2px dashed rgba(255,182,39,0.6)' }} />, 'Comm shadow')}
+      {s.comm.available && item(<div className="hatch-caution" style={{ width: 30, height: 16, border: '2px dashed rgba(233,237,242,0.7)' }} />, 'Comm shadow')}
       {item(<div className="hatch-red" style={{ width: 30, height: 16, border: '2px solid var(--r)' }} />, 'Keep-out')}
-      {item(<svg width={18} height={18}><rect x={3} y={3} width={12} height={12} transform="rotate(45 9 9)" fill="var(--a)" /></svg>, 'Next stop')}
+      {item(<svg width={18} height={18}><rect x={3} y={3} width={12} height={12} transform="rotate(45 9 9)" fill="var(--c)" /></svg>, 'Next stop')}
       <div style={{ flex: 1 }} />
       <span className="num" style={{ fontSize: 14, color: 'var(--g3)', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>
         {s.credit}

@@ -406,7 +406,7 @@ function stayIn(
     });
     segments = sim.segments;
     burndown = sim.burndown;
-    totals = { ...totals, distM: sim.distM, durationMin: sim.tReturn + tl.ingressHalf, energyKJ: sim.energyKJ, doseUSv: sim.doseUSv, maxDistHabM: sim.maxDistHabM, o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)) };
+    totals = { ...totals, distM: sim.distM, durationMin: sim.tReturn + tl.ingressHalf, energyKJ: sim.energyKJ, doseUSv: sim.doseUSv, doseOpenSkyUSv: sim.doseOpenSkyUSv, maxDistHabM: sim.maxDistHabM, o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)) };
     notes.push('Crew is outside: the attached segment is the direct contingency return to the hab.');
   }
   return {
@@ -432,7 +432,7 @@ function modelNotes(lsAssumed: boolean, ls: number): string[] {
   const n = [
     'Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).',
     'Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.',
-    'Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter).',
+    'Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding from the sky-view raster, Guo et al. 2026 two-term model reproduced in V1; never a shelter).',
     'Comm LOS = hab mast ∪ pressurized-rover relay masts (team assumption: the rover carries a relay radio, cf. Apollo LRV LCRU).',
   ];
   if (lsAssumed) n.push(`Season: no REMS Ls for this sol, Ls ${ls}° assumed for daylight.`);
@@ -481,7 +481,7 @@ function sepPlan(R: Resolved, req: PlanRequest, tl: Timeline, rv: RuleVals, lead
     bingo: [],
     totals: {
       distM: sim.distM, durationMin: sim.tReturn + tl.ingressHalf, energyKJ: sim.energyKJ,
-      o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)), doseUSv: sim.doseUSv, scienceValue: 0, maxDistHabM: sim.maxDistHabM,
+      o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)), doseUSv: sim.doseUSv, doseOpenSkyUSv: sim.doseOpenSkyUSv, scienceValue: 0, maxDistHabM: sim.maxDistHabM,
     },
     notes: [
       ...notes,
@@ -757,6 +757,7 @@ function planImpl(pack: LoadedSitePack, req: PlanRequest, t0: number): PlanResul
       energyKJ: sim.energyKJ,
       o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)),
       doseUSv: sim.doseUSv,
+      doseOpenSkyUSv: sim.doseOpenSkyUSv,
       scienceValue: value,
       maxDistHabM: sim.maxDistHabM,
     },

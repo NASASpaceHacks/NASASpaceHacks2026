@@ -68,9 +68,10 @@ function packState(b: Backend, pack: LoadedSitePack) {
   const shelterCells: Record<string, Cell> = {};
   m.shelters.forEach((s) => (shelterCells[s.id] = s.cell));
   const rems = m.conditions.rems;
-  // Season for sun geometry: latest REMS Ls; else the engine's scenario default (keeps the
-  // console's daylight check consistent with the planner); else Ls now.
-  const lsDeg = rems?.length ? rems[rems.length - 1].ls : (engineConst('DEFAULT_LS_DEG') ?? marsTime(Date.now(), m.grid.centerLonLat[0]).lsDeg);
+  // Season for sun geometry, by the engine's own rule (plan.ts lsFor): the rover-weather record for the
+  // scenario sol if the feed has it, else the engine's scenario default; else Ls now. Using the latest
+  // feed reading instead would let the console's daylight check disagree with the planner.
+  const lsDeg = rems?.find((r) => r.sol === m.scenario.sol)?.ls ?? engineConst('DEFAULT_LS_DEG') ?? marsTime(Date.now(), m.grid.centerLonLat[0]).lsDeg;
   return {
     stationOn: {} as Record<string, boolean>,
     shelterCells,

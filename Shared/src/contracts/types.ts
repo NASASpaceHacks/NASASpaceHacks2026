@@ -335,6 +335,8 @@ export interface PlanResult {
     energyKJ: number;
     o2UsedPct: number;
     doseUSv: number;
+    /** Dose of the same route with no terrain shielding (open sky); doseUSv <= this. Absent on old results. */
+    doseOpenSkyUSv?: number;
     scienceValue: number;
     maxDistHabM: number;
   };

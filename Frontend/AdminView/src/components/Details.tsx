@@ -8,6 +8,7 @@ import { RulesSection, SciencePanel } from './PlanParts';
 import { ReportTab } from './ReportTab';
 import { SourcesSection } from './Layers';
 import { SpaceWeatherPanel } from './SpaceWeather';
+import { SurfaceWeather } from './SurfaceWeather';
 import { openEvidence } from './Evidence';
 import { Kbd, SectionHead, cx } from './ui';
 
@@ -15,7 +16,7 @@ const TABS: { id: DetailsTab; label: string }[] = [
   { id: 'report', label: 'Report' },
   { id: 'rules', label: 'Rules' },
   { id: 'margins', label: 'Margins over time' },
-  { id: 'weather', label: 'Space weather' },
+  { id: 'weather', label: 'Weather & radiation' },
   { id: 'science', label: 'Science' },
   { id: 'sources', label: 'Sources' },
   { id: 'log', label: 'Log' },
@@ -83,7 +84,7 @@ export function Details() {
             {tab === 'report' && <ReportTab />}
             {tab === 'rules' && <div className="px-4 pb-6 pt-4"><RulesSection /></div>}
             {tab === 'margins' && <BurndownTab />}
-            {tab === 'weather' && <div className="px-4 pb-6 pt-4"><SectionHead right={<span className="text-[10px] text-dim">forecast · alert · nowcast</span>}>Space weather</SectionHead><div className="mt-2 text-[12px] leading-snug text-mute" data-testid="weather-purpose">Why it matters: a solar storm can force the crew back to shelter. Three tiers: a days-ahead forecast, an Earth alert, and the on-board dose-rate warning that orders the return.</div><div className="mt-3"><SpaceWeatherPanel /></div></div>}
+            {tab === 'weather' && <div className="px-4 pb-6 pt-4"><SectionHead>Weather &amp; radiation</SectionHead><div className="mt-3"><SurfaceWeather /></div><SectionHead className="mt-5" right={<span className="text-[10px] text-dim">forecast · alert · nowcast</span>}>Space weather</SectionHead><div className="mt-2 text-[12px] leading-snug text-mute" data-testid="weather-purpose">Why it matters: a solar storm can force the crew back to shelter. Three tiers: a days-ahead forecast, an Earth alert, and the on-board dose-rate warning that orders the return.</div><div className="mt-3"><SpaceWeatherPanel /></div></div>}
             {tab === 'science' && <div className="px-4 pb-6 pt-4"><SectionHead>Science goals and the stops that cover them</SectionHead><div className="mt-3"><SciencePanel /></div></div>}
             {tab === 'sources' && (
               <div className="px-4 pb-6 pt-4">

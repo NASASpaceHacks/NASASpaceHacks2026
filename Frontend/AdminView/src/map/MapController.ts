@@ -22,6 +22,7 @@ import {
   SLOPE_RAMP,
   TIME_RAMP,
   TI_RAMP,
+  CRISM_RAMP,
   ROUGH_RAMP,
   DEM_TINT,
   elevationRamp,
@@ -263,6 +264,9 @@ export class MapController {
       if (pack.rasters.ti) {
         this.fieldLayers.ti = createFieldLayer({ grid: g, projection: this.proj, bands: [{ data: pack.rasters.ti }], style: rampStyle(TI_RAMP), visible: false, className: 'mw-f-ti' });
       }
+      if (pack.rasters.crism_sindex2) {
+        this.fieldLayers.crism = createFieldLayer({ grid: g, projection: this.proj, bands: [{ data: pack.rasters.crism_sindex2 }], style: rampStyle(CRISM_RAMP), visible: false, className: 'mw-f-crism' });
+      }
     } else {
       console.info('[map] WebGL float textures unavailable — canvas fallback (hillshade + safe zone)');
       this.hillCanvas = createCanvasFieldLayer(g, this.proj, this.hillColor(), { opacity: ortho ? 0.55 : 1, className: ortho ? 'mw-blend' : undefined });
@@ -312,7 +316,7 @@ export class MapController {
       layers: [
         ...(this.imagery ? [this.imagery] : []),
         (this.hillshade ?? this.hillCanvas)!,
-        ...(['elevation', 'ti', 'rough', 'slope'] as OverlayId[]).map((k) => this.fieldLayers[k]).filter((x): x is WebGLTileLayer => !!x),
+        ...(['elevation', 'ti', 'crism', 'rough', 'slope'] as OverlayId[]).map((k) => this.fieldLayers[k]).filter((x): x is WebGLTileLayer => !!x),
         this.aoi,
         this.keepouts,
         this.hazards,

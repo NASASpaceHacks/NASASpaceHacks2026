@@ -53,7 +53,7 @@ Who would use it, and how: Mars crews and the in-habitat IV crewmember (who "ess
 |---|---|---|---|
 | JPL Mars Trek, NASA MMGIS | Global data, measuring, slope, viewshed, ops GIS | No EVA budget, rules or physiology; viewers, not planners | Data breadth, multi-user, heritage |
 | AEGIS / EMSS (JSC, Artemis) | EVA time estimates, science coverage, path comparison; prime Artemis planning tool | Ground tool ("next evolution: extending… to in-space assets"); no suit physiology listed | Real flight-control users, JETT3–5 and Artemis sims |
-| SEXTANT / Minerva (MIT, BASALT) | Energy-optimal paths, walk-back, thermal load | No rule set; MDRS field test found real time and energy **higher** than predicted | Field-tested with human subjects |
+| SEXTANT / Minerva (MIT, BASALT) | Energy-optimal paths, walk-back, thermal load | No rule set; its MDRS field test found real time and energy **higher** than predicted (per the study abstract) | Field-tested with human subjects |
 | MoonPath (2024) | Dijkstra minimising metabolic workload, lunar south pole | Lunar, batch, no comm/heat/explanation | Peer-reviewed |
 | Broddrick et al. (NASA, 2024) | Exact science-yield optimisation (MILP) | Fixed 0.5 m/s speed, "has not yet been validated" | NASA science-team integration |
 | Joint AR, AxEMU HUD | Real suit optics and displays | Hardware and integration bound; no planner | Real hardware |
@@ -68,15 +68,15 @@ Each gap is quoted from a NASA source, with what we did about it (`existing-solu
 |---|---|---|
 | 1 | "operational focus has remained almost exclusively on microgravity rather than planetary surface operations" (NTRS 20260001895) | A surface-EVA planner at the scale of one walk |
 | 2 | Physiology isn't coupled to traverse planning; Apollo crews "frequently exceed[ed] the rates predicted" (NTRS 20260001895, 20250011652) | Energy and suit heat are in the route cost and the burndowns; telemetry is compared with the plan during the EVA |
-| 3 | Metabolic path models under-predict in the field (SEXTANT MDRS study) | We report our model error openly (V2) and plan with contingency walk-back at half speed. Same risk applies to us |
+| 3 | Metabolic path models under-predict in the field (SEXTANT MDRS study, per its abstract) | We report our model error openly (V2) and plan with contingency walk-back at half speed. Same risk applies to us |
 | 4 | Planners are ground tools; crew execution is immature: "Empowering ground-based flight controllers" (NTRS 20260001893); "a seamless suit-integrated AR solution does not yet exist" (NTRS 20220013671) | Planner runs on the habitat server; the visor guides the walk and goes autonomous on link loss |
 | 5 | No public tool documents EVA constraints as machine-checked hard limits with re-verification; general GIS "lack the mission specific capabilities" (NTRS 20230000186) | 12 cited constraints, simulator re-verification, never an unsafe plan |
 | 6 | Single-criterion paths, unvalidated science optimisation: "incorporate multiple criteria" (NTRS 20250011652); fixed 0.5 m/s speed (Broddrick 2024) | Exact stop selection with terrain-dependent walking time and every constraint at once |
-| 7 | Usability and explanation are under-evaluated: "an explicit lack of emphasis placed on evaluating the usability" (NTRS 20250011652) | Plain-language verdicts, the failing stretch in red, ways forward; real mouse-and-keyboard tests (23) |
+| 7 | Usability and explanation are under-evaluated: "an explicit lack of emphasis placed on evaluating the usability" (NTRS 20250011652) | Plain-language verdicts, the failing stretch in red, ways forward; real mouse-and-keyboard tests (26) |
 | 8 | Hackathon peers converge on "A* on slope + Mars Trek tiles + O₂ gauge + AI narrator" (README survey) | Physics-first engine; AI is not in the safety path |
 
 ### 5. How well do we use NASA data?
-**Say it:** "Every layer is real NASA data, and the important ones do work in the engine, not just on screen. The terrain model drives slope limits, walking energy, radio line of sight and sunlight, and we checked it against 372 surveyed Curiosity positions: 19 cm standard deviation. Thermal inertia from Mars Odyssey feeds the walking effort. CCMC's Mars forecasts drive the space-weather go/no-go."
+**Say it:** "Every layer is real NASA data, and the important ones do work in the engine, not just on screen. The terrain model drives slope limits, walking energy, radio line of sight and sunlight, and we checked it against 372 surveyed Curiosity positions: 19 cm standard deviation. Thermal inertia from Mars Odyssey feeds the walking effort, the terrain model shields the radiation dose, CRISM shows where the orbiter sees sulfate at each science stop, and CCMC's Mars forecasts drive the space-weather go/no-go."
 
 | Dataset (mission) | What it does in Marswalk | Checked how | Depth |
 |---|---|---|---|
@@ -85,16 +85,17 @@ Each gap is quoted from a NASA source, with what we did about it (`existing-solu
 | THEMIS thermal inertia (Mars Odyssey) | Terrain factor in walking energy and suit heat | Mapping TI → effort is our assumption, labelled "Indicative" | Medium |
 | Curiosity traverse + waypoints (MSL) | Real science stops; DEM truth check; RAD parking positions for V1 | σ 0.19 m check | **Deep** (as reference) |
 | Curiosity Mastcam/Navcam raw images (MSL) | Point-of-view photo at each stop (console + visor) | Matched to stationary rover positions | Display |
-| RAD results (MSL; Hassler 2014, Guo 2015/2026) | Route dose estimate | V1 reproduces the published terrain-shielding ratios: MAE 2.0 pp, r 0.94 | Medium |
-| REMS weather (MSL) | Season (Ls) for sun geometry | — | Light |
+| RAD results (MSL; Hassler 2014, Guo 2015/2026) | Route dose estimate, with terrain shielding from the DEM sky-view (Guo 2026 two-term model); e.g. terrain shields 8.6% of the dose on the default plan | V1 reproduces the published shielding ratios with the same method: MAE 2.0 pp, r 0.94; the pack's sky-view raster is within 0.9 pp (MAE) of a full-resolution reference | Medium |
+| REMS weather (MSL) / MEDA (M2020) | Latest air and ground temperature, pressure, UV in the Weather tab (labelled as the latest reading, not the scenario sol); season for sun geometry when the feed has the scenario sol | — | Light |
+| CRISM summary parameters (MRO; FRT000058A3, 2007, 18 m) | Minerals layer (polyhydrated sulfate SINDEX2; hydration BD1900_2); sulfate signal shown at each science stop | Co-registered to HiRISE: the product sat ~270 m off and was shifted (confirmed by the DEM hillshade within ~35 m; residual ≤30 m). Tiers are relative to the area; a signature, not an abundance | Medium |
 | CCMC DONKI WSA-ENLIL + flares | Go/no-go banner from real CME arrival forecasts at Mars | 33 events in the pack | Medium |
 | Mars24 (NASA GISS) | Sun elevation: daylight rule, timeline, lighting | Reproduces NASA's worked examples | **Deep** |
 | MOLA (MGS), Viking MDIM 2.1 | Datum, far heading cue; locator map | — | Light |
 | Jezero: HiRISE TRN DTM + ortho, M20 traverse, Mastcam-Z/Navcam, MEDA | Same pipeline, second site | DEM vs 220 Perseverance waypoints: σ 0.07 m | Same |
 
-Coverage of the challenge's data kinds: **optical, topographic, thermal** fully used; **radiation** (literature model + V1 reproduction), **atmospheric** (season only) and **geophysical** (datum, ephemeris) partly; **space weather** in addition. Spectral and chemical: none yet.
+Coverage of the challenge's data kinds: **optical, topographic, thermal** fully used; **spectral** (CRISM sulfate and hydration signal, indicative), **radiation** (literature dose model with terrain shielding, V1 reproduction), **atmospheric** (rover weather shown; season) and **geophysical** (datum, ephemeris) partly; **space weather** in addition. Chemical: none.
 
-**In progress right now (from the data audit):** terrain shielding from V1 wired into the engine's dose; REMS/MEDA temperature, pressure and UV shown in the weather tab; a CRISM mineral layer (adds spectral); our dose model compared with measured Curiosity RAD data. Update this section when each lands.
+**Done since the data audit:** terrain shielding wired into the dose; REMS/MEDA readings shown; CRISM mineral layer (adds spectral). **In progress:** our dose model compared with measured Curiosity RAD data.
 
 **Limits to state:** THEMIS→effort and the dose constants are assumptions (labelled); REMS is the outreach feed; the scenario sol (412) predates the REMS feed, so the season falls back to an assumed Ls 240.
 
@@ -106,12 +107,12 @@ Coverage of the challenge's data kinds: **optical, topographic, thermal** fully 
 |---|---|---|---|---|---|
 | 1 | Impact | "Who benefits, and how much?" | Big answer 2 | v3 numbers; NASA quotes | Simulation only |
 | 2 | Creativity / originality | "What's new? What exists?" | Big answers 1, 3, 4 | Comparison table; peer survey | Combination is new, parts are known |
-| 3 | Scientifically & technically sound | "Why should I trust the numbers?" | "Cited models, checked against NASA data three ways, exact search, 118 unit tests and 23 real-input tests." | V1 MAE 2.0 pp; V2 MAPE 10.6% (0.22–0.32 g); A* 0.000% gap vs an independent oracle on 80 real-terrain cases; stop selection = brute force on 320 cases; V4: all three agree on 23/24 | 0.38 g is an extrapolation (data stop at 0.32 g; error 36% at 0.12–0.17 g); V1 metric chosen post hoc; the AI check shows consistency, not truth; the engine can miss a valid path and say NO-GO (W02, 0.2 min over; safe-side) |
+| 3 | Scientifically & technically sound | "Why should I trust the numbers?" | "Cited models, checked against NASA data three ways, exact search, 122 unit tests and 26 real-input tests." | V1 MAE 2.0 pp; V2 MAPE 10.6% (0.22–0.32 g); A* 0.000% gap vs an independent oracle on 80 real-terrain cases; stop selection = brute force on 320 cases; V4: all three agree on 23/24 | 0.38 g is an extrapolation (data stop at 0.32 g; error 36% at 0.12–0.17 g); V1 metric chosen post hoc; the AI check shows consistency, not truth; the engine can miss a valid path and say NO-GO (W02, 0.2 min over; safe-side) |
 | 4 | Credible data | "Is this real data?" | "Every layer is NASA/USGS data with product IDs, resolution and checksums in the app's Sources tab; anything scenario is labelled SCENARIO." | Sources tab; manifest provenance + sha256; DEM σ 0.19 m | Station science values are team priorities |
 | 5 | Belief | "Did you really build this?" | "Try it. Every number on screen comes from code in the repo, with history and tests." | Live demo; repo history; `pnpm test:ux`; Validation scripts | Public link still to publish (needs team OK) |
 | 6 | Feasible, functional, practical | "Would it work on Mars?" | "It runs offline on a laptop, plans in milliseconds, the route fits in 11 KB, and the visor brings the astronaut home with no link. A second Mars site works with no code changes." | Timings; package gate; autonomy test; Jezero | Visor is a screen UI, not suit hardware; networking is local Wi-Fi |
 | 7 | Relevance | "Does it answer *this* challenge?" | "It's a layered, integrated view of one Marswalk at Mount Sharp's boxwork (the challenge's own example) that helps plan **and** carry it out, with science on the way." | Challenge-alignment table (`docs/designs/marswalk.md`) | — |
-| 8 | Meets requirements | "≥3 data kinds? Safety? Route? POV?" | See the table below | Layers panel; station cards; visor | Spectral not yet (in progress) |
+| 8 | Meets requirements | "≥3 data kinds? Safety? Route? POV?" | See the table below | Layers panel; station cards; visor | No chemical data; spectral is an indicative signal |
 | 9 | Problem → solution → importance | "Say it in 20 seconds." | "Mars crews will plan their own walks with Earth up to 22 minutes away. Marswalk is a habitat console and helmet visor that plan a walk on real NASA data, check it against 12 cited NASA constraints, explain the verdict, and keep guiding with no link. It turns NASA's stated need for Earth-independent EVA decisions into a working tool." | Opening of pitch | — |
 | 10 | Shows which NASA data | "Which datasets, exactly?" | Big answer 5 | Sources tab, data slide | — |
 | 11 | Acknowledges AI + sources | "Did you use AI?" | "Yes. The team chose the problem, concept and design; most of the code was written with Claude coding agents under our direction and review. AI is not in the safety path: no AI decides a route. Blind AI reviewers were used only as an extra check of the engine's verdicts. No AI imagery. Every dataset and paper is cited." | README; project page; final slide | — |
@@ -120,7 +121,7 @@ Coverage of the challenge's data kinds: **optical, topographic, thermal** fully 
 ### Requirement checklist (criterion 8)
 | Challenge asks for | Where it is |
 |---|---|
-| ≥3 kinds of NASA data in one view | Layers panel: imagery (HiRISE), elevation/slope (DEM), thermal inertia (THEMIS), lighting (Mars24), radio coverage (DEM viewshed), safety maps; plus space weather (DONKI) and photos (Curiosity) |
+| ≥3 kinds of NASA data in one view | Layers panel: imagery (HiRISE), elevation/slope (DEM), thermal inertia (THEMIS), minerals (CRISM), lighting (Mars24), radio coverage (DEM viewshed), safety maps; plus space weather (DONKI), rover weather (REMS/MEDA) and photos (Curiosity) |
 | Safety: radiation / space weather | Dose per route; three-tier space weather; 30-min shelter rule |
 | Safety: suit mobility | Slope ≤20°, walking energy at Mars g, suit heat budget, contingency walk-back at half speed |
 | Obstacles | Slope and edge-grade blocking, plume keep-out, astronaut-reported hazards trigger a re-plan |
@@ -146,6 +147,6 @@ Coverage of the challenge's data kinds: **optical, topographic, thermal** fully 
 
 ## What would raise the score further
 1. Publish the no-login demo link (criteria 5, 6; required for global judging). Needs the team's OK.
-2. Land the four data items above (criteria 4, 8, 10).
-3. Visor in the same navigator look (12).
+2. Land the measured-RAD comparison (criteria 3, 4).
+3. ~~Visor in the same navigator look~~ done (12).
 4. Presentation block: video, slides, rehearsal with this file (9–12).

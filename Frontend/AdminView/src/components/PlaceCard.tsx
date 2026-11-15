@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode, type RefObject } fro
 import { addStopAt, directionsTo, removeDestination } from '../actions';
 import { baseInfo } from '../lib/base';
 import { previewCell } from '../lib/places';
-import { stationImage, whyItMatters } from '../lib/science';
+import { mineralSignalAt, stationImage, whyItMatters } from '../lib/science';
 import { get, set, useConsole } from '../store';
 import { fixFromPin } from '../check';
 import { hm } from '../lib/plain';
@@ -40,6 +40,19 @@ function Btn({ children, primary, onClick, testId }: { children: ReactNode; prim
   );
 }
 
+
+export function MineralLine({ x, y, testid = 'place-mineral' }: { x: number; y: number; testid?: string }) {
+  const pack = useConsole((s) => s.pack);
+  const sig = pack ? mineralSignalAt(pack, x, y) : null;
+  if (!sig) return null;
+  return (
+    <div className="mt-1.5 text-[12px] leading-snug text-ink-2" data-testid={testid} data-tier={sig.tier}>
+      Hydrated sulfate signal: <span className="font-medium text-ink">{sig.tier}</span>
+      {sig.hydrated ? ' · water-bearing band present' : ''}
+      <span className="text-mute"> for this area (CRISM, 18 m)</span>
+    </div>
+  );
+}
 /** Google-style place card for a clicked spot or science target: what it is, is it safe, Directions / Add stop. */
 export function PlaceCard({ root }: { root: RefObject<HTMLElement | null> }) {
   const pop = useConsole((s) => s.mapPopover);
@@ -110,6 +123,7 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
         </>
       )}
       {station && <div className="mt-2 line-clamp-2 text-[13px] leading-snug text-ink-2" data-testid="place-why">{whyItMatters(station as never)}</div>}
+      {station && <MineralLine x={station.x} y={station.y} />}
       {isPin && (
         <div
           data-testid="place-verdict"

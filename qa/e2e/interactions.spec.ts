@@ -19,6 +19,9 @@ mkdirSync(SHOTS6, { recursive: true });
 const SHOTS7 = fileURLToPath(new URL('../screens/ux7/', import.meta.url));
 mkdirSync(SHOTS7, { recursive: true });
 
+const SHOTS8 = fileURLToPath(new URL('../screens/ux8/', import.meta.url));
+mkdirSync(SHOTS8, { recursive: true });
+
 const geo = <T>(page: Page, expr: string) => page.evaluate(expr) as Promise<T>;
 const station = (page: Page, id: string) => geo<XY>(page, `window.__mwTest.station(${JSON.stringify(id)})`);
 const dest = (page: Page, letter: string) => geo<XY | null>(page, `window.__mwTest.dest(${JSON.stringify(letter)})`);
@@ -625,5 +628,68 @@ test.describe('sites · picker, switching, deep link', () => {
     await expect(page.getByTestId('science-panel')).toContainText(/covered|lost|not chosen/);
     await page.getByTestId('details-tab-log').click();
     await expect(page.getByTestId('event-log')).not.toContainText('{');
+  });
+
+  test('23 · Details → Report shows terrain shielding on the route; Weather & radiation shows the latest Curiosity REMS reading', async ({ page }) => {
+    await open(page);
+    await searchTo(page, 'Alta');
+    await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+    await page.getByTestId('open-details').click();
+    await page.waitForTimeout(450);
+    const sh = page.getByTestId('radiation-shielding');
+    await expect(sh).toContainText(/Terrain shields [\d.]+% of the dose on this route/);
+    await expect(sh).toContainText('Guo et al. 2026');
+    await expect(sh).toContainText('never a shelter');
+    await page.waitForTimeout(350);
+    await page.screenshot({ path: `${SHOTS8}report-radiation.png` });
+    await page.getByTestId('details-tab-weather').click();
+    const w = page.getByTestId('surface-weather');
+    await expect(w).toContainText('Latest surface weather from Curiosity REMS');
+    await expect(w).toContainText(/sol \d+, \d{4}-\d{2}-\d{2}/);
+    await expect(w).toContainText('Pressure');
+    await expect(w).toContainText('UV index');
+    await expect(page.getByTestId('surface-weather-note')).toContainText('not the scenario sol');
+    await expect(page.getByTestId('surface-weather-note')).toContainText('scenario is sol 412');
+    await page.waitForTimeout(350);
+    await page.screenshot({ path: `${SHOTS8}weather-gale.png` });
+  });
+
+  test('24 · Jezero: the weather block reads Perseverance MEDA', async ({ page }) => {
+    const avail = (await sites(page)).filter((s) => s.available);
+    test.skip(!avail.some((s) => s.id === SITE2), `${SITE2} is not present`);
+    await page.goto(`/?site=${SITE2}`);
+    await expect(siteSelect(page)).toHaveValue(SITE2, { timeout: 60_000 });
+    await planToFirstTarget(page, SITE2);
+    await page.getByTestId('open-details').click();
+    await page.waitForTimeout(450);
+    await page.getByTestId('details-tab-weather').click();
+    const w = page.getByTestId('surface-weather');
+    await expect(w).toContainText('Latest surface weather from Perseverance MEDA');
+    await expect(w).not.toContainText('REMS');
+    await expect(page.getByTestId('surface-weather-note')).toContainText('not the scenario sol');
+    await page.waitForTimeout(350);
+    await page.screenshot({ path: `${SHOTS8}weather-jezero.png` });
+  });
+
+  // ───────────── ux8: CRISM mineral (spectral) layer ─────────────
+  test('23 · Layers → Minerals (CRISM): legend, source, Indicative badge; station card shows the sulfate signal', async ({ page }) => {
+    await open(page);
+    await page.getByTestId('layers-button').click();
+    const row = page.getByTestId('layer-crism');
+    await expect(row).toBeVisible();
+    await expect(row).toContainText('Minerals (CRISM)');
+    await expect(row).toContainText('Indicative');
+    await expect(row).toContainText('18 m');
+    await row.getByRole('switch').click();
+    await expect(row.getByTestId('layer-legend')).toBeVisible();
+    await expect(page.locator('.mw-f-crism')).toBeVisible();
+    await page.screenshot({ path: `${SHOTS8}crism-layer.png` });
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(1200);
+    await click(page, await station(page, 'ST08'));
+    await expect(page.getByTestId('place-card')).toBeVisible();
+    await expect(page.getByTestId('place-mineral')).toContainText(/Hydrated sulfate signal: (strong|moderate|weak)/);
+    await page.waitForTimeout(500);
+    await page.screenshot({ path: `${SHOTS8}crism-station.png` });
   });
 });

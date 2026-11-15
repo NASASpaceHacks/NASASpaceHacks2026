@@ -42,6 +42,8 @@ export function ReportTab() {
   }
   const ruleOf = (id: RuleId) => rules.find((r) => r.id === id);
   const ok = plan.status === 'OK';
+  const open = plan.totals.doseOpenSkyUSv;
+  const shieldPct = open !== undefined && open > 0 ? Math.max(0, (100 * (open - plan.totals.doseUSv)) / open) : null;
   const offeredSet = new Set(Object.entries(stationOn).filter(([, v]) => v).map(([k]) => k));
   const cov = objectiveCoverage(pack.manifest.stations, offeredSet, plan);
   const offeredValue = pack.manifest.stations.filter((s) => offeredSet.has(s.id)).reduce((a, s) => a + s.value, 0);
@@ -152,6 +154,12 @@ export function ReportTab() {
             <Stat label="Radiation dose" value={plan.totals.doseUSv.toFixed(0)} unit="µSv" sub={<Badge tone="ochre">Indicative</Badge>} />
             <Stat label="Science value" value={Math.round(plan.totals.scienceValue)} sub={`of ${Math.round(offeredValue)} offered`} tone="cyan" />
           </div>
+          {shieldPct !== null && (
+            <div data-testid="radiation-shielding" className="mt-3 text-[10.5px] leading-snug text-dim">
+              <span className="text-ink-2">Terrain shields {shieldPct < 0.05 ? 'under 0.1' : shieldPct.toFixed(1)}% of the dose on this route</span> ({Math.round(plan.totals.doseOpenSkyUSv!)} µSv with open sky). Method:
+              Guo et al. 2026 two-term sky-obstruction model on the site DEM, reproduced against Curiosity RAD (see Evidence). Terrain is never a shelter. Indicative.
+            </div>
+          )}
         </section>
       )}
 

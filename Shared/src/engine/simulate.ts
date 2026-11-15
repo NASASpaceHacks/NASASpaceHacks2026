@@ -64,6 +64,8 @@ export interface SimOutput {
   distM: number;
   energyKJ: number;
   doseUSv: number;
+  /** Same route with no terrain shielding (open sky everywhere): the dose without the skyview term. */
+  doseOpenSkyUSv: number;
   maxDistHabM: number;
   /** Latest departure (EVA min) from each stop keeping every time-dependent hard rule. */
   latestDepart: number[];
@@ -108,7 +110,7 @@ export function simulate(inp: SimInput): SimOutput {
   const pendingStops: number[] = [];
 
   let t = tl.tStart, H = inp.H0, gap = 0;
-  let energyJ = 0, dose = 0, distM = 0, maxDistHab = 0;
+  let energyJ = 0, dose = 0, doseOpen = 0, distM = 0, maxDistHab = 0;
   let nextSample = t;
   let curP = REST_W;
   let blockedHit = false;
@@ -176,6 +178,7 @@ export function simulate(inp: SimInput): SimOutput {
       t += d;
       energyJ += REST_W * d * 60;
       dose += doseEqRateUSvPerMin(elev[cell], sky?.[cell]) * d;
+      doseOpen += doseEqRateUSvPerMin(elev[cell]) * d;
       trackGap(cell, d);
       pointChecks(cell);
       sample(cell);
@@ -227,6 +230,7 @@ export function simulate(inp: SimInput): SimOutput {
       energyJ += P * dtMin * 60;
       segEnergy += P * dtMin * 60;
       dose += doseEqRateUSvPerMin(elev[v], sky?.[v]) * dtMin;
+      doseOpen += doseEqRateUSvPerMin(elev[v]) * dtMin;
       const dz = elev[v] - elev[u];
       const hd = horizDistM(grid, u, v);
       const len = Math.sqrt(hd * hd + (dz === dz ? dz * dz : 0));
@@ -255,6 +259,7 @@ export function simulate(inp: SimInput): SimOutput {
         t += d;
         energyJ += st.taskW * d * 60;
         dose += doseEqRateUSvPerMin(elev[cell], sky?.[cell]) * d;
+        doseOpen += doseEqRateUSvPerMin(elev[cell]) * d;
         trackGap(cell, d);
         pointChecks(cell);
         sample(cell);
@@ -326,6 +331,7 @@ export function simulate(inp: SimInput): SimOutput {
     distM,
     energyKJ: energyJ / 1000,
     doseUSv: dose,
+    doseOpenSkyUSv: doseOpen,
     maxDistHabM: maxDistHab,
     latestDepart,
     returnBy,

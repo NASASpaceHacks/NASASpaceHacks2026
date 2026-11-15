@@ -8,6 +8,7 @@ import { set, useConsole } from '../store';
 import { evaLtst, fmtLtst, sunAtLtst } from '../lib/marsclock';
 import { fmtRule } from '../lib/format';
 import { STM, goalById, objectiveById, objectiveCoverage, stationImage, whyItMatters, type Coverage } from '../lib/science';
+import { MineralLine } from './PlaceCard';
 import { Badge, SectionHead, Switch, Tip, cx } from './ui';
 import { EvidenceLegend, RuleEvidence, openEvidence } from './Evidence';
 
@@ -154,6 +155,7 @@ export function StationDetails({ st }: { st: Station }) {
     <div className="flex gap-3 pb-1 pt-2">
       <div className="min-w-0 flex-1">
         {why && <div className="text-[12.5px] leading-snug text-ink-2">{why}</div>}
+        <MineralLine x={st.x} y={st.y} testid="station-mineral" />
         {stop && (
           <div className="num mt-1.5 text-[11.5px] text-mute">
             Arrive {fmtLtst(evaLtst(startLtst, stop.arriveMin))} · leave {fmtLtst(evaLtst(startLtst, stop.departMin))}{bingo ? <> · <span className="text-caution">leave by {fmtLtst(bingo.ltstMin)}</span></> : null}
@@ -240,7 +242,18 @@ export function stayInSentence(base: BaseInfo): string | null {
   const crew = DEFAULT_CREW;
   if (dz > 20 && dist > 0 && heat?.enabled) {
     const pUp = marsMetabolicW(crew, crew.v0, (100 * dz) / dist, 1);
-    return `The stops are about ${Math.round(dz / 10) * 10} m below ${base.short}: the climb back costs ≈${Math.round(pUp)} W against the suit's ${heat.value} W cooling limit, so every stop overruns the ${Math.round((eva?.value ?? 360) / 60)}-hour EVA.`;
+    // Only name what the engine actually reported: other stops can fail for other reasons (radio, shelter, radius).
+    const val = (id: Rule['id']) => s.rules.find((r) => r.id === id)?.value;
+    const OTHER: Partial<Record<Rule['id'], string>> = {
+      los_gap_max_min: 'radio contact',
+      shelter_time_max_min: `the ${val('shelter_time_max_min') ?? 30}-min shelter limit`,
+      walk_radius_max_m: `the ${((val('walk_radius_max_m') ?? 2000) / 1000).toFixed(0)} km walking radius`,
+      daylight_min_sun_elev_deg: 'daylight',
+      slope_max_deg: 'the slope limit',
+    };
+    const others = [...new Set(plan.dropped.map((x) => OTHER[x.rule]).filter((x): x is string => !!x))];
+    const also = others.length ? ` Other stops also break ${others.join(', ').replace(/, ([^,]*)$/, ' or $1')}.` : '';
+    return `The stops are about ${Math.round(dz / 10) * 10} m below ${base.short}: the climb back costs ≈${Math.round(pUp)} W against the suit's ${heat.value} W cooling limit, so the closest one overruns the ${Math.round((eva?.value ?? 360) / 60)}-hour EVA.${also}`;
   }
   return `Even the closest stop (${st.id}) overruns the ${Math.round((eva?.value ?? 360) / 60)}-hour EVA from ${base.short}.`;
 }

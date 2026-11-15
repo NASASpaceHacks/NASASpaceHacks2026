@@ -1,4 +1,5 @@
-import type { PlanResult, Provenance, RoverImage, SitePackManifest, Station } from '@mw/shared/contracts';
+import type { LoadedSitePack, PlanResult, Provenance, RoverImage, SitePackManifest, Station } from '@mw/shared/contracts';
+import { roverWxFor } from './weather';
 import stmJson from '../../../../Content/stm.json';
 
 /** Science Traceability Matrix (Content/stm.json, C1). */
@@ -116,7 +117,7 @@ export function whyItMatters(st: Station): string {
 
 // ───────────────────────────── Data provenance summary ─────────────────────────────
 
-export type DataKind = 'optical' | 'topographic' | 'thermal' | 'atmospheric' | 'radiation' | 'space weather';
+export type DataKind = 'optical' | 'topographic' | 'thermal' | 'spectral' | 'atmospheric' | 'radiation' | 'space weather';
 
 export interface SourceRow {
   layer: string;
@@ -127,13 +128,14 @@ export interface SourceRow {
 
 const RASTER_KIND: Record<string, DataKind> = {
   dem: 'topographic', slope: 'topographic', rough: 'topographic', normals: 'topographic', skyview: 'topographic',
-  ti: 'thermal', dose: 'radiation', shielding: 'radiation', rad: 'radiation',
+  ti: 'thermal', crism_sindex2: 'spectral', crism_bd1900: 'spectral', dose: 'radiation', shielding: 'radiation', rad: 'radiation',
 };
 
 function kindForRaster(id: string, p: Provenance): DataKind {
   if (RASTER_KIND[id]) return RASTER_KIND[id];
   const s = `${p.instrument} ${p.product}`.toLowerCase();
   if (s.includes('rad')) return 'radiation';
+  if (s.includes('crism')) return 'spectral';
   if (s.includes('themis') || s.includes('tes') || s.includes('thermal')) return 'thermal';
   if (s.includes('hirise') || s.includes('ctx')) return 'optical';
   return 'topographic';
@@ -150,19 +152,21 @@ export function sourceRows(m: SitePackManifest): SourceRow[] {
       layer: `Rover images (${m.images.length})`,
       kind: 'optical',
       prov: {
-        mission: 'Mars Science Laboratory', instrument: cams || 'Navcam/Mastcam', product: `${m.images.length} raw images`,
+        mission: roverWxFor(m).mission, instrument: cams || 'Navcam/Mastcam', product: `${m.images.length} raw images`,
         url: m.images[0].sourceUrl, license: 'NASA/JPL-Caltech image use policy', citation: m.images[0].credit, resolutionM: 0,
       },
     });
   }
   const rems = m.conditions.rems;
   if (rems?.length) {
+    const rw = roverWxFor(m);
+    const sols = rems.map((x) => x.sol);
     rows.push({
-      layer: `REMS weather (${rems.length} sols)`,
+      layer: `${rw.instrument} weather (${rems.length} sols)`,
       kind: 'atmospheric',
       prov: {
-        mission: 'Mars Science Laboratory', instrument: 'REMS', product: `sols ${rems[0].sol}–${rems[rems.length - 1].sol}`,
-        url: 'https://mars.nasa.gov/msl/mission/weather/', license: 'Public domain (NASA/JPL-Caltech/CAB)', citation: 'REMS team, Centro de Astrobiología (CSIC-INTA)', resolutionM: 0,
+        mission: rw.mission, instrument: rw.instrument, product: `sols ${Math.min(...sols)}–${Math.max(...sols)}`,
+        url: rw.url, license: 'Public domain (NASA/JPL-Caltech/CAB)', citation: rw.credit, resolutionM: 0,
       },
     });
   }
@@ -178,6 +182,54 @@ export function sourceRows(m: SitePackManifest): SourceRow[] {
     });
   }
   return rows;
+}
+
+// ───────────────────────────── CRISM mineral signal ─────────────────────────────
+
+export type MineralTier = 'strong' | 'moderate' | 'weak';
+export interface MineralSignal {
+  tier: MineralTier;
+  /** SINDEX2 at the station (mean of the 3×3 engine cells ≈ one 18 m CRISM pixel). */
+  value: number;
+  /** BD1900_2 hydration band is clearly present here (top 5 % of the AOI). */
+  hydrated: boolean;
+}
+
+const crismCut = new WeakMap<Float32Array, { p50: number; p85: number }>();
+
+/**
+ * Tier of the CRISM polyhydrated-sulfate parameter (SINDEX2) relative to this AOI: strong = top 15 % of the AOI's valid pixels,
+ * moderate = above the AOI median, weak = at or below it. Relative, not absolute: summary parameters flag a spectral signature,
+ * not an abundance (Viviano-Beck et al. 2014), and the values over this dark terrain are small.
+ */
+export function mineralSignalAt(pack: LoadedSitePack, x: number, y: number): MineralSignal | null {
+  const a = pack.rasters.crism_sindex2;
+  if (!a) return null;
+  const { w, h, cellM, originX, originY } = pack.manifest.grid;
+  let cut = crismCut.get(a);
+  if (!cut) {
+    const v: number[] = [];
+    for (let i = 0; i < a.length; i += 7) if (Number.isFinite(a[i])) v.push(a[i]);
+    v.sort((p, q) => p - q);
+    cut = { p50: v[Math.floor(v.length * 0.5)] ?? 0, p85: v[Math.floor(v.length * 0.85)] ?? 0 };
+    crismCut.set(a, cut);
+  }
+  const mean = (arr: Float32Array | undefined) => {
+    if (!arr) return null;
+    const c = Math.floor((x - originX) / cellM), r = Math.floor((originY - y) / cellM);
+    let s = 0, n = 0;
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      const rr = r + dr, cc = c + dc;
+      if (rr < 0 || cc < 0 || rr >= h || cc >= w) continue;
+      const v = arr[rr * w + cc];
+      if (Number.isFinite(v)) { s += v; n++; }
+    }
+    return n ? s / n : null;
+  };
+  const v = mean(a);
+  if (v === null) return null;
+  const hyd = mean(pack.rasters.crism_bd1900);
+  return { tier: v >= cut.p85 ? 'strong' : v > cut.p50 ? 'moderate' : 'weak', value: v, hydrated: hyd !== null && hyd >= 0.0008 };
 }
 
 const NOT_MISSIONS = /synthetic|ccmc|donki|team|derived/i;

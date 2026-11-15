@@ -3,7 +3,7 @@
  "id": "jezero-v1",
  "name": "Jezero Crater — western delta front",
  "body": "mars",
- "createdUtc": "2026-11-15T02:36:47Z",
+ "createdUtc": "2026-11-15T02:52:58Z",
  "grid": {
   "w": 1000,
   "h": 1000,
@@ -131,6 +131,30 @@
      "citation": "THEMIS quantitative thermal inertia global mosaic, 100 m/px (USGS Astrogeology). Method: Fergason, Christensen & Kieffer (2006), JGR 111, E12004, doi:10.1029/2006JE002735; mosaicking: Edwards et al. (2011), JGR 116, E10008, doi:10.1029/2010JE003755.",
      "resolutionM": 100.0,
      "accuracy": "Native 100 m/px, bilinearly interpolated to 5 m (does not resolve features smaller than ~100 m). Stated thermal-inertia uncertainty ~±20 % (Fergason et al. 2006). Used only as an indicative terrain/sand proxy."
+    }
+   ]
+  },
+  "skyview": {
+   "id": "skyview",
+   "label": "Visible sky fraction (terrain shielding)",
+   "kind": "continuous",
+   "file": "skyview.bin",
+   "dtype": "u16",
+   "bands": 1,
+   "scale": 0.0001,
+   "offset": 0,
+   "unit": "fraction",
+   "indicative": true,
+   "provenance": [
+    {
+     "mission": "Mars Reconnaissance Orbiter (+ Mars Global Surveyor MOLA control)",
+     "instrument": "HiRISE stereo DTMs, mosaicked for Mars 2020 Terrain Relative Navigation",
+     "product": "Derived from JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif (HiRISE DTM mosaic, 1 m)",
+     "url": "https://asc-pds-services.s3.us-west-2.amazonaws.com/mosaic/mars2020_trn/HiRISE/JEZ_hirise_soc_006_DTM_MOLAtopography_DeltaGeoid_1m_Eqc_latTs0_lon0_blend40.tif",
+     "license": "Public domain (USGS Astrogeology / NASA; FGDC metadata lists no access or use constraints)",
+     "citation": "Horizon method and obstructed-sky definition reproduced in Validation/v1_shielding against Guo et al. (2026), JGR Planets, doi:10.1029/2026JE009704 (MAE 2.0 pp, r = 0.94, 15 periods). Fergason, R. L., Galuszka, D., Hare, T., Mayer, D., Redding, B. & Smith, E. (2020), High-Resolution Imaging Science Experiment Digital Terrain Model Mosaic for Mars 2020 Terrain Relative Navigation, U.S. Geological Survey Astrogeology Science Center. https://doi.org/10.5066/P9REJ9JN",
+     "resolutionM": 1.0,
+     "accuracy": "Derived. Horizon at 25 m spacing (1 deg azimuth steps, 5 m DEM samples, rays truncated at the 5 km pack edge), bilinearly upsampled to 5 m. Versus a V1-style full-resolution computation (1 m DEM, 0.25 deg rays) at 60 random cells: MAE 0.6 pp, 95th percentile 1.4 pp, max 16.3 pp (obstructed fraction, solid-angle weighted). Terrain far outside the pack is not seen. Indicative."
     }
    ]
   }
@@ -1285,6 +1309,7 @@
   "ortho.webp": "1ee3af7f59a84a1c521967fe4730c3ec753982b36fc84b36cc47ad3818500542",
   "ortho_cog.tif": "5cc8b10c2df9bf3ace334e0b5c83350495340ee34c460278526829e362106545",
   "rough.bin": "58b652ec549592a9a58ad461eeabc5584351979739e5130d8b49b5aa38ca918d",
+  "skyview.bin": "3e2476dd0cb0ab63c8f1092baf46f83e886404ddc0e3cffef412a33c6ff3344b",
   "slope.bin": "c657aa2a98050ae8e34e4d192c0109d6e8f8f1f2a713af5b44a413aaf3862c27",
   "stm.json": "c9230c3ec90384f2dc1671bc5ea35d5c45c0f2d969076eb57d90af86b7d497f0",
   "ti.bin": "4845b5c6ebdf088d3d875b9c5cd9fe468771090151309aeda8d0be17ab967644",

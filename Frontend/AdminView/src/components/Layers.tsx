@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
-import { LOS_RAMP, ROUGH_RAMP, SLOPE_RAMP, TIME_RAMP, TI_RAMP, elevationRamp, type Ramp } from '@mw/shared/map';
+import { CRISM_RAMP, LOS_RAMP, ROUGH_RAMP, SLOPE_RAMP, TIME_RAMP, TI_RAMP, elevationRamp, type Ramp } from '@mw/shared/map';
 import type { Provenance } from '@mw/shared/contracts';
 import { toggleOverlay, toggleVector } from '../actions';
 import { OVERLAY_LIMIT, useConsole } from '../store';
+import { roverWxFor } from '../lib/weather';
 import { sourceRows, type SourceRow } from '../lib/science';
 import { demRange } from '../lib/layers';
 import { fmtLtst, sunAtLtst } from '../lib/marsclock';
@@ -129,6 +130,7 @@ export function LayersPanel() {
     { key: 'slope', name: 'Slope', unit: '°', what: `How steep the ground is. Red = ${lim.slope}° and steeper (NASA suited-walking limit).`, source: provLine(R.slope?.provenance), legend: { ramp: SLOPE_RAMP, min: 0, max: 35, ticks: [[0, '0°'], [10, '10°'], [lim.slope, `${lim.slope}°`], [35, '35°']], mark: { at: lim.slope, label: `${lim.slope}°` } }, ...ov('slope') },
     ...(R.rough ? [{ key: 'rough', name: 'Surface roughness', unit: 'm', what: 'Metre-scale bumpiness (rocks, ridges) inside each 5 m cell, from the 1 m DTM. White = rough.', source: provLine(R.rough.provenance), legend: { ramp: ROUGH_RAMP, min: 0, max: 0.5, ticks: [[0, '0 m'], [0.2, '0.2'], [0.5, '0.5 m']] as [number, string][] }, ...ov('rough') }] : []),
     ...(R.ti ? [{ key: 'ti', name: 'Thermal inertia', unit: 'J m⁻² K⁻¹ s⁻½', what: 'Loose sand (low) ↔ rock (high): sand makes walking slower and costlier.', source: provLine(R.ti.provenance), badge: R.ti.indicative ? 'Indicative' : undefined, legend: { ramp: TI_RAMP, min: 50, max: 700, ticks: [[50, 'sand 50'], [400, '400'], [700, '700 rock']] as [number, string][] }, ...ov('ti') }] : []),
+    ...(R.crism_sindex2 ? [{ key: 'crism', name: 'Minerals (CRISM)', unit: 'sulfate signal', what: 'Where the orbiter sees a hydrated-sulfate spectral signature. Brighter violet = stronger signal. It marks a signature, not how much mineral is there.', source: `${provLine(R.crism_sindex2.provenance)} · ${(Array.isArray(R.crism_sindex2.provenance) ? R.crism_sindex2.provenance[0] : R.crism_sindex2.provenance).product.split(' ')[0].replace(/\.img$/, '')}`, badge: 'Indicative', legend: { ramp: CRISM_RAMP, min: 0.003, max: 0.0105, ticks: [[0.003, 'weak'], [0.0105, 'strong']] as [number, string][] }, ...ov('crism') }] : []),
   ];
   const safety: LayerRow[] = [
     { key: 'outline', name: 'Safe walking area', what: 'Outline of ground that meets every hard flight rule at once.', source: engine, ...vec('outline') },
@@ -160,13 +162,14 @@ export function LayersPanel() {
 }
 
 
-const KIND_ORDER = ['optical', 'topographic', 'thermal', 'atmospheric', 'radiation', 'space weather', 'traverse', 'imagery'];
+const KIND_ORDER = ['optical', 'topographic', 'thermal', 'spectral', 'atmospheric', 'radiation', 'space weather', 'traverse', 'imagery'];
 
 /** Every data layer with mission, instrument, resolution and citation (Details → Sources). */
 export function SourcesSection() {
   const pack = useConsole((s) => s.pack);
   const fieldsSource = useConsole((s) => s.fieldsSource);
   const rows = useMemo(() => (pack ? sourceRows(pack.manifest) : []), [pack]);
+  const rv = pack ? roverWxFor(pack.manifest) : { rover: 'Curiosity', instrument: 'REMS' };
   const groups = useMemo(() => {
     const g = new Map<string, SourceRow[]>();
     for (const r of rows) g.set(r.kind, [...(g.get(r.kind) ?? []), r]);
@@ -175,7 +178,7 @@ export function SourcesSection() {
   return (
     <div className="flex flex-col gap-5">
       <div className="grid gap-2 text-[11.5px] leading-relaxed text-mute" data-testid="real-vs-scenario">
-        <div className="border border-line-2 p-2.5"><span className="label !text-ok">Real NASA data</span><div className="mt-1 text-ink-2">Terrain (USGS/HiRISE DEM), imagery (HiRISE), thermal inertia (THEMIS), Curiosity traverse and photos, science targets (real Curiosity sites), REMS weather, DONKI space weather.</div></div>
+        <div className="border border-line-2 p-2.5"><span className="label !text-ok">Real NASA data</span><div className="mt-1 text-ink-2">Terrain (USGS/HiRISE DEM), imagery (HiRISE), thermal inertia (THEMIS), mineral signatures (CRISM), {rv.rover} traverse and photos, science targets (real {rv.rover} sites), {rv.instrument} weather, DONKI space weather.</div></div>
         <div className="border border-line-2 p-2.5"><span className="label !text-ink">Scenario</span><div className="mt-1 text-ink-2">Habitat, rover and landing-pad placements, the sol number, and crew parameters.</div></div>
       </div>
       <p className="text-[11.5px] leading-relaxed text-mute">
