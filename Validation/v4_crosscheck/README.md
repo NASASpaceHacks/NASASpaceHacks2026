@@ -39,3 +39,14 @@ See `summary.json` and `results.csv`. Headline:
 - For NO-GO walks the candidate route is not what the engine would fly; the checker judges it as a route, so the "failing rule" comparison uses the engine's `evaluateOrder` list on the same route.
 - The checker's out-of-LOS accounting and LOS rays are our own discretisation; walks within about 1 min of the 10 min limit would be genuinely ambiguous (none were: closest margins are in `results.csv`).
 - AI-judge results are pending (orchestrator). Batch 1: W01-W12; batch 2: W13-W24 (6 GO + 6 NO-GO each).
+
+## Three-way result (engine · independent checker · blind AI judges)
+| Comparison | Same GO/NO-GO verdict | Engine's failing rule also named (12 NO-GO walks) |
+|---|---|---|
+| Engine vs blind Claude AI judges (2 judges × 12 walks, engine verdicts hidden) | **24/24** | **12/12** |
+| Engine vs independent Python checker (no engine code) | **22/24** | 6/12 |
+
+- The AI judges read only `ai_judge_instructions.md` and the per-step packets. The packets include engine-derived per-step times (with heat rests), line of sight and shelter minutes, so this checks that the **rules are applied correctly** to the evidence. It is not an independent check of the physical models.
+- The independent checker recomputes slope, edge grade, distance, **line of sight (own ray casting)** and a simple walking time from the raw DEM. It agrees on every engine GO. Its 2 verdict differences (W02, W19) and its lower rule agreement come from having **no suit-heat model**, so it misses time-based failures (EVA duration, daylight) and the extra out-of-contact time from heat rests.
+- Together: geometry and line of sight are confirmed independently, and the engine's rule logic is confirmed by blind review. The remaining model assumptions (metabolic model, heat budget) are covered by `v2_metabolic` and stated as limitations.
+- Files: `ai_judge_batch1.json`, `ai_judge_batch2.json`, `three_way_summary.json`.

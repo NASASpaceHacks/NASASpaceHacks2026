@@ -1,0 +1,190 @@
+[
+ {
+  "walk": "W01",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 467.01,
+    "limit": 360
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 407.01,
+    "limit": 300
+   },
+   {
+    "rule": "los_gap_max_min",
+    "observed": 175.51,
+    "limit": 10
+   }
+  ],
+  "reasoning": "Max slope 19.92, max radius 922 m, total EVA 467.0 min, worst walk-back 407.0 (row 117), max shelter 20.97, max out-of-LOS run 175.5 min (row 113), min sun 12.35. Fails: eva_duration_max_min, walkback_speed_factor, los_gap_max_min."
+ },
+ {
+  "walk": "W02",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 19.15,
+    "limit": 10
+   }
+  ],
+  "reasoning": "Max slope 16.32, max radius 487.1 m, total EVA 154.8 min, worst walk-back 99.2 (row 52), max shelter 15.09, max out-of-LOS run 19.2 min (row 44), min sun 36.3. Fails: los_gap_max_min."
+ },
+ {
+  "walk": "W03",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Max slope 13.4, max radius 589.2 m, total EVA 166.1 min, worst walk-back 109.7 (row 56), max shelter 18.9, max out-of-LOS run 0.8 min (row 32), min sun 36.3. All seven rules pass."
+ },
+ {
+  "walk": "W04",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Max slope 8.22, max radius 211 m, total EVA 93.2 min, worst walk-back 39.8 (row 35), max shelter 6.6, max out-of-LOS run 0.0 min (row 0), min sun 71.45. All seven rules pass."
+ },
+ {
+  "walk": "W05",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 57.18,
+    "limit": 10
+   }
+  ],
+  "reasoning": "Max slope 19.97, max radius 259.9 m, total EVA 137.0 min, worst walk-back 77.0 (row 111), max shelter 12.87, max out-of-LOS run 57.2 min (row 88), min sun 65.43. Fails: los_gap_max_min."
+ },
+ {
+  "walk": "W06",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Max slope 14.39, max radius 285.4 m, total EVA 103.3 min, worst walk-back 46.3 (row 58), max shelter 8.7, max out-of-LOS run 0.0 min (row 0), min sun 58.25. All seven rules pass."
+ },
+ {
+  "walk": "W07",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2224.3,
+    "limit": 2000
+   },
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 497.51,
+    "limit": 360
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 437.51,
+    "limit": 300
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 73.92,
+    "limit": 30
+   },
+   {
+    "rule": "los_gap_max_min",
+    "observed": 355.44,
+    "limit": 10
+   }
+  ],
+  "reasoning": "Max slope 19.03, max radius 2224.3 m, total EVA 497.5 min, worst walk-back 437.5 (row 116), max shelter 73.92, max out-of-LOS run 355.4 min (row 98), min sun 5.47. Fails: walk_radius_max_m, eva_duration_max_min, walkback_speed_factor, shelter_time_max_min, los_gap_max_min."
+ },
+ {
+  "walk": "W08",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Max slope 18.36, max radius 373.1 m, total EVA 113.9 min, worst walk-back 53.9 (row 116), max shelter 11.94, max out-of-LOS run 0.0 min (row 0), min sun 58.25. All seven rules pass."
+ },
+ {
+  "walk": "W09",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2185.8,
+    "limit": 2000
+   },
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 1002.85,
+    "limit": 360
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 942.85,
+    "limit": 300
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 141.48,
+    "limit": 30
+   },
+   {
+    "rule": "los_gap_max_min",
+    "observed": 860.8,
+    "limit": 10
+   },
+   {
+    "rule": "daylight_min_sun_elev_deg",
+    "observed": -63.29,
+    "limit": 5
+   }
+  ],
+  "reasoning": "Max slope 19.93, max radius 2185.8 m, total EVA 1002.9 min, worst walk-back 942.9 (row 116), max shelter 141.48, max out-of-LOS run 860.8 min (row 102), min sun -63.29. Fails: walk_radius_max_m, eva_duration_max_min, walkback_speed_factor, shelter_time_max_min, los_gap_max_min, daylight_min_sun_elev_deg."
+ },
+ {
+  "walk": "W10",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Max slope 15.87, max radius 872 m, total EVA 233.0 min, worst walk-back 173.0 (row 115), max shelter 28.24, max out-of-LOS run 1.7 min (row 24), min sun 58.25. All seven rules pass."
+ },
+ {
+  "walk": "W11",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2029.2,
+    "limit": 2000
+   },
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 692.77,
+    "limit": 360
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 632.77,
+    "limit": 300
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 83.53,
+    "limit": 30
+   },
+   {
+    "rule": "los_gap_max_min",
+    "observed": 573.01,
+    "limit": 10
+   },
+   {
+    "rule": "daylight_min_sun_elev_deg",
+    "observed": -37.28,
+    "limit": 5
+   }
+  ],
+  "reasoning": "Max slope 19.98, max radius 2029.2 m, total EVA 692.8 min, worst walk-back 632.8 (row 117), max shelter 83.53, max out-of-LOS run 573.0 min (row 107), min sun -37.28. Fails: walk_radius_max_m, eva_duration_max_min, walkback_speed_factor, shelter_time_max_min, los_gap_max_min, daylight_min_sun_elev_deg."
+ },
+ {
+  "walk": "W12",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Max slope 19.33, max radius 659 m, total EVA 173.0 min, worst walk-back 113.0 (row 115), max shelter 20.9, max out-of-LOS run 5.6 min (row 52), min sun 58.74. All seven rules pass."
+ }
+]

@@ -1,0 +1,375 @@
+{
+ "walks": 24,
+ "engine_vs_ai": 24,
+ "engine_vs_independent": 22,
+ "all_three": 22,
+ "rule_named_by_ai": 12,
+ "rule_named_by_independent": 6,
+ "engine_nogo": 12,
+ "rows": [
+  {
+   "walk": "W01",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "eva_duration_max_min",
+    "walkback_speed_factor",
+    "los_gap_max_min"
+   ],
+   "ai_reasoning": "Max slope 19.92, max radius 922 m, total EVA 467.0 min, worst walk-back 407.0 (row 117), max shelter 20.97, max out-of-LOS run 175.5 min (row 113), min sun 12.35. Fails: eva_duration_max_min, walkback_speed_factor, los_gap_max_min.",
+   "engine_rules": [
+    "eva_duration_max_min"
+   ]
+  },
+  {
+   "walk": "W02",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "los_gap_max_min"
+   ],
+   "ai_reasoning": "Max slope 16.32, max radius 487.1 m, total EVA 154.8 min, worst walk-back 99.2 (row 52), max shelter 15.09, max out-of-LOS run 19.2 min (row 44), min sun 36.3. Fails: los_gap_max_min.",
+   "engine_rules": [
+    "los_gap_max_min"
+   ]
+  },
+  {
+   "walk": "W03",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "Max slope 13.4, max radius 589.2 m, total EVA 166.1 min, worst walk-back 109.7 (row 56), max shelter 18.9, max out-of-LOS run 0.8 min (row 32), min sun 36.3. All seven rules pass."
+  },
+  {
+   "walk": "W04",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "Max slope 8.22, max radius 211 m, total EVA 93.2 min, worst walk-back 39.8 (row 35), max shelter 6.6, max out-of-LOS run 0.0 min (row 0), min sun 71.45. All seven rules pass."
+  },
+  {
+   "walk": "W05",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "los_gap_max_min"
+   ],
+   "ai_reasoning": "Max slope 19.97, max radius 259.9 m, total EVA 137.0 min, worst walk-back 77.0 (row 111), max shelter 12.87, max out-of-LOS run 57.2 min (row 88), min sun 65.43. Fails: los_gap_max_min.",
+   "engine_rules": [
+    "los_gap_max_min"
+   ]
+  },
+  {
+   "walk": "W06",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "Max slope 14.39, max radius 285.4 m, total EVA 103.3 min, worst walk-back 46.3 (row 58), max shelter 8.7, max out-of-LOS run 0.0 min (row 0), min sun 58.25. All seven rules pass."
+  },
+  {
+   "walk": "W07",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "walk_radius_max_m",
+    "shelter_time_max_min",
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "walk_radius_max_m",
+    "eva_duration_max_min",
+    "walkback_speed_factor",
+    "shelter_time_max_min",
+    "los_gap_max_min"
+   ],
+   "ai_reasoning": "Max slope 19.03, max radius 2224.3 m, total EVA 497.5 min, worst walk-back 437.5 (row 116), max shelter 73.92, max out-of-LOS run 355.4 min (row 98), min sun 5.47. Fails: walk_radius_max_m, eva_duration_max_min, walkback_speed_factor, shelter_time_max_min, los_gap_max_min.",
+   "engine_rules": [
+    "walk_radius_max_m"
+   ]
+  },
+  {
+   "walk": "W08",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "Max slope 18.36, max radius 373.1 m, total EVA 113.9 min, worst walk-back 53.9 (row 116), max shelter 11.94, max out-of-LOS run 0.0 min (row 0), min sun 58.25. All seven rules pass."
+  },
+  {
+   "walk": "W09",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "walk_radius_max_m",
+    "eva_duration_max_min",
+    "walkback_speed_factor",
+    "shelter_time_max_min",
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "walk_radius_max_m",
+    "eva_duration_max_min",
+    "walkback_speed_factor",
+    "shelter_time_max_min",
+    "los_gap_max_min",
+    "daylight_min_sun_elev_deg"
+   ],
+   "ai_reasoning": "Max slope 19.93, max radius 2185.8 m, total EVA 1002.9 min, worst walk-back 942.9 (row 116), max shelter 141.48, max out-of-LOS run 860.8 min (row 102), min sun -63.29. Fails: walk_radius_max_m, eva_duration_max_min, walkback_speed_factor, shelter_time_max_min, los_gap_max_min, daylight_min_sun_elev_deg.",
+   "engine_rules": [
+    "shelter_time_max_min"
+   ]
+  },
+  {
+   "walk": "W10",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "Max slope 15.87, max radius 872 m, total EVA 233.0 min, worst walk-back 173.0 (row 115), max shelter 28.24, max out-of-LOS run 1.7 min (row 24), min sun 58.25. All seven rules pass."
+  },
+  {
+   "walk": "W11",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "walk_radius_max_m",
+    "shelter_time_max_min",
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "walk_radius_max_m",
+    "eva_duration_max_min",
+    "walkback_speed_factor",
+    "shelter_time_max_min",
+    "los_gap_max_min",
+    "daylight_min_sun_elev_deg"
+   ],
+   "ai_reasoning": "Max slope 19.98, max radius 2029.2 m, total EVA 692.8 min, worst walk-back 632.8 (row 117), max shelter 83.53, max out-of-LOS run 573.0 min (row 107), min sun -37.28. Fails: walk_radius_max_m, eva_duration_max_min, walkback_speed_factor, shelter_time_max_min, los_gap_max_min, daylight_min_sun_elev_deg.",
+   "engine_rules": [
+    "walk_radius_max_m"
+   ]
+  },
+  {
+   "walk": "W12",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "Max slope 19.33, max radius 659 m, total EVA 173.0 min, worst walk-back 113.0 (row 115), max shelter 20.9, max out-of-LOS run 5.6 min (row 52), min sun 58.74. All seven rules pass."
+  },
+  {
+   "walk": "W13",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "slope max 15.15 (row 9); radius 264 m; total EVA 106.6 min; walk-back worst 53.9 (row 49); shelter max 8.32 (row 45); LOS run max 0.84 (row 33); min sun 19.49. All seven rules pass."
+  },
+  {
+   "walk": "W14",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "eva_duration_max_min",
+    "walkback_speed_factor",
+    "los_gap_max_min"
+   ],
+   "ai_reasoning": "slope max 19.92 (row 6); radius 1602 m; total EVA 570.4 min; walk-back worst 510.4 (row 117); shelter max 21.98 (row 59); LOS run max 463.49 (row 105); min sun 12.21. Failing rules make it NO-GO.",
+   "engine_rules": [
+    "eva_duration_max_min"
+   ]
+  },
+  {
+   "walk": "W15",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "slope max 17.30 (row 23); radius 226 m; total EVA 89.5 min; walk-back worst 36.0 (row 46); shelter max 6.99 (row 46); LOS run max 0.00 (row 0); min sun 58.25. All seven rules pass."
+  },
+  {
+   "walk": "W16",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "slope max 12.81 (row 67); radius 350 m; total EVA 112.7 min; walk-back worst 52.7 (row 111); shelter max 11.19 (row 55); LOS run max 0.51 (row 67); min sun 18.1. All seven rules pass."
+  },
+  {
+   "walk": "W17",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "slope max 13.39 (row 85); radius 469 m; total EVA 143.8 min; walk-back worst 93.2 (row 57); shelter max 14.97 (row 57); LOS run max 3.27 (row 41); min sun 58.25. All seven rules pass."
+  },
+  {
+   "walk": "W18",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "los_gap_max_min",
+    "daylight_min_sun_elev_deg"
+   ],
+   "ai_reasoning": "slope max 19.80 (row 30); radius 551 m; total EVA 259.7 min; walk-back worst 199.7 (row 115); shelter max 20.86 (row 58); LOS run max 193.44 (row 110); min sun -14.9. Failing rules make it NO-GO.",
+   "engine_rules": [
+    "daylight_min_sun_elev_deg"
+   ]
+  },
+  {
+   "walk": "W19",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "los_gap_max_min"
+   ],
+   "ai_reasoning": "slope max 17.22 (row 47); radius 762 m; total EVA 216.8 min; walk-back worst 156.8 (row 104); shelter max 24.28 (row 52); LOS run max 27.97 (row 47); min sun 58.25. Failing rules make it NO-GO.",
+   "engine_rules": [
+    "los_gap_max_min"
+   ]
+  },
+  {
+   "walk": "W20",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "los_gap_max_min",
+    "daylight_min_sun_elev_deg"
+   ],
+   "ai_reasoning": "slope max 19.03 (row 29); radius 664 m; total EVA 242.3 min; walk-back worst 182.3 (row 109); shelter max 27.94 (row 55); LOS run max 100.19 (row 79); min sun -11.03. Failing rules make it NO-GO.",
+   "engine_rules": [
+    "daylight_min_sun_elev_deg"
+   ]
+  },
+  {
+   "walk": "W21",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "slope max 12.98 (row 106); radius 336 m; total EVA 114.6 min; walk-back worst 56.3 (row 58); shelter max 10.36 (row 58); LOS run max 0.00 (row 0); min sun 58.25. All seven rules pass."
+  },
+  {
+   "walk": "W22",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "walk_radius_max_m",
+    "eva_duration_max_min",
+    "walkback_speed_factor",
+    "shelter_time_max_min",
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "walk_radius_max_m",
+    "eva_duration_max_min",
+    "walkback_speed_factor",
+    "shelter_time_max_min",
+    "los_gap_max_min",
+    "daylight_min_sun_elev_deg"
+   ],
+   "ai_reasoning": "slope max 19.93 (row 34); radius 2194 m; total EVA 1047.8 min; walk-back worst 987.8 (row 117); shelter max 149.91 (row 59); LOS run max 905.70 (row 103); min sun -63.29. Failing rules make it NO-GO.",
+   "engine_rules": [
+    "shelter_time_max_min"
+   ]
+  },
+  {
+   "walk": "W23",
+   "engine": "GO",
+   "engine_rule": "",
+   "independent": "GO",
+   "independent_rules": [],
+   "ai": "GO",
+   "ai_rules": [],
+   "ai_reasoning": "slope max 17.55 (row 6); radius 146 m; total EVA 94.8 min; walk-back worst 38.8 (row 26); shelter max 4.58 (row 24); LOS run max 0.00 (row 0); min sun 36.3. All seven rules pass."
+  },
+  {
+   "walk": "W24",
+   "engine": "NO-GO",
+   "engine_rule": "",
+   "independent": "NO-GO",
+   "independent_rules": [
+    "walk_radius_max_m",
+    "shelter_time_max_min",
+    "los_gap_max_min"
+   ],
+   "ai": "NO-GO",
+   "ai_rules": [
+    "walk_radius_max_m",
+    "eva_duration_max_min",
+    "walkback_speed_factor",
+    "shelter_time_max_min",
+    "los_gap_max_min",
+    "daylight_min_sun_elev_deg"
+   ],
+   "ai_reasoning": "slope max 19.79 (row 53); radius 2260 m; total EVA 513.3 min; walk-back worst 453.3 (row 115); shelter max 72.37 (row 58); LOS run max 370.36 (row 99); min sun 1.92. Failing rules make it NO-GO.",
+   "engine_rules": [
+    "walk_radius_max_m"
+   ]
+  }
+ ]
+}
