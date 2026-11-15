@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { VisorController } from '@mw/visor/src/core/visor';
 import { useVisor, type Snapshot } from '@mw/visor/src/state/store';
 import { fmtCountdown, fmtDist, hdg, pad } from '@mw/visor/src/ui/format';
-import { requestCompassPermission, useCamera, useCompass, useWakeLock } from './sensors';
+import { requestCompassPermission, useCamera, useCompass, useVoiceCommands, useWakeLock, type VoiceCommand, type VoiceState } from './sensors';
 
 /** Signed angle in (−180, 180]. */
 const signed = (d: number) => ((((d + 180) % 360) + 360) % 360) - 180;
@@ -149,7 +149,7 @@ function ProgressRail({ leg, target }: { leg: Leg | null; target: Target | null 
         <div className="rail-fill" style={{ width: `${pct.toFixed(1)}%` }} />
         <span className="rail-me" style={{ left: `${pct.toFixed(1)}%` }} />
       </div>
-      <span className="rail-lbl end">{dist(target.distM)} · {target.name}</span>
+      <span className="rail-lbl end">{dist(target.distM)} · ETA {Math.ceil(target.etaMin)} min</span>
     </div>
   );
 }
@@ -209,10 +209,65 @@ function MiniMap({ ctl, est, track, heading, nextId }: { ctl: VisorController; e
   );
 }
 
-// ─────────────────────────── action cards (non-nav states) ───────────────────────────
+// ─────────────────────────── instruction (bottom-left) ───────────────────────────
 
-function Card({ tone = 'go', children }: { tone?: Tone; children: ReactNode }) {
-  return <div className={`card tone-${tone}`}>{children}</div>;
+/** Spoken-command prompt. Suited crew can't tap a phone, so actions are voice-only; tapping the prompt is a
+ *  bench-test fallback for browsers without speech recognition. */
+function SayPrompt({ phrase, onFallback, disabled }: { phrase: string; onFallback: () => void; disabled?: boolean }) {
+  return (
+    <div className={`say ${disabled ? 'off' : ''}`} onClick={disabled ? undefined : onFallback} role="note">
+      <MicIcon />
+      <span>Say <q>{phrase}</q></span>
+    </div>
+  );
+}
+
+function MicIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="mic" aria-hidden>
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" />
+    </svg>
+  );
+}
+
+function MicStatus({ state }: { state: VoiceState }) {
+  // While listening: a dot only. Text appears only when voice input is broken.
+  if (state === 'off') return null;
+  const txt = state === 'denied' ? 'MIC BLOCKED' : state === 'unsupported' ? 'NO VOICE INPUT' : state === 'error' ? 'MIC ERROR' : null;
+  return (
+    <div className={`mic-status ${state}`} title={state === 'listening' ? 'Listening' : undefined}>
+      <span className="dot" />
+      {txt}
+    </div>
+  );
+}
+
+/** Voice command vocabulary: displayed phrase first, then short forms and frequent mishearings. */
+const SAY = {
+  accept: ['accept route', 'accept', 'accepted', 'except route', 'except', 'accept root', 'except root', 'expect route', 'a set route', 'accepts'],
+  done: ['task done', 'done', 'task complete', 'tasks done', 'test done', 'ask done', 'task finished', 'finished'],
+  depart: ['depart', 'departing', 'departed', 'the part', 'departure', 'deport', 'd part', 'leave', 'leaving'],
+};
+
+type Act = { kind: 'say'; text: string; run: () => void } | { kind: 'admin'; text: string } | { kind: 'none'; text: string };
+interface Instr { title: string; detail?: string; warn?: string; act: Act }
+
+/** Bottom-left: current situation + the single next action (say a word / hab does something on Admin / nothing). */
+function Instruction({ ins }: { ins: Instr }) {
+  const a = ins.act;
+  return (
+    <div className="instr">
+      <div className="instr-main">{ins.title}</div>
+      {ins.detail && <div className="instr-sub">{ins.detail}</div>}
+      {ins.warn && <div className="instr-sub tone-warn">{ins.warn}</div>}
+      {a.kind === 'say' && <SayPrompt phrase={a.text} onFallback={a.run} />}
+      {a.kind === 'admin' && (
+        <div className="instr-act admin"><span className="tag">ADMIN</span><span>{a.text}</span></div>
+      )}
+      {a.kind === 'none' && <div className="instr-act none">{a.text}</div>}
+    </div>
+  );
 }
 
 // ─────────────────────────── app ───────────────────────────
@@ -250,7 +305,6 @@ export function App({ ctl }: { ctl: VisorController }) {
 
   let rel: number | null = null;
   let target: Target | null = null;
-  let card: ReactNode = null;
 
   if (returning && s.ret) {
     const crs = s.ret.bearingDeg;
@@ -277,57 +331,46 @@ export function App({ ctl }: { ctl: VisorController }) {
     leg = { totalM: Math.max(1, end - startS), doneM: ctl.sim.s - startS };
   }
 
+  const voice: VoiceCommand[] = [];
+
+  // Bottom-left instruction: what is happening, and the one thing to do next —
+  // a word to say (voice command), something the hab operator does on the Admin console, or nothing.
+  let ins: Instr | null = null;
   if (s.display === 'BOOT') {
-    card = (
-      <Card>
-        <div className="instr-main">MARSWALK</div>
-        <div className="instr-sub">{s.bootError ?? s.bootStage}</div>
-      </Card>
-    );
+    ins = { title: 'Starting up', detail: s.bootError ?? s.bootStage, act: { kind: 'none', text: 'Please wait' } };
   } else if (s.display === 'WAITING_FOR_ROUTE') {
-    card = (
-      <Card>
-        <div className="instr-main">Waiting for route</div>
-        <div className="instr-sub">
-          <LinkDot s={s} /> {s.link === 'down' ? 'No hab link' : 'Hab connected'}
-        </div>
-      </Card>
-    );
+    ins = s.link === 'down'
+      ? { title: 'Waiting for route', detail: 'No hab link', act: { kind: 'admin', text: 'Open the Habitat console and check the surface link' } }
+      : { title: 'Waiting for route', detail: 'Hab connected', act: { kind: 'admin', text: 'Plan now → Review & send → Send to crew' } };
   } else if (s.display === 'NEW_ROUTE' && s.pending) {
     const p = s.pending;
-    card = (
-      <Card>
-        <div className="instr-main">New route v{p.seq}</div>
-        <div className="instr-sub wrap">
-          {p.fromLabel} → {p.toLabel} · {p.stops.length} stops · {dist(p.distM)} · {Math.round(p.durMin)} min
-        </div>
-        {p.sig === 'unverified' && <div className="instr-sub tone-warn">Signature not verified</div>}
-        <button className="btn" disabled={p.sig === 'checking'} onClick={() => void ctl.accept()}>
-          {p.sig === 'checking' ? 'Checking…' : 'Accept'}
-        </button>
-      </Card>
-    );
+    const checking = p.sig === 'checking';
+    if (!checking) voice.push({ phrases: SAY.accept, run: () => void ctl.accept() });
+    ins = {
+      title: `New route v${p.seq}`,
+      detail: `${p.fromLabel} → ${p.toLabel} · ${p.stops.length} stops · ${dist(p.distM)} · ${Math.round(p.durMin)} min`,
+      warn: p.sig === 'unverified' ? 'Signature not verified' : undefined,
+      act: checking ? { kind: 'none', text: 'Checking signature…' } : { kind: 'say', text: 'Accept route', run: () => void ctl.accept() },
+    };
+  } else if (returning && s.ret) {
+    ins = { title: `Return now to ${s.ret.target}`, detail: s.ret.reason, act: { kind: 'none', text: 'Follow the path' } };
   } else if (s.display === 'STATION' && s.station) {
     const st = s.station;
-    const task = st.tasks.find((t) => t.active);
+    const task = st.tasks.find((x) => x.active);
     const allDone = st.tasksDone >= st.tasks.length;
-    card = (
-      <Card>
-        <div className="instr-main">{st.name}</div>
-        <div className="instr-sub wrap">
-          {allDone ? 'All tasks done' : `${st.tasksDone + 1}/${st.tasks.length} · ${task?.label ?? ''}`} · {fmtCountdown(st.dwellLeftMin)} left
-        </div>
-        <button className="btn" onClick={ctl.next}>{allDone ? 'Depart' : 'Task done'}</button>
-      </Card>
-    );
+    voice.push({ phrases: allDone ? SAY.depart : SAY.done, run: ctl.next });
+    ins = {
+      title: st.name,
+      detail: `${allDone ? 'All tasks done' : `Task ${st.tasksDone + 1}/${st.tasks.length} · ${task?.label ?? ''}`} · ${fmtCountdown(st.dwellLeftMin)} left`,
+      act: { kind: 'say', text: allDone ? 'Depart' : 'Task done', run: ctl.next },
+    };
+  } else if (s.display === 'NAV' && target) {
+    ins = { title: `Walk to ${target.name}`, act: { kind: 'none', text: 'Follow the path' } };
   } else if (s.display === 'COMPLETE') {
-    card = (
-      <Card>
-        <div className="instr-main">EVA complete</div>
-        <div className="instr-sub">At {s.homeName} · {dist(s.odoM)} walked</div>
-      </Card>
-    );
+    ins = { title: 'EVA complete', detail: `At ${s.homeName} · ${dist(s.odoM)} walked`, act: { kind: 'admin', text: 'Review the EVA report' } };
   }
+
+  const mic = useVoiceCommands(started, voice);
 
   return (
     <div className={`root tone-${tone}`}>
@@ -337,12 +380,6 @@ export function App({ ctl }: { ctl: VisorController }) {
       <div className="safe">
         <div className="top">
           <ProgressRail leg={leg} target={target} />
-          {returning && s.ret && (
-            <div className="banner tone-ret">
-              <div className="banner-main">RETURN NOW</div>
-              <div className="banner-sub">{s.ret.reason}</div>
-            </div>
-          )}
           {!returning && s.autonomous && <div className="chip tone-warn">LINK LOST · AUTONOMOUS</div>}
           {!returning && !s.autonomous && s.offRouteM > 25 && s.display === 'NAV' && (
             <div className="chip tone-warn">OFF ROUTE {Math.round(s.offRouteM)} M</div>
@@ -351,8 +388,9 @@ export function App({ ctl }: { ctl: VisorController }) {
 
         {rel !== null && <GroundArrow rel={rel} />}
         <Corner t={s.t} heading={heading} target={target} />
+        <MicStatus state={mic.state} />
 
-        {card && <div className="action">{card}</div>}
+        {started && ins && <Instruction ins={ins} />}
       </div>
 
       <MiniMap ctl={ctl} est={s.est} track={track.current.pts} heading={heading} nextId={s.next?.id ?? null} />
@@ -366,7 +404,7 @@ export function App({ ctl }: { ctl: VisorController }) {
       {!started && (
         <button className="start" onClick={() => void start()}>
           <span className="start-main">Start AR visor</span>
-          <span className="start-sub">Uses camera and compass</span>
+          <span className="start-sub">Uses camera, compass and microphone</span>
         </button>
       )}
     </div>
