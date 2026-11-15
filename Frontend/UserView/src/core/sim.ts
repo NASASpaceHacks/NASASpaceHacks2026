@@ -76,12 +76,30 @@ export interface SimEnv {
   hold?: boolean;
 }
 
-/** Hold in place along the route while the crew walks elsewhere (a detour): heat accrues at walking power. */
+/**
+ * Hold in place along the route while the crew walks elsewhere (a detour): heat accrues at walking power,
+ * and the engine heat governor still inserts rests (sim.resting = true → the detour walker stands still).
+ */
 function holdWalking(sim: SimState, route: RouteModel, dt: number) {
   const [i] = route.locate(sim.s);
-  sim.metW = route.edgeP[i];
+  const P = route.edgeP[i];
+  if ((sim.restLeftS ?? 0) <= 0) {
+    const rest = restNeeded(sim.heatAvgW, 1, P, HP); // rest before the next minute of walking
+    if (rest > 0) sim.restLeftS = rest * 60;
+  }
+  if ((sim.restLeftS ?? 0) > 0) {
+    const r = Math.min(dt, sim.restLeftS!);
+    sim.metW = REST_W;
+    sim.resting = true;
+    accumulateHeat(sim, REST_W, r);
+    sim.restLeftS = sim.restLeftS! - r;
+    sim.restMin = (sim.restMin ?? 0) + r / 60;
+    dt -= r;
+    if (dt <= 1e-6) return;
+  }
+  sim.metW = P;
   sim.resting = false;
-  accumulateHeat(sim, sim.metW, dt);
+  accumulateHeat(sim, P, dt);
 }
 
 /** mulberry32 step with explicit state (keeps SimState serialisable). */

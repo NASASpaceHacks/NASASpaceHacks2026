@@ -4,8 +4,20 @@
     {
       "name": "ar-visor",
       "runtimeExecutable": "bash",
-      "runtimeArgs": ["-c", "export PATH=$HOME/.local/share/fnm/node-versions/v22.23.5/installation/bin:$PATH && cd Frontend/UserView_AR && MW_HTTPS=0 npx vite --port 5175"],
+      "runtimeArgs": [
+        "-c",
+        "export PATH=$HOME/.local/share/fnm/node-versions/v22.23.5/installation/bin:$PATH && cd Frontend/UserView_AR && MW_HTTPS=0 npx vite --port 5175"
+      ],
       "port": 5175
+    },
+    {
+      "name": "ar-visor-http",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "export PATH=$HOME/.local/share/fnm/node-versions/v22.23.5/installation/bin:$PATH && cd Frontend/UserView_AR && MW_HTTPS=0 npx vite --port 5176 --strictPort"
+      ],
+      "port": 5176
     }
   ]
 }

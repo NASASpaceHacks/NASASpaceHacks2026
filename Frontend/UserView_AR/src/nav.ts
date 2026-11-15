@@ -188,7 +188,8 @@ export class NavModel implements PositionModel {
     if (this.detour && this.detour.target.kind === 'stop' && sim.mode === 'RETURN') this.handBack(sim, route, null);
     this.prevMode = sim.mode;
 
-    const walking = dtS > 0 && (sim.mode === 'WALK' || sim.mode === 'RETURN') && (this.detour !== null || !sim.resting);
+    // Heat-governor rests (on the route or on a detour) stand still: no progress, no drift.
+    const walking = dtS > 0 && (sim.mode === 'WALK' || sim.mode === 'RETURN') && !sim.resting;
 
     // Walk the detour.
     const d = this.detour;
