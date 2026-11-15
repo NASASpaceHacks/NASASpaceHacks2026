@@ -22,6 +22,7 @@ const VAR_DIR = process.env.MARSWALK_E2E_VAR_DIR;
 
 export default defineConfig({
   testDir: './e2e',
+  testIgnore: /interactions\.spec\.ts$/, // real-input UX tests have their own config (pnpm test:ux)
   outputDir: './test-results',
   timeout: 300_000,
   expect: { timeout: 20_000 },

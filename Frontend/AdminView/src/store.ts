@@ -48,6 +48,10 @@ export interface ConsoleState {
   customStops: Station[];
   /** Small map popover for a clicked target or empty terrain (px = map pixel). */
   mapPopover: { kind: 'station' | 'terrain'; id?: string; cell: Cell; px: [number, number] } | null;
+  /** "Choose on map" (picked from the To dropdown): the next map click sets that field. */
+  pickOnMap: boolean;
+  /** Right-click context menu on the map (px = map pixel). */
+  ctxMenu: { cell: Cell; px: [number, number]; stationId?: string | null } | null;
   /** "Must visit" pins: the planner gives these stations priority (still dropped, with the reason, if unsafe). */
   mustVisit: Record<string, boolean>;
   startLtstMin: number;
@@ -145,6 +149,8 @@ export const useConsole = create<ConsoleState>()(
     destinations: [],
     customStops: [],
     mapPopover: null,
+    pickOnMap: false,
+    ctxMenu: null,
     mustVisit: {},
     startLtstMin: 9 * 60 + 40,
     lsDeg: 150,

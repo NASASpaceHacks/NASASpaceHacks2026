@@ -104,7 +104,6 @@ function StartControls() {
   const uiMode = useConsole((s) => s.uiMode);
   const [timeOpen, setTimeOpen] = useState(false);
   const shelters = pack.manifest.shelters.filter((s) => s.kind === 'hab' || s.kind === 'rover');
-  const movable = shelters.some((s) => s.movable);
   return (
     <div className="grid grid-cols-[1fr_auto] items-end gap-3">
       <div className="hidden">
@@ -146,7 +145,6 @@ function StartControls() {
           <div className="mt-3 text-[11px] leading-snug text-dim">Drag along the sun curve. The plan updates as you go.</div>
         </Popover>
       </div>
-      {movable && <div className="col-span-2 -mt-1 text-[12px] text-dim">Pick the start in the From field, or click Hab-1 or PR-1 on the map. Drag the rover to move it.</div>}
     </div>
   );
 }

@@ -100,8 +100,9 @@ function StationTip() {
   const pack = useConsole((s) => s.pack);
   const plan = useConsole((s) => s.plan);
   const on = useConsole((s) => (hover ? !!s.stationOn[hover.id] : false));
+  const cardOpen = useConsole((s) => !!s.mapPopover || !!s.ctxMenu);
   const st = hover && pack ? pack.manifest.stations.find((x) => x.id === hover.id) : null;
-  if (!hover || !st || !pack) return null;
+  if (!hover || !st || !pack || cardOpen) return null;
   const order = plan?.order.indexOf(st.id) ?? -1;
   const stop = plan?.stops.find((x) => x.id === st.id);
   const dropped = plan?.dropped.find((d) => d.id === st.id);

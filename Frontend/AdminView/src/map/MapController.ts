@@ -1,7 +1,10 @@
 import OlMap from 'ol/Map';
 import View from 'ol/View';
 import Feature from 'ol/Feature';
-import { Polygon } from 'ol/geom';
+import { Point, Polygon } from 'ol/geom';
+import type { FeatureLike } from 'ol/Feature';
+import Translate from 'ol/interaction/Translate';
+import { Circle as CircleStyle, Fill, Icon, Text } from 'ol/style';
 import type BaseLayer from 'ol/layer/Base';
 import type ImageLayer from 'ol/layer/Image';
 import type ImageStatic from 'ol/source/ImageStatic';
@@ -63,9 +66,56 @@ import {
 import type { OverlayId, VectorId } from '../lib/types';
 import { toVars, type ExplainStep } from '../lib/zone';
 
+/** A route stop drawn as a lettered, draggable marker (B, C… — A is the start base). */
+export interface DestMarker {
+  id: string;
+  letter: string;
+  name: string;
+  x: number;
+  y: number;
+  /** Left out of the plan (unsafe / unreachable): drawn red. */
+  bad: boolean;
+}
+
+const PIN_SVG =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="36" viewBox="0 0 26 36"><path d="M13 1C6.4 1 1 6.3 1 12.9 1 21.5 13 35 13 35s12-13.5 12-22.1C25 6.3 19.6 1 13 1z" fill="#00e5ff" stroke="#000" stroke-width="2"/><circle cx="13" cy="13" r="4.5" fill="#000"/></svg>',
+  );
+
+function destStyle(f: FeatureLike): Style | Style[] {
+  if (f.get('pin')) return new Style({ image: new Icon({ src: PIN_SVG, anchor: [0.5, 1], width: 26, height: 36 }), zIndex: 10 });
+  const bad = !!f.get('bad');
+  const dragging = !!f.get('dragging');
+  const color = bad ? '#ff3b30' : '#ff2bd6';
+  const nm = String(f.get('name') ?? '');
+  return [
+    new Style({
+      image: new CircleStyle({ radius: dragging ? 14 : 12, fill: new Fill({ color: '#000' }), stroke: new Stroke({ color, width: 2.5 }) }),
+      text: new Text({ text: String(f.get('letter')), font: '700 13px "Barlow Condensed", sans-serif', fill: new Fill({ color: '#fff' }) }),
+      zIndex: 5,
+    }),
+    new Style({
+      text: new Text({
+        text: nm.length > 26 ? `${nm.slice(0, 25)}…` : nm,
+        font: '600 13px "Barlow Condensed", sans-serif',
+        offsetX: 18,
+        textAlign: 'left',
+        fill: new Fill({ color: bad ? '#ff8a80' : '#ffffff' }),
+        stroke: new Stroke({ color: 'rgba(0,0,0,0.85)', width: 3 }),
+      }),
+      zIndex: 4,
+    }),
+  ];
+}
+
 export interface MapCallbacks {
   onShelterMoved(id: string, cell: Cell): void;
-  onClick(cell: Cell, stationId: string | null, extra?: { shelterId: string | null; pixel: [number, number] }): void;
+  /** A destination marker was dragged to a new cell. */
+  onDestMoved?(id: string, cell: Cell): void;
+  /** Right-click on the map. */
+  onContext?(cell: Cell, stationId: string | null, pixel: [number, number]): void;
+  onClick(cell: Cell, stationId: string | null, extra?: { shelterId: string | null; pixel: [number, number]; destId?: string }): void;
   onReadout(r: CursorReadout | null): void;
   onHoverStation(id: string | null, pixel: [number, number] | null): void;
   onHoverShelter?(id: string | null, pixel: [number, number] | null): void;
@@ -102,6 +152,10 @@ export class MapController {
   private outlineOn = true;
   private traverse: VectorLayer<VectorSource>;
   private astronaut = createAstronautLayer();
+  /** Route stops (lettered, draggable) and the temporary dropped pin. */
+  private destLayer = new VectorLayer({ source: new VectorSource(), zIndex: 40, style: destStyle });
+  private destTranslate: Translate;
+  private pickMode = false;
   private aoi: VectorLayer<VectorSource>;
   private shelters: ReturnType<typeof createSheltersLayer>;
   private prevZone: SafeZoneInputs | null = null;
@@ -158,12 +212,36 @@ export class MapController {
       style: new Style({ stroke: new Stroke({ color: 'rgba(233,228,216,0.28)', width: 1, lineDash: [2, 6] }) }),
     });
 
+    // Dragging a destination marker moves that stop (snapped to the engine cell on drop) and re-plans.
+    this.destTranslate = new Translate({ layers: [this.destLayer], filter: (f) => !!f.get('dest'), hitTolerance: 6 });
+    this.destTranslate.on('translatestart', (e) => {
+      e.features.forEach((f) => f.set('dragging', true));
+      this.cursor('grabbing');
+    });
+    this.destTranslate.on('translateend', (e) => {
+      this.cursor('grab');
+      e.features.forEach((f) => {
+        f.set('dragging', false);
+        const geom = f.getGeometry() as Point;
+        const [x, y] = geom.getCoordinates();
+        const c = Math.max(0, Math.min(g.w - 1, Math.floor((x - g.originX) / g.cellM)));
+        const r = Math.max(0, Math.min(g.h - 1, Math.floor((g.originY - y) / g.cellM)));
+        const cell = r * g.w + c;
+        geom.setCoordinates(cellToXY(g, cell));
+        this.cb.onDestMoved?.(f.get('id') as string, cell);
+      });
+    });
+    this.shelters.translate.on('translatestart', () => this.cursor('grabbing'));
+    this.shelters.translate.on('translateend', () => this.cursor('grab'));
+
     const span = Math.max(ext[2] - ext[0], ext[3] - ext[1]);
     const pad = span * 0.1;
     this.map = new OlMap({
       target,
       controls: [],
-      interactions: defaultInteractions({ altShiftDragRotate: false, pinchRotate: false }).extend([this.shelters.translate]),
+      // A press-drag-release under 5 px still counts as a click (hand jitter); anything more is a pan.
+      moveTolerance: 5,
+      interactions: defaultInteractions({ altShiftDragRotate: false, pinchRotate: false }).extend([this.shelters.translate, this.destTranslate]),
       layers: [
         ...(this.imagery ? [this.imagery] : []),
         (this.hillshade ?? this.hillCanvas)!,
@@ -178,6 +256,7 @@ export class MapController {
         this.stationsLayer,
         this.shelters.layer,
         this.astronaut,
+        this.destLayer,
       ],
       view: new View({
         projection: this.proj,
@@ -193,7 +272,20 @@ export class MapController {
     this.offReadout = attachCursorReadout(this.map, g, { dem: pack.rasters.dem, slope: pack.rasters.slope }, (r) => this.cb.onReadout(r));
 
     this.map.on('singleclick', (e) => {
-      const cell = xyToCell(g, e.coordinate[0], e.coordinate[1]);
+      let cell = xyToCell(g, e.coordinate[0], e.coordinate[1]);
+      // A click on a route-stop marker opens that stop's card (a science target, or the place itself).
+      let dest: { id: string; xy: number[] } | null = null;
+      this.map.forEachFeatureAtPixel(e.pixel, (f) => {
+        if (f.get('dest')) dest = { id: f.get('id') as string, xy: (f.getGeometry() as unknown as { getCoordinates(): number[] }).getCoordinates() };
+        return !!dest;
+      }, { layerFilter: (l) => l === this.destLayer, hitTolerance: 6 });
+      if (dest) {
+        const d = dest as { id: string; xy: number[] };
+        const isStation = this.pack.manifest.stations.some((s) => s.id === d.id);
+        cell = xyToCell(g, d.xy[0], d.xy[1]);
+        if (cell >= 0) this.cb.onClick(cell, isStation ? d.id : null, { shelterId: null, pixel: e.pixel as [number, number], destId: isStation ? undefined : d.id });
+        return;
+      }
       let stationId: string | null = null;
       this.map.forEachFeatureAtPixel(e.pixel, (f) => {
         stationId = (f.get('id') as string) ?? null;
@@ -218,6 +310,7 @@ export class MapController {
       const hit = this.map.forEachFeatureAtPixel(
         e.pixel,
         (f, layer) => {
+          if (layer === this.destLayer) return f.get('dest') ? 'grab' : null;
           if (layer === this.stationsLayer) {
             station = f.get('id') as string;
             stationXY = (f.getGeometry() as unknown as { getCoordinates(): number[] }).getCoordinates();
@@ -225,10 +318,10 @@ export class MapController {
           if (layer === this.shelters.layer) shelter = (f.get('id') as string) ?? null;
           return f.get('movable') ? 'grab' : f.get('id') ? 'pointer' : null;
         },
-        { layerFilter: (l) => l === this.shelters.layer || l === this.stationsLayer, hitTolerance: 6 },
+        { layerFilter: (l) => l === this.shelters.layer || l === this.stationsLayer || l === this.destLayer, hitTolerance: 6 },
       );
       const vp = this.map.getViewport();
-      if (vp) vp.style.cursor = hit ?? '';
+      if (vp) vp.style.cursor = hit ?? (this.pickMode ? 'crosshair' : '');
       if (shelter !== hoveredShelter) {
         hoveredShelter = shelter;
         this.cb.onHoverShelter?.(shelter, shelter ? (e.pixel as [number, number]) : null);
@@ -238,6 +331,20 @@ export class MapController {
         const px = stationXY ? (this.map.getPixelFromCoordinate(stationXY) as [number, number]) : null;
         this.cb.onHoverStation(station, px);
       }
+    });
+    // Right-click: a small context menu (Directions to here / Add as stop / What's here?).
+    this.map.getViewport()?.addEventListener('contextmenu', (ev) => {
+      ev.preventDefault();
+      const px = this.map.getEventPixel(ev) as [number, number];
+      const coord = this.map.getCoordinateFromPixel(px);
+      if (!coord) return;
+      const cell = xyToCell(g, coord[0], coord[1]);
+      let stationId: string | null = null;
+      this.map.forEachFeatureAtPixel(px, (f) => {
+        stationId = (f.get('id') as string) ?? null;
+        return true;
+      }, { layerFilter: (l) => l === this.stationsLayer, hitTolerance: 6 });
+      if (cell >= 0) this.cb.onContext?.(cell, stationId, px);
     });
     this.map.on('movestart', () => {
       if (hoveredShelter) {
@@ -249,6 +356,31 @@ export class MapController {
         this.cb.onHoverStation(null, null);
       }
     });
+  }
+
+  /** Route stops as lettered markers (plan mode) plus the temporary dropped pin. */
+  setDestinations(list: DestMarker[], pin: [number, number] | null) {
+    const src = this.destLayer.getSource()!;
+    src.clear(true);
+    const feats = list.map((d) => {
+      const f = new Feature({ geometry: new Point([d.x, d.y]), dest: true, id: d.id, letter: d.letter, name: d.name, bad: d.bad });
+      f.setId(`dest-${d.id}`);
+      return f;
+    });
+    if (pin) feats.push(new Feature({ geometry: new Point(pin), pin: true }));
+    src.addFeatures(feats);
+  }
+
+  private cursor(c: string) {
+    const vp = this.map.getViewport();
+    if (vp) vp.style.cursor = c;
+  }
+
+  /** "Choose on map": crosshair cursor until the next map click. */
+  setPickMode(on: boolean) {
+    this.pickMode = on;
+    const vp = this.map.getViewport();
+    if (vp) vp.style.cursor = on ? 'crosshair' : '';
   }
 
   attachScale(el: HTMLElement) {

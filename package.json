@@ -20,6 +20,7 @@
     "ci": "pnpm typecheck && vitest run",
     "bench": "tsx Research/bench/run.ts",
     "e2e": "playwright test -c qa/playwright.config.ts",
+    "test:ux": "playwright test -c qa/playwright.interactions.config.ts",
     "sitepack": "Pipeline/.venv/bin/python Pipeline/build_sitepack.py"
   },
   "devDependencies": {

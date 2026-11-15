@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { applyPreset, boot, closeDetails, closeSheet, explainSafeZone, generatePlan, getMap, openDetails, openSheet, primaryAction, setMode, shutdown, startHazardPick } from './actions';
+import { applyPreset, boot, closeDetails, closeSheet, dismissMapUi, explainSafeZone, generatePlan, getMap, openDetails, openSheet, primaryAction, setMode, shutdown, startHazardPick } from './actions';
 import { get, set, useConsole } from './store';
 import { TopBar, Mark } from './components/TopBar';
 import { MapView } from './map/MapView';
@@ -42,6 +42,7 @@ function useShortcuts() {
       if (k === 'escape') {
         if (s.showHelp) set({ showHelp: false });
         else if (s.evidence !== 'closed') set({ evidence: 'closed' });
+        else if (dismissMapUi()) return;
         else if (s.layersOpen || s.simOpen) set({ layersOpen: false, simOpen: false });
         else if (s.sheet) closeSheet();
         else if (s.hazardPick) startHazardPick();

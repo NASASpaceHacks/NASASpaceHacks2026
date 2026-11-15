@@ -24,6 +24,7 @@ export function Timeline() {
   const status = useConsole((s) => s.planStatus);
   const shelterCells = useConsole((s) => s.shelterCells);
   const selected = useConsole((s) => s.selectedStation);
+  const dests = useConsole((s) => s.destinations);
   const base = useBaseInfo();
   const live = uiMode === 'live';
   const lastT = live && telem.length ? telem[telem.length - 1].t : null;
@@ -43,8 +44,13 @@ export function Timeline() {
     const t1 = Math.max(evaMax - cut, back + half, dl + half) * 1.02;
     const label = (id: string, cell?: number) => endpointLabel(pack, base, id, shelterCells, cell);
     const order = (id: string) => plan.order.indexOf(id) + 1;
-    return { evaMax, half, cut, back, dl, resumed, t1, label, order };
-  }, [plan, pack, base, rules, events, req, shelterCells]);
+    // Plan mode: the same letters as the directions card and the map markers (B, C…).
+    const tag = (id: string) => {
+      const di = uiMode === 'plan' ? dests.indexOf(id) : -1;
+      return di >= 0 ? String.fromCharCode(66 + di) : String(order(id));
+    };
+    return { evaMax, half, cut, back, dl, resumed, t1, label, order, tag };
+  }, [plan, pack, base, rules, events, req, shelterCells, uiMode, dests]);
 
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackW, setTrackW] = useState(900);
@@ -60,11 +66,11 @@ export function Timeline() {
   if (!model || !plan) {
     return (
       <div className="flex h-full items-center px-5 text-[12.5px] text-mute">
-        {status === 'planning' ? 'Planning the walk…' : plan?.status === 'STAY_IN' ? 'No walk to show: nothing is safe from this base.' : 'The EVA timeline appears with the plan.'}
+        {status === 'planning' ? 'Planning the walk…' : plan?.status === 'STAY_IN' ? 'No walk to show: nothing is safe from this base.' : 'No route yet'}
       </div>
     );
   }
-  const { half, back, dl, resumed, t1, label, order } = model;
+  const { half, back, dl, resumed, t1, label, order, tag } = model;
   const x = (t: number) => `${(Math.max(0, Math.min(t1, t)) / t1) * 100}%`;
   const w = (a: number, b: number) => `${(Math.max(0, Math.min(t1, b) - Math.max(0, a)) / t1) * 100}%`;
   const firstSeg = plan.segments[0];
@@ -108,7 +114,7 @@ export function Timeline() {
         <div className="absolute inset-x-0 top-0 h-[18px]">
           {plan.bingo.filter((b) => b.id !== 'HAB' && order(b.id) > 0).map((b) => (
             <div key={b.id} className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: x(b.tMin) }} title={`Leave ${b.id} by ${fmtLtst(b.ltstMin)}`}>
-              <span className="num text-[10px] leading-none text-white">{order(b.id)}</span>
+              <span className="num text-[10px] leading-none text-white">{tag(b.id)}</span>
               <span className="mt-[2px] h-[7px] w-[1px] bg-white" />
             </div>
           ))}
@@ -146,7 +152,7 @@ export function Timeline() {
             );
           })}
           {plan.stops.map((st) => {
-            const n = order(st.id);
+            const n = tag(st.id);
             const bingo = plan.bingo.find((b) => b.id === st.id);
             const dwell = Math.round(st.departMin - st.arriveMin);
             return (

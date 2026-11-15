@@ -1,16 +1,16 @@
 import { useEffect, useRef } from 'react';
 import type { CursorReadout } from '@mw/shared/map';
 import type { StationState } from '@mw/shared/map';
-import { addDestination, addPlace, goHere, attachMap, handleMapClick, moveShelter, removeDestination } from '../actions';
-import { STM, whyItMatters } from '../lib/science';
+import { attachMap, handleMapClick, moveDestination, moveShelter, openContextMenu } from '../actions';
 import { get, set, useConsole } from '../store';
 import { sunAtLtst } from '../lib/marsclock';
 import { MapController } from './MapController';
 import { Locator } from '../components/Locator';
 import { MapHud } from '../components/MapHud';
 import { DirectionsCard } from '../components/Directions';
-import { previewCell } from '../lib/places';
-import { cellToXY } from '@mw/shared/contracts';
+import { PlaceCard, MapContextMenu } from '../components/PlaceCard';
+import { cellToXY, xyToCell as xyToCellSafe } from '@mw/shared/contracts';
+import type { DestMarker } from './MapController';
 
 function stationStateFn(): (id: string) => { state: StationState; order?: number } {
   const s = get();
@@ -18,6 +18,8 @@ function stationStateFn(): (id: string) => { state: StationState; order?: number
   const lastT = s.telem.length ? s.telem[s.telem.length - 1].t : -1;
   return (id: string) => {
     if (!s.stationOn[id]) return { state: s.uiMode === 'plan' ? 'choice' : 'idle' };
+    // Plan mode: route stops are drawn as lettered markers (B, C…) on their own layer.
+    if (s.uiMode === 'plan' && s.destinations.includes(id)) return { state: 'idle' };
     const idx = plan?.order.indexOf(id) ?? -1;
     if (idx >= 0) {
       const stop = plan!.stops.find((x) => x.id === id);
@@ -30,7 +32,29 @@ function stationStateFn(): (id: string) => { state: StationState; order?: number
 }
 
 /** OpenLayers map, created once per site pack and driven by store subscriptions (no React re-renders). */
+/** Route stops as lettered markers (plan mode) + the temporary dropped pin. */
+function destMarkers(): { list: DestMarker[]; pin: [number, number] | null } {
+  const s = get();
+  const pack = s.pack!;
+  const g = pack.manifest.grid;
+  const all = [...pack.manifest.stations, ...s.customStops];
+  const plan = s.planStatus === 'ready' ? s.plan : null;
+  const list: DestMarker[] =
+    s.uiMode !== 'plan'
+      ? []
+      : s.destinations.flatMap((id, i) => {
+          const st = all.find((x) => x.id === id);
+          if (!st) return [];
+          const name = st.name.replace(/\s*\([^)]*\)\s*$/, '');
+          return [{ id, letter: String.fromCharCode(66 + i), name, x: st.x, y: st.y, bad: !!plan && !plan.order.includes(id) }];
+        });
+  const pop = s.mapPopover;
+  const pin = pop?.kind === 'terrain' && !pop.id ? cellToXY(g, pop.cell) : null;
+  return { list, pin };
+}
+
 export function MapView() {
+  const rootRef = useRef<HTMLDivElement>(null);
   const el = useRef<HTMLDivElement>(null);
   const readoutRef = useRef<HTMLDivElement>(null);
   const scaleRef = useRef<HTMLDivElement>(null);
@@ -58,6 +82,8 @@ export function MapView() {
     const ctrl = new MapController(el.current, pack, {
       onShelterMoved: moveShelter,
       onClick: handleMapClick,
+      onDestMoved: moveDestination,
+      onContext: openContextMenu,
       onReadout: writeReadout,
       onHoverShelter: (id, px) => set({ hoverShelter: id && px ? { id, x: px[0], y: px[1] } : null }),
       onHoverStation: (id, px) => set({ hoverStation: id && px ? { id, x: px[0], y: px[1] } : null }),
@@ -80,7 +106,22 @@ export function MapView() {
     ctrl.setExtraStations(s0.customStops);
     ctrl.setBaseA(s0.evaBase);
     ctrl.setPlan(s0.plan, stationStateFn());
-    ctrl.map.on('movestart', () => set({ mapPopover: null }));
+    const syncDest = () => {
+      const d = destMarkers();
+      ctrl.setDestinations(d.list, d.pin);
+    };
+    syncDest();
+    ctrl.setPickMode(s0.pickOnMap);
+    ctrl.map.on('movestart', () => get().ctxMenu && set({ ctxMenu: null }));
+    // The place card follows its spot while the map pans or zooms.
+    ctrl.map.on('postrender', () => {
+      const p = get().mapPopover;
+      if (!p) return;
+      const st = p.kind === 'station' && p.id ? pack.manifest.stations.find((x) => x.id === p.id) : null;
+      const xy = st ? [st.x, st.y] : cellToXY(pack.manifest.grid, p.cell);
+      const px = ctrl.map.getPixelFromCoordinate(xy);
+      if (px && (Math.abs(px[0] - p.px[0]) > 0.5 || Math.abs(px[1] - p.px[1]) > 0.5)) set({ mapPopover: { ...p, px: [px[0], px[1]] } });
+    });
     ctrl.setHazards(s0.hazards);
 
     const subs = [
@@ -88,12 +129,14 @@ export function MapView() {
       useConsole.subscribe((s) => [s.overlays, s.opacity] as const, ([o, op]) => ctrl.setOverlays(o, op), { equalityFn: (a, b) => a[0] === b[0] && a[1] === b[1] }),
       useConsole.subscribe((s) => s.vectors, (v) => ctrl.setVectors(v)),
       useConsole.subscribe((s) => s.plan, () => ctrl.setPlan(get().plan, stationStateFn())),
-      useConsole.subscribe((s) => [s.stationOn, s.destinations, s.customStops, s.uiMode, s.mapPopover] as const, () => {
-        const sx = get();
-        const pin = sx.mapPopover?.kind === 'terrain' ? cellToXY(sx.pack!.manifest.grid, sx.mapPopover.cell) : null;
-        ctrl.setExtraStations([...sx.customStops, ...(pin ? [{ id: 'PIN', name: 'Dropped pin', x: pin[0], y: pin[1], value: 0 }] : [])]);
+      useConsole.subscribe((s) => [s.stationOn, s.destinations, s.customStops, s.uiMode] as const, () => {
+        ctrl.setExtraStations(get().customStops);
         ctrl.refreshStations(stationStateFn());
+      }, { equalityFn: (a, b) => a.every((v, i) => v === b[i]) }),
+      useConsole.subscribe((s) => [s.destinations, s.customStops, s.uiMode, s.plan, s.planStatus, s.mapPopover?.kind, s.mapPopover?.cell, s.mapPopover?.id] as const, syncDest, {
+        equalityFn: (a, b) => a.every((v, i) => v === b[i]),
       }),
+      useConsole.subscribe((s) => s.pickOnMap, (on) => ctrl.setPickMode(on)),
       useConsole.subscribe((s) => s.evaBase, (id) => ctrl.setBaseA(id)),
       useConsole.subscribe((s) => s.hazards, (h) => ctrl.setHazards(h)),
       useConsole.subscribe((s) => s.shelterCells, (cells) => Object.entries(cells).forEach(([id, c]) => ctrl.setShelter(id, c))),
@@ -108,6 +151,59 @@ export function MapView() {
         },
       ),
     ];
+    // Read-only geometry hook for the real-input interaction tests (qa/e2e/interactions.spec.ts): where
+    // things are on screen, in client pixels. Tests then drive the map with real mouse/keyboard events.
+    const g = pack.manifest.grid;
+    const toClient = (xy: number[]): [number, number] | null => {
+      const px = ctrl.map.getPixelFromCoordinate(xy);
+      const r = ctrl.map.getViewport()?.getBoundingClientRect();
+      return px && r ? [Math.round(r.left + px[0]), Math.round(r.top + px[1])] : null;
+    };
+    (window as unknown as { __mwTest: unknown }).__mwTest = {
+      station: (id: string) => {
+        const st = pack.manifest.stations.find((x) => x.id === id);
+        return st ? toClient([st.x, st.y]) : null;
+      },
+      shelter: (id: string) => {
+        const sh = pack.manifest.shelters.find((x) => x.id === id);
+        return sh ? toClient(cellToXY(g, get().shelterCells[id] ?? sh.cell)) : null;
+      },
+      dest: (letter: string) => {
+        const d = destMarkers().list.find((x) => x.letter === letter);
+        return d ? toClient([d.x, d.y]) : null;
+      },
+      /** A visible, feature-free spot: 'steep' (> 24°) or 'flat' (< 6°), optionally within `withinPx` of a client point. */
+      find: (kind: 'steep' | 'flat', near?: [number, number], withinPx = 200) => {
+        const r = ctrl.map.getViewport()?.getBoundingClientRect();
+        if (!r) return null;
+        let best: [number, number] | null = null;
+        let bd = Infinity;
+        for (let y = r.top + 60; y < r.bottom - 70; y += 6) {
+          for (let x = r.left + 420; x < r.right - 260; x += 6) {
+            const px = [x - r.left, y - r.top];
+            const c = ctrl.map.getCoordinateFromPixel(px);
+            if (!c) continue;
+            let ok = true;
+            // The whole 5×5-cell neighbourhood must match, so a few pixels of jitter can't change the answer.
+            for (let dy = -2; dy <= 2 && ok; dy++) for (let dx = -2; dx <= 2 && ok; dx++) {
+              const cell = xyToCellSafe(g, c[0] + dx * g.cellM, c[1] + dy * g.cellM);
+              const sl = cell >= 0 ? pack.rasters.slope[cell] : NaN;
+              ok = kind === 'steep' ? sl > 24 : sl < 6;
+            }
+            if (!ok || ctrl.map.getFeaturesAtPixel(px, { hitTolerance: 16 }).length) continue;
+            const d = near ? Math.hypot(x - near[0], y - near[1]) : 0;
+            if (near && d > withinPx) continue;
+            if (d < bd) {
+              bd = d;
+              best = [Math.round(x), Math.round(y)];
+              if (!near) return best;
+            }
+          }
+        }
+        return best;
+      },
+    };
+
     const ro = new ResizeObserver(() => ctrl.map.updateSize());
     ro.observe(el.current);
     return () => {
@@ -119,10 +215,11 @@ export function MapView() {
   }, [pack]);
 
   return (
-    <div className="absolute inset-0">
+    <div ref={rootRef} className="absolute inset-0">
       <div ref={el} className="mw-map absolute inset-0" />
       <DirectionsHost />
-      <MapPopover />
+      <PlaceCard root={rootRef} />
+      <MapContextMenu root={rootRef} />
       <MapHud readoutRef={readoutRef} scaleRef={scaleRef} />
       <Locator />
     </div>
@@ -132,70 +229,4 @@ export function MapView() {
 function DirectionsHost() {
   const uiMode = useConsole((s) => s.uiMode);
   return uiMode === 'plan' ? <DirectionsCard /> : null;
-}
-
-function MapPopover() {
-  const pop = useConsole((s) => s.mapPopover);
-  const pack = useConsole((s) => s.pack);
-  const dests = useConsole((s) => s.destinations);
-  const customs = useConsole((s) => s.customStops);
-  if (!pop || !pack) return null;
-  const st = pop.kind === 'station' ? [...pack.manifest.stations, ...customs].find((x) => x.id === pop.id) : null;
-  const added = !!st && dests.includes(st.id);
-  const left = Math.max(8, pop.px[0] - 130);
-  const top = pop.px[1] + 16;
-  return (
-    <div style={{ left, top }} className="absolute z-[35] w-[300px] border border-line-2 bg-black p-3.5" data-testid="map-popover" onClick={(e) => e.stopPropagation()}>
-      <button aria-label="Close" onClick={() => set({ mapPopover: null })} className="absolute right-2 top-1.5 h-7 w-7 rounded-md text-mute hover:text-ink">✕</button>
-      {st ? (
-        <>
-          <div className="pr-6 text-[14.5px] font-semibold leading-tight text-ink">{st.name.replace(/\s*\([^)]*\)\s*$/, '')}</div>
-          <div className="mt-1 text-[12px] text-mute">Science value {Math.round(st.value)} of 100 · {st.dwellMin} min at the stop</div>
-          <div className="mt-2 line-clamp-4 text-[13px] leading-snug text-ink-2">{whyItMatters(st as never)}</div>
-          {(() => {
-            const obj = STM.objectives.find((o) => o.stations?.includes(st.id));
-            return obj ? (
-              <div className="mt-2 border-t border-line pt-2 text-[12.5px] leading-snug text-ink-2" data-testid="popover-objective">
-                <span className="label !text-[11px]">Science objective </span>
-                <span className="num text-[11px] text-mute">{obj.id}</span>
-                <div className="line-clamp-4">{obj.statement}</div>
-              </div>
-            ) : null;
-          })()}
-          <button
-            data-testid="popover-toggle"
-            onClick={() => (added ? removeDestination(st.id) : addDestination(st.id))}
-            className={`mt-3 h-11 w-full text-[16px] font-bold uppercase tracking-[0.14em] ${added ? 'border border-cyan bg-black text-cyan' : 'bg-cyan text-black hover:bg-white'}`}
-          >
-            {added ? 'Remove from walk' : 'Add to walk'}
-          </button>
-        </>
-      ) : (
-        <PinCard cell={pop.cell} />
-      )}
-    </div>
-  );
-}
-
-function PinCard({ cell }: { cell: number }) {
-  const pv = previewCell(get(), cell);
-  const base = useConsole((s) => s.evaBase);
-  if (!pv) return null;
-  const sh = get().pack!.manifest.shelters.find((x) => x.id === base);
-  const from = sh ? sh.name.replace(/^.*\(([^)]+)\)\s*$/, '$1') : 'start';
-  return (
-    <div data-testid="pin-card">
-      <div className="pr-6 text-[17px] font-semibold leading-tight text-ink">Dropped pin</div>
-      <div className="num mt-1 text-[12px] leading-snug text-ink-2">
-        {pv.lon.toFixed(4)}°E {pv.lat.toFixed(4)}°N · elev {Number.isFinite(pv.elevM) ? Math.round(pv.elevM) : '—'} m · slope {Number.isFinite(pv.slopeDeg) ? Math.round(pv.slopeDeg) : '—'}°
-      </div>
-      <div data-testid="pin-safety" className={`mt-2 text-[14px] leading-snug ${pv.ok ? 'text-ok' : 'text-red'}`}>
-        {pv.ok ? `${pv.minutes !== null ? `~${Math.round(pv.minutes)} min walk from ${from} · ` : ''}safe to stand` : `Can't go here safely: ${pv.reason}`}
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <button data-testid="pin-go" onClick={() => goHere(cell)} className="h-10 bg-cyan text-[15px] font-bold uppercase tracking-[0.14em] text-black hover:bg-white">Go here</button>
-        <button data-testid="pin-add" onClick={() => addPlace(cell)} className="h-10 border border-cyan bg-black text-[15px] font-bold uppercase tracking-[0.1em] text-cyan hover:bg-cyan/10">Add as stop</button>
-      </div>
-    </div>
-  );
 }

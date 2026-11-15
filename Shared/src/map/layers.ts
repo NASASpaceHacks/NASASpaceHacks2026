@@ -402,17 +402,17 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
       const detail = !!layer.get('detail');
       if (state === 'choice') {
         // Route builder: a neutral numbered pin with a short label (nothing chosen yet).
+        // A plain cyan point of interest (no number: route stops are lettered A, B, C… by the console).
         const id = String(f.get('id'));
-        const num = id === 'PIN' ? '+' : /^ST0*(\d+)$/.exec(id)?.[1] ?? id;
         const nm = String(f.get('name') ?? '').replace(/\s*\([^)]*\)\s*$/, '');
         return [
           new Style({
-            image: new CircleStyle({ radius: 11, fill: new Fill({ color: '#000' }), stroke: new Stroke({ color: MAP_COLORS.cyan, width: 2 }), declutterMode: 'obstacle' }),
-            text: new Text({ text: num, font: '500 11px "Roboto Mono", monospace', fill: new Fill({ color: '#ffffff' }), declutterMode: 'none' }),
+            image: new CircleStyle({ radius: 7, fill: new Fill({ color: '#000' }), stroke: new Stroke({ color: MAP_COLORS.cyan, width: 2 }), declutterMode: 'obstacle' }),
+            text: id === 'PIN' ? new Text({ text: '+', font: '500 11px "Roboto Mono", monospace', fill: new Fill({ color: '#ffffff' }), declutterMode: 'none' }) : undefined,
             zIndex: 1,
           }),
           new Style({
-            text: new Text({ text: nm.length > 24 ? `${nm.slice(0, 23)}…` : nm, font: theme.font, offsetX: f.get('flip') ? -15 : 17, offsetY: f.get('flip') ? 16 : -4, textAlign: f.get('flip') ? 'right' : 'left', fill: new Fill({ color: theme.label }), stroke: halo(theme), declutterMode: 'none' }),
+            text: new Text({ text: nm.length > 24 ? `${nm.slice(0, 23)}…` : nm, font: theme.font, offsetX: f.get('flip') ? -12 : 13, offsetY: f.get('flip') ? 14 : 0, textAlign: f.get('flip') ? 'right' : 'left', fill: new Fill({ color: theme.label }), stroke: halo(theme), declutterMode: 'none' }),
             zIndex: 0,
           }),
         ];

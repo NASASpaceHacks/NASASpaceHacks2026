@@ -139,7 +139,7 @@ export function setEvaBase(id: string) {
   const s = get();
   const sh = shelterById(s.pack!, id);
   if (!sh || s.evaBase === id) return;
-  set({ evaBase: id });
+  set({ evaBase: id, mapPopover: null, ctxMenu: null });
   log(`EVA base → ${sh.name}${sh.kind === 'rover' ? ' (rover-staged EVA)' : ''} — replanning`, 'info');
   scheduleReplan(`Replanned from ${shortName(sh)}`, 10);
 }
@@ -266,7 +266,7 @@ function applyDestinations(ids: string[], why: string) {
   const s = get();
   const stationOn: Record<string, boolean> = {};
   ids.forEach((id) => (stationOn[id] = true));
-  set({ destinations: ids, stationOn, customStops: s.customStops.filter((c) => ids.includes(c.id)), mustVisit: Object.fromEntries(Object.entries(s.mustVisit).filter(([k, v]) => v && stationOn[k])), mapPopover: null });
+  set({ destinations: ids, stationOn, customStops: s.customStops.filter((c) => ids.includes(c.id)), mustVisit: Object.fromEntries(Object.entries(s.mustVisit).filter(([k, v]) => v && stationOn[k])), mapPopover: null, ctxMenu: null, pickOnMap: false });
   if (!ids.length) {
     planToken++;
     if (replanTimer) clearTimeout(replanTimer);
@@ -311,6 +311,77 @@ export function addPlace(cell: Cell, name = 'Dropped pin'): string {
 export function goHere(cell: Cell, name?: string) {
   applyDestinations([], 'Cleared');
   addPlace(cell, name);
+}
+
+/** A new custom stop (not yet a destination). */
+function newPlace(cell: Cell, name = 'Dropped pin'): Station {
+  const s = get();
+  const g = s.pack!.manifest.grid;
+  let n = 1;
+  while (s.customStops.some((c) => c.id === `P${n}`)) n++;
+  const [x, y] = cellToXY(g, cell);
+  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? `Dropped pin ${n}` : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
+  set({ customStops: [...s.customStops, st] });
+  return st;
+}
+
+/** Place card / context menu "Directions": route from the current base to this target or place (replaces the stops). */
+export function directionsTo(target: { stationId: string } | { cell: Cell; name?: string }) {
+  const id = 'stationId' in target ? target.stationId : newPlace(target.cell, target.name).id;
+  set({ mustVisit: { [id]: true } });
+  applyDestinations([id], `Directions to ${id}`);
+}
+
+/** Place card / context menu "Add stop": append this target or place to the route. */
+export function addStopAt(target: { stationId: string } | { cell: Cell; name?: string }) {
+  if ('stationId' in target) return addDestination(target.stationId);
+  const st = newPlace(target.cell, target.name);
+  addDestination(st.id);
+}
+
+/** A destination marker was dragged: the stop moves there (a science target becomes a dropped pin) and the walk re-plans. */
+export function moveDestination(id: string, cell: Cell) {
+  const s = get();
+  if (!s.destinations.includes(id)) return;
+  const g = s.pack!.manifest.grid;
+  const [x, y] = cellToXY(g, cell);
+  const custom = s.customStops.find((c) => c.id === id);
+  if (custom) {
+    const name = /^Dropped pin/.test(custom.name) ? custom.name : `Dropped pin ${id.slice(1)}`;
+    set({ customStops: s.customStops.map((c) => (c.id === id ? { ...c, cell, x, y, name } : c)), mapPopover: null, ctxMenu: null });
+    scheduleReplan(`Replanned: ${id} moved`, 30);
+    return;
+  }
+  const st = newPlace(cell);
+  set({ mustVisit: { ...get().mustVisit, [st.id]: true } });
+  applyDestinations(s.destinations.map((d) => (d === id ? st.id : d)), `Replanned: ${id} moved`);
+}
+
+/** "Choose on map" from the To field: crosshair, and the next map click sets that field. */
+export function startPickOnMap() {
+  set({ pickOnMap: true, mapPopover: null, ctxMenu: null });
+  map?.setPickMode(true);
+}
+
+export function cancelPickOnMap() {
+  set({ pickOnMap: false });
+  map?.setPickMode(false);
+}
+
+export function openContextMenu(cell: Cell, stationId: string | null, px: [number, number]) {
+  const s = get();
+  if (s.uiMode !== 'plan' || s.hazardPick) return;
+  if (s.pickOnMap) cancelPickOnMap();
+  set({ ctxMenu: { cell, px, stationId }, mapPopover: null, hoverStation: null });
+}
+
+/** Esc on the map: close the context menu, then the place card, then cancel "Choose on map". */
+export function dismissMapUi(): boolean {
+  const s = get();
+  if (s.ctxMenu) return set({ ctxMenu: null }), true;
+  if (s.pickOnMap) return cancelPickOnMap(), true;
+  if (s.mapPopover) return set({ mapPopover: null }), true;
+  return false;
 }
 
 /** "Suggest best stops": the planner picks its best subset and order from all targets. */
@@ -730,16 +801,24 @@ export function startHazardPick() {
   set((s) => ({ hazardPick: !s.hazardPick }));
 }
 
-export function handleMapClick(cell: Cell, stationId: string | null, extra?: { shelterId: string | null; pixel: [number, number] }) {
+export function handleMapClick(cell: Cell, stationId: string | null, extra?: { shelterId: string | null; pixel: [number, number]; destId?: string }) {
   const s = get();
   if (s.uiMode === 'plan' && !s.hazardPick && extra) {
-    if (stationId) return set({ mapPopover: { kind: 'station', id: stationId, cell, px: extra.pixel }, selectedStation: stationId });
+    if (s.ctxMenu) set({ ctxMenu: null });
+    if (s.pickOnMap) {
+      // "Choose on map": this click fills the To field (a target under the cursor counts as that target).
+      cancelPickOnMap();
+      return stationId ? addDestination(stationId) : void addStopAt({ cell });
+    }
+    if (stationId) return set({ mapPopover: { kind: 'station', id: stationId, cell, px: extra.pixel }, selectedStation: stationId, hoverStation: null });
+    if (extra.destId) return set({ mapPopover: { kind: 'terrain', id: extra.destId, cell, px: extra.pixel } });
     if (extra.shelterId) {
       const sh = shelterById(s.pack!, extra.shelterId);
       if (sh && (sh.kind === 'hab' || sh.kind === 'rover')) setEvaBase(sh.id);
       return set({ mapPopover: null });
     }
-    return set({ mapPopover: s.mapPopover ? null : { kind: 'terrain', cell, px: extra.pixel } });
+    // Empty terrain: drop (or move) the temporary pin and show its place card.
+    return set({ mapPopover: { kind: 'terrain', cell, px: extra.pixel } });
   }
   if (s.hazardPick) {
     const g = s.pack!.manifest.grid;
