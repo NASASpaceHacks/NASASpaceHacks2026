@@ -1,0 +1,32 @@
+# EVA destination selection and map layers: research notes
+
+## 1. How destinations are chosen
+- **Artemis workflow (public).** Mission priorities, landing site and EVA count come from Moon to Mars. Science (SMD) supplies priorities, geologic maps and terrain hazards. Flight Operations (FOD) supplies limits: max traverse distance, max distance from lander, lighting, max safe slope, max time without line of sight to lander, consumables. Science and Task flight controllers then iterate on the traverse plans. https://ntrs.nasa.gov/api/citations/20250006988/downloads/ASCEND%20presentation%20-%20Planning%20Lunar%20EVAs.pdf
+- **Planning steps.** (1) collect objectives, (2) locate and prioritize science POIs, (3) identify the constraint-driven operational range, (4) group POIs into EVAs, (5) iterate with stakeholders. Same source.
+- **JETT3 (2022).** Four science subteams each proposed preferred stations, then merged them into one prioritized Merged Station list (priority, crew activities, time estimates, hypotheses). The EVA Science Officer (ESO) and EVA Task officer shaped the traverses from that list. Science Traceability Matrix (STM) rows: goals, objectives, requested crew actions, later a station number. https://ntrs.nasa.gov/api/citations/20230003806/downloads/Young.theintegration.poster.pdf
+- **Real-time.** The Science Evaluation Room (SER) sits inside the flight control team and replans when constraints or science opportunities change. A prototype tool scores stations by science yield against time and distance, for example re-routing through another station within a 45-minute EVA. Source: search summary of NTRS 20240000165 (Broddrick, LPSC 2024). https://ntrs.nasa.gov/citations/20240000165 (abstract not read in full).
+- **Apollo.** Stations were pre-selected per traverse, with operations planned at each (secondary source). The A17 traverse planning data refers to "targets of opportunity selected by the crew" for photography. https://www.nasa.gov/wp-content/uploads/static/history/alsj/a17/A17TraversePlanningData.pdf (seen only as a search snippet). How much latitude crews had: **UNVERIFIED**.
+- **BASALT (Mars latency analog, 5 and 15 min one-way).** The science backroom (MSC) kept a dynamic leaderboard of candidate samples and sent only the top 3-5 to the crew. The crew placed markers on 3-6 candidates per station. Crew "could choose exactly where in an outcrop to sample but not which outcrop," and sometimes the visiting order. "Bingo times" are the latest moment the ground can send information without leaving the crew idle. The backroom sent text through the intravehicular (IV) crew, not voice to the EV crew. At 15 min, decisions were fewer and more measured. https://pmc.ncbi.nlm.nih.gov/articles/PMC6442282
+- Text and data were preferred over voice for sending traverse updates under latency. https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6442240/ (search summary only, UNVERIFIED in detail).
+- Desert RATS and NEEMO specifics: **not researched (UNVERIFIED)**.
+
+## 2. Information used and how targets are represented
+- Inputs: orbital imagery, DEMs, geologic maps (JETT3 mapped at 1:20,000 and 1:4,000), and science hypotheses. Same JETT3 poster.
+- Representations: prioritized station list, STM, POI descriptions in the Map Book (with sampling instructions per POI), traverse plan authored in AEGIS with burndown charts (time and distance from lander, elevation vs time), and a cuff checklist. https://ntrs.nasa.gov/api/citations/20240002135/downloads/SMD_Intro_to_EVA_Ops_Products_Feb2424.pdf
+- Crew navigate with the hard-copy Map Book. Ground uses it to communicate. An "Execute Package" is uplinked overnight between EVAs. Same source.
+
+## 3. Map layers
+- **Map Book contents:** slope, lighting, comm coverage, horizon views, geologic map, geologic unit descriptions, traverse maps, POI descriptions. ASCEND source (section 1).
+- **Ground-only layers:** illumination profiles, viewsheds, horizon profiles. Intro to EVA Ops Products (section 2).
+- **Artemis Geospatial Data Team products:** DEMs, slope, directional slope vs distance, terrain ruggedness index, hillshade, hazard maps, viewsheds, illumination and its change over time, Earth visibility and comm link availability, line of sight back to lander or habitat, surface properties (rocks, roughness), and least-cost-path traverses (cost by slope, distance or energy). They are also developing an MGRS-like lunar grid. https://ntrs.nasa.gov/api/citations/20230006633/downloads/Artemis%20Geospatial%20Data%20Team%20Capabilities%20-%20Strives%20(final).pdf
+- **Artemis limits (may have changed):** slope under 20 deg, stay within 2 km of the lander (secondary summary of the HLS update, NTRS 20240009596, not read). https://ntrs.nasa.gov/api/citations/20240009596/downloads/ArtemisHLSUpdate_2024.pdf
+- **Mars relevance.** Keep: slope, geologic map and units, POIs, horizon and viewshed, distance from habitat, traverse maps. Adapt: lighting becomes sun-elevation and time-of-sol windows. Comm coverage becomes habitat line of sight plus orbiter-pass and latency windows. Drop: Earth visibility. Whether AEGIS has a Mars version: UNVERIFIED.
+
+## 4. Design implications for Marswalk
+1. **Two-stage targeting.** Science proposes POIs with priority, time estimate and requested crew action (STM-style). The EVA officer assembles them into a station list. The visor shows only the approved list.
+2. **Constraint checks on every candidate:** slope (deg), distance from habitat (m), walkback time (min), time without habitat line of sight (min), consumables burndown. Show pass or fail against the FOD-style limits. Flag violations rather than silently blocking them.
+3. **Default layers:** slope (deg), geologic units, POIs, viewshed or horizon profile, habitat line of sight, hillshade or contours (m), traverse path with elevation-vs-time and distance-from-hab burndown.
+4. **Map Book export.** One printable page per station: map, slope profile, POI description, sampling instructions.
+5. **Crew-proposed targets** are flagged "candidate" and go to a ranked leaderboard. The EVA officer promotes or rejects, then pushes updates as text before the bingo time. Crew choose order and exact sampling spot but not new stations without approval.
+6. **Latency.** Show the one-way light time and a bingo countdown. Pre-load fallback "next-best" stations so the crew never idle waiting.
+7. **Re-plan preview.** When a station is added or dropped, recompute the route, time and walkback and show the delta (as in the SER optimizer) before approving.
