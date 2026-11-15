@@ -698,4 +698,65 @@ test.describe('sites · picker, switching, deep link', () => {
     await page.waitForTimeout(500);
     await page.screenshot({ path: `${SHOTS8}crism-station.png` });
   });
+  // ───────────── route options: priorities and comparison ─────────────
+  test('27 · Options → "Stay in contact" re-plans and the verdict shows the active priorities', async ({ page }) => {
+    await open(page);
+    await searchTo(page, 'Alta');
+    await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+    await expect(page.getByTestId('verdict-prefs')).toHaveCount(0);
+    await page.getByTestId('route-options').click();
+    const panel = page.getByTestId('route-options-panel');
+    await expect(panel).toBeVisible();
+    await expect(panel.getByTestId('prefs-preset-default')).toHaveAttribute('aria-checked', 'true');
+    for (const k of ['distance', 'slope', 'rough', 'thermal', 'radio', 'science']) await expect(panel.getByTestId(`prefs-slider-${k}`)).toBeVisible();
+    await panel.getByTestId('prefs-preset-radio').click();
+    await expect(page.getByTestId('verdict-prefs')).toHaveText('Priorities: Stay in contact');
+    await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+    await expect(page.getByTestId('route-options')).toContainText('Stay in contact');
+    await page.screenshot({ path: `${SHOTS8}options-open.png` });
+    // Moving a slider by keyboard switches to Custom.
+    await panel.getByTestId('prefs-slider-slope').focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(panel.getByTestId('prefs-preset-custom')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.getByTestId('verdict-prefs')).toHaveText('Priorities: Custom');
+    // Esc closes the panel.
+    await page.keyboard.press('Escape');
+    await expect(panel).toHaveCount(0);
+  });
+
+  test('28 · Compare routes: one row per preset with real numbers; a row applies its priorities', async ({ page }) => {
+    await open(page);
+    await searchTo(page, 'Alta');
+    await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+    await page.getByTestId('route-options').click();
+    const panel = page.getByTestId('route-options-panel');
+    await panel.getByTestId('compare-routes').click();
+    await expect(panel.getByTestId('compare-table')).toBeVisible({ timeout: 60_000 });
+    const rows = panel.locator('[data-testid^="compare-row-"]');
+    await expect(rows).toHaveCount(4);
+    for (const id of ['default', 'safest', 'radio', 'science']) {
+      await expect(panel.getByTestId(`compare-row-${id}`)).toContainText(/\d+ min/);
+      await expect(panel.getByTestId(`compare-row-${id}`)).toContainText(/\d\.\d+ km/);
+    }
+    await expect(panel.getByTestId('compare-row-default')).toHaveAttribute('data-current', 'true');
+    await page.screenshot({ path: `${SHOTS8}compare.png` });
+    await panel.getByTestId('compare-row-safest').click();
+    await expect(page.getByTestId('verdict-prefs')).toHaveText('Priorities: Easiest ground');
+    await expect(panel.getByTestId('compare-row-safest')).toHaveAttribute('data-current', 'true');
+    await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+  });
+
+  test('29 · Jezero has no mineral map: the Science slider is disabled', async ({ page }) => {
+    const avail = (await sites(page)).filter((s) => s.available);
+    test.skip(!avail.some((s) => s.id === SITE2), `${SITE2} is not present`);
+    await open(page);
+    await page.getByTestId(`locator-site-${SITE2}`).click();
+    await expect(siteSelect(page)).toHaveValue(SITE2, { timeout: 60_000 });
+    await expect(page.getByTestId(`locator-site-${SITE2}`)).toHaveAttribute('data-current', 'true');
+    await page.getByTestId('route-options').click();
+    const panel = page.getByTestId('route-options-panel');
+    await expect(panel.getByTestId('prefs-slider-science')).toBeDisabled();
+    await expect(panel).toContainText('No mineral map for this site');
+    await expect(panel.getByTestId('prefs-slider-radio')).toBeEnabled();
+  });
 });

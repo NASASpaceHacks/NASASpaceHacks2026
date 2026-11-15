@@ -7,6 +7,7 @@ import { requestHash, resolve, ruleVals, type Resolved, type RuleVals } from './
 import { dwellChunks, HEAT_INITIAL_W, HEAT_TAU_MIN, REST_W, Seg, TASK_W_DEFAULT, type HeatParams } from './heat';
 import { formatLtst, ltstAt, sunAtLtst } from './marstime';
 import { evalSequence, solveDP, type DPResult, type Leg, type OrInstance } from './orienteer';
+import { describePrefs, ROUGH_REF_M } from './prefs';
 import { getPathSearch } from './registry';
 import { fin, simulate, type SimOutput, type SimStop, type Timeline } from './simulate';
 
@@ -439,6 +440,15 @@ function modelNotes(lsAssumed: boolean, ls: number): string[] {
   return n;
 }
 
+/** Note for PlanResult.notes when operator route priorities are set (never added for neutral priorities). */
+function prefsNote(R: Resolved): string {
+  const p = R.prefs!;
+  const head = `Route priorities${p.preset ? ` (${p.preset})` : ''}: ${describePrefs(p)}`;
+  const noCrism = p.science > 0 && !R.pack.rasters.crism_sindex2 ? ' Science priority has no effect here: this site pack has no CRISM layer.' : '';
+  if (!R.routeMult) return `${head}. No effect on this ground: the fastest safe routing is used.${noCrism}`;
+  return `${head}. They choose among safe paths only: times, safety fields and every hard rule are unchanged and re-checked by the simulator.${noCrism}`;
+}
+
 function sepPlan(R: Resolved, req: PlanRequest, tl: Timeline, rv: RuleVals, leadMin: number, t0: number, notes: string[]): PlanResult {
   const start = req.resume?.cell ?? R.hab;
   const nameOf = (id: string) => R.pack.manifest.shelters.find((s) => s.id === id)?.name ?? id;
@@ -594,7 +604,8 @@ function planImpl(pack: LoadedSitePack, req: PlanRequest, t0: number): PlanResul
   if (req.resume) notes.push(`Replan from the current position at +${req.resume.elapsedMin.toFixed(0)} min; heat state assumed at the budget (conservative).`);
 
   const sep = [...(req.events ?? [])].reverse().find((e) => e.t === 'SEP_NOWCAST');
-  if (sep && sep.t === 'SEP_NOWCAST') return sepPlan(R, req, tl, rv, sep.leadMin, t0, notes);
+  if (sep && sep.t === 'SEP_NOWCAST') return sepPlan(R, req, tl, rv, sep.leadMin, t0, notes); // safety return: shelter tree, pure time
+  if (R.prefs) notes.push(prefsNote(R));
 
   const allDropped = (rule: RuleId, why: string): Dropped[] =>
     req.stations.filter((s) => !(req.resume?.visited ?? []).includes(s.id)).map((s) => ({ id: s.id, rule, deficitMin: 0, text: `${s.id} dropped: ${why}` }));
@@ -794,8 +805,8 @@ export interface OrderEval {
 /**
  * Evaluate a FIXED stop order (station ids, visited in this order, then back to the base) against the
  * request's hard rules with the same simulator plan() uses. Legs default to the engine's
- * cheapest routes inside the safety mask; pass `legs` (cell paths: base→s1, …, sn→base) to check an
- * externally produced route instead (e.g. a slope-only planner's).
+ * cheapest routes inside the safety mask (under the request's route priorities, if any); pass `legs` (cell
+ * paths: base→s1, …, sn→base) to check an externally produced route instead (e.g. a slope-only planner's).
  */
 export function evaluateOrder(pack: LoadedSitePack, req: PlanRequest, order: string[], legs?: number[][]): OrderEval {
   return makeOrderEvaluator(pack, req)(order, legs);
@@ -842,8 +853,9 @@ export interface AttemptResult {
 
 /**
  * What a NO-GO walk would have looked like: the cheapest path base -> stop -> base found over all walkable
- * ground (not limited to the safety mask), simulated with the same rules plan() applies. Lets the console
- * show the attempted walk's real totals and WHERE it breaks a rule. Does not decide GO/NO-GO.
+ * ground (not limited to the safety mask; "cheapest" under the request's route priorities, if any), simulated
+ * with the same rules plan() applies. Lets the console show the attempted walk's real totals and WHERE it
+ * breaks a rule. Does not decide GO/NO-GO.
  */
 export function attemptRoute(pack: LoadedSitePack, req: PlanRequest, stationId: string): AttemptResult {
   const R = resolve(pack, req);
@@ -868,4 +880,62 @@ export function attemptRoute(pack: LoadedSitePack, req: PlanRequest, stationId: 
     endLabel: 'HAB', checks: enforcedChecks(rv),
   });
   return { sim, los: R.fields.los, legs, deadlineMin: tl.deadline };
+}
+
+export interface RouteStats {
+  /** Minutes out of comm line of sight: true walking time onto cells outside the LOS field + dwell at stops outside it (heat rests excluded). */
+  outOfContactMin: number;
+  /** True walking minutes along the path cells (base cost model; heat rests and dwell excluded). */
+  walkMin: number;
+  distM: number;
+  /** Slope (deg) along the path cells: cell average and maximum. */
+  meanSlopeDeg: number;
+  maxSlopeDeg: number;
+  /** Share (0..1) of path cells rougher than ROUGH_REF_M (10 cm detrended-height std-dev). */
+  roughFrac: number;
+  /** Cell-averaged CRISM SINDEX2 along the path; null when the site pack has no CRISM layer. */
+  meanCrism: number | null;
+}
+
+/**
+ * Route-comparison metrics of a plan (or attempt) path, for the console's priority comparison table. Pure
+ * terrain/LOS statistics along `segments` cells with true travel time; does not re-plan. The LOS field and
+ * grid come from `req` (cached), so pass the request the result was planned with (prefs do not change them).
+ * Accepts a PlanResult or an AttemptResult's `sim`.
+ */
+export function routeStats(pack: LoadedSitePack, req: PlanRequest, res: { segments: Segment[]; stops?: { id: string; arriveMin: number; departMin: number }[] }): RouteStats {
+  const R = resolve(pack, req);
+  const los = R.fields.los, slope = R.grid.slopeDeg, rough = R.grid.rough;
+  const cr = pack.rasters.crism_sindex2 && pack.rasters.crism_sindex2.length === R.n ? pack.rasters.crism_sindex2 : null;
+  let out = 0, walk = 0, dist = 0, n = 0, sSum = 0, sMax = 0, rN = 0, cSum = 0, cN = 0;
+  for (const s of res.segments) {
+    dist += s.distM;
+    for (let k = 0; k < s.cells.length; k++) {
+      const c = s.cells[k];
+      n++;
+      const sl = slope[c];
+      if (sl === sl) {
+        sSum += sl;
+        if (sl > sMax) sMax = sl;
+      }
+      if (rough[c] > ROUGH_REF_M) rN++;
+      if (cr && cr[c] === cr[c]) {
+        cSum += cr[c];
+        cN++;
+      }
+      if (k > 0) {
+        const dt = R.model.edgeCost(R.grid, s.cells[k - 1], c, R.ctx1) / 60;
+        if (dt < Infinity) {
+          walk += dt;
+          if (los[c] !== 1) out += dt;
+        }
+      }
+    }
+  }
+  const cellOf = new Map(req.stations.map((s) => [s.id, s.cell]));
+  for (const st of res.stops ?? []) {
+    const c = cellOf.get(st.id);
+    if (c !== undefined && los[c] !== 1) out += st.departMin - st.arriveMin;
+  }
+  return { outOfContactMin: out, walkMin: walk, distM: dist, meanSlopeDeg: n ? sSum / n : 0, maxSlopeDeg: sMax, roughFrac: n ? rN / n : 0, meanCrism: cr && cN ? cSum / cN : null };
 }

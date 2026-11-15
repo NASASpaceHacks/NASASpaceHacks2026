@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { addDestination, addPlace, cancelPickOnMap, clearDestinations, removeDestination, setEvaBase, startPickOnMap, suggestStops } from '../actions';
+import { addDestination, addPlace, prefsLabel, cancelPickOnMap, clearDestinations, removeDestination, setEvaBase, startPickOnMap, suggestStops } from '../actions';
 import { shortName } from '../lib/base';
 import { useDestReason } from '../lib/reasons';
 import { landmarksIn } from '../lib/places';
 import { whyItMatters } from '../lib/science';
 import { useConsole } from '../store';
 import { cx } from './ui';
+import { RouteOptionsPanel, isDefaultPrefs, openRouteOptions } from './RouteOptions';
 import { WayForward } from './WayForward';
 
 const clean = (n: string) => n.replace(/\s*\([^)]*\)\s*$/, '');
@@ -39,6 +40,8 @@ export function DirectionsCard() {
     setActS(actRef.current);
   };
   const picking = useConsole((s) => s.pickOnMap);
+  const prefs = useConsole((s) => s.prefs);
+  const optionsOpen = useConsole((s) => s.routeOptions);
   const inputRef = useRef<HTMLInputElement>(null);
   const focusInput = useRef(false);
   // A new stop closes the extra "To" field; "+ Add stop" opens it with the caret in it.
@@ -96,6 +99,7 @@ export function DirectionsCard() {
 
   const rows = dests.map((id) => all.find((x) => x.id === id)).filter((x): x is NonNullable<typeof x> => !!x);
   return (
+    <>
     <div data-testid="directions" className="absolute left-3 top-3 z-30 w-[380px] max-w-[min(380px,calc(100%-32px))] max-h-[calc(100%-96px)] overflow-y-auto overflow-x-hidden border border-line-2 bg-black" onClick={(e) => e.stopPropagation()}>
       <div className="flex items-center gap-2 border-b border-line px-3 py-2">
         <span className="num flex h-[22px] w-[22px] items-center justify-center border border-cyan text-[11px] text-cyan">A</span>
@@ -176,10 +180,15 @@ export function DirectionsCard() {
         <div className="flex items-center gap-3 px-3 py-2 text-[13.5px]">
           {dests.length > 0 && !adding && dests.length < 8 && <button data-testid="add-stop" onClick={() => { focusInput.current = true; setAdding(true); }} className="text-cyan hover:underline">+ Add stop</button>}
           <button data-testid="suggest-stops" onClick={() => void suggestStops()} className="text-cyan hover:underline">Suggest best stops</button>
+          <button data-testid="route-options" data-route-options-anchor aria-haspopup="dialog" aria-expanded={optionsOpen} onClick={() => openRouteOptions(!optionsOpen)} className="max-w-[120px] truncate text-cyan hover:underline">
+            {isDefaultPrefs(prefs) ? 'Options' : `Options · ${prefsLabel(prefs)}`}
+          </button>
           {dests.length > 0 && <button onClick={() => { clearDestinations(); setAdding(false); }} className="ml-auto text-mute hover:text-ink">Clear</button>}
         </div>
       )}
     </div>
+    <RouteOptionsPanel anchorSelector="[data-route-options-anchor]" />
+    </>
   );
 }
 

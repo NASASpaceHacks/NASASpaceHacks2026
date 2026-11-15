@@ -6,6 +6,7 @@ import { pandolfSanteeMars } from './costModel';
 import { REST_W } from './heat';
 import { buildEdgeTable, dialRun, dsToMinutes, DS_PER_MIN, scaleEdgeTable, type EdgeTable } from './dial';
 import './defaults';
+import { describePrefs, normalizePrefs, prefsForHash, prefsKey, routeMultiplier, slopeRefDeg, weightedRouteModel, weightEdgeTable, type NormPrefs } from './prefs';
 import { DEFAULT_COST_MODEL, DEFAULT_PATH_SEARCH, getCostModel } from './registry';
 
 // ─────────────────────────── rules ───────────────────────────
@@ -81,9 +82,14 @@ export function canonicalJson(v: unknown): string {
     .join(',')}}`;
 }
 
-/** Stable hash of a plan request. */
+/**
+ * Stable hash of a plan request. Route priorities enter as their clamped weights, and not at all when they are
+ * route-neutral (absent, DEFAULT_ROUTE_PREFS, or only a distance weight), so a default-priority request hashes
+ * exactly like one without `prefs` while two different priority settings never share a hash (or a cached plan).
+ */
 export function requestHash(req: PlanRequest): string {
-  return hashString(canonicalJson(req));
+  if (req.prefs === undefined) return hashString(canonicalJson(req));
+  return hashString(canonicalJson({ ...req, prefs: prefsForHash(req.prefs) }));
 }
 
 // ─────────────────────────── caches (pure: values depend only on their keys) ───────────────────────────
@@ -93,6 +99,8 @@ const tableCache = new WeakMap<Float32Array, WeakMap<Float32Array, Map<string, E
 function crewKey(c: CrewParams): string {
   return `${c.bodyMassKg},${c.suitMassKg},${c.toolsKg},${c.v0},${c.gRatio}`;
 }
+
+const EDGE_TABLE_KEEP = 6;
 
 /** Cached edge table for (terrain, cost model, crew, speed factor). */
 export function getEdgeTable(g: CostGrid, model: CostModel, ctx: CostCtx): EdgeTable {
@@ -107,6 +115,11 @@ export function getEdgeTable(g: CostGrid, model: CostModel, ctx: CostCtx): EdgeT
       // travel time ∝ 1/speedFactor for this model: scale the speed-factor-1 table
       t = scaleEdgeTable(getEdgeTable(g, model, { ...ctx, speedFactor: 1 }), 1 / ctx.speedFactor);
     } else t = buildEdgeTable(g, model, ctx);
+    m.set(key, t);
+    // Keep the most recent few: each distinct rule set builds a 16–32 MB table, and a long session edits rules often.
+    while (m.size > EDGE_TABLE_KEEP) m.delete(m.keys().next().value as string);
+  } else {
+    m.delete(key); // refresh recency
     m.set(key, t);
   }
   return t;
@@ -145,17 +158,37 @@ export function heatAwareModel(base: CostModel, budgetW: number, restW = REST_W)
   return m;
 }
 
+/** Route search with operator priorities applied (see prefs.ts). */
+interface Routing {
+  model: CostModel;
+  table: EdgeTable;
+  mult: Float32Array;
+}
+
 interface PackCache {
   terrain?: Terrain;
   grids: Map<string, CostGrid>;
   fields: Map<string, InternalFields>;
   los: Map<string, Uint8Array>;
+  /** Route-priority multipliers by (weights, slope reference, LOS masts); null = uniform. */
+  mult: Map<string, Float32Array | null>;
+  /** Weighted route tables/models by (multiplier key, base route table). */
+  routing: Map<string, Routing>;
 }
 const packCache = new WeakMap<LoadedSitePack, PackCache>();
 function cacheFor(pack: LoadedSitePack): PackCache {
   let c = packCache.get(pack);
-  if (!c) packCache.set(pack, (c = { grids: new Map(), fields: new Map(), los: new Map() }));
+  if (!c) packCache.set(pack, (c = { grids: new Map(), fields: new Map(), los: new Map(), mult: new Map(), routing: new Map() }));
   return c;
+}
+
+/** Stable small id per object (identity key for long-lived cached tables). */
+const objIds = new WeakMap<object, number>();
+let nextObjId = 1;
+function idOf(o: object): number {
+  let id = objIds.get(o);
+  if (id === undefined) objIds.set(o, (id = nextObjId++));
+  return id;
 }
 function lruGet<V>(m: Map<string, V>, k: string): V | undefined {
   const v = m.get(k);
@@ -262,9 +295,17 @@ export interface Resolved {
   ctxW: CostCtx;
   T1: EdgeTable;
   TW: EdgeTable;
-  /** Route-search model (heat-aware) and its edge table at speed factor 1. */
-  routeModel: CostModel;
-  TR: EdgeTable;
+  /**
+   * Route-search model and its edge table at speed factor 1: heat-aware travel time, times the operator's
+   * route-priority multiplier when `prefs` is set (computed lazily on first access). A SEARCH COST only: true
+   * times always come from `model` (buildLeg, simulate); safety fields use T1/TW.
+   */
+  readonly routeModel: CostModel;
+  readonly TR: EdgeTable;
+  /** Clamped operator route priorities; null = route-neutral (today's routing, no multiplier built). */
+  prefs: NormPrefs | null;
+  /** Per-cell route-search multiplier (min 1); null when prefs are neutral or the multiplier is uniform. */
+  readonly routeMult: Float32Array | null;
   hazards: number[];
   /** blocked ∪ hazards (1 = impassable). */
   mask: Uint8Array;
@@ -302,25 +343,60 @@ export function resolve(pack: LoadedSitePack, req: PlanRequest, override?: { rul
   const ctxW: CostCtx = { crew, rules, speedFactor: rv.wbFactor };
   const T1 = getEdgeTable(baseGrid, model, ctx1);
   const TW = rv.wbFactor === 1 ? T1 : getEdgeTable(baseGrid, model, ctxW);
-  const routeModel = heatAwareModel(model, rv.heatMax);
-  const TR = routeModel === model ? T1 : getEdgeTable(baseGrid, routeModel, ctx1);
+  const baseRouteModel = heatAwareModel(model, rv.heatMax);
+  const baseTR = baseRouteModel === model ? T1 : getEdgeTable(baseGrid, baseRouteModel, ctx1);
   const hab = req.hab;
   const shelters = req.shelters?.length ? req.shelters : [{ id: 'HAB', kind: 'hab', cell: hab }];
 
   const c = cacheFor(pack);
   const shelterKey = shelters.map((s) => s.cell).sort((a, b) => a - b).join(',');
   const fkey = `${rv.slopeMax}|${rv.plumeOn}|${hashString(hazards.join(','))}|${hab}|${shelterKey}|${modelId}|${crewKey(crew)}|${rv.wbFactor}`;
+  // Every masted shelter relays radio, whichever one is the EVA base: a walk staged from the rover still
+  // has the habitat mast in view where terrain allows (caches carry no radio).
+  const relayCells = shelters.filter((s) => s.kind !== 'cache' && s.cell !== hab).map((s) => s.cell);
   let fields = lruGet(c.fields, fkey);
   if (!fields) {
-    // Every masted shelter relays radio, whichever one is the EVA base: a walk staged from the rover still
-    // has the habitat mast in view where terrain allows (caches carry no radio).
-    const relayCells = shelters.filter((s) => s.kind !== 'cache' && s.cell !== hab).map((s) => s.cell);
     fields = computeInternalFields(pack, { w, h, cellM, mask, T1, TW, hab, shelterCells: shelters.map((s) => s.cell), relayCells, elev: baseGrid.elev });
     lruSet(c.fields, fkey, fields, 4);
   }
+
+  // Operator route priorities: shape only the route search (routeModel / TR). Neutral prefs build nothing,
+  // so the default path below is byte-for-byte today's.
+  const prefs = normalizePrefs(req.prefs);
+  let routing: Routing | null | undefined = prefs ? undefined : null;
+  const route = (): Routing | null => {
+    if (routing !== undefined) return routing;
+    const p = prefs!;
+    // The slope term is normalized by the REQUEST's slope limit (not a relaxed what-if limit) and the radio term
+    // reads the comm-LOS union of the masts, which depends only on (hab, relay cells): both are in the key.
+    const slopeRef = slopeRefDeg(mergeRules(req.rules));
+    const mkey = `${prefsKey(p)}|${slopeRef}|${hab}|${relayCells.join(',')}`;
+    let mult = lruGet(c.mult, mkey);
+    if (mult === undefined) {
+      mult = routeMultiplier(pack, baseGrid, fields!.los, p, slopeRef);
+      lruSet(c.mult, mkey, mult, 4);
+    }
+    if (!mult) return (routing = null);
+    const rkey = `${mkey}|${idOf(baseTR)}`;
+    let r = lruGet(c.routing, rkey);
+    if (!r) {
+      r = { model: weightedRouteModel(baseRouteModel, mult, describePrefs(p)), table: weightEdgeTable(baseTR, mult), mult };
+      lruSet(c.routing, rkey, r, 4);
+    }
+    return (routing = r);
+  };
   return {
     pack, gs, w, h, n, cellM, rules, rv, crew, model, modelId, pathSearchId, baseGrid, grid, ctx1, ctxW, T1, TW,
-    routeModel, TR, hazards, mask, hab, shelters, fields,
+    get routeModel() {
+      return route()?.model ?? baseRouteModel;
+    },
+    get TR() {
+      return route()?.table ?? baseTR;
+    },
+    get routeMult() {
+      return route()?.mult ?? null;
+    },
+    prefs, hazards, mask, hab, shelters, fields,
   };
 }
 

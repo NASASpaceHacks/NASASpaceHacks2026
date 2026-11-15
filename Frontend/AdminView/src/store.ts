@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import type { Cell, FieldSet, Station, LoadedSitePack, PlanEvent, PlanRequest, PlanResult, Rule, Telem } from '@mw/shared/contracts';
-import { DEFAULT_RULES } from '@mw/shared/contracts';
+import type { Cell, FieldSet, Station, LoadedSitePack, PlanEvent, PlanRequest, PlanResult, RoutePrefs, Rule, Telem } from '@mw/shared/contracts';
+import { DEFAULT_ROUTE_PREFS, DEFAULT_RULES } from '@mw/shared/contracts';
 import type { SafeZoneInputs, SafeZoneLimits } from '@mw/shared/map';
 import type { SiteInfo } from './api';
 import type { AttemptView } from './lib/failure';
@@ -58,6 +58,21 @@ export interface PinCheck {
   spareMin?: number;
 }
 
+/** One row of "Compare routes": the same destinations planned with one priority preset. All values come from that PlanResult. */
+export interface CompareRow {
+  id: string;
+  label: string;
+  verdict: 'GO' | 'CAUTION' | 'NO-GO';
+  timeMin: number | null;
+  distM: number | null;
+  steepDeg: number | null;
+  radioGapMin: number | null;
+  spareMin: number | null;
+  /** Stops kept and their summed science value (the team spec compares routes on science too). */
+  stops: number | null;
+  science: number | null;
+}
+
 export interface ConsoleState {
   mode: 'boot' | 'live' | 'mock';
   bootSteps: string[];
@@ -86,6 +101,12 @@ export interface ConsoleState {
   ctxMenu: { cell: Cell; px: [number, number]; stationId?: string | null } | null;
   /** "Must visit" pins: the planner gives these stations priority (still dropped, with the reason, if unsafe). */
   mustVisit: Record<string, boolean>;
+  /** Route priorities (Options in the Directions card); sent in every plan request. */
+  prefs: RoutePrefs;
+  /** Route options panel open. */
+  routeOptions: boolean;
+  /** Compare routes: one plan per preset for the current destinations. */
+  compare: { status: 'running' | 'done' | 'error'; rows: CompareRow[] } | null;
   startLtstMin: number;
   lsDeg: number;
   shelterCells: Record<string, Cell>;
@@ -180,6 +201,9 @@ export const useConsole = create<ConsoleState>()(
     pickOnMap: false,
     ctxMenu: null,
     mustVisit: {},
+    prefs: DEFAULT_ROUTE_PREFS,
+    routeOptions: false,
+    compare: null,
     startLtstMin: 9 * 60 + 40,
     lsDeg: 150,
     shelterCells: {},

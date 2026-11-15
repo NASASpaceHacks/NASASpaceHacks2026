@@ -1,5 +1,5 @@
-import type { Cell, LoadedSitePack, LinkMsg, Station, PlanEvent, PlanRequest, PlanResult, Rule, RuleId, SitePackManifest } from '@mw/shared/contracts';
-import { DEFAULT_CREW, cellToXY, xyToCell } from '@mw/shared/contracts';
+import type { Cell, LoadedSitePack, LinkMsg, RoutePrefs, Station, PlanEvent, PlanRequest, PlanResult, Rule, RuleId, SitePackManifest } from '@mw/shared/contracts';
+import { DEFAULT_CREW, DEFAULT_ROUTE_PREFS, ROUTE_PRESETS, cellToXY, xyToCell } from '@mw/shared/contracts';
 import { stageFromShelter } from '@mw/shared/engine';
 import { maskAreaKm2, safeZoneMask } from '@mw/shared/map';
 import { HttpBackend, detectBackend, type Backend } from './api';
@@ -86,6 +86,9 @@ function packState(b: Backend, pack: LoadedSitePack) {
 
 /** Everything that belonged to the previous site: plan, destinations, events, route, telemetry, map UI. */
 const SITE_RESET = {
+  prefs: DEFAULT_ROUTE_PREFS,
+  routeOptions: false,
+  compare: null,
   destinations: [] as string[],
   customStops: [] as Station[],
   mustVisit: {} as Record<string, boolean>,
@@ -179,7 +182,7 @@ export function buildRequest(): PlanRequest {
 /** The plan request for a manifest and the planning inputs (pure; `buildRequest` = current state). */
 export function requestFor(
   m: SitePackManifest,
-  s: { customStops?: Station[]; shelterCells: Record<string, Cell>; stationOn: Record<string, boolean>; mustVisit: Record<string, boolean>; startLtstMin: number; rules: Rule[]; events: PlanEvent[]; evaBase: string | null },
+  s: { prefs?: RoutePrefs; customStops?: Station[]; shelterCells: Record<string, Cell>; stationOn: Record<string, boolean>; mustVisit: Record<string, boolean>; startLtstMin: number; rules: Rule[]; events: PlanEvent[]; evaBase: string | null },
 ): PlanRequest {
   const hab = m.shelters.find((x) => x.kind === 'hab')!;
   let req: PlanRequest = {
@@ -196,6 +199,7 @@ export function requestFor(
     crew: DEFAULT_CREW,
     seed: 1,
   };
+  if (s.prefs) req.prefs = s.prefs;
   if (s.events.length) req.events = s.events;
   // EVA base: a rover-staged EVA starts and ends at the pressurized rover (engine stageFromShelter
   // sets req.hab to the rover cell; comm LOS stays the union of the hab mast and rover relay masts).
@@ -535,6 +539,15 @@ export function setAllStations(on: boolean) {
 export function updateRule(id: RuleId, patch: Partial<Rule>) {
   set((s) => ({ rules: s.rules.map((r) => (r.id === id ? { ...r, ...patch } : r)) }));
   scheduleReplan(`Replanned: ${ruleLabel(get().rules.find((r) => r.id === id)?.label ?? 'a rule')} changed`, 450);
+}
+
+/** Display name of a priority profile: a preset's label, else "Custom". */
+export const prefsLabel = (p: RoutePrefs) => ROUTE_PRESETS.find((x) => x.id === p.preset)?.label ?? 'Custom';
+
+/** Change the route priorities (preset chip or slider). Re-plans like any other input and logs the profile. */
+export function setPrefs(p: RoutePrefs) {
+  set({ prefs: p });
+  scheduleReplan(`Route priorities: ${prefsLabel(p)}`, 300);
 }
 
 export function setStartLtst(min: number) {

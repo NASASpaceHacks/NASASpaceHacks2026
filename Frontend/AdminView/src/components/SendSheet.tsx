@@ -7,6 +7,7 @@ import { endpointLabel, stopLabel, stopName, useBaseInfo } from '../lib/base';
 import { evaLtst, fmtLtst } from '../lib/marsclock';
 import { limitLine, pet, thingsToWatch, verdictOf } from '../lib/plain';
 import { Button, Kbd, cx } from './ui';
+import { PrefsLine } from './RouteOptions';
 
 /** Curiosity's typical daily uplink volume, the yardstick for the route package (design doc §5). */
 export const UPLINK_BYTES = 28_000;
@@ -94,6 +95,7 @@ function Brief() {
           <div className="eyebrow">Crew brief · route v{sent ? route!.seq : nextSeq}</div>
           <div data-testid="review-route" className="num mt-1.5 text-[15.5px] leading-snug text-ink">{routeText}</div>
           <div className="mt-1 text-[13px] text-ink-2">{v.headline} · back at the {endName} airlock {pet(back)} <span className="text-mute">({fmtLtst(evaLtst(start, back))} Mars local)</span></div>
+          <PrefsLine className="mt-0.5 block text-[12.5px] text-mute" />
         </div>
         {!sent && (
           <button onClick={() => setMode('plan')} className="ml-auto flex h-9 shrink-0 items-center gap-2 rounded-[6px] px-3 text-[12px] text-mute hover:bg-raised hover:text-ink" aria-label="Back to plan">

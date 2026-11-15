@@ -5,6 +5,7 @@ import { relabel, shortName, useBaseInfo } from '../lib/base';
 import { fmtLtst } from '../lib/marsclock';
 import { verdictOf, type Verdict } from '../lib/plain';
 import { useDestReason } from '../lib/reasons';
+import { CompareLink, PrefsLine } from './RouteOptions';
 import { LtstScrubber, stayInSentence, stayInWhy } from './PlanParts';
 import { Button, Kbd, Popover, Tip, ToneMark, cx } from './ui';
 import { WayForward, useLeftOut } from './WayForward';
@@ -70,6 +71,10 @@ function VerdictCard() {
       </div>
       <div className="mt-0.5 break-words text-[clamp(14px,1.2vw,16px)] font-medium text-ink" data-testid="verdict-headline">{v.headline}</div>
       {v.breakdown && <div className="mt-0.5 text-[12.5px] text-mute" data-testid="verdict-breakdown">{v.breakdown}</div>}
+      <div className="mt-1 flex items-center gap-3 text-[12.5px] text-mute">
+        <PrefsLine />
+        <CompareLink />
+      </div>
 
       {nogo ? (
         <>

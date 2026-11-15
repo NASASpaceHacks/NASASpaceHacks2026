@@ -150,6 +150,18 @@ export const RuleSchema = z.object({
   evidence: z.enum(['M', 'A', 'D', 'S', 'E']).optional(),
 });
 
+/** Route priority weight: 0..1; out-of-range values are rejected at the API (the engine also clamps). */
+const weight = num.min(0).max(1);
+export const RoutePrefsSchema = z.object({
+  preset: z.string().max(40).optional(),
+  distance: weight,
+  slope: weight,
+  rough: weight,
+  thermal: weight,
+  radio: weight,
+  science: weight,
+});
+
 export const PlanRequestSchema = z.object({
   siteId: z.string(),
   hab: z.number().int().nonnegative(),
@@ -175,6 +187,7 @@ export const PlanRequestSchema = z.object({
     .object({ elapsedMin: num.nonnegative(), cell: z.number().int().nonnegative(), visited: z.array(z.string()), o2UsedPct: num })
     .optional(),
   planner: z.object({ pathSearch: z.string(), costModel: z.string() }).optional(),
+  prefs: RoutePrefsSchema.optional(),
   seed: z.number().int(),
 });
 
