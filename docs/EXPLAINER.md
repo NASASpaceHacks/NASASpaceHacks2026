@@ -48,7 +48,7 @@ The NASA challenge: *"create a layered, integrated view of a location or route o
    - Walking back uphill carrying 211 kg (crew + suit) at Mars gravity costs about 800 W.
    - A Mars suit can only shed about 352 W on average, because its evaporative cooler works poorly in Mars air.
    - The suit's heat limit forces so much resting that even the nearest station overruns the 6-hour EVA.
-   - **Staged from the pressurized rover, the plan is OK.** This matches NASA's Mars reference architecture (DRA 5.0), where pressurized rovers act as mobile bases. *On foot, the suit's cooling, not its oxygen, sets the range.*
+   - **Staged from the pressurized rover, the plan is OK.** This matches NASA's Mars reference architecture (DRA 5.0), where pressurized rovers act as mobile bases. *From the habitat, four limits block every stop at once: suit heat on the climb back, radio contact, shelter time and distance. Even with unlimited suit cooling the walk still fails, so this doesn't hinge on our heat model. The rover fixes all four (consistent with NASA's rover-based plans).*
 4. **Explain safe zone.** The reachable area shrinks one NASA rule at a time (slope → distance → walkback → shelter time → comm line of sight), then the route draws itself inside it.
 5. **Confirm and push.** The route package (about 11 KB; Curiosity's whole daily uplink is about 28 KB) is signed and pushed. The visor verifies the signature, and the astronaut presses **A** to accept. The console sees the ACK.
 6. **Walk.** The visor shows:

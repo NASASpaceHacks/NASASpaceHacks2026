@@ -1,0 +1,111 @@
+{
+  "site": "gale-v1",
+  "base": "HAB1 (walk from the habitat)",
+  "startLtst": "09:40",
+  "nasaSizingW": 352,
+  "rows": [
+    {
+      "budgetW": 352,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "eva_duration_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    },
+    {
+      "budgetW": 400,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "los_gap_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    },
+    {
+      "budgetW": 450,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "los_gap_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    },
+    {
+      "budgetW": 500,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "los_gap_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    },
+    {
+      "budgetW": 530,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "los_gap_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    },
+    {
+      "budgetW": 600,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "los_gap_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    },
+    {
+      "budgetW": 700,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "los_gap_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    },
+    {
+      "budgetW": 800,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "los_gap_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    },
+    {
+      "budgetW": 1000,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "los_gap_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    },
+    {
+      "budgetW": 1500,
+      "reachable": [],
+      "nReachable": 0,
+      "bindingWhenDropped": {
+        "los_gap_max_min": 7,
+        "shelter_time_max_min": 2,
+        "walk_radius_max_m": 3
+      }
+    }
+  ],
+  "minBudgetForAnyStopW": null,
+  "ratioToNasaSizing": null,
+  "note": "Each stop is planned alone (out and back) from Hab-1 with every rule except the heat budget unchanged. The budget at which the first stop becomes reachable says how much more heat the suit would have to reject (or, roughly, how much our energy model would have to over-predict) before walking from the habitat works. Rest periods are fixed at the engine default."
+}

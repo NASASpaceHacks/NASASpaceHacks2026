@@ -53,7 +53,7 @@
   },
   {
    "id": "los_gap_max_min",
-   "label": "Max time without habitat line-of-sight",
+   "label": "Max time out of radio contact (habitat or rover relay)",
    "value": 10,
    "unit": "min",
    "hard": true
@@ -123,7 +123,8 @@
   }
  ],
  "radio_masts": [
-  512435
+  512435,
+  621576
  ],
  "grid": {
   "cell_size_m": 5,

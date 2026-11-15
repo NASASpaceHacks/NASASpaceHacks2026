@@ -123,10 +123,10 @@
    "slope_max_deg": 150,
    "unsafe_edge_grade_gt_20deg": 150
   },
-  "planP50Ms": 38.5,
-  "planP95Ms": 71.7,
-  "replanP50Ms": 8.5,
-  "replanP95Ms": 18.2,
+  "planP50Ms": 37.9,
+  "planP95Ms": 73.8,
+  "replanP50Ms": 8.3,
+  "replanP95Ms": 19.8,
   "oversubscribed": {
    "scenarios": 200,
    "candidates": 12,
@@ -146,8 +146,8 @@
    "meanStationsB": 4.64,
    "meanEvaMinA": 196.9,
    "meanEvaMinB": 185.2,
-   "solveMsA_p50": 105.1,
-   "solveMsA_p95": 124.8,
+   "solveMsA_p50": 106.6,
+   "solveMsA_p95": 113.1,
    "byBucket": {
     "120-160": {
      "n": 65,
@@ -186,12 +186,12 @@
  },
  "v4": {
   "walks": 24,
-  "engine_vs_ai_verdict": 24,
-  "engine_vs_independent_verdict": 22,
+  "engine_vs_ai_verdict": 23,
+  "engine_vs_independent_verdict": 23,
   "engine_nogo": 12,
-  "failing_rule_named_by_ai": 12,
-  "failing_rule_named_by_independent": 6,
-  "notes": "24 single-destination walks on gale-v1 (12 GO, 12 NO-GO by the engine). Independent Python checker (own slope, edge grade, ray line-of-sight, radius, simple time model; no engine code) and blind Claude AI judges (read only the rules + per-step evidence packets; engine verdicts hidden). AI judges use packet values that include engine-derived per-step times (incl. heat rests), line of sight and shelter minutes, so they verify rule application, not the underlying models; the independent checker verifies geometry and line of sight independently. Both independent-checker disagreements (W02, W19) are radio-gap cases where the engine counts heat-governor rests taken out of line of sight; the checker has no heat model. See v4_crosscheck/README.md."
+  "failing_rule_named_by_ai": 11,
+  "failing_rule_named_by_independent": 7,
+  "notes": "24 single-destination walks on gale-v1 (12 GO, 12 NO-GO by the engine). Independent Python checker (own slope, edge grade, ray line-of-sight, radius, simple time model; no engine code) and blind Claude AI judges (read only the rules + per-step evidence packets; engine verdicts hidden). AI judges use packet values that include engine-derived per-step times (incl. heat rests), line of sight and shelter minutes, so they verify rule application, not the underlying models; the independent checker verifies geometry and line of sight independently. Re-run after the radio-relay fix (every masted shelter relays). The single disagreement (W02) is a safe-side engine NO-GO: the engine judged its heat-aware route (radio gap 0.22 min over the limit) while the shortest-time path in the packet passes; the engine does not yet try alternative paths before NO-GO. See v4_crosscheck/README.md."
  },
- "generatedUtc": "2026-11-15T02:28:30Z"
+ "generatedUtc": "2026-11-15T02:58:10Z"
 }

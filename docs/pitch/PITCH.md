@@ -56,7 +56,7 @@ Rules: real NASA imagery and our own screen recordings only; Space Apps brand as
 | 0:02-0:05 | Gale crater, Mount Sharp, a suited figure silhouette | Voice: "NASA Space Apps 2026: plan a Marswalk." Caption: "Challenge: a layered map for the first Mars EVA" |
 | 0:05-0:10 | Safe zone animating on the 2D map | Caption: "Marswalk (working name). Walk far. Come back safe." (tagline is a draft) |
 | 0:10-0:12.5 | Shot 1: six data layers stack on one grid | Caption: "Six NASA missions, one Mars grid" |
-| 0:12.5-0:15 | Shot 2: constraints shrink the zone, binding constraint shown | Caption: "FOD flight rules as hard limits" |
+| 0:12.5-0:15 | Shot 2: constraints shrink the zone, binding constraint shown | Caption: "NASA EVA constraints as hard limits" |
 | 0:15-0:17.5 | Shot 3: confirm on console, route appears on the visor | Caption: "Habitat plans, visor guides" |
 | 0:17.5-0:20 | Shot 4: Earth goes dark, visor keeps guiding | Caption: "Link lost. She still gets home." |
 | 0:20-0:27 | Future: any DEM, Artemis lunar EVAs, hardware visor render | Caption: "Any terrain. Moon next. Open source." |

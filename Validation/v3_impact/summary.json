@@ -30,11 +30,11 @@
     "slope_max_deg": 150,
     "unsafe_edge_grade_gt_20deg": 150
    },
-   "planP50Ms": 38.50570799999696,
-   "planP95Ms": 71.69499999999243,
-   "planMaxMs": 1386.037291,
-   "replanP50Ms": 8.477708000005805,
-   "replanP95Ms": 18.225875000003725,
+   "planP50Ms": 37.92591700000048,
+   "planP95Ms": 73.77770800000872,
+   "planMaxMs": 1325.594417,
+   "replanP50Ms": 8.274166999995941,
+   "replanP95Ms": 19.762999999991735,
    "replans": 196
   },
   "HAB1": {
@@ -63,9 +63,9 @@
     "unsafe_edge_grade_gt_20deg": 60,
     "walk_radius_max_m": 50
    },
-   "planP50Ms": 65.23333299999649,
-   "planP95Ms": 125.22566700002062,
-   "planMaxMs": 296.86762499999895,
+   "planP50Ms": 56.39674999998533,
+   "planP95Ms": 115.19058299998869,
+   "planMaxMs": 222.34329200000502,
    "replanP50Ms": null,
    "replanP95Ms": null,
    "replans": 0

@@ -18,7 +18,7 @@ from a few hundred 5 m cells; every row's value is exact for that row; block col
 | eva_duration_max_min | 360 min | Total EVA = 30 min egress + walking (incl. suit-heat rests) + dwell + 30 min ingress must not exceed 360. |
 | walkback_speed_factor (0.5) | 300 min surface time | At every point, if a crew member were degraded and had to walk home at HALF speed, they must still get home inside the 300 surface minutes (360 total minus 60 egress/ingress). |
 | shelter_time_max_min | 30 min | From every point the nearest shelter (hab or rover) is at most 30 walking minutes away at nominal pace. |
-| los_gap_max_min | 10 min | The crew may never go more than 10 continuous minutes without radio line of sight to the base mast. Waiting, resting and working out of sight count. |
+| los_gap_max_min | 10 min | The crew may never go more than 10 continuous minutes without radio line of sight to any radio mast (the base, the habitat and any rover relay; listed in `radio_masts`). Waiting, resting and working out of sight count. |
 | daylight_min_sun_elev_deg | 5 deg | Sun must be at least 5 deg above the horizon at all times, through the end of ingress. |
 
 The packet's `rules` table lists the same values (plus a few rules you do not need: contingency O2 is never planned into,

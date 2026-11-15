@@ -6,13 +6,13 @@ Status: draft v0 by C1. Replace bracketed items. Keep claims to what the repo sh
 Marswalk (working name)
 
 ## Summary (about 250 characters)
-A two-device Mars EVA route planner. The habitat console computes constraint-safe walking routes from NASA flight rules and multi-mission data; the astronaut's visor guides her and keeps working if the link to the habitat drops.
+A two-device Mars EVA route planner. The habitat console computes walking routes that satisfy 12 cited NASA EVA constraints, using multi-mission NASA data; the astronaut's visor guides her and keeps working if the link to the habitat drops.
 
 ## Detailed description
 **The problem.** On Mars the habitat crew is the primary EVA support: Earth is 3 to 22 minutes away and unreachable for about 13 days at conjunction (Mars DRA 5.0). NASA's Flight Operations constraints for a traverse include maximum distance from the lander, safe slope, time without line of sight to the lander, lighting and consumables, and NASA's own papers name the gaps: real-time suit data is not tied to traverse planning, plans and actuals are poorly coupled, and science priorities conflict with the achievable route (NTRS 20250006063, 20260001895).
 
 **What we built.**
-1. A habitat console (Admin view) that generates routes where every flight rule is a hard constraint. Each plan states its margins, the binding constraint ("limited by shelter time at St 3"), bingo times, and why any science station was dropped.
+1. A habitat console (Admin view) that generates routes where each of 12 cited NASA EVA constraints is a hard limit, re-verified by a simulator. Each plan states its margins, the binding constraint ("limited by shelter time at St 3"), bingo times, and why any science station was dropped.
 2. An astronaut visor (User view): a glass cockpit with heading, next stop, walkback and shelter margin. It runs its own safety core and keeps guiding when the link is lost.
 3. A surface link between them: CONFIRM, push, ACK; replanning in under one second for a solar-storm nowcast, a shortened EVA, or an astronaut-reported hazard. [verify latency]
 4. A science traceability matrix tied to the Curiosity team's 2025-2026 boxwork campaign at Gale crater: 12 stations, each traced to an objective and a cited NASA mission blog post.

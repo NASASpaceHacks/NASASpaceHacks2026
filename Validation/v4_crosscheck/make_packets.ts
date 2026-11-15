@@ -193,7 +193,7 @@ final.forEach((x, i) => {
     rules: rulesOut, crew: DEFAULT_CREW,
     base: { name: tr.base === 'PR-1' ? 'Pressurized rover PR-1 (EVA base)' : 'Habitat Hab-1 (EVA base)', cell: req.hab, ...lonlat(req.hab) },
     destination: { cell: tr.cell, ...lonlat(tr.cell), label: tr.label },
-    shelters, radio_masts: [req.hab, ...req.shelters.filter((s) => s.kind === 'rover' && s.cell !== req.hab).map((s) => s.cell)],
+    shelters, radio_masts: [req.hab, ...req.shelters.filter((s) => s.kind !== 'cache' && s.cell !== req.hab).map((s) => s.cell)], // every masted shelter relays (engine rule)
     grid: { cell_size_m: cellM, rows: 1000, cols: w },
     start_ltst_min: tr.startLtst, start_ltst_hhmm: `${String(Math.floor(tr.startLtst / 60)).padStart(2, '0')}:${String(tr.startLtst % 60).padStart(2, '0')}`,
     dwell_min: tr.dwell, egress_min_before_walk: 30, ingress_min_after_walk: 30,

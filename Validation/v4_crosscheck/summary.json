@@ -2,35 +2,34 @@
  "walks": 24,
  "engine_GO": 12,
  "engine_NOGO": 12,
- "verdict_agreement": 22,
- "verdict_agreement_pct": 91.7,
+ "verdict_agreement": 23,
+ "verdict_agreement_pct": 95.8,
  "GO_agreement": 12,
- "NOGO_agreement": 10,
+ "NOGO_agreement": 11,
  "engine_GO_independent_NOGO": 0,
- "engine_NOGO_independent_GO": 2,
+ "engine_NOGO_independent_GO": 1,
  "disagreements": [
-  "W02",
-  "W19"
+  "W02"
  ],
  "disagreement_classes": {
-  "model_difference_heat_rests": 2,
-  "agree": 22
+  "model_difference_heat_rests": 1,
+  "agree": 23
  },
  "after_rest_scaled_diagnostic": {
   "verdict_agreement": 23,
   "of": 24
  },
- "engine_primary_rule_found_by_independent_raw": "6/12",
+ "engine_primary_rule_found_by_independent_raw": "7/12",
  "engine_primary_rule_found_by_independent_rest_scaled": "11/12",
- "identical_rule_sets_raw": "13/24",
+ "identical_rule_sets_raw": "14/24",
  "time_independent_rules_pass_fail_agreement": "96/96 (slope, radius, keepout, shelter-minutes x 24 walks)",
- "los_row_disagreement": "61/2600 rows (2.3%) differ between my ray LOS and the engine viewshed field",
+ "los_row_disagreement": "65/2625 rows (2.5%) differ between my ray LOS and the engine viewshed field",
  "time_free_rules_note": "radius / slope / keepout / shelter-minutes do not depend on heat rests",
  "walks_by_engine_primary_rule": {
   "daylight_min_sun_elev_deg": 2,
   "eva_duration_max_min": 2,
   "los_gap_max_min": 3,
-  "shelter_time_max_min": 2,
-  "walk_radius_max_m": 3
+  "shelter_time_max_min": 3,
+  "walk_radius_max_m": 2
  }
 }
