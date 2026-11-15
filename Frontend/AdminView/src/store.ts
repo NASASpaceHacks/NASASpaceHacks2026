@@ -206,8 +206,8 @@ export const useConsole = create<ConsoleState>()(
     attemptPlan: null,
     attemptPin: null,
     pinCheck: null,
-    overlays: [],
-    opacity: { safezone: 1, elevation: 0.8, slope: 0.85, rough: 0.85, ti: 0.75, crism: 0.8, shelter: 0.9, walkback: 0.85, los: 0.9 },
+    overlays: ['safezone'], // exact walkable-area shading on from the start (testers: "where can I go?")
+    opacity: { safezone: 0.6, elevation: 0.8, slope: 0.85, rough: 0.85, ti: 0.75, crism: 0.8, shelter: 0.9, walkback: 0.85, los: 0.9 },
     // Calm default: imagery (+ lighting), route, science targets, base and rover, safe-area outline.
     vectors: { outline: true, contours: false, keepouts: false, traverse: false, stations: true, stationDetail: false, route: true, shelters: true, imagery: true, relief: true },
     details: { open: false, tab: 'report' },

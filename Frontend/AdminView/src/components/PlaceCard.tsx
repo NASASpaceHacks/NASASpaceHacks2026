@@ -147,8 +147,8 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
         </div>
       )}
       {mine?.verdict === 'NO-GO' && (
-        <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[13.5px]">
-          <button data-testid="place-fix-closest" onClick={() => void fixFromPin('closest')} className="text-cyan hover:underline">Closest safe point</button>
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13.5px]">
+          <Btn testId="place-fix-closest" primary onClick={() => void fixFromPin('closest')}>Closest safe spot</Btn>
           {mine.rule !== 'slope_max_deg' && <button data-testid="place-fix-rover" onClick={() => void fixFromPin('rover')} className="text-cyan hover:underline">Move rover closer</button>}
         </div>
       )}
@@ -157,9 +157,9 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
           <Btn testId="place-remove" onClick={() => removeDestination(id!)}>Remove stop</Btn>
         ) : (
           <>
-            <Btn testId="place-directions" primary onClick={() => directionsTo(target)}>
+            <Btn testId="place-directions" primary={mine?.verdict !== 'NO-GO'} onClick={() => directionsTo(target)}>
               <span className="inline-flex items-center gap-1.5">
-                <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden><path d="M8 0.8 15.2 8 8 15.2 0.8 8Z" fill="currentColor" /><path d="M6 11V8.2h4M8.4 6.4 10.2 8.2 8.4 10" fill="none" stroke="#00e5ff" strokeWidth="1.5" /></svg>
+                <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden><path d="M8 0.8 15.2 8 8 15.2 0.8 8Z" fill="currentColor" /><path d="M6 11V8.2h4M8.4 6.4 10.2 8.2 8.4 10" fill="none" stroke={mine?.verdict === 'NO-GO' ? '#000' : '#00e5ff'} strokeWidth="1.5" /></svg>
                 Directions
               </span>
             </Btn>

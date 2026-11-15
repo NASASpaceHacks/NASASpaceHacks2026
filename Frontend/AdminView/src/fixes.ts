@@ -117,7 +117,7 @@ export async function findClosestSafe(destId: string) {
     }
   }
   if (my !== token) return;
-  set({ fix: { destId, kind: 'closest', status: 'none', note: cands.length ? `No spot within ${CLOSEST_MAX_M} m makes this walk safe.` : `Every spot within ${CLOSEST_MAX_M} m breaks a hard rule.` } });
+  set({ fix: { destId, kind: 'closest', status: 'none', note: `No safe spot within ${CLOSEST_MAX_M} m of ${destId.startsWith('P') ? 'your pin' : 'this target'}.` } });
   void restoreServerBase();
 }
 

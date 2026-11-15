@@ -610,7 +610,7 @@ export class MapController {
       const prev = ex.some((k) => k !== v.act);
       const act = ex.includes(v.act);
       if (prev || (act && v.actGlow < 0.3)) { out[o] = 8; out[o + 1] = 9; out[o + 2] = 12; out[o + 3] = 140; }
-      else if (act) { out[o] = 242; out[o + 1] = 181; out[o + 2] = 68; out[o + 3] = 128; }
+      else if (act) { out[o] = 255; out[o + 1] = 59; out[o + 2] = 48; out[o + 3] = 128; }
       else { out[o] = 79; out[o + 1] = 209; out[o + 2] = 224; out[o + 3] = 26; }
     };
   }
