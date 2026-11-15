@@ -1,0 +1,1778 @@
+[
+ {
+  "walk": "W01",
+  "base": "Hab-1",
+  "dest_label": "ST03",
+  "start_ltst_min": 580,
+  "dwell_min": 25,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "eva_duration_max_min",
+   "text": "Stay in: EVA duration rules out every station — staging from ROVER1 allows 1 station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "eva_duration_max_min",
+    "deficitMin": 88.98910751352753,
+    "text": "DEST dropped: EVA duration, −89 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 110.5313270158122,
+     "limit": 10
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 1,
+     "worst": 407.2228531113902,
+     "limit": 300
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 175.8727278211509,
+     "limit": 10
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "seg": 1,
+     "worst": 467.01362970013895,
+     "limit": 360
+    }
+   ],
+   "durationMin": 467.01362970013895
+  },
+  "own_packet_total_min_with_rests": 407.01,
+  "packet_rest_min": 287.45,
+  "dist_base_m": 903.8
+ },
+ {
+  "walk": "W02",
+  "base": "PR-1",
+  "dest_label": "ST07",
+  "start_ltst_min": 480,
+  "dwell_min": 30,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "los_gap_max_min",
+   "text": "Stay in: comm LOS gap rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "los_gap_max_min",
+    "deficitMin": 10.618239208315746,
+    "text": "DEST dropped: comm LOS gap, −11 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 19.557057145722545,
+     "limit": 10
+    }
+   ],
+   "durationMin": 154.80176176123052
+  },
+  "own_packet_total_min_with_rests": 94.8,
+  "packet_rest_min": 34.58,
+  "dist_base_m": 487.1
+ },
+ {
+  "walk": "W03",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 480,
+  "dwell_min": 20,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at HAB→DEST",
+   "seg": 0
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 1271.4422331261749,
+   "durationMin": 166.04970996597066,
+   "energyKJ": 2349.4729452328224,
+   "o2UsedPct": 35.34990332199022,
+   "doseUSv": 49.51497798462623,
+   "scienceValue": 10,
+   "maxDistHabM": 589.1731494221372
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 6.600000381469727,
+    "atMin": 30
+   },
+   "walk_radius_max_m": {
+    "min": 1410.8268505778628,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 190.27412962962467,
+    "atMin": 101.93253540943785
+   },
+   "shelter_time_max_min": {
+    "min": 11.10333251953125,
+    "atMin": 81.93253540943785
+   },
+   "los_gap_max_min": {
+    "min": 9.18746551899164,
+    "atMin": 46.67570161604885
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 31.297126918942865,
+    "atMin": 30
+   },
+   "heat_avg_max_w": {
+    "min": 0,
+    "atMin": 39.01816435693422
+   },
+   "eva_duration_max_min": {
+    "min": 193.95029003402934,
+    "atMin": 136.04970996597066
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 166.04970996597066
+  },
+  "own_packet_total_min_with_rests": 106.05,
+  "packet_rest_min": 48.21,
+  "dist_base_m": 589.2
+ },
+ {
+  "walk": "W04",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 660,
+  "dwell_min": 20,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at DEST→HAB",
+   "seg": 1
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 444.2922056876075,
+   "durationMin": 93.22298231213117,
+   "energyKJ": 729.8446741272672,
+   "o2UsedPct": 11.074327437377063,
+   "doseUSv": 15.495193854615287,
+   "scienceValue": 10,
+   "maxDistHabM": 211.0094784600919
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 11.779999732971191,
+    "atMin": 30
+   },
+   "walk_radius_max_m": {
+    "min": 1788.990521539908,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 260.18865813792166,
+    "atMin": 56.61134205281321
+   },
+   "shelter_time_max_min": {
+    "min": 23.40000009536743,
+    "atMin": 36.61134205281321
+   },
+   "los_gap_max_min": {
+    "min": 10,
+    "atMin": 30
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 66.44854577686667,
+    "atMin": 30
+   },
+   "heat_avg_max_w": {
+    "min": 25.499331382474907,
+    "atMin": 63.22298231213117
+   },
+   "eva_duration_max_min": {
+    "min": 266.7770176878688,
+    "atMin": 63.22298231213117
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 93.22298231213117
+  },
+  "own_packet_total_min_with_rests": 33.22,
+  "packet_rest_min": 0,
+  "dist_base_m": 211
+ },
+ {
+  "walk": "W05",
+  "base": "Hab-1",
+  "dest_label": "rand",
+  "start_ltst_min": 660,
+  "dwell_min": 25,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "los_gap_max_min",
+   "text": "Stay in: comm LOS gap rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "los_gap_max_min",
+    "deficitMin": 31.34700235490604,
+    "text": "DEST dropped: comm LOS gap, −32 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 39.82848664030769,
+     "limit": 10
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 58.05841682187271,
+     "limit": 10
+    }
+   ],
+   "durationMin": 136.96658316829058
+  },
+  "own_packet_total_min_with_rests": 76.97,
+  "packet_rest_min": 26.2,
+  "dist_base_m": 259.9
+ },
+ {
+  "walk": "W06",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 20,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at DEST→HAB",
+   "seg": 1
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 593.4496214889009,
+   "durationMin": 103.31776610202698,
+   "energyKJ": 987.8078823123014,
+   "o2UsedPct": 14.43925536734234,
+   "doseUSv": 20.188131473471017,
+   "scienceValue": 10,
+   "maxDistHabM": 285.3944638566067
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 5.609999656677246,
+    "atMin": 30
+   },
+   "walk_radius_max_m": {
+    "min": 1714.6055361433932,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 253.64335432419227,
+    "atMin": 58.949979873805766
+   },
+   "shelter_time_max_min": {
+    "min": 21.296667098999023,
+    "atMin": 38.949979873805766
+   },
+   "los_gap_max_min": {
+    "min": 10,
+    "atMin": 30
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 53.25316990579106,
+    "atMin": 30
+   },
+   "heat_avg_max_w": {
+    "min": 0,
+    "atMin": 66.4434713432258
+   },
+   "eva_duration_max_min": {
+    "min": 256.682233897973,
+    "atMin": 73.31776610202698
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 103.31776610202698
+  },
+  "own_packet_total_min_with_rests": 43.32,
+  "packet_rest_min": 5.66,
+  "dist_base_m": 285.4
+ },
+ {
+  "walk": "W07",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 15,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "walk_radius_max_m",
+   "text": "Stay in: walk radius rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "walk_radius_max_m",
+    "deficitMin": 6.676361325402429,
+    "text": "DEST dropped: walk radius, −7 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 0,
+     "worst": 2224.3257405335216,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 0,
+     "worst": 380.43563888743324,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 0,
+     "worst": 73.91999816894531,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 193.12646830510536,
+     "limit": 10
+    },
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 1,
+     "worst": 2224.3257405335216,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 1,
+     "worst": 437.6559394223228,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 1,
+     "worst": 73.91999816894531,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 355.22787526806815,
+     "limit": 10
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "seg": 1,
+     "worst": 497.5082086052463,
+     "limit": 360
+    }
+   ],
+   "durationMin": 497.5082086052463
+  },
+  "own_packet_total_min_with_rests": 437.51,
+  "packet_rest_min": 274.34,
+  "dist_base_m": 2224.3
+ },
+ {
+  "walk": "W08",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 15,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at DEST→HAB",
+   "seg": 1
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 806.5472613442889,
+   "durationMin": 113.86420349097673,
+   "energyKJ": 1242.0245018476423,
+   "o2UsedPct": 17.95473449699224,
+   "doseUSv": 25.103934377386658,
+   "scienceValue": 10,
+   "maxDistHabM": 373.1286641361128
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 1.6399993896484375,
+    "atMin": 57.04472287765408
+   },
+   "walk_radius_max_m": {
+    "min": 1626.8713358638872,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 245.9881750245067,
+    "atMin": 83.71515832352911
+   },
+   "shelter_time_max_min": {
+    "min": 18.0649995803833,
+    "atMin": 42.04472287765408
+   },
+   "los_gap_max_min": {
+    "min": 10,
+    "atMin": 30
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 53.25316990579106,
+    "atMin": 30
+   },
+   "heat_avg_max_w": {
+    "min": 0,
+    "atMin": 63.88729787363933
+   },
+   "eva_duration_max_min": {
+    "min": 246.13579650902327,
+    "atMin": 83.86420349097673
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 113.86420349097673
+  },
+  "own_packet_total_min_with_rests": 53.86,
+  "packet_rest_min": 14.86,
+  "dist_base_m": 373.1
+ },
+ {
+  "walk": "W09",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 660,
+  "dwell_min": 30,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "shelter_time_max_min",
+   "text": "Stay in: shelter time rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "shelter_time_max_min",
+    "deficitMin": 111.48333740234375,
+    "text": "DEST dropped: shelter time, −112 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 0,
+     "worst": 2196.0475860053666,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 0,
+     "worst": 745.7500932114572,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 0,
+     "worst": 141.48333740234375,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 423.31424416233244,
+     "limit": 10
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "seg": 0,
+     "worst": -11.903387112841102,
+     "limit": 5
+    },
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 1,
+     "worst": 2196.0475860053666,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 1,
+     "worst": 942.9988982374186,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 1,
+     "worst": 141.48333740234375,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 860.5708340831632,
+     "limit": 10
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "seg": 1,
+     "worst": -63.29092604307553,
+     "limit": 5
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "seg": 1,
+     "worst": 1002.8511674203421,
+     "limit": 360
+    }
+   ],
+   "durationMin": 1002.8511674203421
+  },
+  "own_packet_total_min_with_rests": 942.85,
+  "packet_rest_min": 629.34,
+  "dist_base_m": 1188.6
+ },
+ {
+  "walk": "W10",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 15,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at HAB→DEST",
+   "seg": 0
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 1904.1381166498097,
+   "durationMin": 233.03851223191123,
+   "energyKJ": 3779.674596326934,
+   "o2UsedPct": 57.67950407730375,
+   "doseUSv": 80.85243276173047,
+   "scienceValue": 10,
+   "maxDistHabM": 871.9661690685024
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 4.130000114440918,
+    "atMin": 30
+   },
+   "walk_radius_max_m": {
+    "min": 1128.0338309314975,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 126.81375695101227,
+    "atMin": 202.88957639702355
+   },
+   "shelter_time_max_min": {
+    "min": 1.7649993896484375,
+    "atMin": 126.07615446297693
+   },
+   "los_gap_max_min": {
+    "min": 8.004898998093363,
+    "atMin": 50.529470047578045
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 53.25316990579106,
+    "atMin": 30
+   },
+   "heat_avg_max_w": {
+    "min": 0,
+    "atMin": 38.942466844895506
+   },
+   "eva_duration_max_min": {
+    "min": 126.96148776808877,
+    "atMin": 203.03851223191123
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 233.03851223191123
+  },
+  "own_packet_total_min_with_rests": 173.04,
+  "packet_rest_min": 101.37,
+  "dist_base_m": 872
+ },
+ {
+  "walk": "W11",
+  "base": "Hab-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 15,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "walk_radius_max_m",
+   "text": "Stay in: walk radius rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "walk_radius_max_m",
+    "deficitMin": 0.8693949282720885,
+    "text": "DEST dropped: walk radius, −1 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 0,
+     "worst": 2029.2116695899422,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 0,
+     "worst": 467.4399890050964,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 0,
+     "worst": 83.52666473388672,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 277.59333689350916,
+     "limit": 10
+    },
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 1,
+     "worst": 2029.2116695899422,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 1,
+     "worst": 632.9762791624668,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 1,
+     "worst": 83.52666473388672,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 573.0680559632834,
+     "limit": 10
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "seg": 1,
+     "worst": -37.28324970925722,
+     "limit": 5
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "seg": 1,
+     "worst": 692.7670557512155,
+     "limit": 360
+    }
+   ],
+   "durationMin": 692.7670557512155
+  },
+  "own_packet_total_min_with_rests": 632.77,
+  "packet_rest_min": 450.46,
+  "dist_base_m": 2029.2
+ },
+ {
+  "walk": "W12",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 660,
+  "dwell_min": 25,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at HAB→DEST",
+   "seg": 0
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 1410.814890140132,
+   "durationMin": 173.03689491824142,
+   "energyKJ": 2464.2198889674673,
+   "o2UsedPct": 37.67896497274714,
+   "doseUSv": 52.671181291217536,
+   "scienceValue": 10,
+   "maxDistHabM": 658.9764790946639
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 0.6700000762939453,
+    "atMin": 30
+   },
+   "walk_radius_max_m": {
+    "min": 1341.0235209053362,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 186.815483597242,
+    "atMin": 142.8878497507938
+   },
+   "shelter_time_max_min": {
+    "min": 9.101667404174805,
+    "atMin": 64.861473303095
+   },
+   "los_gap_max_min": {
+    "min": 3.7436698144557843,
+    "atMin": 61.68868805814524
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 53.74097354281746,
+    "atMin": 173.03689491824142
+   },
+   "heat_avg_max_w": {
+    "min": 0,
+    "atMin": 44.689338819112876
+   },
+   "eva_duration_max_min": {
+    "min": 186.96310508175858,
+    "atMin": 143.03689491824142
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 173.03689491824142
+  },
+  "own_packet_total_min_with_rests": 113.04,
+  "packet_rest_min": 46.05,
+  "dist_base_m": 659
+ },
+ {
+  "walk": "W13",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 900,
+  "dwell_min": 25,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at HAB→DEST",
+   "seg": 0
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 592.6394530285961,
+   "durationMin": 106.56966603802888,
+   "energyKJ": 1080.5025051622383,
+   "o2UsedPct": 15.523222012676296,
+   "doseUSv": 21.736116180332356,
+   "scienceValue": 10,
+   "maxDistHabM": 264.00757564888175
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 4.850000381469727,
+    "atMin": 30
+   },
+   "walk_radius_max_m": {
+    "min": 1735.9924243511182,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 246.12208636878495,
+    "atMin": 67.7612468373918
+   },
+   "shelter_time_max_min": {
+    "min": 21.678333282470703,
+    "atMin": 67.1590865903938
+   },
+   "los_gap_max_min": {
+    "min": 9.15299183216377,
+    "atMin": 36.7901686562471
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 14.494242291009172,
+    "atMin": 106.56966603802888
+   },
+   "heat_avg_max_w": {
+    "min": 0,
+    "atMin": 37.545917468657294
+   },
+   "eva_duration_max_min": {
+    "min": 253.43033396197112,
+    "atMin": 76.56966603802888
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 106.56966603802888
+  },
+  "own_packet_total_min_with_rests": 46.57,
+  "packet_rest_min": 3.93,
+  "dist_base_m": 264
+ },
+ {
+  "walk": "W14",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 480,
+  "dwell_min": 30,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "eva_duration_max_min",
+   "text": "Stay in: EVA duration rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "eva_duration_max_min",
+    "deficitMin": 190.7856404934182,
+    "text": "DEST dropped: EVA duration, −191 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 0,
+     "worst": 424.98294592889243,
+     "limit": 300
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 293.2321066410851,
+     "limit": 10
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 1,
+     "worst": 510.5858006661731,
+     "limit": 300
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 464.552121335933,
+     "limit": 10
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "seg": 1,
+     "worst": 570.3733700122708,
+     "limit": 360
+    }
+   ],
+   "durationMin": 570.3733700122708
+  },
+  "own_packet_total_min_with_rests": 510.37,
+  "packet_rest_min": 358.18,
+  "dist_base_m": 1602.1
+ },
+ {
+  "walk": "W15",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 15,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at DEST→HAB",
+   "seg": 1
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 486.14696244393616,
+   "durationMin": 89.46865959654573,
+   "energyKJ": 731.289919202555,
+   "o2UsedPct": 9.822886532181908,
+   "doseUSv": 13.747544769560113,
+   "scienceValue": 10,
+   "maxDistHabM": 225.88713996153032
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 4.090000152587891,
+    "atMin": 30
+   },
+   "walk_radius_max_m": {
+    "min": 1774.1128600384698,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 264.0292248627861,
+    "atMin": 51.9941086867134
+   },
+   "shelter_time_max_min": {
+    "min": 23.011666774749756,
+    "atMin": 36.9941086867134
+   },
+   "los_gap_max_min": {
+    "min": 10,
+    "atMin": 30
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 53.25316990579106,
+    "atMin": 30
+   },
+   "heat_avg_max_w": {
+    "min": 3.542946328924927,
+    "atMin": 59.46865959654573
+   },
+   "eva_duration_max_min": {
+    "min": 270.53134040345424,
+    "atMin": 59.46865959654573
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 89.46865959654573
+  },
+  "own_packet_total_min_with_rests": 29.47,
+  "packet_rest_min": 0,
+  "dist_base_m": 225.9
+ },
+ {
+  "walk": "W16",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 900,
+  "dwell_min": 15,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at DEST→HAB",
+   "seg": 1
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 761.3369122316167,
+   "durationMin": 112.72924036827865,
+   "energyKJ": 1211.7419827037584,
+   "o2UsedPct": 17.576413456092887,
+   "doseUSv": 24.572478028862992,
+   "scienceValue": 10,
+   "maxDistHabM": 350.46397817750113
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 7.189999580383301,
+    "atMin": 56.449895935689725
+   },
+   "walk_radius_max_m": {
+    "min": 1649.536021822499,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 247.12313814720477,
+    "atMin": 82.58019520083103
+   },
+   "shelter_time_max_min": {
+    "min": 18.81166648864746,
+    "atMin": 41.449895935689725
+   },
+   "los_gap_max_min": {
+    "min": 9.488481584097942,
+    "atMin": 58.9102156348678
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 13.104307911649414,
+    "atMin": 112.72924036827865
+   },
+   "heat_avg_max_w": {
+    "min": 0,
+    "atMin": 62.40182080305325
+   },
+   "eva_duration_max_min": {
+    "min": 247.27075963172135,
+    "atMin": 82.72924036827865
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 112.72924036827865
+  },
+  "own_packet_total_min_with_rests": 52.73,
+  "packet_rest_min": 15.07,
+  "dist_base_m": 350.5
+ },
+ {
+  "walk": "W17",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 30,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at HAB→DEST",
+   "seg": 0
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 1007.5125373919346,
+   "durationMin": 143.79779999886625,
+   "energyKJ": 1837.6133429376707,
+   "o2UsedPct": 27.932599999622088,
+   "doseUSv": 39.116551408734786,
+   "scienceValue": 10,
+   "maxDistHabM": 469.0682253148256
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 6.609999656677246,
+    "atMin": 93.26491281484766
+   },
+   "walk_radius_max_m": {
+    "min": 1530.9317746851743,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 206.7917545130332,
+    "atMin": 93.26491281484766
+   },
+   "shelter_time_max_min": {
+    "min": 15.02833366394043,
+    "atMin": 63.26491281484767
+   },
+   "los_gap_max_min": {
+    "min": 6.417647209304907,
+    "atMin": 46.614617041818406
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 53.25316990579106,
+    "atMin": 30
+   },
+   "heat_avg_max_w": {
+    "min": 0,
+    "atMin": 39.114372113901844
+   },
+   "eva_duration_max_min": {
+    "min": 216.20220000113375,
+    "atMin": 113.79779999886624
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 143.79779999886625
+  },
+  "own_packet_total_min_with_rests": 83.8,
+  "packet_rest_min": 23.81,
+  "dist_base_m": 469.1
+ },
+ {
+  "walk": "W18",
+  "base": "Hab-1",
+  "dest_label": "rand",
+  "start_ltst_min": 900,
+  "dwell_min": 25,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "daylight_min_sun_elev_deg",
+   "text": "Stay in: daylight rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "daylight_min_sun_elev_deg",
+    "deficitMin": 79.33338694090043,
+    "text": "DEST dropped: daylight, −80 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 93.56167259419006,
+     "limit": 10
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 194.46607405060527,
+     "limit": 10
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "seg": 1,
+     "worst": -14.897950971676863,
+     "limit": 5
+    }
+   ],
+   "durationMin": 259.69024328936035
+  },
+  "own_packet_total_min_with_rests": 199.69,
+  "packet_rest_min": 132.91,
+  "dist_base_m": 551.1
+ },
+ {
+  "walk": "W19",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 30,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "los_gap_max_min",
+   "text": "Stay in: comm LOS gap rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "los_gap_max_min",
+    "deficitMin": 1.7105696264934522,
+    "text": "DEST dropped: comm LOS gap, −2 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 28.66765064163767,
+     "limit": 10
+    }
+   ],
+   "durationMin": 216.7759693805172
+  },
+  "own_packet_total_min_with_rests": 156.78,
+  "packet_rest_min": 78.13,
+  "dist_base_m": 762
+ },
+ {
+  "walk": "W20",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 900,
+  "dwell_min": 30,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "daylight_min_sun_elev_deg",
+   "text": "Stay in: daylight rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "daylight_min_sun_elev_deg",
+    "deficitMin": 61.93051826046354,
+    "text": "DEST dropped: daylight, −62 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 66.80764370493188,
+     "limit": 10
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 99.9809414315336,
+     "limit": 10
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "seg": 1,
+     "worst": -11.030750347416358,
+     "limit": 5
+    }
+   ],
+   "durationMin": 242.261274768712
+  },
+  "own_packet_total_min_with_rests": 182.26,
+  "packet_rest_min": 96.27,
+  "dist_base_m": 664.1
+ },
+ {
+  "walk": "W21",
+  "base": "PR-1",
+  "dest_label": "ST01",
+  "start_ltst_min": 580,
+  "dwell_min": 25,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at DEST→HAB",
+   "seg": 1
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 705.6036341784759,
+   "durationMin": 114.58437843439158,
+   "energyKJ": 1210.6076659193614,
+   "o2UsedPct": 18.194792811463856,
+   "doseUSv": 25.43821930749717,
+   "scienceValue": 10,
+   "maxDistHabM": 336.3406011768427
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 7.020000457763672,
+    "atMin": 65.62151572237374
+   },
+   "walk_radius_max_m": {
+    "min": 1663.6593988231573,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 243.6618171023333,
+    "atMin": 65.62151572237374
+   },
+   "shelter_time_max_min": {
+    "min": 19.641666412353516,
+    "atMin": 40.62151572237374
+   },
+   "los_gap_max_min": {
+    "min": 10,
+    "atMin": 30
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 53.25316990579106,
+    "atMin": 30
+   },
+   "heat_avg_max_w": {
+    "min": 0,
+    "atMin": 73.2909435629138
+   },
+   "eva_duration_max_min": {
+    "min": 245.41562156560843,
+    "atMin": 84.58437843439158
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 114.58437843439158
+  },
+  "own_packet_total_min_with_rests": 54.58,
+  "packet_rest_min": 8.58,
+  "dist_base_m": 336.3
+ },
+ {
+  "walk": "W22",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 30,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "shelter_time_max_min",
+   "text": "Stay in: shelter time rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "shelter_time_max_min",
+    "deficitMin": 119.91000366210938,
+    "text": "DEST dropped: shelter time, −120 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 0,
+     "worst": 2196.0475860053666,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 0,
+     "worst": 796.6886958913589,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 0,
+     "worst": 149.91000366210938,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 457.3995143227028,
+     "limit": 10
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "seg": 0,
+     "worst": -1.1444798729954613,
+     "limit": 5
+    },
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 1,
+     "worst": 2196.0475860053666,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 1,
+     "worst": 987.900753788266,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 1,
+     "worst": 149.91000366210938,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 905.4726896340112,
+     "limit": 10
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "seg": 1,
+     "worst": -63.29092112710896,
+     "limit": 5
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "seg": 1,
+     "worst": 1047.7530229711895,
+     "limit": 360
+    }
+   ],
+   "durationMin": 1047.7530229711895
+  },
+  "own_packet_total_min_with_rests": 987.75,
+  "packet_rest_min": 657.34,
+  "dist_base_m": 711.4
+ },
+ {
+  "walk": "W23",
+  "base": "PR-1",
+  "dest_label": "ST03",
+  "start_ltst_min": 480,
+  "dwell_min": 25,
+  "route_source": "engine_plan",
+  "engine_status": "OK",
+  "engine_verdict": "GO",
+  "binding": {
+   "rule": "heat_avg_max_w",
+   "text": "Limited by suit heat at DEST→HAB",
+   "seg": 1
+  },
+  "dropped": [],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": {
+   "distM": 328.166583093127,
+   "durationMin": 94.76686259205736,
+   "energyKJ": 733.6296271028962,
+   "o2UsedPct": 11.588954197352452,
+   "doseUSv": 16.22021569245261,
+   "scienceValue": 10,
+   "maxDistHabM": 146.03081866510234
+  },
+  "plan_margins": {
+   "slope_max_deg": {
+    "min": 2.450000762939453,
+    "atMin": 30
+   },
+   "walk_radius_max_m": {
+    "min": 1853.9691813348977,
+    "atMin": 30
+   },
+   "walkback_speed_factor": {
+    "min": 261.2199314432191,
+    "atMin": 59.886735121722324
+   },
+   "shelter_time_max_min": {
+    "min": 25.421666622161865,
+    "atMin": 34.58637822825651
+   },
+   "los_gap_max_min": {
+    "min": 10,
+    "atMin": 30
+   },
+   "daylight_min_sun_elev_deg": {
+    "min": 31.297126918942865,
+    "atMin": 30
+   },
+   "heat_avg_max_w": {
+    "min": 34.923371162208866,
+    "atMin": 64.76686259205736
+   },
+   "eva_duration_max_min": {
+    "min": 265.23313740794265,
+    "atMin": 64.76686259205736
+   }
+  },
+  "candidate_eval": {
+   "pass": true,
+   "reason": null,
+   "failures": [],
+   "durationMin": 94.76686259205736
+  },
+  "own_packet_total_min_with_rests": 34.77,
+  "packet_rest_min": 0,
+  "dist_base_m": 146
+ },
+ {
+  "walk": "W24",
+  "base": "PR-1",
+  "dest_label": "rand",
+  "start_ltst_min": 580,
+  "dwell_min": 15,
+  "route_source": "path_search",
+  "engine_status": "STAY_IN",
+  "engine_verdict": "NO-GO",
+  "binding": {
+   "rule": "walk_radius_max_m",
+   "text": "Stay in: walk radius rules out every station",
+   "seg": -1
+  },
+  "dropped": [
+   {
+    "id": "DEST",
+    "rule": "walk_radius_max_m",
+    "deficitMin": 7.724431028834701,
+    "text": "DEST dropped: walk radius, −8 min"
+   }
+  ],
+  "notes": [
+   "Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).",
+   "Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.",
+   "Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter)."
+  ],
+  "plan_totals": null,
+  "plan_margins": null,
+  "candidate_eval": {
+   "pass": false,
+   "reason": null,
+   "failures": [
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 0,
+     "worst": 2259.540882568846,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 0,
+     "worst": 339.1052957032582,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 0,
+     "worst": 72.37000274658203,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 0,
+     "worst": 171.88309258579577,
+     "limit": 10
+    },
+    {
+     "rule": "walk_radius_max_m",
+     "seg": 1,
+     "worst": 2259.540882568846,
+     "limit": 2000
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "seg": 1,
+     "worst": 453.4794996914867,
+     "limit": 300
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "seg": 1,
+     "worst": 72.37000274658203,
+     "limit": 30
+    },
+    {
+     "rule": "los_gap_max_min",
+     "seg": 1,
+     "worst": 370.7222668843921,
+     "limit": 10
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "seg": 1,
+     "worst": 1.9151113604243193,
+     "limit": 5
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "seg": 1,
+     "worst": 513.2670690375844,
+     "limit": 360
+    }
+   ],
+   "durationMin": 513.2670690375844
+  },
+  "own_packet_total_min_with_rests": 453.27,
+  "packet_rest_min": 293.21,
+  "dist_base_m": 2259.5
+ }
+]

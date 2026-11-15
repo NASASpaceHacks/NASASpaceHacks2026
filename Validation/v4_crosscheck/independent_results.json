@@ -1,0 +1,2093 @@
+{
+ "W01": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 31.683,
+    "limit": 10,
+    "margin": -21.683
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.921001036646903,
+    "limit": 20,
+    "margin": 0.0789989633530972,
+    "detail": {
+     "cell_slope_max": 19.921001036646903,
+     "edge_grade_max": 19.132901107457386
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 925.0,
+    "limit": 2000,
+    "margin": 1075.0
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 179.55940960273747,
+    "limit": 360,
+    "margin": 180.44059039726253
+   },
+   "walkback_speed_factor": {
+    "observed": 164.66673910954114,
+    "limit": 300,
+    "margin": 135.33326089045886
+   },
+   "shelter_time_max_min": {
+    "observed": 20.761839959761964,
+    "limit": 30,
+    "margin": 9.238160040238036
+   },
+   "los_gap_max_min": {
+    "observed": 31.683103863146748,
+    "limit": 10,
+    "margin": -21.683103863146748,
+    "detail": {
+     "lo": 31.529117021815388,
+     "hi": 31.68546524821744
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 94.55940960273747,
+   "total_eva_min_no_rests": 179.55940960273747,
+   "path_3d_m": 3177.1961626519806,
+   "max_slope_ref_diff_deg": 0.005392860070321248,
+   "los_true_frac": 0.32934131736526945,
+   "n_nodes": 501,
+   "los_rows_disagree_with_engine_field": 2,
+   "los_rows": 118
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 4.03989408991552,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "eva_duration_max_min",
+     "observed": 467.01,
+     "limit": 360,
+     "margin": -107.01
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "observed": 407.01,
+     "limit": 300,
+     "margin": -107.01
+    },
+    {
+     "rule": "los_gap_max_min",
+     "observed": 127.996,
+     "limit": 10,
+     "margin": -117.996
+    }
+   ]
+  },
+  "packet_final_cum_min": 407.01
+ },
+ "W02": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 16.31605219401683,
+    "limit": 20,
+    "margin": 3.68394780598317,
+    "detail": {
+     "cell_slope_max": 14.686516748740342,
+     "edge_grade_max": 16.31605219401683
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 487.08315511830216,
+    "limit": 2000,
+    "margin": 1512.916844881698
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 120.21916831375674,
+    "limit": 360,
+    "margin": 239.78083168624326
+   },
+   "walkback_speed_factor": {
+    "observed": 75.31620081206283,
+    "limit": 300,
+    "margin": 224.68379918793715
+   },
+   "shelter_time_max_min": {
+    "observed": 15.10349613614416,
+    "limit": 30,
+    "margin": 14.89650386385584
+   },
+   "los_gap_max_min": {
+    "observed": 3.811054933756191,
+    "limit": 10,
+    "margin": 6.188945066243809,
+    "detail": {
+     "lo": 3.660420848720708,
+     "hi": 3.8122166236071884
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 36.31379072915824,
+    "limit": 5,
+    "margin": 31.313790729158242
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 30.21916831375674,
+   "total_eva_min_no_rests": 120.21916831375674,
+   "path_3d_m": 1015.3640553422277,
+   "max_slope_ref_diff_deg": 0.005505471113362859,
+   "los_true_frac": 0.6974358974358974,
+   "n_nodes": 195,
+   "los_rows_disagree_with_engine_field": 11,
+   "los_rows": 108
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 2.144334328701593,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 94.8
+ },
+ "W03": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 13.39729696484803,
+    "limit": 20,
+    "margin": 6.60270303515197,
+    "detail": {
+     "cell_slope_max": 13.39729696484803,
+     "edge_grade_max": 10.521051517989438
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 589.1731494221372,
+    "limit": 2000,
+    "margin": 1410.8268505778628
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 117.8405426525647,
+    "limit": 360,
+    "margin": 242.1594573474353
+   },
+   "walkback_speed_factor": {
+    "observed": 76.76042098854683,
+    "limit": 300,
+    "margin": 223.23957901145317
+   },
+   "shelter_time_max_min": {
+    "observed": 18.919892079000835,
+    "limit": 30,
+    "margin": 11.080107920999165
+   },
+   "los_gap_max_min": {
+    "observed": 0.2110923794292594,
+    "limit": 10,
+    "margin": 9.78890762057074,
+    "detail": {
+     "lo": 0.0,
+     "hi": 0.21114592516237352
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 36.31379072915824,
+    "limit": 5,
+    "margin": 31.313790729158242
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 37.84054265256469,
+   "total_eva_min_no_rests": 117.8405426525647,
+   "path_3d_m": 1271.4422331261749,
+   "max_slope_ref_diff_deg": 0.005461617377624961,
+   "los_true_frac": 0.9902439024390244,
+   "n_nodes": 205,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 112
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 2.2740160147827013,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 106.05
+ },
+ "W04": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 8.22211567660234,
+    "limit": 20,
+    "margin": 11.77788432339766,
+    "detail": {
+     "cell_slope_max": 8.22211567660234,
+     "edge_grade_max": 5.95147570684796
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 211.0094784600919,
+    "limit": 2000,
+    "margin": 1788.990521539908
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 93.22298231213117,
+    "limit": 360,
+    "margin": 266.7770176878688
+   },
+   "walkback_speed_factor": {
+    "observed": 39.83344487912329,
+    "limit": 300,
+    "margin": 260.1665551208767
+   },
+   "shelter_time_max_min": {
+    "observed": 6.611051413155042,
+    "limit": 30,
+    "margin": 23.388948586844958
+   },
+   "los_gap_max_min": {
+    "observed": 0.0,
+    "limit": 10,
+    "margin": 10.0,
+    "detail": {
+     "lo": 0.0,
+     "hi": 0.0
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 71.59405621678225,
+    "limit": 5,
+    "margin": 66.59405621678225
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 13.222982312131169,
+   "total_eva_min_no_rests": 93.22298231213117,
+   "path_3d_m": 444.2922056876075,
+   "max_slope_ref_diff_deg": 0.005297114474667186,
+   "los_true_frac": 1.0,
+   "n_nodes": 69,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 70
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 1.0,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 33.22
+ },
+ "W05": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 40.057,
+    "limit": 10,
+    "margin": -30.057
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.97240092517455,
+    "limit": 20,
+    "margin": 0.02759907482544932,
+    "detail": {
+     "cell_slope_max": 19.97240092517455,
+     "edge_grade_max": 19.162838595910856
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 259.8557292037257,
+    "limit": 2000,
+    "margin": 1740.1442707962742
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 110.76621868459699,
+    "limit": 360,
+    "margin": 249.233781315403
+   },
+   "walkback_speed_factor": {
+    "observed": 60.90971920849875,
+    "limit": 300,
+    "margin": 239.09028079150124
+   },
+   "shelter_time_max_min": {
+    "observed": 11.512230199191258,
+    "limit": 30,
+    "margin": 18.487769800808742
+   },
+   "los_gap_max_min": {
+    "observed": 40.05716540591664,
+    "limit": 10,
+    "margin": -30.057165405916642,
+    "detail": {
+     "lo": 39.902339992636776,
+     "hi": 40.05716540591664
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 69.57345107955805,
+    "limit": 5,
+    "margin": 64.57345107955805
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 25.766218684596986,
+   "total_eva_min_no_rests": 110.76621868459699,
+   "path_3d_m": 865.7449478024587,
+   "max_slope_ref_diff_deg": 0.005031344896108791,
+   "los_true_frac": 0.39490445859872614,
+   "n_nodes": 157,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 112
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 2.0169820273654513,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "los_gap_max_min",
+     "observed": 55.37,
+     "limit": 10,
+     "margin": -45.37
+    }
+   ]
+  },
+  "packet_final_cum_min": 76.97
+ },
+ "W06": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 14.391916851314058,
+    "limit": 20,
+    "margin": 5.608083148685942,
+    "detail": {
+     "cell_slope_max": 14.391916851314058,
+     "edge_grade_max": 13.846505585252771
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 285.3944638566067,
+    "limit": 2000,
+    "margin": 1714.6055361433932
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 97.6621911157411,
+    "limit": 360,
+    "margin": 262.3378088842589
+   },
+   "walkback_speed_factor": {
+    "observed": 46.374301665349265,
+    "limit": 300,
+    "margin": 253.62569833465074
+   },
+   "shelter_time_max_min": {
+    "observed": 8.712160895771747,
+    "limit": 30,
+    "margin": 21.287839104228254
+   },
+   "los_gap_max_min": {
+    "observed": 0.0,
+    "limit": 10,
+    "margin": 10.0,
+    "detail": {
+     "lo": 0.0,
+     "hi": 0.0
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 17.662191115741095,
+   "total_eva_min_no_rests": 97.6621911157411,
+   "path_3d_m": 593.4496214889009,
+   "max_slope_ref_diff_deg": 0.005518386059779834,
+   "los_true_frac": 1.0,
+   "n_nodes": 115,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 116
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 1.3203344843900193,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 43.32
+ },
+ "W07": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2224.326,
+    "limit": 2000,
+    "margin": -224.326
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 73.881,
+    "limit": 30,
+    "margin": -43.881
+   },
+   {
+    "rule": "los_gap_max_min",
+    "observed": 134.355,
+    "limit": 10,
+    "margin": -124.355
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.025444094598953,
+    "limit": 20,
+    "margin": 0.9745559054010471,
+    "detail": {
+     "cell_slope_max": 19.025444094598953,
+     "edge_grade_max": 17.14840025535989
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 2224.3257405335216,
+    "limit": 2000,
+    "margin": -224.32574053352164
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 223.16927523016275,
+    "limit": 360,
+    "margin": 136.83072476983725
+   },
+   "walkback_speed_factor": {
+    "observed": 236.84456312169962,
+    "limit": 300,
+    "margin": 63.15543687830038
+   },
+   "shelter_time_max_min": {
+    "observed": 73.88094593534821,
+    "limit": 30,
+    "margin": -43.88094593534821
+   },
+   "los_gap_max_min": {
+    "observed": 134.35501585663786,
+    "limit": 10,
+    "margin": -124.35501585663786,
+    "detail": {
+     "lo": 134.14431993948784,
+     "hi": 134.35501585663792
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 148.16927523016275,
+   "total_eva_min_no_rests": 223.16927523016275,
+   "path_3d_m": 4978.487647733474,
+   "max_slope_ref_diff_deg": 0.00551762345786333,
+   "los_true_frac": 0.17515527950310558,
+   "n_nodes": 805,
+   "los_rows_disagree_with_engine_field": 6,
+   "los_rows": 117
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 2.851535848735729,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "walk_radius_max_m",
+     "observed": 2224.326,
+     "limit": 2000,
+     "margin": -224.326
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "observed": 497.51,
+     "limit": 360,
+     "margin": -137.51
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "observed": 437.51,
+     "limit": 300,
+     "margin": -137.51
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "observed": 73.881,
+     "limit": 30,
+     "margin": -43.881
+    },
+    {
+     "rule": "los_gap_max_min",
+     "observed": 355.345,
+     "limit": 10,
+     "margin": -345.345
+    }
+   ]
+  },
+  "packet_final_cum_min": 437.51
+ },
+ "W08": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 18.361960830989087,
+    "limit": 20,
+    "margin": 1.6380391690109128,
+    "detail": {
+     "cell_slope_max": 18.361960830989087,
+     "edge_grade_max": 11.781601865662898
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 373.12866413611266,
+    "limit": 2000,
+    "margin": 1626.8713358638875
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 99.00438277810383,
+    "limit": 360,
+    "margin": 260.99561722189617
+   },
+   "walkback_speed_factor": {
+    "observed": 50.79273596053296,
+    "limit": 300,
+    "margin": 249.20726403946705
+   },
+   "shelter_time_max_min": {
+    "observed": 11.874006541439446,
+    "limit": 30,
+    "margin": 18.125993458560554
+   },
+   "los_gap_max_min": {
+    "observed": 0.36018151328763093,
+    "limit": 10,
+    "margin": 9.639818486712368,
+    "detail": {
+     "lo": 0.0,
+     "hi": 0.21068512328961475
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 24.004382778103825,
+   "total_eva_min_no_rests": 99.00438277810383,
+   "path_3d_m": 806.5472613442889,
+   "max_slope_ref_diff_deg": 0.0053399972412915275,
+   "los_true_frac": 0.9846153846153847,
+   "n_nodes": 130,
+   "los_rows_disagree_with_engine_field": 2,
+   "los_rows": 117
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 1.6188710353113966,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 53.86
+ },
+ "W09": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2196.048,
+    "limit": 2000,
+    "margin": -196.048
+   },
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 373.507,
+    "limit": 360,
+    "margin": -13.507
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 392.267,
+    "limit": 300,
+    "margin": -92.267
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 93.571,
+    "limit": 30,
+    "margin": -63.571
+   },
+   {
+    "rule": "los_gap_max_min",
+    "observed": 284.693,
+    "limit": 10,
+    "margin": -274.693
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.934009915890456,
+    "limit": 20,
+    "margin": 0.06599008410954355,
+    "detail": {
+     "cell_slope_max": 19.934009915890456,
+     "edge_grade_max": 19.50161989010354
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 2196.047586005367,
+    "limit": 2000,
+    "margin": -196.04758600536707
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 373.5072900317353,
+    "limit": 360,
+    "margin": -13.507290031735295
+   },
+   "walkback_speed_factor": {
+    "observed": 392.2670781830276,
+    "limit": 300,
+    "margin": -92.26707818302759
+   },
+   "shelter_time_max_min": {
+    "observed": 93.57073275273551,
+    "limit": 30,
+    "margin": -63.57073275273551
+   },
+   "los_gap_max_min": {
+    "observed": 284.69303065821043,
+    "limit": 10,
+    "margin": -274.69303065821043,
+    "detail": {
+     "lo": 284.4823347410603,
+     "hi": 284.69303065821043
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 14.88496483784775,
+    "limit": 5,
+    "margin": 9.88496483784775
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 283.5072900317353,
+   "total_eva_min_no_rests": 373.5072900317353,
+   "path_3d_m": 9525.844945066325,
+   "max_slope_ref_diff_deg": 0.00551762345786333,
+   "los_true_frac": 0.09021113243761997,
+   "n_nodes": 1563,
+   "los_rows_disagree_with_engine_field": 6,
+   "los_rows": 117
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 3.2198466568454633,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "walk_radius_max_m",
+     "observed": 2196.048,
+     "limit": 2000,
+     "margin": -196.048
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "observed": 1002.85,
+     "limit": 360,
+     "margin": -642.85
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "observed": 942.85,
+     "limit": 300,
+     "margin": -642.85
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "observed": 93.571,
+     "limit": 30,
+     "margin": -63.571
+    },
+    {
+     "rule": "los_gap_max_min",
+     "observed": 850.073,
+     "limit": 10,
+     "margin": -840.073
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "observed": -63.566,
+     "limit": 5,
+     "margin": -68.566
+    }
+   ]
+  },
+  "packet_final_cum_min": 942.85
+ },
+ "W10": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 15.870568645096737,
+    "limit": 20,
+    "margin": 4.129431354903263,
+    "detail": {
+     "cell_slope_max": 15.870568645096737,
+     "edge_grade_max": 12.728305566958296
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 871.9661690685024,
+    "limit": 2000,
+    "margin": 1128.0338309314975
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 131.67077728124434,
+    "limit": 360,
+    "margin": 228.32922271875566
+   },
+   "walkback_speed_factor": {
+    "observed": 99.85280575667946,
+    "limit": 300,
+    "margin": 200.14719424332054
+   },
+   "shelter_time_max_min": {
+    "observed": 28.27337374709977,
+    "limit": 30,
+    "margin": 1.7266262529002283
+   },
+   "los_gap_max_min": {
+    "observed": 0.4791723212398651,
+    "limit": 10,
+    "margin": 9.520827678760135,
+    "detail": {
+     "lo": 0.2989606917706027,
+     "hi": 0.44804316757494433
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 56.670777281244355,
+   "total_eva_min_no_rests": 131.67077728124434,
+   "path_3d_m": 1904.1381166498097,
+   "max_slope_ref_diff_deg": 0.005461617377624961,
+   "los_true_frac": 0.9908256880733946,
+   "n_nodes": 327,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 116
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 2.7887388806347744,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 173.04
+ },
+ "W11": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2029.212,
+    "limit": 2000,
+    "margin": -29.212
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 83.369,
+    "limit": 30,
+    "margin": -53.369
+   },
+   {
+    "rule": "los_gap_max_min",
+    "observed": 158.655,
+    "limit": 10,
+    "margin": -148.655
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.979809404548412,
+    "limit": 20,
+    "margin": 0.020190595451587967,
+    "detail": {
+     "cell_slope_max": 19.979809404548412,
+     "edge_grade_max": 19.4493999440642
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 2029.2116695899422,
+    "limit": 2000,
+    "margin": -29.211669589942176
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 242.30572968415333,
+    "limit": 360,
+    "margin": 117.69427031584667
+   },
+   "walkback_speed_factor": {
+    "observed": 265.39152229448257,
+    "limit": 300,
+    "margin": 34.60847770551743
+   },
+   "shelter_time_max_min": {
+    "observed": 83.36857177021723,
+    "limit": 30,
+    "margin": -53.36857177021723
+   },
+   "los_gap_max_min": {
+    "observed": 158.65504748998978,
+    "limit": 10,
+    "margin": -148.65504748998978,
+    "detail": {
+     "lo": 158.50620773978065,
+     "hi": 158.65501743406648
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 167.30572968415333,
+   "total_eva_min_no_rests": 242.30572968415333,
+   "path_3d_m": 5621.472517387564,
+   "max_slope_ref_diff_deg": 0.005521118194041996,
+   "los_true_frac": 0.1375387797311272,
+   "n_nodes": 967,
+   "los_rows_disagree_with_engine_field": 3,
+   "los_rows": 118
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 3.6924617056824753,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "walk_radius_max_m",
+     "observed": 2029.212,
+     "limit": 2000,
+     "margin": -29.212
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "observed": 692.77,
+     "limit": 360,
+     "margin": -332.77
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "observed": 632.77,
+     "limit": 300,
+     "margin": -332.77
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "observed": 83.369,
+     "limit": 30,
+     "margin": -53.369
+    },
+    {
+     "rule": "los_gap_max_min",
+     "observed": 545.441,
+     "limit": 10,
+     "margin": -535.441
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "observed": -37.405,
+     "limit": 5,
+     "margin": -42.405
+    }
+   ]
+  },
+  "packet_final_cum_min": 632.77
+ },
+ "W12": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.331529516810487,
+    "limit": 20,
+    "margin": 0.6684704831895125,
+    "detail": {
+     "cell_slope_max": 19.331529516810487,
+     "edge_grade_max": 16.264501797768553
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 658.9764790946639,
+    "limit": 2000,
+    "margin": 1341.0235209053362
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 126.98853839702772,
+    "limit": 360,
+    "margin": 233.01146160297228
+   },
+   "walkback_speed_factor": {
+    "observed": 87.90969762019023,
+    "limit": 300,
+    "margin": 212.09030237980977
+   },
+   "shelter_time_max_min": {
+    "observed": 20.9313591221314,
+    "limit": 30,
+    "margin": 9.0686408778686
+   },
+   "los_gap_max_min": {
+    "observed": 3.795656548133504,
+    "limit": 10,
+    "margin": 6.204343451866496,
+    "detail": {
+     "lo": 3.6143110225294564,
+     "hi": 3.8248818783339686
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 67.18585037783552,
+    "limit": 5,
+    "margin": 62.18585037783552
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 41.98853839702773,
+   "total_eva_min_no_rests": 126.98853839702772,
+   "path_3d_m": 1410.814890140132,
+   "max_slope_ref_diff_deg": 0.005322712156582199,
+   "los_true_frac": 0.8764478764478765,
+   "n_nodes": 259,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 116
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 2.0967626728877073,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 113.04
+ },
+ "W13": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 15.149856811162422,
+    "limit": 20,
+    "margin": 4.850143188837578,
+    "detail": {
+     "cell_slope_max": 15.149856811162422,
+     "edge_grade_max": 14.047835911548853
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 264.0075756488817,
+    "limit": 2000,
+    "margin": 1735.9924243511182
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 102.6380789591844,
+    "limit": 360,
+    "margin": 257.3619210408156
+   },
+   "walkback_speed_factor": {
+    "observed": 50.41103561989715,
+    "limit": 300,
+    "margin": 249.58896438010285
+   },
+   "shelter_time_max_min": {
+    "observed": 8.327013360052316,
+    "limit": 30,
+    "margin": 21.672986639947684
+   },
+   "los_gap_max_min": {
+    "observed": 0.8497201128744916,
+    "limit": 10,
+    "margin": 9.150279887125508,
+    "detail": {
+     "lo": 0.6364212087474019,
+     "hi": 0.8470081678362282
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 20.371555597478416,
+    "limit": 5,
+    "margin": 15.371555597478416
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 17.6380789591844,
+   "total_eva_min_no_rests": 102.6380789591844,
+   "path_3d_m": 592.6394530285961,
+   "max_slope_ref_diff_deg": 0.005086437278759348,
+   "los_true_frac": 0.925531914893617,
+   "n_nodes": 94,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 95
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 1.222922294991099,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 46.57
+ },
+ "W14": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 132.901,
+    "limit": 10,
+    "margin": -122.901
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.921001036646903,
+    "limit": 20,
+    "margin": 0.0789989633530972,
+    "detail": {
+     "cell_slope_max": 19.921001036646903,
+     "edge_grade_max": 19.521504344319382
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 1602.0611723651505,
+    "limit": 2000,
+    "margin": 397.93882763484953
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 212.1956629015334,
+    "limit": 360,
+    "margin": 147.8043370984666
+   },
+   "walkback_speed_factor": {
+    "observed": 212.52806249957763,
+    "limit": 300,
+    "margin": 87.47193750042237
+   },
+   "shelter_time_max_min": {
+    "observed": 21.908444576868433,
+    "limit": 30,
+    "margin": 8.091555423131567
+   },
+   "los_gap_max_min": {
+    "observed": 132.90104857328558,
+    "limit": 10,
+    "margin": -122.90104857328558,
+    "detail": {
+     "lo": 132.7494231170249,
+     "hi": 132.90104857328555
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 36.31379072915824,
+    "limit": 5,
+    "margin": 31.313790729158242
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 122.19566290153342,
+   "total_eva_min_no_rests": 212.1956629015334,
+   "path_3d_m": 4105.77427349153,
+   "max_slope_ref_diff_deg": 0.005556632313293175,
+   "los_true_frac": 0.1648177496038035,
+   "n_nodes": 631,
+   "los_rows_disagree_with_engine_field": 2,
+   "los_rows": 118
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 3.931154253707738,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "eva_duration_max_min",
+     "observed": 570.37,
+     "limit": 360,
+     "margin": -210.37
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "observed": 510.37,
+     "limit": 300,
+     "margin": -210.37
+    },
+    {
+     "rule": "los_gap_max_min",
+     "observed": 434.52,
+     "limit": 10,
+     "margin": -424.52
+    }
+   ]
+  },
+  "packet_final_cum_min": 510.37
+ },
+ "W15": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 17.29538478116164,
+    "limit": 20,
+    "margin": 2.7046152188383594,
+    "detail": {
+     "cell_slope_max": 15.911056199929027,
+     "edge_grade_max": 17.29538478116164
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 225.88713996153035,
+    "limit": 2000,
+    "margin": 1774.1128600384695
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 89.46865959654572,
+    "limit": 360,
+    "margin": 270.5313404034543
+   },
+   "walkback_speed_factor": {
+    "observed": 35.98068130433203,
+    "limit": 300,
+    "margin": 264.01931869566795
+   },
+   "shelter_time_max_min": {
+    "observed": 6.993286308809313,
+    "limit": 30,
+    "margin": 23.006713691190686
+   },
+   "los_gap_max_min": {
+    "observed": 0.0,
+    "limit": 10,
+    "margin": 10.0,
+    "detail": {
+     "lo": 0.0,
+     "hi": 0.0
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 14.468659596545718,
+   "total_eva_min_no_rests": 89.46865959654572,
+   "path_3d_m": 486.14696244393616,
+   "max_slope_ref_diff_deg": 0.005105274639324975,
+   "los_true_frac": 1.0,
+   "n_nodes": 91,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 92
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 1.0000926418543015,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 29.47
+ },
+ "W16": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 12.812935283739021,
+    "limit": 20,
+    "margin": 7.187064716260979,
+    "detail": {
+     "cell_slope_max": 12.812935283739021,
+     "edge_grade_max": 12.432499921179097
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 350.46397817750113,
+    "limit": 2000,
+    "margin": 1649.536021822499
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 97.65883667356,
+    "limit": 360,
+    "margin": 262.34116332644
+   },
+   "walkback_speed_factor": {
+    "observed": 48.866502537051176,
+    "limit": 300,
+    "margin": 251.1334974629488
+   },
+   "shelter_time_max_min": {
+    "observed": 11.208303300680736,
+    "limit": 30,
+    "margin": 18.791696699319264
+   },
+   "los_gap_max_min": {
+    "observed": 0.3301666552094531,
+    "limit": 10,
+    "margin": 9.669833344790547,
+    "detail": {
+     "lo": 0.14881489451684793,
+     "hi": 0.3593573925500202
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 21.496035674895385,
+    "limit": 5,
+    "margin": 16.496035674895385
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 22.658836673560003,
+   "total_eva_min_no_rests": 97.65883667356,
+   "path_3d_m": 761.3369122316167,
+   "max_slope_ref_diff_deg": 0.0050794125457596095,
+   "los_true_frac": 0.9854014598540146,
+   "n_nodes": 137,
+   "los_rows_disagree_with_engine_field": 2,
+   "los_rows": 112
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 1.6651340288809326,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 52.73
+ },
+ "W17": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 13.389216404271396,
+    "limit": 20,
+    "margin": 6.610783595728604,
+    "detail": {
+     "cell_slope_max": 13.389216404271396,
+     "edge_grade_max": 11.013619018576875
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 469.0682253148256,
+    "limit": 2000,
+    "margin": 1530.9317746851743
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 119.98549218428377,
+    "limit": 360,
+    "margin": 240.01450781571623
+   },
+   "walkback_speed_factor": {
+    "observed": 74.97728619273155,
+    "limit": 300,
+    "margin": 225.02271380726845
+   },
+   "shelter_time_max_min": {
+    "observed": 14.991794008447785,
+    "limit": 30,
+    "margin": 15.008205991552215
+   },
+   "los_gap_max_min": {
+    "observed": 1.0550832403720332,
+    "limit": 10,
+    "margin": 8.944916759627967,
+    "detail": {
+     "lo": 0.8440085764432474,
+     "hi": 1.0552408001371383
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 29.985492184283764,
+   "total_eva_min_no_rests": 119.98549218428377,
+   "path_3d_m": 1007.5125373919346,
+   "max_slope_ref_diff_deg": 0.005461617377624961,
+   "los_true_frac": 0.9192546583850931,
+   "n_nodes": 161,
+   "los_rows_disagree_with_engine_field": 4,
+   "los_rows": 110
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 1.7942009979145208,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 83.8
+ },
+ "W18": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 64.047,
+    "limit": 10,
+    "margin": -54.047
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.80006491240588,
+    "limit": 20,
+    "margin": 0.19993508759412038,
+    "detail": {
+     "cell_slope_max": 19.80006491240588,
+     "edge_grade_max": 19.583611719109168
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 551.0898293381942,
+    "limit": 2000,
+    "margin": 1448.9101706618058
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 126.78443217834334,
+    "limit": 360,
+    "margin": 233.21556782165666
+   },
+   "walkback_speed_factor": {
+    "observed": 86.22910596001493,
+    "limit": 300,
+    "margin": 213.77089403998508
+   },
+   "shelter_time_max_min": {
+    "observed": 20.168612694692946,
+    "limit": 30,
+    "margin": 9.831387305307054
+   },
+   "los_gap_max_min": {
+    "observed": 64.04657776451621,
+    "limit": 10,
+    "margin": -54.046577764516215,
+    "detail": {
+     "lo": 63.89022953811416,
+     "hi": 64.04657776451623
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 14.913225472464072,
+    "limit": 5,
+    "margin": 9.913225472464072
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 41.784432178343344,
+   "total_eva_min_no_rests": 126.78443217834334,
+   "path_3d_m": 1403.9569211923376,
+   "max_slope_ref_diff_deg": 0.005286606152814954,
+   "los_true_frac": 0.06584362139917696,
+   "n_nodes": 243,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 116
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 4.180743662002925,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "los_gap_max_min",
+     "observed": 188.244,
+     "limit": 10,
+     "margin": -178.244
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "observed": -14.965,
+     "limit": 5,
+     "margin": -19.965
+    }
+   ]
+  },
+  "packet_final_cum_min": 199.69
+ },
+ "W19": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 17.224894546005853,
+    "limit": 20,
+    "margin": 2.775105453994147,
+    "detail": {
+     "cell_slope_max": 17.224894546005853,
+     "edge_grade_max": 15.433523516844993
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 761.9875327064085,
+    "limit": 2000,
+    "margin": 1238.0124672935915
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 138.6500701334157,
+    "limit": 360,
+    "margin": 221.3499298665843
+   },
+   "walkback_speed_factor": {
+    "observed": 102.94023771760504,
+    "limit": 300,
+    "margin": 197.05976228239496
+   },
+   "shelter_time_max_min": {
+    "observed": 24.306574257956694,
+    "limit": 30,
+    "margin": 5.693425742043306
+   },
+   "los_gap_max_min": {
+    "observed": 6.524079063647795,
+    "limit": 10,
+    "margin": 3.475920936352205,
+    "detail": {
+     "lo": 6.311002663399925,
+     "hi": 6.521667907394182
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 48.65007013341572,
+   "total_eva_min_no_rests": 138.6500701334157,
+   "path_3d_m": 1634.642356482768,
+   "max_slope_ref_diff_deg": 0.005622969684766055,
+   "los_true_frac": 0.6120401337792643,
+   "n_nodes": 299,
+   "los_rows_disagree_with_engine_field": 11,
+   "los_rows": 105
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 2.605957188804134,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "los_gap_max_min",
+     "observed": 17.001,
+     "limit": 10,
+     "margin": -7.001
+    }
+   ]
+  },
+  "packet_final_cum_min": 156.78
+ },
+ "W20": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 57.176,
+    "limit": 10,
+    "margin": -47.176
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.025444094598953,
+    "limit": 20,
+    "margin": 0.9745559054010471,
+    "detail": {
+     "cell_slope_max": 19.025444094598953,
+     "edge_grade_max": 17.14840025535989
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 664.1159537309732,
+    "limit": 2000,
+    "margin": 1335.8840462690268
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 145.9898017724472,
+    "limit": 360,
+    "margin": 214.0101982275528
+   },
+   "walkback_speed_factor": {
+    "observed": 113.785487912044,
+    "limit": 300,
+    "margin": 186.214512087956
+   },
+   "shelter_time_max_min": {
+    "observed": 27.89518580809376,
+    "limit": 30,
+    "margin": 2.1048141919062395
+   },
+   "los_gap_max_min": {
+    "observed": 57.175542398922396,
+    "limit": 10,
+    "margin": -47.175542398922396,
+    "detail": {
+     "lo": 56.96484648177233,
+     "hi": 57.17554239892239
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 10.569549676913876,
+    "limit": 5,
+    "margin": 5.569549676913876
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 55.989801772447194,
+   "total_eva_min_no_rests": 145.9898017724472,
+   "path_3d_m": 1881.257339554226,
+   "max_slope_ref_diff_deg": 0.00570706545735522,
+   "los_true_frac": 0.44200626959247646,
+   "n_nodes": 319,
+   "los_rows_disagree_with_engine_field": 6,
+   "los_rows": 110
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 2.7194238089788656,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "los_gap_max_min",
+     "observed": 103.902,
+     "limit": 10,
+     "margin": -93.902
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "observed": -11.09,
+     "limit": 5,
+     "margin": -16.09
+    }
+   ]
+  },
+  "packet_final_cum_min": 182.26
+ },
+ "W21": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 12.982251127220064,
+    "limit": 20,
+    "margin": 7.017748872779936,
+    "detail": {
+     "cell_slope_max": 12.982251127220064,
+     "edge_grade_max": 10.377564365066481
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 336.34060117684277,
+    "limit": 2000,
+    "margin": 1663.6593988231573
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 106.0001081600737,
+    "limit": 360,
+    "margin": 253.9998918399263
+   },
+   "walkback_speed_factor": {
+    "observed": 56.37854112991483,
+    "limit": 300,
+    "margin": 243.62145887008518
+   },
+   "shelter_time_max_min": {
+    "observed": 10.37851270377054,
+    "limit": 30,
+    "margin": 19.62148729622946
+   },
+   "los_gap_max_min": {
+    "observed": 0.0,
+    "limit": 10,
+    "margin": 10.0,
+    "detail": {
+     "lo": 0.0,
+     "hi": 0.0
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 21.000108160073694,
+   "total_eva_min_no_rests": 106.0001081600737,
+   "path_3d_m": 705.6036341784759,
+   "max_slope_ref_diff_deg": 0.0051818450352731915,
+   "los_true_frac": 1.0,
+   "n_nodes": 135,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 116
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 1.4085641737902457,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 54.58
+ },
+ "W22": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2196.048,
+    "limit": 2000,
+    "margin": -196.048
+   },
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 390.408,
+    "limit": 360,
+    "margin": -30.408
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 409.168,
+    "limit": 300,
+    "margin": -109.168
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 92.745,
+    "limit": 30,
+    "margin": -62.745
+   },
+   {
+    "rule": "los_gap_max_min",
+    "observed": 301.594,
+    "limit": 10,
+    "margin": -291.594
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.934009915890456,
+    "limit": 20,
+    "margin": 0.06599008410954355,
+    "detail": {
+     "cell_slope_max": 19.934009915890456,
+     "edge_grade_max": 19.50161989010354
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 2196.047586005367,
+    "limit": 2000,
+    "margin": -196.04758600536707
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 390.40816716792,
+    "limit": 360,
+    "margin": -30.40816716792
+   },
+   "walkback_speed_factor": {
+    "observed": 409.16795531921224,
+    "limit": 300,
+    "margin": -109.16795531921224
+   },
+   "shelter_time_max_min": {
+    "observed": 92.74520071624121,
+    "limit": 30,
+    "margin": -62.745200716241214
+   },
+   "los_gap_max_min": {
+    "observed": 301.593907794395,
+    "limit": 10,
+    "margin": -291.593907794395,
+    "detail": {
+     "lo": 301.38321187724495,
+     "hi": 301.59390779439497
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 29.614874163727183,
+    "limit": 5,
+    "margin": 24.614874163727183
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 300.40816716792,
+   "total_eva_min_no_rests": 390.40816716792,
+   "path_3d_m": 10093.71441684212,
+   "max_slope_ref_diff_deg": 0.005565418433728375,
+   "los_true_frac": 0.08488862131246237,
+   "n_nodes": 1661,
+   "los_rows_disagree_with_engine_field": 6,
+   "los_rows": 118
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 3.1881623227128966,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "walk_radius_max_m",
+     "observed": 2196.048,
+     "limit": 2000,
+     "margin": -196.048
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "observed": 1047.75,
+     "limit": 360,
+     "margin": -687.75
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "observed": 987.75,
+     "limit": 300,
+     "margin": -687.75
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "observed": 92.745,
+     "limit": 30,
+     "margin": -62.745
+    },
+    {
+     "rule": "los_gap_max_min",
+     "observed": 895.885,
+     "limit": 10,
+     "margin": -885.885
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "observed": -63.566,
+     "limit": 5,
+     "margin": -68.566
+    }
+   ]
+  },
+  "packet_final_cum_min": 987.75
+ },
+ "W23": {
+  "verdict": "GO",
+  "failing_rules": [],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 17.550436148209677,
+    "limit": 20,
+    "margin": 2.449563851790323,
+    "detail": {
+     "cell_slope_max": 17.550436148209677,
+     "edge_grade_max": 16.0511078936976
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 146.03081866510234,
+    "limit": 2000,
+    "margin": 1853.9691813348977
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 94.76686259205735,
+    "limit": 360,
+    "margin": 265.23313740794265
+   },
+   "walkback_speed_factor": {
+    "observed": 38.7928244806754,
+    "limit": 300,
+    "margin": 261.2071755193246
+   },
+   "shelter_time_max_min": {
+    "observed": 4.583913814801258,
+    "limit": 30,
+    "margin": 25.416086185198743
+   },
+   "los_gap_max_min": {
+    "observed": 0.0,
+    "limit": 10,
+    "margin": 10.0,
+    "detail": {
+     "lo": 0.0,
+     "hi": 0.0
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 36.31379072915824,
+    "limit": 5,
+    "margin": 31.313790729158242
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 9.766862592057347,
+   "total_eva_min_no_rests": 94.76686259205735,
+   "path_3d_m": 328.166583093127,
+   "max_slope_ref_diff_deg": 0.005086437278759348,
+   "los_true_frac": 1.0,
+   "n_nodes": 54,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 55
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 1.0003212298640516,
+   "verdict": "GO",
+   "failing_rules": []
+  },
+  "packet_final_cum_min": 34.77
+ },
+ "W24": {
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2259.541,
+    "limit": 2000,
+    "margin": -259.541
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 72.416,
+    "limit": 30,
+    "margin": -42.416
+   },
+   {
+    "rule": "los_gap_max_min",
+    "observed": 124.517,
+    "limit": 10,
+    "margin": -114.517
+   }
+  ],
+  "checks": {
+   "slope_max_deg": {
+    "observed": 19.793505365631837,
+    "limit": 20,
+    "margin": 0.20649463436816262,
+    "detail": {
+     "cell_slope_max": 19.793505365631837,
+     "edge_grade_max": 18.645908394596805
+    }
+   },
+   "walk_radius_max_m": {
+    "observed": 2259.540882568846,
+    "limit": 2000,
+    "margin": -259.540882568846
+   },
+   "plume_keepout_m": {
+    "observed": 0,
+    "limit": 0,
+    "margin": 0
+   },
+   "eva_duration_max_min": {
+    "observed": 220.0549321960866,
+    "limit": 360,
+    "margin": 139.9450678039134
+   },
+   "walkback_speed_factor": {
+    "observed": 232.35968070646913,
+    "limit": 300,
+    "margin": 67.64031929353087
+   },
+   "shelter_time_max_min": {
+    "observed": 72.41621063616564,
+    "limit": 30,
+    "margin": -42.416210636165644
+   },
+   "los_gap_max_min": {
+    "observed": 124.51666148381835,
+    "limit": 10,
+    "margin": -114.51666148381835,
+    "detail": {
+     "lo": 124.30453119824129,
+     "hi": 124.51679743331431
+    }
+   },
+   "daylight_min_sun_elev_deg": {
+    "observed": 58.323852557570724,
+    "limit": 5,
+    "margin": 53.323852557570724
+   }
+  },
+  "model": {
+   "walk_min_no_rests": 145.0549321960866,
+   "total_eva_min_no_rests": 220.0549321960866,
+   "path_3d_m": 4873.845721788506,
+   "max_slope_ref_diff_deg": 0.005402336133462526,
+   "los_true_frac": 0.25480153649167736,
+   "n_nodes": 781,
+   "los_rows_disagree_with_engine_field": 0,
+   "los_rows": 116
+  },
+  "diagnostic_rest_scaled": {
+   "scale": 3.02140708602409,
+   "verdict": "NO-GO",
+   "failing_rules": [
+    {
+     "rule": "walk_radius_max_m",
+     "observed": 2259.541,
+     "limit": 2000,
+     "margin": -259.541
+    },
+    {
+     "rule": "eva_duration_max_min",
+     "observed": 513.27,
+     "limit": 360,
+     "margin": -153.27
+    },
+    {
+     "rule": "walkback_speed_factor",
+     "observed": 453.27,
+     "limit": 300,
+     "margin": -153.27
+    },
+    {
+     "rule": "shelter_time_max_min",
+     "observed": 72.416,
+     "limit": 30,
+     "margin": -42.416
+    },
+    {
+     "rule": "los_gap_max_min",
+     "observed": 345.894,
+     "limit": 10,
+     "margin": -335.894
+    },
+    {
+     "rule": "daylight_min_sun_elev_deg",
+     "observed": 1.877,
+     "limit": 5,
+     "margin": -3.123
+    }
+   ]
+  },
+  "packet_final_cum_min": 453.27
+ }
+}
