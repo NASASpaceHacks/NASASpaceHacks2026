@@ -7,6 +7,7 @@ import { dropConsequence, objectiveCoverage } from '../lib/science';
 import { RULE_PLAIN, dropReason, hm, limitLine } from '../lib/plain';
 import { Badge, Button, Empty, MarginBar, SectionHead, Stat, Tip } from './ui';
 import { RuleEvidence } from './Evidence';
+import { useDestReason } from '../lib/reasons';
 import { WayForward, useLeftOut } from './WayForward';
 import { useBaseInfo } from '../lib/base';
 import { cx } from './ui';
@@ -30,6 +31,7 @@ export function ReportTab() {
   const attempt = useConsole((s) => s.attemptPlan);
   const customs = useConsole((s) => s.customStops);
   const leftOut = useLeftOut();
+  const reasonOf = useDestReason();
   const base = useBaseInfo();
   if (!plan || !pack || !base) {
     return (
@@ -98,7 +100,7 @@ export function ReportTab() {
             {fail ? (
               <>
                 <div className="font-display text-[19px] font-semibold leading-tight text-red">{ruleOf(fail.rule)?.label ?? RULE_PLAIN[fail.rule]}</div>
-                <div className="mt-1.5 text-[13px] leading-snug text-ink">{fail.sentence}, on the walk to {dest} and back. This stretch is marked red on the map.</div>
+                <div className="mt-1.5 text-[13px] leading-snug text-ink">{fail.sentence}, on the walk to {dest} and back. {fail.marks}</div>
               </>
             ) : first ? (
               <div className="text-[13px] leading-snug text-ink">{first.name}: {first.reason}.</div>
@@ -204,7 +206,7 @@ export function ReportTab() {
                   <div className="flex items-baseline gap-2">
                     <span className="min-w-0 flex-1 truncate text-[12.5px] text-ink">{stationName(d.id)}</span>
                   </div>
-                  <div className="mt-1 text-[12px] text-ink-2">{dropReason(d, rules)}{r ? <span className="text-dim"> · rule: {r.label}</span> : null}</div>
+                  <div className="mt-1 text-[12px] text-ink-2">{reasonOf(d.id) ?? dropReason(d, rules)}{r ? <span className="text-dim"> · rule: {r.label}</span> : null}</div>
                   <div className="mt-1 text-[11px] text-mute">{consequence}</div>
                 </div>
               );
@@ -220,8 +222,8 @@ export function ReportTab() {
             {[...plan.leaderboard].sort((a, b) => b.value / Math.max(1, b.marginalMin) - a.value / Math.max(1, a.marginalMin)).map((l) => {
               const vpm = l.value / Math.max(1, l.marginalMin);
               return (
-                <div key={l.id} className="grid grid-cols-[42px_1fr_96px] items-center gap-2">
-                  <span className="num text-[11px] text-mute">{l.id}</span>
+                <div key={l.id} className="grid grid-cols-[110px_1fr_96px] items-center gap-2">
+                  <span className="num truncate text-[11px] text-mute">{stationName(l.id)}</span>
                   <div className="h-[5px] overflow-hidden rounded-[1px] bg-sunk ring-1 ring-line">
                     <div className="h-full bg-mute" style={{ width: `${(vpm / maxMarginal) * 100}%` }} />
                   </div>

@@ -145,14 +145,19 @@ test.describe('habitat console · real mouse and keyboard', () => {
     await expect(page.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
     await page.waitForTimeout(600); // route fit
     const b0 = (await dest(page, 'B'))!;
-    const to = await find(page, 'flat', [b0[0] + 60, b0[1] + 60], 90);
+    let to: XY | null = null;
+    for (const [dx, dy] of [[60, 60], [-60, 60], [60, -60], [-60, -60], [90, 0], [0, 90]] as XY[]) {
+      to = await find(page, 'flat', [b0[0] + dx, b0[1] + dy], 90);
+      if (to) break;
+    }
+    if (!to) throw new Error('no flat ground near marker B');
     const st01Before = await station(page, 'ST01');
     await page.mouse.move(b0[0], b0[1]);
     await expect.poll(() => page.evaluate(() => (document.querySelector('.ol-viewport') as HTMLElement).style.cursor)).toBe('grab');
     await drag(page, b0, to);
     await expect(page.getByTestId('dest-ST01')).toHaveCount(0);
     await expect(page.getByTestId('dest-P1')).toBeVisible();
-    await expect(page.getByTestId('dest-P1')).toContainText('Target of opportunity');
+    await expect(page.getByTestId('dest-P1')).toContainText('Dropped pin');
     const b1 = (await dest(page, 'B'))!;
     expect(Math.hypot(b1[0] - to[0], b1[1] - to[1])).toBeLessThan(8);
     // The map did not pan while the marker was dragged.
@@ -348,8 +353,9 @@ test.describe('habitat console · real mouse and keyboard', () => {
     await page.mouse.click(steep[0], steep[1], { button: 'right' });
     await page.getByTestId('map-context-menu').getByRole('menuitem', { name: 'Directions to here' }).click();
     await expect(page.getByTestId('dest-reason-P1')).toBeVisible();
-    await expect(page.getByTestId('dest-reason-P1')).toContainText(/too steep/);
-    await expect(page.getByTestId('verdict-dest-reason')).toContainText(/too steep/);
+    const steepReason = /too steep|on \d+° ground \(limit 20°\)|steeper than 20°/;
+    await expect(page.getByTestId('dest-reason-P1')).toContainText(steepReason);
+    await expect(page.getByTestId('verdict-dest-reason')).toContainText(steepReason);
     await expect(page.getByTestId('fix-closest-P1')).toBeVisible();
     await expect(page.getByTestId('verdict-fix-closest')).toBeVisible();
     await page.screenshot({ path: `${SHOTS6}nogo-options.png` });
@@ -531,7 +537,8 @@ test.describe('sites · picker, switching, deep link', () => {
     await page.getByTestId('place-directions').click();
     await expect(page.getByTestId('stayin-card')).toBeVisible();
     await expect(page.getByTestId('verdict-dest-reason')).toContainText(/radio contact/i);
-    await expect(page.getByTestId('verdict-where')).toContainText(/No radio contact for \d+ min/);
+    await expect(page.getByTestId('verdict-dest-reason')).toContainText(/no radio contact for \d+ min/i);
+    await expect(page.getByTestId('verdict-where')).toContainText(/marked red on the map/);
     await expect.poll(async () => (await attemptInfo(page))?.label ?? '').toMatch(/^No radio \d+ min \(limit \d+\)$/);
     await page.waitForTimeout(900); // the map fits the attempted walk
     const at = (await attemptInfo(page))!;

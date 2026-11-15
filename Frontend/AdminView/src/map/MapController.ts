@@ -103,6 +103,7 @@ function attemptStyle(f: FeatureLike): Style | Style[] {
       backgroundFill: new Fill({ color: 'rgba(0,0,0,0.88)' }),
       backgroundStroke: new Stroke({ color: '#ff3b30', width: 1.5 }),
       padding: [3, 6, 2, 6],
+      declutterMode: 'obstacle',
     }),
     zIndex: 5,
   });
@@ -143,15 +144,15 @@ const PIN_SVG =
   );
 
 function destStyle(f: FeatureLike): Style | Style[] {
-  if (f.get('pin')) return new Style({ image: new Icon({ src: PIN_SVG, anchor: [0.5, 1], width: 26, height: 36 }), zIndex: 10 });
+  if (f.get('pin')) return new Style({ image: new Icon({ src: PIN_SVG, anchor: [0.5, 1], width: 26, height: 36, declutterMode: 'obstacle' }), zIndex: 10 });
   const bad = !!f.get('bad');
   const dragging = !!f.get('dragging');
   const color = bad ? '#ff3b30' : '#ff2bd6';
   const nm = String(f.get('name') ?? '');
   return [
     new Style({
-      image: new CircleStyle({ radius: dragging ? 14 : 12, fill: new Fill({ color: '#000' }), stroke: new Stroke({ color, width: 2.5 }) }),
-      text: new Text({ text: String(f.get('letter')), font: '700 13px "Barlow Condensed", sans-serif', fill: new Fill({ color: '#fff' }) }),
+      image: new CircleStyle({ radius: dragging ? 14 : 12, fill: new Fill({ color: '#000' }), stroke: new Stroke({ color, width: 2.5 }), declutterMode: 'obstacle' }),
+      text: new Text({ text: String(f.get('letter')), font: '700 13px "Barlow Condensed", sans-serif', fill: new Fill({ color: '#fff' }), declutterMode: 'none' }),
       zIndex: 5,
     }),
     new Style({
@@ -162,6 +163,7 @@ function destStyle(f: FeatureLike): Style | Style[] {
         textAlign: 'left',
         fill: new Fill({ color: bad ? '#ff8a80' : '#ffffff' }),
         stroke: new Stroke({ color: 'rgba(0,0,0,0.85)', width: 3 }),
+        declutterMode: 'obstacle',
       }),
       zIndex: 4,
     }),
@@ -212,12 +214,12 @@ export class MapController {
   private traverse: VectorLayer<VectorSource>;
   private astronaut = createAstronautLayer();
   /** Route stops (lettered, draggable) and the temporary dropped pin. */
-  private destLayer = new VectorLayer({ source: new VectorSource(), zIndex: 40, style: destStyle });
+  private destLayer = new VectorLayer({ source: new VectorSource(), zIndex: 40, declutter: 'labels', style: destStyle });
   private destTranslate: Translate;
   private pickMode = false;
   /** Way-forward suggestion (closest safe point / rover parking spot). */
   /** A NO-GO's attempted walk (dimmed) with the stretch that breaks the rule in red. */
-  private attemptLayer = new VectorLayer({ source: new VectorSource(), zIndex: 39, style: attemptStyle });
+  private attemptLayer = new VectorLayer({ source: new VectorSource(), zIndex: 39, declutter: 'labels', style: attemptStyle });
   private suggestLayer = new VectorLayer({ source: new VectorSource(), zIndex: 41, style: suggestStyle });
   private aoi: VectorLayer<VectorSource>;
   private shelters: ReturnType<typeof createSheltersLayer>;
@@ -306,7 +308,7 @@ export class MapController {
     this.shelters.translate.on('translateend', () => this.cursor('grab'));
 
     const span = Math.max(ext[2] - ext[0], ext[3] - ext[1]);
-    const pad = span * 0.1;
+    const pad = span * 0.03;
     this.map = new OlMap({
       target,
       controls: [],
@@ -464,8 +466,28 @@ export class MapController {
   fit(duration = 450) {
     const g = this.pack.manifest.grid;
     const size = this.map.getSize();
-    if (!size) return;
-    this.map.getView().fit(gridExtent(g), { padding: [16, 16, 16, 16], duration });
+    if (!size || !size[0] || !size[1]) return;
+    // Cover-style: the study area fills the visible map (no black bars); the base is kept in view.
+    const [ax0, ay0, ax1, ay1] = gridExtent(g);
+    const aw = ax1 - ax0, ah = ay1 - ay0, r = size[0] / size[1];
+    const w = aw / ah > r ? ah * r : aw;
+    const h = w / r;
+    // Centre on the targets and bases (so most of them are in view), then keep the window inside the study area.
+    const pts = [...this.pack.manifest.stations.map((q) => [q.x, q.y]), ...this.pack.manifest.shelters.map((q) => cellToXY(g, q.cell))];
+    const bx = pts.length ? (Math.min(...pts.map((p) => p[0])) + Math.max(...pts.map((p) => p[0]))) / 2 : (ax0 + ax1) / 2;
+    const by = pts.length ? (Math.min(...pts.map((p) => p[1])) + Math.max(...pts.map((p) => p[1]))) / 2 : (ay0 + ay1) / 2;
+    let x0 = bx - w / 2, y0 = by - h / 2;
+    x0 = Math.max(ax0, Math.min(ax1 - w, x0));
+    y0 = Math.max(ay0, Math.min(ay1 - h, y0));
+    this.map.getView().fit([x0, y0, x0 + w, y0 + h], { padding: [0, 0, 0, 0], duration });
+  }
+
+  /** Pixels to keep clear when fitting a route: the Directions card on the left, labels on the right, the scale strip below. */
+  private fitPadding(): [number, number, number, number] {
+    const vp = this.map.getViewport()?.getBoundingClientRect() ?? new DOMRect(0, 0, 1000, 700);
+    const card = document.querySelector('[data-testid="directions"]')?.getBoundingClientRect();
+    const left = card && card.right > vp.left && card.right < vp.left + vp.width * 0.7 ? card.right - vp.left + 24 : 60;
+    return [90, 230, 90, left + 100];
   }
 
   zoomBy(d: number) {
@@ -565,8 +587,21 @@ export class MapController {
     this.attemptLabelXY = null;
     if (!a || !a.failure) return;
     const g = this.pack.manifest.grid;
-    for (const leg of a.legs) src.addFeature(new Feature({ geometry: new LineString(routeCoords(g, leg)), k: 'leg' }));
+    // Outbound walk only: the return leg runs almost on top of it and would read as a two-lane road.
+    const out = a.legs[0] ?? [];
+    if (out.length >= 2) src.addFeature(new Feature({ geometry: new LineString(routeCoords(g, out)), k: 'leg' }));
+    const onOut = new Set(out);
+    const runs: number[][] = [];
     for (const run of a.failure.runs) {
+      if (!run.some((c) => onOut.has(c))) { runs.push(run); continue; } // return leg only: keep
+      let cur: number[] = [];
+      for (const c of run) {
+        if (onOut.has(c)) cur.push(c);
+        else if (cur.length) (runs.push(cur), (cur = []));
+      }
+      if (cur.length) runs.push(cur);
+    }
+    for (const run of runs) {
       if (run.length >= 2) src.addFeature(new Feature({ geometry: new LineString(routeCoords(g, run)), k: 'bad' }));
       else src.addFeature(new Feature({ geometry: new Point(cellToXY(g, run[0])), k: 'point' }));
     }
@@ -751,8 +786,8 @@ export class MapController {
       if (y < y0) y0 = y;
       if (y > y1) y1 = y;
     }
-    const pad = Math.max(250, 0.35 * Math.max(x1 - x0, y1 - y0));
-    this.map.getView().fit([x0 - pad, y0 - pad, x1 + pad, y1 + pad], { padding: [16, 16, 16, 16], duration });
+    const pad = Math.max(100, 0.05 * Math.max(x1 - x0, y1 - y0));
+    this.map.getView().fit([x0 - pad, y0 - pad, x1 + pad, y1 + pad], { padding: this.fitPadding(), duration });
   }
 
   setPlan(plan: PlanResult | null, stateOf: (id: string) => { state: StationState; order?: number }) {

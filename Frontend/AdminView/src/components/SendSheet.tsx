@@ -124,7 +124,7 @@ function Brief() {
                   return (
                     <tr key={st.id} className="text-[13px]">
                       <td className="py-1"><span className="num inline-flex h-[22px] w-[22px] items-center justify-center border border-cyan bg-black text-[11px] font-semibold text-white">{i + 1}</span></td>
-                      <td className="truncate py-1 pr-3 text-ink"><span className="num mr-2 text-[11.5px] text-mute">{st.id}</span>{s?.name.replace(/\s*\([^)]*\)\s*$/, '') ?? st.id}</td>
+                      <td className="truncate py-1 pr-3 text-ink">{s?.name.replace(/\s*\([^)]*\)\s*$/, '') ?? st.id}</td>
                       <td className="num py-1 text-right text-ink-2">{fmtLtst(evaLtst(start, st.arriveMin))}</td>
                       <td className="num py-1 text-right text-ink-2">{fmtLtst(evaLtst(start, st.departMin))}</td>
                       <td className="num py-1 text-right text-ink">{b ? fmtLtst(b.ltstMin) : '—'}</td>

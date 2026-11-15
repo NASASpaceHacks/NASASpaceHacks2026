@@ -1,6 +1,6 @@
 import { acceptFix, dismissFix, findClosestSafe, findRoverSpot, fixKinds } from '../fixes';
 import { shortName } from '../lib/base';
-import { dropReason } from '../lib/plain';
+import { useDestReason } from '../lib/reasons';
 import { useConsole } from '../store';
 import { cx } from './ui';
 
@@ -14,14 +14,14 @@ export function useLeftOut(): { id: string; letter: string; name: string; reason
   const customs = useConsole((s) => s.customStops);
   const plan = useConsole((s) => s.plan);
   const status = useConsole((s) => s.planStatus);
-  const rules = useConsole((s) => s.rules);
+  const reasonOf = useDestReason();
   if (!pack || !plan || status !== 'ready') return [];
   const all = [...pack.manifest.stations, ...customs];
   return dests.flatMap((id, i) => {
     if (plan.order.includes(id)) return [];
     const st = all.find((x) => x.id === id);
     const d = plan.dropped.find((x) => x.id === id);
-    return st ? [{ id, letter: String.fromCharCode(66 + i), name: clean(st.name), reason: d ? dropReason(d, rules) : 'not reachable in this walk' }] : [];
+    return st ? [{ id, letter: String.fromCharCode(66 + i), name: clean(st.name), reason: d ? reasonOf(id) ?? 'not reachable in this walk' : 'not reachable in this walk' }] : [];
   });
 }
 

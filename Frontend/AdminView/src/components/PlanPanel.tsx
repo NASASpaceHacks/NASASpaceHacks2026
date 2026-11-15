@@ -3,7 +3,8 @@ import { clearDestinations, isSendable, openDetails, primaryAction, removeDestin
 import { useConsole } from '../store';
 import { relabel, shortName, useBaseInfo } from '../lib/base';
 import { fmtLtst } from '../lib/marsclock';
-import { dropReason, verdictOf, type Verdict } from '../lib/plain';
+import { verdictOf, type Verdict } from '../lib/plain';
+import { useDestReason } from '../lib/reasons';
 import { LtstScrubber, stayInSentence, stayInWhy } from './PlanParts';
 import { Button, Kbd, Popover, Tip, ToneMark, cx } from './ui';
 import { WayForward, useLeftOut } from './WayForward';
@@ -74,7 +75,7 @@ function VerdictCard() {
               </div>
               {attempt?.failure && (
                 <div data-testid="verdict-where" className="mt-1 text-[13.5px] leading-snug text-ink-2">
-                  The walk there and back: <span className="text-red">{attempt.failure.sentence}</span>. The stretch is marked red on the map.
+                  {attempt.failure.marks}
                 </div>
               )}
               <WayForward destId={first.id} where="verdict" className="mt-2" />
@@ -192,7 +193,7 @@ function Destinations() {
   const dests = useConsole((s) => s.destinations);
   const customs = useConsole((s) => s.customStops);
   const plan = useConsole((s) => s.plan);
-  const rules = useConsole((s) => s.rules);
+  const reasonOf = useDestReason();
   const status = useConsole((s) => s.planStatus);
   const live = useConsole((s) => s.uiMode === 'live');
   const all = useMemo(() => [...pack.manifest.stations, ...customs], [pack, customs]);
@@ -214,7 +215,7 @@ function Destinations() {
           {rows.map((st, i) => {
             const dropped = plan?.dropped.find((d) => d.id === st.id);
             const planned = plan ? plan.order.indexOf(st.id) >= 0 : false;
-            const reason = dropped ? `Can't include: ${dropReason(dropped, rules)}` : plan && !planned && status !== 'planning' ? "Can't include in this walk" : null;
+            const reason = dropped ? `Can't include: ${reasonOf(st.id)}` : plan && !planned && status !== 'planning' ? "Can't include in this walk" : null;
             return (
               <li key={st.id} data-testid={`dest-${st.id}`} className="flex min-h-[52px] items-center gap-3 rounded-[10px] bg-raised/50 px-3 py-1.5">
                 <span className={cx('num flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full text-[12px] font-bold', reason ? 'bg-sunk text-red ring-1 ring-red/40' : 'bg-cyan text-black')}>
@@ -222,10 +223,10 @@ function Destinations() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[14px] text-ink">{st.name.replace(/\s*\([^)]*\)\s*$/, '')}</div>
-                  <div className={cx('text-[11.5px] leading-tight', reason ? 'text-red/90' : 'text-mute')}>{reason ?? `${st.id} · science value ${Math.round(st.value)}`}</div>
+                  <div className={cx('text-[11.5px] leading-tight', reason ? 'text-red/90' : 'text-mute')}>{reason ?? (st.id.startsWith('ST') ? `Science value ${Math.round(st.value)}` : 'Your stop')}</div>
                 </div>
                 {!live && (
-                  <button aria-label={`Remove ${st.id}`} data-testid={`dest-remove-${st.id}`} onClick={() => removeDestination(st.id)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] text-[16px] text-mute hover:bg-sunk hover:text-ink">
+                  <button aria-label={`Remove ${st.name.replace(/\s*\([^)]*\)\s*$/, '')}`} data-testid={`dest-remove-${st.id}`} onClick={() => removeDestination(st.id)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px] text-[16px] text-mute hover:bg-sunk hover:text-ink">
                     ✕
                   </button>
                 )}
@@ -247,24 +248,14 @@ function Destinations() {
 function RouteSection() {
   const dests = useConsole((s) => s.destinations);
   const plan = useConsole((s) => s.plan);
-  const rules = useConsole((s) => s.rules);
-  const customs = useConsole((s) => s.customStops);
-  const pack = useConsole((s) => s.pack)!;
   if (!dests.length) return null;
-  const nameOf = (id: string) => [...pack.manifest.stations, ...customs].find((x) => x.id === id)?.name.replace(/\s*\([^)]*\)\s*$/, '') ?? id;
-  const dropped = plan?.dropped.filter((d) => dests.includes(d.id)) ?? [];
+  // Each left-out stop is explained once: in its Directions row, and the first also in the verdict box.
+  const showOrder = !!plan && plan.status === 'OK' && plan.order.length >= 2;
   return (
     <section data-testid="route-section">
       <SectionHead n={2} title="Is it safe?" />
       <VerdictCard />
-      {dropped.length > 0 && (
-        <ul className="mt-2 flex flex-col gap-1 px-1 text-[12.5px] text-red/90" data-testid="dropped-list">
-          {dropped.map((d) => (
-            <li key={d.id}>{nameOf(d.id)} can't be reached safely: {dropReason(d, rules)}</li>
-          ))}
-        </ul>
-      )}
-      <div className="mt-2 px-1 text-[12px] text-mute">Stops are reordered for the fastest safe loop &middot; round trip back to the start.</div>
+      {showOrder && <div className="mt-2 px-1 text-[12px] text-mute">Stops are reordered for the fastest safe loop &middot; round trip back to the start.</div>}
     </section>
   );
 }

@@ -51,6 +51,19 @@ export function endpointLabel(pack: LoadedSitePack, base: BaseInfo, id: string, 
   return s ? shortName(s) : id;
 }
 
+/** A stop's plain name (no parenthesised code), from the science targets and the user's own stops. */
+export function stopName(id: string): string {
+  const s = useConsole.getState();
+  const st = [...(s.pack?.manifest.stations ?? []), ...s.customStops].find((x) => x.id === id);
+  return st ? st.name.replace(/\s*\([^)]*\)\s*$/, '') : id;
+}
+
+/** A stop as the directions card shows it: its map letter (B, C…) when it is a destination, then its name. */
+export function stopLabel(id: string): string {
+  const i = useConsole.getState().destinations.indexOf(id);
+  return i >= 0 ? `${String.fromCharCode(66 + i)} ${stopName(id)}` : stopName(id);
+}
+
 /** Replace engine shelter tokens in free text: 'HAB' → the EVA base, other shelter ids → short names. */
 export function relabel(pack: LoadedSitePack, base: BaseInfo, text: string): string {
   let out = text;
@@ -61,6 +74,9 @@ export function relabel(pack: LoadedSitePack, base: BaseInfo, text: string): str
     if (s.id === 'HAB') continue;
     out = out.replace(new RegExp(`\\b${s.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g'), shortName(s));
   }
+  // Stop ids ("ST04", "P1") never reach the screen: the map letter and the name instead.
+  const known = new Set([...pack.manifest.stations, ...useConsole.getState().customStops].map((x) => x.id));
+  out = out.replace(/\b(?:ST\d\d|P\d+)\b/g, (id) => (known.has(id) ? stopLabel(id) : id));
   return out;
 }
 

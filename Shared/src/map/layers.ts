@@ -395,7 +395,7 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
     source: new VectorSource(),
     declutter: 'labels',
     zIndex: 20,
-    style: (f: FeatureLike) => {
+    style: (f: FeatureLike, resolution: number) => {
       const value = f.get('value') as number;
       const state = f.get('state') as StationState;
       const order = f.get('order') as number | undefined;
@@ -412,7 +412,8 @@ export function createStationsLayer(theme: MapTheme = DEFAULT_THEME): VectorLaye
             zIndex: 1,
           }),
           new Style({
-            text: new Text({ text: nm.length > 24 ? `${nm.slice(0, 23)}…` : nm, font: theme.font, offsetX: f.get('flip') ? -12 : 13, offsetY: f.get('flip') ? 14 : 0, textAlign: f.get('flip') ? 'right' : 'left', fill: new Fill({ color: theme.label }), stroke: halo(theme), declutterMode: 'none' }),
+            // Labels that collide drop out (the marker dot stays); zoomed in far enough the full name shows.
+            text: new Text({ text: resolution > 1.2 && nm.length > 30 ? `${nm.slice(0, 29)}…` : nm, font: theme.font, offsetX: f.get('flip') ? -12 : 13, offsetY: f.get('flip') ? 14 : 0, textAlign: f.get('flip') ? 'right' : 'left', fill: new Fill({ color: theme.label }), stroke: halo(theme), declutterMode: 'declutter' }),
             zIndex: 0,
           }),
         ];
@@ -504,14 +505,15 @@ export function createSheltersLayer(
   const layer = new VectorLayer({
     source: src,
     zIndex: 30,
+    declutter: 'labels', // base labels always show; station labels drop out around them
     style: (f: FeatureLike) => {
       const kind = f.get('kind') as Shelter['kind'];
       const dragging = !!f.get('dragging');
       const isHab = kind === 'hab';
       const badge = f.get('isA')
         ? [new Style({
-            image: new CircleStyle({ radius: 10, fill: new Fill({ color: MAP_COLORS.cyan }), stroke: new Stroke({ color: theme.routeCasing, width: 2 }), displacement: [16, 16] }),
-            text: new Text({ text: 'A', font: '700 13px "Barlow Condensed", sans-serif', offsetX: 16, offsetY: -16, fill: new Fill({ color: '#000' }) }),
+            image: new CircleStyle({ radius: 10, fill: new Fill({ color: MAP_COLORS.cyan }), stroke: new Stroke({ color: theme.routeCasing, width: 2 }), displacement: [16, 16], declutterMode: 'obstacle' }),
+            text: new Text({ text: 'A', font: '700 13px "Barlow Condensed", sans-serif', offsetX: 16, offsetY: -16, fill: new Fill({ color: '#000' }), declutterMode: 'none' }),
             zIndex: 5,
           })]
         : [];
@@ -524,8 +526,9 @@ export function createSheltersLayer(
             angle: isHab ? Math.PI / 4 : 0,
             fill: new Fill({ color: isHab ? theme.safe : dragging ? theme.caution : '#e6e6e6' }),
             stroke: new Stroke({ color: theme.routeCasing, width: 2.5 }),
+            declutterMode: 'obstacle',
           }),
-          text: new Text({ text: isHab ? 'H' : 'R', font: '700 10px sans-serif', fill: new Fill({ color: theme.routeCasing }) }),
+          text: new Text({ text: isHab ? 'H' : 'R', font: '700 10px sans-serif', fill: new Fill({ color: theme.routeCasing }), declutterMode: 'none' }),
         }),
         new Style({
           text: new Text({
@@ -535,6 +538,7 @@ export function createSheltersLayer(
             offsetY: 19,
             fill: new Fill({ color: isHab ? theme.safe : theme.label }),
             stroke: halo(theme),
+            declutterMode: 'obstacle',
           }),
         }),
       ];

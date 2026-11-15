@@ -49,16 +49,36 @@ export const RULE_PLAIN: Record<RuleId, string> = {
   plume_keepout_m: 'keep-out zone',
 };
 
-/** One-line reason a station was left out ("too steep to reach", "+7 min beyond shelter limit"). */
-export function dropReason(d: { rule: RuleId; deficitMin: number; text: string }, rules: Rule[]): string {
+/** Where a dropped stop is, so a distance or slope rule can be stated in its own unit. */
+export interface DropCtx { pack: LoadedSitePack; baseCell: number; stopCell: number }
+
+const kmText = (m: number) => `${(m / 1000).toFixed(1)} km`;
+
+/**
+ * One-line reason a station was left out ("too steep to reach", "45 min from shelter (limit 30)").
+ * Each rule is stated in its own unit: shelter in minutes, walking range in km, steepness in degrees.
+ */
+export function dropReason(d: { rule: RuleId; deficitMin: number; text: string }, rules: Rule[], ctx?: DropCtx): string {
   const n = Math.max(1, Math.ceil(d.deficitMin));
   const by = d.deficitMin > 0;
   if (/15 highest-value/.test(d.text)) return 'only the 15 most valuable stops are planned';
   if (/SEP nowcast/i.test(d.text)) return 'radiation spike: returning to shelter';
   switch (d.rule) {
-    case 'slope_max_deg': return 'too steep to reach';
-    case 'walk_radius_max_m': return by ? `beyond walking range of the base (+${n} min)` : 'beyond walking range of the base';
-    case 'shelter_time_max_min': return by ? `+${n} min beyond the ${ruleVal(rules, 'shelter_time_max_min', 30)}-min shelter limit` : 'too far from shelter';
+    case 'slope_max_deg': {
+      const lim = ruleVal(rules, 'slope_max_deg', 20);
+      const at = ctx ? ctx.pack.rasters.slope?.[ctx.stopCell] : undefined;
+      if (at === undefined) return 'too steep to reach';
+      return Number.isFinite(at) && at > lim ? `the spot is on ${Math.round(at)}° ground (limit ${lim}°)` : `every way there crosses ground steeper than ${lim}°`;
+    }
+    case 'walk_radius_max_m': {
+      if (!ctx) return 'beyond walking range of the base';
+      const dist = cellDistM(ctx.pack.manifest.grid, ctx.baseCell, ctx.stopCell);
+      return `${kmText(dist)} from the base (limit ${kmText(ruleVal(rules, 'walk_radius_max_m', 2000))})`;
+    }
+    case 'shelter_time_max_min': {
+      const lim = ruleVal(rules, 'shelter_time_max_min', 30);
+      return by ? `${Math.round(d.deficitMin + lim)} min from shelter (limit ${lim})` : 'too far from shelter';
+    }
     case 'los_gap_max_min': return by ? `out of radio contact ${n} min too long` : 'out of radio contact too long';
     case 'eva_duration_max_min': return by ? `doesn't fit the EVA time (+${n} min)` : "doesn't fit the EVA time";
     case 'walkback_speed_factor': return by ? `+${n} min past the walk-back deadline` : 'past the walk-back deadline';
@@ -79,7 +99,8 @@ export function limitLine(p: PlanResult, pack: LoadedSitePack, base: BaseInfo): 
   const short = /\(−(\d+) min\)/.exec(text)?.[1];
   const gain = /would add (\d+) science value/.exec(text)?.[1];
   const what = RULE_PLAIN[b.rule] ?? b.rule;
-  const head = `${what[0].toUpperCase()}${what.slice(1)}${at ? ` at ${at}` : ''}`;
+  const leg = at ? /^(.+?)→(.+)$/.exec(at) : null;
+  const head = `${what[0].toUpperCase()}${what.slice(1)}${leg ? (leg[2].trim() === base.short ? ` on the way back from ${leg[1].trim()}` : leg[1].trim() === base.short ? ` on the way to ${leg[2].trim()}` : ` on the walk from ${leg[1].trim()} to ${leg[2].trim()}`) : at ? ` at ${at}` : ''}`;
   let detail = '';
   if (short && at) detail = `${at} would need ${short} more min; it is left out.`;
   else if (gain) detail = `10 % more ${what} would add ${gain} science points.`;

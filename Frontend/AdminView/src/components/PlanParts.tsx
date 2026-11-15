@@ -215,9 +215,9 @@ export function stayInWhy(base: BaseInfo): string | null {
   if (dz > 20 && dist > 0 && heat?.enabled) {
     const grade = (100 * dz) / dist;
     const pUp = marsMetabolicW(crew, crew.v0, grade, 1);
-    return `Suit heat: ${st.id} sits ${Math.round(dz)} m below ${base.short}, so the walk back climbs ≈${grade.toFixed(0)} % on average. Carrying ${mass} kg at 0.38 g and ${crew.v0} m/s that costs ≈${Math.round(pUp)} W (level ≈${Math.round(pLevel)} W) against the ${heat.value} W suit-heat budget, so the heat governor must insert rests and even the closest station overruns the ${eva?.value ?? 360}-min EVA ${deficit}.`;
+    return `Suit heat: ${st.name.replace(/\s*\([^)]*\)\s*$/, '')} sits ${Math.round(dz)} m below ${base.short}, so the walk back climbs ≈${grade.toFixed(0)} % on average. Carrying ${mass} kg at 0.38 g and ${crew.v0} m/s that costs ≈${Math.round(pUp)} W (level ≈${Math.round(pLevel)} W) against the ${heat.value} W suit-heat budget, so the heat governor must insert rests and even the closest station overruns the ${eva?.value ?? 360}-min EVA ${deficit}.`;
   }
-  return `Even the closest station (${st.id}) overruns the ${eva?.value ?? 360}-min EVA ${deficit} from ${base.short}${heat?.enabled && pLevel > heat.value ? ` (walking ≈${Math.round(pLevel)} W vs the ${heat.value} W suit-heat budget needs rests)` : ''}.`;
+  return `Even the closest station (${st.name.replace(/\s*\([^)]*\)\s*$/, '')}) overruns the ${eva?.value ?? 360}-min EVA ${deficit} from ${base.short}${heat?.enabled && pLevel > heat.value ? ` (walking ≈${Math.round(pLevel)} W vs the ${heat.value} W suit-heat budget needs rests)` : ''}.`;
 }
 
 /**
@@ -255,7 +255,7 @@ export function stayInSentence(base: BaseInfo): string | null {
     const also = others.length ? ` Other stops also break ${others.join(', ').replace(/, ([^,]*)$/, ' or $1')}.` : '';
     return `The stops are about ${Math.round(dz / 10) * 10} m below ${base.short}: the climb back costs ≈${Math.round(pUp)} W against the suit's ${heat.value} W cooling limit, so the closest one overruns the ${Math.round((eva?.value ?? 360) / 60)}-hour EVA.${also}`;
   }
-  return `Even the closest stop (${st.id}) overruns the ${Math.round((eva?.value ?? 360) / 60)}-hour EVA from ${base.short}.`;
+  return `Even the closest stop (${st.name.replace(/\s*\([^)]*\)\s*$/, '')}) overruns the ${Math.round((eva?.value ?? 360) / 60)}-hour EVA from ${base.short}.`;
 }
 
 function RuleRow({ r }: { r: Rule }) {

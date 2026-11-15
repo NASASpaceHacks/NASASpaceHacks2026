@@ -1,7 +1,7 @@
 import { useMemo, type ReactNode } from 'react';
 import { isSendable, openDetails, openSheet, setMode } from '../actions';
 import { set, useConsole } from '../store';
-import { endpointLabel, useBaseInfo } from '../lib/base';
+import { endpointLabel, stopName, useBaseInfo } from '../lib/base';
 import { evaLtst, fmtLtst } from '../lib/marsclock';
 import { liveValues, scheduleDelta, type Tone } from '../lib/plain';
 import type { ActionKind } from '../lib/types';
@@ -61,9 +61,9 @@ function CrewCard() {
     next = <>Radiation spike: crew told to head for shelter. <b className="font-medium text-ink">Send them the return route.</b></>;
   } else if (stopNow) {
     const b = plan.bingo.find((x) => x.id === stopNow.id);
-    next = <>Leave <b className="font-medium text-ink">{stopNow.id}</b> at {fmtLtst(evaLtst(start, stopNow.departMin))}{b ? <span className="text-caution"> · latest {fmtLtst(b.ltstMin)}</span> : null}</>;
+    next = <>Leave <b className="font-medium text-ink">{stopName(stopNow.id)}</b> at {fmtLtst(evaLtst(start, stopNow.departMin))}{b ? <span className="text-caution"> · latest {fmtLtst(b.ltstMin)}</span> : null}</>;
   } else if (nextStop) {
-    next = <>Arrive <b className="font-medium text-ink">{nextStop.id}</b> at {fmtLtst(evaLtst(start, nextStop.arriveMin))} <span className="text-mute">(stop {plan.order.indexOf(nextStop.id) + 1} of {plan.order.length})</span></>;
+    next = <>Arrive <b className="font-medium text-ink">{stopName(nextStop.id)}</b> at {fmtLtst(evaLtst(start, nextStop.arriveMin))} <span className="text-mute">(stop {plan.order.indexOf(nextStop.id) + 1} of {plan.order.length})</span></>;
   } else if (lastSeg) {
     next = <>Back at <b className="font-medium text-ink">{endName}</b> by {fmtLtst(evaLtst(start, lastSeg.t1Min))}</>;
   }

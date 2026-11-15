@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { closeSheet, explainSafeZone, getMap, startHazardPick } from '../actions';
 import { set, useConsole } from '../store';
 import { objectiveById, stationImage, whyItMatters } from '../lib/science';
-import { shortName } from '../lib/base';
+import { baseInfo, shortName } from '../lib/base';
 import { LayersPanel } from './Layers';
 import { Kbd, Popover, cx } from './ui';
 
@@ -99,10 +99,13 @@ function StationTip() {
   const hover = useConsole((s) => s.hoverStation);
   const pack = useConsole((s) => s.pack);
   const plan = useConsole((s) => s.plan);
+  const destinations = useConsole((s) => s.destinations);
   const on = useConsole((s) => (hover ? !!s.stationOn[hover.id] : false));
   const cardOpen = useConsole((s) => !!s.mapPopover || !!s.ctxMenu);
   const st = hover && pack ? pack.manifest.stations.find((x) => x.id === hover.id) : null;
   if (!hover || !st || !pack || cardOpen) return null;
+  const di = destinations.indexOf(st.id);
+  const letter = di >= 0 ? String.fromCharCode(66 + di) : null;
   const order = plan?.order.indexOf(st.id) ?? -1;
   const stop = plan?.stops.find((x) => x.id === st.id);
   const dropped = plan?.dropped.find((d) => d.id === st.id);
@@ -113,7 +116,7 @@ function StationTip() {
       <div className="flex gap-3 p-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="num text-[11px] text-mute">{st.id}</span>
+            {letter && <span className="num text-[11px] text-mute">{letter}</span>}
             <span className="num ml-auto text-[11px] text-mute">value {Math.round(st.value)}</span>
           </div>
           <div className="mt-1 text-[12.5px] leading-snug text-ink">{st.name}</div>
@@ -169,6 +172,8 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
   const sheet = useConsole((s) => s.sheet);
   const [hover, setHover] = useState(false);
   const pack = useConsole((s) => s.pack);
+  const keyOn = useConsole((s) => s.vectors.outline && !!s.zone);
+  const baseShort = useConsole((s) => (s.pack ? baseInfo(s.pack, s.evaBase, s.shelterCells).short : ''));
   const caption = (() => {
     const g = pack?.manifest.grid;
     const km = g ? `${+((g.w * g.cellM) / 1000).toFixed(1)} × ${+((g.h * g.cellM) / 1000).toFixed(1)} km` : '';
@@ -176,7 +181,10 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
     const inst = im?.provenance?.[0]?.instrument?.split(/\s*\(/)[0] ?? 'HiRISE';
     const mission = im?.provenance?.[0]?.mission === 'Mars Reconnaissance Orbiter' ? 'MRO' : im?.provenance?.[0]?.mission;
     const site = pack?.manifest.name.replace(/\s*[—-].*$/, '').replace(/ Crater$/, ' crater') ?? 'Mars';
-    return `Study area ${km} · ${site}, Mars · ${im ? `${inst} colour imagery${mission ? ` (${mission})` : ''}` : 'terrain model'}`;
+    // Colour or greyscale comes from the manifest (label / instrument), never assumed.
+    const text = `${im?.label ?? ''} ${im?.provenance?.[0]?.instrument ?? ''}`;
+    const kind = /grey|gray|panchromatic/i.test(text) ? 'greyscale ' : /colou?r/i.test(text) ? 'colour ' : '';
+    return `Study area ${km} · ${site}, Mars · ${im ? `${inst} ${kind}imagery${mission ? ` (${mission})` : ''}` : 'terrain model'}`;
   })();
   useEffect(() => {
     const el = readoutRef.current?.parentElement?.parentElement;
@@ -201,10 +209,10 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
       <div className="absolute right-4 top-4 z-30 flex items-start gap-2">
         <button
           data-testid="why-area"
-          onClick={() => void explainSafeZone()}
-          disabled={!hasZone}
+          onClick={() => { if (hasZone) void explainSafeZone(); }}
+          aria-disabled={!hasZone}
           className={cx(
-            'flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] transition-colors disabled:opacity-40',
+            'flex h-11 items-center gap-2 rounded-[10px] px-3.5 text-[13px] transition-colors',
             explaining ? 'bg-cyan/20 text-cyan' : 'bg-black text-ink-2 hover:text-ink',
           )}
           title="Watch the safe area shrink one flight rule at a time (S)"
@@ -231,9 +239,15 @@ export function MapHud({ readoutRef, scaleRef }: { readoutRef: RefObject<HTMLDiv
 
       <ShelterTip />
       <div className="pointer-events-none absolute bottom-3 left-3 right-[72px] z-10 flex flex-col items-start gap-1">
-        <div className="max-w-full bg-black/80 px-2 py-0.5 text-[11px] leading-snug text-mute" data-testid="map-caption">{caption}</div>
         <div className="flex max-w-full flex-wrap items-end gap-3">
-        <div className="pointer-events-auto rounded-[8px] bg-black px-2.5 pb-1.5 pt-1.5">
+        <div className="pointer-events-auto flex max-w-full flex-col gap-1 bg-black/90 px-2.5 pb-1.5 pt-1.5">
+          <div className="text-[11px] leading-snug text-mute" data-testid="map-caption">{caption}</div>
+          {keyOn && (
+            <div className="flex items-center gap-2 text-[11px] leading-snug text-ink-2" data-testid="map-key">
+              <svg width="26" height="8" viewBox="0 0 26 8" aria-hidden><line x1="1" y1="4" x2="25" y2="4" stroke="rgba(0,0,0,0.7)" strokeWidth="4" /><line x1="1" y1="4" x2="25" y2="4" stroke="#fff" strokeWidth="1.5" strokeDasharray="6 4" /></svg>
+              Safe on foot from {baseShort}
+            </div>
+          )}
           <div ref={scaleRef} className="num pr-3 text-[9.5px] text-ink-2 [&_.mw-sb-bar]:text-ink" />
         </div>
         <div ref={readoutRef} className={cx('flex gap-3 rounded-[8px] bg-black px-2.5 py-1.5 text-[11px] transition-opacity', hover ? 'opacity-100' : 'opacity-0')} aria-hidden={!hover}>

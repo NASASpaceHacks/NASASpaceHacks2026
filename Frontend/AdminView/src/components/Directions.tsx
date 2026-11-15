@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { addDestination, addPlace, cancelPickOnMap, clearDestinations, removeDestination, setEvaBase, startPickOnMap, suggestStops } from '../actions';
 import { shortName } from '../lib/base';
-import { dropReason } from '../lib/plain';
+import { useDestReason } from '../lib/reasons';
 import { landmarksIn } from '../lib/places';
 import { whyItMatters } from '../lib/science';
 import { useConsole } from '../store';
@@ -26,7 +26,7 @@ export function DirectionsCard() {
   const dests = useConsole((s) => s.destinations);
   const customs = useConsole((s) => s.customStops);
   const plan = useConsole((s) => s.plan);
-  const rules = useConsole((s) => s.rules);
+  const reasonOf = useDestReason();
   const shelterCells = useConsole((s) => s.shelterCells);
   const status = useConsole((s) => s.planStatus);
   const [q, setQ] = useState('');
@@ -105,7 +105,7 @@ export function DirectionsCard() {
 
       {rows.map((st, i) => {
         const dropped = plan?.dropped.find((d) => d.id === st.id);
-        const reason = dropped ? dropReason(dropped, rules) : plan && status === 'ready' && !plan.order.includes(st.id) ? 'not reachable in this walk' : null;
+        const reason = dropped ? reasonOf(st.id) : plan && status === 'ready' && !plan.order.includes(st.id) ? 'not reachable in this walk' : null;
         return (
           <div key={st.id} data-testid={`dest-${st.id}`} className="flex items-start gap-2 border-b border-line px-3 py-2">
             <span className={cx('num mt-0.5 flex h-[22px] w-[22px] shrink-0 items-center justify-center border text-[11px]', reason ? 'border-red text-red' : 'border-magenta text-magenta')}>{String.fromCharCode(66 + i)}</span>
@@ -116,7 +116,7 @@ export function DirectionsCard() {
               </div>
               {reason && !live && <WayForward destId={st.id} where="row" className="mt-1.5" />}
             </div>
-            {!live && <button aria-label={`Remove ${st.id}`} data-testid={`dest-remove-${st.id}`} onClick={() => removeDestination(st.id)} className="h-7 w-7 shrink-0 text-[15px] text-mute hover:text-cyan">✕</button>}
+            {!live && <button aria-label={`Remove ${clean(st.name)}`} data-testid={`dest-remove-${st.id}`} onClick={() => removeDestination(st.id)} className="h-7 w-7 shrink-0 text-[15px] text-mute hover:text-cyan">✕</button>}
           </div>
         );
       })}

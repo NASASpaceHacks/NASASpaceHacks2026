@@ -93,6 +93,9 @@ export function Locator() {
   const sites = useConsole((s) => s.sites);
   const siteId = useConsole((s) => s.siteId);
   const [open, setOpen] = useState(true);
+  // Never sit on top of route content: fold to the header once a destination, place card or route exists, reopen when cleared.
+  const busy = useConsole((s) => s.destinations.length > 0 || !!s.mapPopover || !!s.plan || !!s.attemptPin || !!s.attemptPlan);
+  useEffect(() => { setOpen(!busy); }, [busy]);
   const [siteCtx, setSiteCtx] = useState<Record<string, Context>>({});
 
   useEffect(() => {
@@ -119,7 +122,7 @@ export function Locator() {
   }, [sites, pack]);
 
   if (!pack || !ctx) return null;
-  const H = 92;
+  const H = 80;
   const credit = ctx.global.credit ?? ctx.global.source ?? '';
   const site = ctx.labels?.find((l) => new RegExp(shortName(pack.manifest.name).split(/\s+/)[0], 'i').test(l.name))?.name ?? shortName(pack.manifest.name);
   const ctxs = { ...siteCtx, [pack.manifest.id]: ctx };

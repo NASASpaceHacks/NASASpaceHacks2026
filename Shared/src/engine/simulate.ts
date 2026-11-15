@@ -199,7 +199,8 @@ export function simulate(inp: SimInput): SimOutput {
     const t0 = t;
     let segDist = 0, segEnergy = 0, segRest = 0;
     for (const c of cells) {
-      note('slope_max_deg', mask[c] ? 90 : slope[c], c);
+      // A blocked cell is only reported as 90 when the map can't use it (keep-out zone, no elevation data); steep ground reports its real slope.
+      note('slope_max_deg', mask[c] && !(Number.isFinite(slope[c]) && slope[c] > rv.slopeMax) ? 90 : slope[c], c);
       note('walk_radius_max_m', distHab(c), c);
       if (mask[c]) blockedHit = true;
       const dh = distHab(c);

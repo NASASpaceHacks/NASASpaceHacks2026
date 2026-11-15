@@ -5,7 +5,7 @@ import { maskAreaKm2, safeZoneMask } from '@mw/shared/map';
 import { HttpBackend, detectBackend, type Backend } from './api';
 import { loadStm } from './lib/science';
 import { marsTime } from './lib/marsclock';
-import { baseInfo, defaultBase, relabel, shelterById, shortName } from './lib/base';
+import { baseInfo, defaultBase, relabel, shelterById, shortName, stopName } from './lib/base';
 import { engineConst } from './lib/engine';
 import type { ActionKind, ConsoleEvent, DetailsTab, LinkCtl, OverlayId, PlanBundle, UiMode, VectorId } from './lib/types';
 import { buildZone, explainSteps, losGapSource, zoneLimits } from './lib/zone';
@@ -357,16 +357,25 @@ export function addDestination(id: string) {
   if (s.destinations.includes(id) || s.destinations.length >= 15) return;
   // Anything the officer chooses is a must-visit: the optimizer reorders it but never silently drops it.
   set({ mustVisit: { ...s.mustVisit, [id]: true } });
-  applyDestinations([...s.destinations, id], `Replanned: ${id} added`);
+  applyDestinations([...s.destinations, id], `Replanned: ${stopName(id)} added`);
 }
 
 export function removeDestination(id: string) {
   const s = get();
-  applyDestinations(s.destinations.filter((x) => x !== id), `Replanned: ${id} removed`);
+  applyDestinations(s.destinations.filter((x) => x !== id), `Replanned: ${stopName(id)} removed`);
 }
 
 export function clearDestinations() {
   applyDestinations([], 'Cleared');
+}
+
+/** Google-Maps-style pin names: "Dropped pin", then "Dropped pin 2", "Dropped pin 3"… (first number not in use). */
+function pinName(customs: Station[]): string {
+  const used = new Set(customs.map((c) => c.name));
+  if (!used.has('Dropped pin')) return 'Dropped pin';
+  let n = 2;
+  while (used.has(`Dropped pin ${n}`)) n++;
+  return `Dropped pin ${n}`;
 }
 
 /** A place anywhere on the map (dropped pin, landmark, base): becomes a stop Pn the planner must visit. */
@@ -376,7 +385,7 @@ export function addPlace(cell: Cell, name = 'Dropped pin'): string {
   let n = 1;
   while (s.customStops.some((c) => c.id === `P${n}`)) n++;
   const [x, y] = cellToXY(g, cell);
-  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? `Target of opportunity ${n}` : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
+  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? pinName(get().customStops) : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
   set({ customStops: [...s.customStops, st], mapPopover: null });
   addDestination(st.id);
   return st.id;
@@ -395,7 +404,7 @@ function newPlace(cell: Cell, name = 'Dropped pin'): Station {
   let n = 1;
   while (s.customStops.some((c) => c.id === `P${n}`)) n++;
   const [x, y] = cellToXY(g, cell);
-  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? `Target of opportunity ${n}` : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
+  const st: Station = { id: `P${n}`, name: name === 'Dropped pin' ? pinName(get().customStops) : name, x, y, cell, value: 50, objectiveIds: [], dwellMin: 10, description: 'A place you chose on the map.' };
   set({ customStops: [...s.customStops, st] });
   return st;
 }
@@ -404,7 +413,7 @@ function newPlace(cell: Cell, name = 'Dropped pin'): Station {
 export function directionsTo(target: { stationId: string } | { cell: Cell; name?: string }) {
   const id = 'stationId' in target ? target.stationId : newPlace(target.cell, target.name).id;
   set({ mustVisit: { [id]: true } });
-  applyDestinations([id], `Directions to ${id}`);
+  applyDestinations([id], `Directions to ${stopName(id)}`);
 }
 
 /** Place card / context menu "Add stop": append this target or place to the route. */
@@ -422,14 +431,14 @@ export function moveDestination(id: string, cell: Cell) {
   const [x, y] = cellToXY(g, cell);
   const custom = s.customStops.find((c) => c.id === id);
   if (custom) {
-    const name = /^Target of opportunity/.test(custom.name) ? custom.name : `Target of opportunity ${id.slice(1)}`;
+    const name = /^Dropped pin/.test(custom.name) ? custom.name : pinName(s.customStops);
     set({ customStops: s.customStops.map((c) => (c.id === id ? { ...c, cell, x, y, name } : c)), mapPopover: null, ctxMenu: null });
-    scheduleReplan(`Replanned: ${id} moved`, 30);
+    scheduleReplan(`Replanned: ${stopName(id)} moved`, 30);
     return;
   }
   const st = newPlace(cell);
   set({ mustVisit: { ...get().mustVisit, [st.id]: true } });
-  applyDestinations(s.destinations.map((d) => (d === id ? st.id : d)), `Replanned: ${id} moved`);
+  applyDestinations(s.destinations.map((d) => (d === id ? st.id : d)), `Replanned: ${stopName(id)} moved`);
 }
 
 /** Way forward: replace a destination with another spot (e.g. the closest safe point) and re-plan. */
@@ -441,12 +450,12 @@ export function replaceDestination(id: string, cell: Cell, name: string) {
   const custom = s.customStops.find((c) => c.id === id);
   if (custom) {
     set({ customStops: s.customStops.map((c) => (c.id === id ? { ...c, cell, x, y, name } : c)), mapPopover: null, ctxMenu: null });
-    scheduleReplan(`Replanned: ${id} moved to the closest safe point`, 10);
+    scheduleReplan(`Replanned: ${stopName(id)} moved to the closest safe point`, 10);
     return;
   }
   const st = newPlace(cell, name);
   set({ mustVisit: { ...get().mustVisit, [st.id]: true } });
-  applyDestinations(s.destinations.map((d) => (d === id ? st.id : d)), `Replanned: ${id} → closest safe point`);
+  applyDestinations(s.destinations.map((d) => (d === id ? st.id : d)), `Replanned: ${stopName(id)} → closest safe point`);
 }
 
 /** "Choose on map" from the To field: crosshair, and the next map click sets that field. */
@@ -511,7 +520,7 @@ export function toggleMustVisit(id: string) {
   const s = get();
   const pin = !s.mustVisit[id];
   set({ mustVisit: { ...s.mustVisit, [id]: pin }, stationOn: pin ? { ...s.stationOn, [id]: true } : s.stationOn });
-  scheduleReplan(`Replanned: ${id} ${pin ? 'pinned as must visit' : 'unpinned'}`, 60);
+  scheduleReplan(`Replanned: ${stopName(id)} ${pin ? 'pinned as must visit' : 'unpinned'}`, 60);
 }
 
 export function setAllStations(on: boolean) {
@@ -524,7 +533,7 @@ export function setAllStations(on: boolean) {
 
 export function updateRule(id: RuleId, patch: Partial<Rule>) {
   set((s) => ({ rules: s.rules.map((r) => (r.id === id ? { ...r, ...patch } : r)) }));
-  scheduleReplan(`Replanned: rule ${id} changed`, 450);
+  scheduleReplan(`Replanned: ${get().rules.find((r) => r.id === id)?.label ?? "a rule"} changed`, 450);
 }
 
 export function setStartLtst(min: number) {

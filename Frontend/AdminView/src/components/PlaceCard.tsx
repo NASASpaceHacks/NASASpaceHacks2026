@@ -89,6 +89,8 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
         : `Can't go here: ${pv.reason}`
     : null;
   const mine = isPin && pin && pin.cell === pop.cell ? pin : null;
+  // The ground itself is fine but the full walk check says NO-GO: say so neutrally, never a green "safe".
+  const groundOnly = isPin && !!pv?.ok && mine?.verdict === 'NO-GO';
 
   return (
     <div
@@ -138,8 +140,8 @@ function PlaceCardInner({ root, pop }: { root: RefObject<HTMLElement | null>; po
         </div>
       )}
       {safety && (
-        <div data-testid="place-safety" data-ok={pv!.ok ? '1' : '0'} className={`mt-2 text-[13.5px] leading-snug ${pv!.ok ? 'text-ok' : 'text-red'}`}>
-          {safety}
+        <div data-testid="place-safety" data-ok={pv!.ok ? '1' : '0'} className={`mt-2 text-[13.5px] leading-snug ${!pv!.ok ? 'text-red' : groundOnly ? 'text-ink-2' : 'text-ok'}`}>
+          {groundOnly ? `Ground here: ${Number.isFinite(pv!.slopeDeg) ? `${Math.round(pv!.slopeDeg)}°, ` : ''}walkable` : safety}
         </div>
       )}
       {mine?.verdict === 'NO-GO' && (

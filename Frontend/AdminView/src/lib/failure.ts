@@ -12,6 +12,10 @@ export interface FailureInfo {
   short: string;
   /** One plain sentence with numbers, for the verdict panel. */
   sentence: string;
+  /** The reason as a phrase for a destination row ("83 min from shelter (limit 30)"): same numbers as `sentence`. */
+  reason: string;
+  /** What the red mark on the map is, in one sentence. */
+  marks: string;
   /** Stretches of route cells to paint red (one cell = a point). */
   runs: number[][];
   /** Where the label sits. */
@@ -121,7 +125,7 @@ export function summarizeAttempt(
 
   const fails = failing(segs);
   const pick = (preferRule && fails.find((c) => c.rule === preferRule)) || fails[0];
-  let failure: FailureInfo | null = null;
+  let failure: Omit<FailureInfo, 'marks'> | null = null;
   if (pick) {
     const lim = ruleOf(pick.rule);
     const limit = lim ? lim.value : pick.limit;
@@ -135,6 +139,7 @@ export function summarizeAttempt(
           rule: pick.rule, runs: [cells], labelCell: cells[Math.floor(cells.length / 2)], worst: w, limit, atMin: pick.atMin,
           short: `No radio ${Math.round(w)} min (limit ${limit})`,
           sentence: `No radio contact for ${Math.round(w)} min on the way (limit ${limit} min)`,
+          reason: `no radio contact for ${Math.round(w)} min on the way (limit ${limit} min)`,
         };
         break;
       }
@@ -147,10 +152,14 @@ export function summarizeAttempt(
         }
         if (cur.length) runs.push(cur);
         const first = runs[0] ?? [pick.atCell];
+        // 90 is the engine's marker for ground the map can't use at all (keep-out zone, no elevation data), not a slope.
+        const unusable = w >= 90;
+        const deg = Math.round(w);
         failure = {
           rule: pick.rule, runs: runs.length ? runs : point(pick.atCell), labelCell: first[Math.floor(first.length / 2)], worst: w, limit, atMin: pick.atMin,
-          short: `Slope ${Math.round(w)}° (limit ${limit}°)`,
-          sentence: `The ground reaches ${Math.round(w)}° (limit ${limit}°)`,
+          short: unusable ? "Ground the map can't use" : `Slope ${deg}° (limit ${limit}°)`,
+          sentence: unusable ? "The walk crosses ground the map can't use (a keep-out zone or no elevation data)" : `The ground reaches ${deg}° (limit ${limit}°)`,
+          reason: unusable ? "the walk crosses ground the map can't use (a keep-out zone or no elevation data)" : `the walk reaches ${deg}° ground (limit ${limit}°)`,
         };
         break;
       }
@@ -158,8 +167,9 @@ export function summarizeAttempt(
         const first = (legs[0] ?? []).find((c) => cellDistM(g, base, c) > limit) ?? pick.atCell;
         failure = {
           rule: pick.rule, runs: point(first), labelCell: first, worst: w, limit, atMin: pick.atMin,
-          short: `${dist(limit)} from base reached`,
+          short: `${dist(w)} from the base (limit ${dist(limit)})`,
           sentence: `The stop is ${dist(w)} from the base (limit ${dist(limit)})`,
+          reason: `${dist(w)} from the base (limit ${dist(limit)})`,
         };
         break;
       }
@@ -168,6 +178,7 @@ export function summarizeAttempt(
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
           short: `${Math.round(w)} min from shelter (limit ${limit})`,
           sentence: `The farthest point is ${Math.round(w)} min from shelter (limit ${limit} min)`,
+          reason: `${Math.round(w)} min from shelter (limit ${limit})`,
         };
         break;
       case 'walkback_speed_factor': {
@@ -176,6 +187,7 @@ export function summarizeAttempt(
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
           short: `Walk-back ${over} min too long`,
           sentence: `The slow walk back from the stop would be ${over} min past the deadline`,
+          reason: `the slow walk back would be ${over} min past the deadline`,
         };
         break;
       }
@@ -184,6 +196,7 @@ export function summarizeAttempt(
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
           short: `Suit heat ${Math.round(w)} W (limit ${limit})`,
           sentence: `Suit heat reaches ${Math.round(w)} W (limit ${limit} W)`,
+          reason: `suit heat reaches ${Math.round(w)} W (limit ${limit} W)`,
         };
         break;
       case 'eva_duration_max_min': {
@@ -192,6 +205,7 @@ export function summarizeAttempt(
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
           short: `${over} min over the EVA time`,
           sentence: `The walk runs ${over} min past the EVA time limit`,
+          reason: `the walk runs ${over} min past the EVA time limit`,
         };
         break;
       }
@@ -200,19 +214,21 @@ export function summarizeAttempt(
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
           short: `Sun ${num(w)}° (minimum ${limit}°)`,
           sentence: `The sun drops to ${num(w)}° (minimum ${limit}°)`,
+          reason: `the sun drops to ${num(w)}° (minimum ${limit}°)`,
         };
         break;
       default:
         failure = {
           rule: pick.rule, runs: point(pick.atCell), labelCell: pick.atCell, worst: w, limit, atMin: pick.atMin,
-          short: lim?.label ?? pick.rule, sentence: lim?.label ?? pick.rule,
+          short: lim?.label ?? pick.rule, sentence: lim?.label ?? pick.rule, reason: lim?.label ?? pick.rule,
         };
     }
   }
+  const marked: FailureInfo | null = failure && { ...failure, marks: failure.runs.some((r) => r.length > 1) ? 'The stretch is marked red on the map.' : 'The red circle on the map marks where.' };
 
   const first = segs[0], last = segs[segs.length - 1];
   return {
-    source, destId, legs, failure, margins, burndown: sim.burndown,
+    source, destId, legs, failure: marked, margins, burndown: sim.burndown,
     totals: {
       distM: sim.distM,
       durationMin: first && last ? last.t1Min - first.t0Min : 0,

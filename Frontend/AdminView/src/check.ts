@@ -3,6 +3,7 @@ import { cellToXY } from '@mw/shared/contracts';
 import { attemptRoute } from '@mw/shared/engine';
 import { directionsTo, getBackend, requestFor } from './actions';
 import { findClosestSafe, findRoverSpot, restoreServerBase } from './fixes';
+import { baseInfo } from './lib/base';
 import { deadlineT, dropReason, hm, returnT } from './lib/plain';
 import { summarizeAttempt, type AttemptView } from './lib/failure';
 import { get, set, useConsole, type ConsoleState } from './store';
@@ -72,7 +73,8 @@ async function runPin() {
   }
   const d = r.dropped.find((x2) => x2.id === id);
   const attempt = attemptFor(req, id, 'pin', d?.rule ?? r.binding?.rule);
-  const text = attempt?.failure ? attempt.failure.sentence : d ? dropReason(d, s.rules) : (r.notes[r.notes.length - 1] ?? 'no safe plan');
+  const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+  const text = attempt?.failure ? cap(attempt.failure.reason) : d ? cap(dropReason(d, s.rules, { pack: s.pack, baseCell: baseInfo(s.pack, s.evaBase, s.shelterCells).cell, stopCell: pop.cell })) : (r.notes[r.notes.length - 1] ?? 'no safe plan');
   set({ pinCheck: { cell: pop.cell, destId: id, status: 'done', verdict: 'NO-GO', text, rule: d?.rule ?? attempt?.failure?.rule ?? r.binding?.rule }, attemptPin: attempt?.failure ? attempt : null });
 }
 

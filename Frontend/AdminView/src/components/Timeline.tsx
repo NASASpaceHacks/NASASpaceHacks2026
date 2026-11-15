@@ -25,6 +25,8 @@ export function Timeline() {
   const shelterCells = useConsole((s) => s.shelterCells);
   const selected = useConsole((s) => s.selectedStation);
   const dests = useConsole((s) => s.destinations);
+  const attempt = useConsole((s) => s.attemptPlan);
+  const customs = useConsole((s) => s.customStops);
   const base = useBaseInfo();
   const live = uiMode === 'live';
   const lastT = live && telem.length ? telem[telem.length - 1].t : null;
@@ -43,14 +45,15 @@ export function Timeline() {
     const resumed = req?.resume?.elapsedMin ?? null;
     const t1 = Math.max(evaMax - cut, back + half, dl + half) * 1.02;
     const label = (id: string, cell?: number) => endpointLabel(pack, base, id, shelterCells, cell);
+    const nameOf = (id: string) => [...pack.manifest.stations, ...customs].find((x) => x.id === id)?.name.replace(/\s*\([^)]*\)\s*$/, '') ?? id;
     const order = (id: string) => plan.order.indexOf(id) + 1;
     // Plan mode: the same letters as the directions card and the map markers (B, C…).
     const tag = (id: string) => {
       const di = uiMode === 'plan' ? dests.indexOf(id) : -1;
       return di >= 0 ? String.fromCharCode(66 + di) : String(order(id));
     };
-    return { evaMax, half, cut, back, dl, resumed, t1, label, order, tag };
-  }, [plan, pack, base, rules, events, req, shelterCells, uiMode, dests]);
+    return { evaMax, half, cut, back, dl, resumed, t1, label, order, tag, nameOf };
+  }, [plan, pack, base, rules, events, req, shelterCells, uiMode, dests, customs]);
 
   const trackRef = useRef<HTMLDivElement>(null);
   const [trackW, setTrackW] = useState(900);
@@ -66,11 +69,11 @@ export function Timeline() {
   if (!model || !plan) {
     return (
       <div className="flex h-full items-center px-5 text-[12.5px] text-mute">
-        {status === 'planning' ? 'Planning the walk…' : plan?.status === 'STAY_IN' ? 'No walk to show: the chosen stops can’t be reached safely from this base.' : 'No route yet'}
+        {status === 'planning' ? 'Planning the walk…' : plan?.status === 'STAY_IN' ? (attempt?.failure ? 'Not safe · dashed: the walk that was checked · red: where it breaks a rule' : 'Not safe · no walk to show from this base') : 'No route yet'}
       </div>
     );
   }
-  const { half, back, dl, resumed, t1, label, order, tag } = model;
+  const { half, back, dl, resumed, t1, label, order, tag, nameOf } = model;
   const x = (t: number) => `${(Math.max(0, Math.min(t1, t)) / t1) * 100}%`;
   const w = (a: number, b: number) => `${(Math.max(0, Math.min(t1, b) - Math.max(0, a)) / t1) * 100}%`;
   const firstSeg = plan.segments[0];
@@ -90,7 +93,7 @@ export function Timeline() {
     <div data-testid="timeline" className="relative flex h-full flex-col px-5 pb-2.5 pt-2.5" aria-label="EVA timeline">
       <div className="flex items-center gap-4">
         <span className="eyebrow">EVA timeline</span>
-        <span className="num text-[11.5px] text-mute">Mars local time · {fmtLtst(start)} → {fmtLtst(evaLtst(start, plan.totals.durationMin))}</span>
+        <span className="num text-[11.5px] text-mute" title="Walk times are in Earth minutes; a Mars clock minute is about 2.7 % longer, so the clock span is a little shorter than the walk time.">Mars local time · {fmtLtst(start)} → {fmtLtst(evaLtst(start, plan.totals.durationMin))}</span>
         {live && (
           <span data-testid="timeline-delta" className={cx('num ml-1 text-[12.5px] font-medium', deltaTone || 'text-mute')}>
             {lastT === null ? 'Waiting for the crew to start' : `NOW ${fmtLtst(evaLtst(start, lastT))} · ${deltaText ?? '—'}`}
@@ -113,7 +116,7 @@ export function Timeline() {
         {/* leave-by ticks */}
         <div className="absolute inset-x-0 top-0 h-[18px]">
           {plan.bingo.filter((b) => b.id !== 'HAB' && order(b.id) > 0).map((b) => (
-            <div key={b.id} className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: x(b.tMin) }} title={`Leave ${b.id} by ${fmtLtst(b.ltstMin)}`}>
+            <div key={b.id} className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: x(b.tMin) }} title={`Leave ${nameOf(b.id)} by ${fmtLtst(b.ltstMin)}`}>
               <span className="num text-[10px] leading-none text-white">{tag(b.id)}</span>
               <span className="mt-[2px] h-[7px] w-[1px] bg-white" />
             </div>
@@ -161,10 +164,10 @@ export function Timeline() {
                 onClick={() => set({ selectedStation: st.id })}
                 className={cx('absolute inset-y-0 flex min-w-[6px] items-center gap-1 overflow-hidden px-1.5 text-left transition-colors', selected === st.id ? 'border border-cyan bg-cyan/20' : 'border border-magenta bg-black hover:bg-magenta/10')}
                 style={{ left: x(st.arriveMin), width: w(st.arriveMin, st.departMin) }}
-                title={`Stop ${n} · ${st.id} · ${dwell} min · arrive ${fmtLtst(evaLtst(start, st.arriveMin))}, leave ${fmtLtst(evaLtst(start, st.departMin))}${bingo ? ` · leave by ${fmtLtst(bingo.ltstMin)}` : ''}`}
+                title={`Stop ${n} · ${nameOf(st.id)} · ${dwell} min · arrive ${fmtLtst(evaLtst(start, st.arriveMin))}, leave ${fmtLtst(evaLtst(start, st.departMin))}${bingo ? ` · leave by ${fmtLtst(bingo.ltstMin)}` : ''}`}
               >
                 <span className="num text-[11px] font-semibold text-magenta">{n}</span>
-                {px(st.arriveMin, st.departMin) >= 50 && <span className="num truncate text-[11px] text-ink">{st.id}</span>}
+                {px(st.arriveMin, st.departMin) >= 50 && <span className="num truncate text-[11px] text-ink">{nameOf(st.id)}</span>}
                 {px(st.arriveMin, st.departMin) >= 82 && <span className="num truncate text-[10px] text-mute">{dwell}′</span>}
               </button>
             );

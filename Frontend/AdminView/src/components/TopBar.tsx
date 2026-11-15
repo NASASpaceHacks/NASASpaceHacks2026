@@ -181,7 +181,7 @@ export function TopBar() {
               Visor offline
             </div>
           ) : (
-            <div data-testid="crew-link" data-link={link} className={cx('flex h-10 items-center gap-2 rounded-[8px] px-3 text-[12.5px]', link === 'up' ? 'text-ok' : link === 'degraded' ? 'bg-caution/10 text-caution' : 'bg-red/12 text-red')}>
+            <div data-testid="crew-link" data-link={link} title="How recently the crew visor was last heard from: OK within 1.5 seconds, weak after 1.5 seconds, lost after 3 seconds of silence." className={cx('flex h-10 items-center gap-2 rounded-[8px] px-3 text-[12.5px]', link === 'up' ? 'text-ok' : link === 'degraded' ? 'bg-caution/10 text-caution' : 'bg-red/12 text-red')}>
               <span className={cx('h-2 w-2 rounded-full', link === 'up' ? 'bg-ok' : link === 'degraded' ? 'bg-caution mw-pulse' : 'bg-red mw-pulse')} />
               Crew link {link === 'up' ? 'OK' : link === 'degraded' ? 'weak' : 'lost'}
             </div>

@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 import type { CursorReadout } from '@mw/shared/map';
 import type { StationState } from '@mw/shared/map';
-import { attachMap, handleMapClick, moveDestination, moveShelter, openContextMenu } from '../actions';
+import { attachMap, getBackend, getMap, handleMapClick, moveDestination, moveShelter, openContextMenu, requestFor } from '../actions';
+import { buildZone, losGapSource, zoneLimits } from '../lib/zone';
+import { maskAreaKm2, safeZoneMask } from '@mw/shared/map';
 import { get, set, useConsole } from '../store';
 import { sunAtLtst } from '../lib/marsclock';
 import { MapController } from './MapController';
@@ -54,7 +56,49 @@ function destMarkers(): { list: DestMarker[]; pin: [number, number] | null } {
   return { list, pin };
 }
 
+/**
+ * The safe-walking outline is shown from first load, before any route exists. The safe-area model comes from
+ * the engine's fields, which a plan normally brings; so with no plan we ask for the fields once per base and
+ * install the zone ourselves. A real plan's own zone always wins (we skip, or yield to it, when one exists).
+ */
+function useBaseZone() {
+  const pack = useConsole((s) => s.pack);
+  useEffect(() => {
+    if (!pack) return;
+    let alive = true;
+    let tried = '';
+    const warm = async () => {
+      const s = get();
+      const backend = getBackend();
+      if (s.plan) tried = ''; // a real plan owns the zone now
+      if (!backend || s.plan || s.planStatus === 'planning' || s.planStatus === 'error') return;
+      const req = requestFor(pack.manifest, { ...s, stationOn: Object.fromEntries(pack.manifest.stations.map((x) => [x.id, true])), mustVisit: {}, customStops: [] });
+      const key = `${s.evaBase}:${req.hab}:${s.hazards.join(',')}:${s.events.length}:${s.rules.map((r) => `${r.id}${r.enabled}${r.value}`).join('|')}`;
+      if (key === tried) return;
+      tried = key;
+      try {
+        const bundle = await backend.plan(req);
+        const now = get();
+        if (!alive || now.plan || now.pack !== pack) return;
+        const zone = buildZone(pack, bundle.fields, now.hazards, req.hab);
+        const limits = zoneLimits(now.rules, now.events);
+        set({ zone, limits, zoneAreaKm2: maskAreaKm2(safeZoneMask(zone, limits), zone.cellM), losSource: bundle.fieldsSource === 'estimate' ? 'estimate' : losGapSource(pack, bundle.fields) });
+        getMap()?.setZone(zone, limits, false);
+      } catch {
+        tried = ''; // try again on the next change
+      }
+    };
+    void warm();
+    const off = useConsole.subscribe((s) => [s.evaBase, s.shelterCells, s.plan, s.hazards, s.rules, s.events] as const, () => void warm(), { equalityFn: (a, b) => a.every((v, i) => v === b[i]) });
+    return () => { alive = false; off(); };
+  }, [pack]);
+}
+
+/** Test hook: features a person could click or that carry text (markers, stops, labels), not area outlines or tints. */
+const clickable = (f: { get(k: string): unknown }) => f.get('id') != null || !!f.get('dest') || !!f.get('movable') || f.get('label') != null;
+
 export function MapView() {
+  useBaseZone();
   const rootRef = useRef<HTMLDivElement>(null);
   const el = useRef<HTMLDivElement>(null);
   const readoutRef = useRef<HTMLDivElement>(null);
@@ -157,7 +201,7 @@ export function MapView() {
       useConsole.subscribe((s) => s.fix, syncFix),
       useConsole.subscribe((s) => [s.attemptPin, s.attemptPlan] as const, ([pin, pl], [, prevPl]) => {
         ctrl.setAttempt(pin ?? pl);
-        if (!pin && pl && pl !== prevPl) setTimeout(() => ctrl.fitRoute(450, pl.legs.flat()), 120); // after the plan's own first fit
+        if (!pin && pl && pl !== prevPl) setTimeout(() => ctrl.fitRoute(450, [...pl.legs.flat(), ...(pl.failure?.runs.flat() ?? []), ...(pl.failure ? [pl.failure.labelCell] : [])]), 120); // after the plan's own first fit
       }, { equalityFn: (a, b) => a[0] === b[0] && a[1] === b[1] }),
       useConsole.subscribe((s) => s.evaBase, (id) => ctrl.setBaseA(id)),
       useConsole.subscribe((s) => s.hazards, (h) => ctrl.setHazards(h)),
@@ -233,7 +277,7 @@ export function MapView() {
               const cell = xyToCellSafe(g, c[0] + dx * g.cellM, c[1] + dy * g.cellM);
               ok = cell >= 0 && pack.rasters.slope[cell] < 8 && los[cell] === 0;
             }
-            if (!ok || ctrl.map.getFeaturesAtPixel(px, { hitTolerance: 16 }).length) continue;
+            if (!ok || ctrl.map.getFeaturesAtPixel(px, { hitTolerance: 16 }).some(clickable)) continue;
             const score = Math.abs(dm - targetM);
             if (score < bd) {
               bd = score;
@@ -261,7 +305,7 @@ export function MapView() {
               const sl = cell >= 0 ? pack.rasters.slope[cell] : NaN;
               ok = kind === 'steep' ? sl > 24 : sl < 6;
             }
-            if (!ok || ctrl.map.getFeaturesAtPixel(px, { hitTolerance: 16 }).length) continue;
+            if (!ok || ctrl.map.getFeaturesAtPixel(px, { hitTolerance: 16 }).some(clickable)) continue;
             const d = near ? Math.hypot(x - near[0], y - near[1]) : 0;
             if (near && d > withinPx) continue;
             if (d < bd) {
