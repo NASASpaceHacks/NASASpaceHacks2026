@@ -4,7 +4,7 @@
 
 NASA Space Apps Challenge 2026 · *Interplanetary Survival Guide: Martian Map* · Team NASASpaceHacks (Toronto)
 
-[Website](https://marswalk-gale.vercel.app) · [Slides](https://marswalk-gale.vercel.app/slides/) · [Paper](docs/paper/marswalk-paper.pdf) · [Hardware report](Mars%20Walk%20Design%20Concept%20Report.pdf) · 30-second film: coming soon
+[Website](https://marswalk-gale.vercel.app) · [Slides](https://marswalk-gale.vercel.app/slides/) · [Paper](docs/paper/marswalk-paper.pdf) · [Hardware report](Mars%20Walk%20Design%20Concept%20Report.pdf) · [30-second film](https://www.youtube.com/watch?v=bI-LNrVficQ)
 
 ## The problem and what Marswalk does
 
@@ -123,7 +123,7 @@ Start with the website for the overview; the other materials each have one job.
 | [Slides](https://marswalk-gale.vercel.app/slides/) · [PDF](Website/files/marswalk-slides.pdf) | The 10-slide visual pitch |
 | [Research paper](docs/paper/marswalk-paper.pdf) ([sources and scripts](docs/paper/README.md)) | Detailed write-up: models, engine, evaluation |
 | [Hardware concept report](Mars%20Walk%20Design%20Concept%20Report.pdf) | Helmet optics, localization, suit compute |
-| 30-second film | Coming soon |
+| [30-second film](https://www.youtube.com/watch?v=bI-LNrVficQ) | The product in action: plan, check, walk, lose the link, come home |
 
 Docs in the repo:
 

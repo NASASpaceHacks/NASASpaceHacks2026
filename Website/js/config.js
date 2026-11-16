@@ -1,7 +1,7 @@
 // The only place to edit links. Empty string = shown as "coming soon".
 window.MW_LINKS = {
-  video: '',        // e.g. https://youtu.be/XXXX  (the 30-second film)
-  videoEmbed: '',   // e.g. https://www.youtube-nocookie.com/embed/XXXX
+  video: 'https://www.youtube.com/watch?v=bI-LNrVficQ',  // the 30-second film
+  videoEmbed: 'https://www.youtube-nocookie.com/embed/bI-LNrVficQ',
   slides: 'slides/',  // slide viewer page (PDF: files/marswalk-slides.pdf)
   github: 'https://github.com/NASASpaceHacks/NASASpaceHacks2026',
   repo: 'https://github.com/NASASpaceHacks/NASASpaceHacks2026',
