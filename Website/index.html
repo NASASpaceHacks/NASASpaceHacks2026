@@ -1,0 +1,1786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marswalk · Mars EVA planning, from habitat to helmet</title>
+<meta name="description" content="Marswalk plans a Mars surface walk on real NASA terrain, checks it against 12 cited NASA EVA constraints, explains every NO-GO, and guides the astronaut through an AR navigator, even when the link to the habitat drops. NASA Space Apps Challenge 2026.">
+<meta name="theme-color" content="#0b0605">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Marswalk · Mars EVA planning, from habitat to helmet">
+<meta property="og:description" content="Plan a Mars walk that brings the crew home. Real NASA terrain, 12 cited EVA constraints, an AR navigator that keeps guiding when the link drops.">
+<meta property="og:image" content="https://marswalk-gale.vercel.app/assets/og.jpg">
+<meta property="og:url" content="https://marswalk-gale.vercel.app/">
+<link rel="canonical" href="https://marswalk-gale.vercel.app/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23b5432c'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%237fe0a6' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=B612+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/base.css">
+<script src="js/config.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<!-- HERO: "Descent" — orbit → Gale crater → 5×5 km terrain → on foot, through the AR navigator's visor -->
+<nav class="topnav" id="topnav" aria-label="Main">
+  <a class="tn-brand" href="#top" aria-label="Marswalk, back to top">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".5"/><circle cx="12" cy="12" r="4" fill="none" stroke="#7fe0a6" stroke-width="1.6"/><path d="M12 0v5M12 19v5M0 12h5M19 12h5" stroke="currentColor" stroke-width="1.2"/></svg>
+    <span>MARSWALK</span>
+  </a>
+  <div class="tn-links">
+    <a href="#problem">Problem</a><a href="#system">System</a><a href="#rover">Why the rover</a><a href="#how">How it works</a><a href="#results">Results</a><a href="#resources">Resources</a>
+  </div>
+  <a class="btn primary tn-cta" data-link="video"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>Watch the film</a>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-pin">
+    <!-- world layers -->
+    <div class="hx-stage" aria-hidden="true">
+      <div class="hx-stars"></div>
+      <div class="hx-globe-wrap"><div class="hx-atmo"></div><canvas class="hx-globe" width="10" height="10"></canvas><div class="hx-rim"></div></div>
+      <div class="hx-layer hx-regional"><img src="assets/img/gale-regional.jpg" alt="" decoding="async"></div>
+      <div class="hx-entry"></div>
+      <div class="hx-layer hx-terrain">
+        <div class="hx-tilt">
+          <img src="assets/img/hirise-2400.jpg" alt="" decoding="async">
+          <svg class="hx-map" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+      <div class="hx-haze"></div>
+      <div class="hx-layer hx-ground"><img src="assets/img/msl-5072-5072MR1102610012602321C0.jpg" alt="" decoding="async"></div>
+      <svg class="hx-ar" preserveAspectRatio="none"></svg>
+      <div class="hx-aoi"><i></i><span class="hud-label is-hud">Study area · 5 × 5 km</span></div>
+      <div class="hx-target"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="16" fill="none" stroke="#7fe0a6" stroke-width="1.5"/><circle cx="40" cy="40" r="2.5" fill="#7fe0a6"/><path d="M40 6v14M40 60v14M6 40h14M60 40h14" stroke="#7fe0a6" stroke-width="1.5"/><circle class="pulse" cx="40" cy="40" r="16" fill="none" stroke="#7fe0a6" stroke-width="1"/></svg><span class="hx-target-line"></span><span class="hx-target-label hud-label is-hud">Target · Gale crater<br><span>4.805°S 137.388°E</span></span></div>
+    </div>
+
+    <!-- AR navigator cards (ground stage) -->
+    <div class="hx-arui" aria-hidden="true">
+      <div class="ar-card glass"><i class="brk"></i>
+        <div class="ar-card-top"><span class="hud-label is-hud">Next stop · ST01</span><span class="hud-label hud-num">122 m · ETA 4 min</span></div>
+        <div class="ar-turn"><svg viewBox="0 0 24 24"><path d="M6 20v-7a5 5 0 0 1 5-5h7m-4-4 4 4-4 4" fill="none" stroke="#7fe0a6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Walk to Altadena drill site</div>
+        <div class="ar-meta">Follow the path</div>
+        <div class="ar-rail"><span></span></div>
+      </div>
+      <div class="ar-pills"><span class="chip plain hud-num">PET 00:31:44</span><span class="chip plain hud-num">HDG 293°</span><span class="chip plain hud-num">CRS 295°</span></div>
+      <div class="ar-link"><span class="chip go ar-up">Link up</span><span class="chip nogo ar-lost">Link lost · autonomous</span></div>
+      <div class="ar-banner glass"><span class="hud-label is-alert">Link lost</span> Guiding on last confirmed route v1</div>
+    </div>
+
+    <!-- visor frame -->
+    <div class="hx-visor" aria-hidden="true"><i class="brk"></i></div>
+
+    <!-- HUD readouts -->
+    <div class="hx-hud" aria-hidden="true">
+      <div class="hx-readout"><span class="hud-label">Field of view</span><span class="hud-num hx-fov">6,780 km</span></div>
+      <div class="hx-readout hx-ro-2"><span class="hud-label">Sol 412 · LTST</span><span class="hud-num">09:40</span></div>
+      <div class="hx-readout hx-ro-3"><span class="hud-label">Earth → Mars, one way <i>(example)</i></span><span class="hud-num hx-light">12 min 38 s</span></div>
+    </div>
+    <ol class="hx-rail" aria-hidden="true"><li data-i="0">Orbit</li><li data-i="1">Gale</li><li data-i="2">The plan</li><li data-i="3">On foot</li><span class="hx-rail-fill"></span></ol>
+
+    <!-- copy -->
+    <div class="hx-copy hx-c0">
+      <p class="hud-label is-hud hx-kicker">NASA Space Apps 2026 · Interplanetary Survival Guide: Martian Map</p>
+      <h1 class="display hx-h1">First steps on Mars, <em>without Earth in the&nbsp;loop.</em></h1>
+      <p class="hx-lede">Marswalk plans a surface walk on real NASA terrain, checks it against <b>12 cited NASA EVA constraints</b>, and guides the astronaut through an AR navigator, even when the link to the habitat drops.</p>
+      <div class="hx-ctas">
+        <a class="btn primary" data-link="video"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>Watch the 30-second film</a>
+        <a class="btn" data-link="github"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.23 1.87.87 2.33.67.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.22 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"/></svg>GitHub</a>
+        <a class="btn" data-link="slides">Slides</a>
+        <a class="btn" data-link="researchPaper">Research paper</a>
+      </div>
+    </div>
+    <div class="hx-copy hx-cap hx-c1"><div class="glass hx-capcard"><i class="brk"></i>
+      <p class="hud-label is-hud">01 · Gale crater</p>
+      <h2 class="display">Mount Sharp, where <em>Curiosity</em> is driving.</h2>
+      <p>A 5 × 5 km study area on Curiosity's 2025–26 boxwork traverse at 4.805°S 137.388°E, the challenge's own example.</p>
+    </div></div>
+    <div class="hx-copy hx-cap hx-c2"><div class="glass hx-capcard"><i class="brk"></i>
+      <p class="hud-label is-hud">02 · The plan</p>
+      <h2 class="display">Planned in the habitat, on <em>1-metre terrain.</em></h2>
+      <p>From Hab-1, no science stop passes all 12 constraints. Staged from the PR-1 rover, it's a GO. Every plan is re-walked in a simulator in about 38 ms.</p>
+      <div class="hx-chips"><span class="chip nogo">No-go · from Hab-1</span><span class="chip go">Go · from PR-1</span></div>
+    </div></div>
+    <div class="hx-copy hx-cap hx-c3"><div class="glass hx-capcard"><i class="brk"></i>
+      <p class="hud-label is-hud">03 · On foot</p>
+      <h2 class="display">The AR navigator <em>brings her home.</em></h2>
+      <p>Chevrons on the ground and one instruction at a time. Mars has no GPS, so it dead-reckons between landmark fixes. If the link to the habitat drops, it goes autonomous within about 3 seconds.</p>
+    </div></div>
+
+    <div class="hx-foot">
+      <a class="hx-scroll" href="#problem"><span class="hx-scroll-line"></span><span class="hud-label">Scroll to descend · <u>skip</u></span></a>
+      <p class="hx-credit hud-label"></p>
+    </div>
+  </div>
+</header>
+
+<style>
+.skip{position:absolute;left:-9999px;top:8px;z-index:200;background:var(--hud);color:#04140b;padding:10px 14px;border-radius:8px;font-weight:600}
+.skip:focus{left:8px}
+/* ---------- top nav ---------- */
+.topnav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;gap:28px;height:72px;padding:0 var(--gutter);transition:background .4s,border-color .4s,height .4s;border-bottom:1px solid transparent}
+.topnav.solid{background:rgba(11,6,5,.72);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border-bottom-color:var(--line);height:64px}
+.tn-brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+.tn-brand svg{width:22px;height:22px}
+.tn-brand span{font:600 15px/1 var(--font-display);font-stretch:125%;letter-spacing:.28em}
+.tn-links{display:flex;gap:26px;margin-left:auto}
+.tn-links a{font:500 13.5px/1 var(--font-body);color:var(--mute);text-decoration:none;transition:color .25s}
+.tn-links a:hover{color:var(--cream)}
+.tn-cta{--h:40px;padding:0 18px;font-size:13px}
+@media (max-width:1080px){.tn-links{display:none}.tn-cta{margin-left:auto}}
+@media (max-width:520px){.tn-cta .soon{display:none}.tn-brand span{font-size:13px;letter-spacing:.22em}}
+
+/* ---------- pinned stage ---------- */
+.hero{position:relative;height:460vh;height:460svh;background:var(--space)}
+.hero-pin{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;isolation:isolate}
+.hx-stage{position:absolute;inset:0;overflow:hidden;contain:strict}
+.hx-stars{position:absolute;inset:-10%;background:
+  radial-gradient(1px 1px at 12% 18%,rgba(255,255,255,.55),transparent 60%),radial-gradient(1px 1px at 33% 72%,rgba(255,255,255,.35),transparent 60%),
+  radial-gradient(1.5px 1.5px at 58% 9%,rgba(200,220,255,.6),transparent 60%),radial-gradient(1px 1px at 81% 31%,rgba(255,255,255,.4),transparent 60%),
+  radial-gradient(1px 1px at 7% 88%,rgba(255,255,255,.3),transparent 60%),radial-gradient(1px 1px at 46% 41%,rgba(255,255,255,.25),transparent 60%),
+  radial-gradient(1.2px 1.2px at 92% 64%,rgba(220,230,255,.45),transparent 60%),radial-gradient(1px 1px at 24% 52%,rgba(255,255,255,.3),transparent 60%),
+  radial-gradient(1px 1px at 68% 84%,rgba(255,255,255,.3),transparent 60%),radial-gradient(1px 1px at 75% 12%,rgba(255,255,255,.35),transparent 60%),
+  radial-gradient(ellipse 80% 60% at 70% 70%,rgba(110,36,22,.28),transparent 70%),radial-gradient(ellipse 60% 50% at 10% 0%,rgba(143,178,217,.06),transparent 70%)}
+.hx-globe-wrap{position:absolute;left:0;top:0;width:var(--D,800px);height:var(--D,800px);transform-origin:50% 50%;will-change:transform,opacity}
+.hx-globe{position:absolute;inset:0;width:100%;height:100%;border-radius:50%}
+.hx-atmo{position:absolute;inset:-6%;border-radius:50%;background:radial-gradient(circle,transparent 46%,rgba(143,178,217,.22) 47.2%,rgba(143,178,217,.07) 52%,transparent 62%);filter:blur(2px)}
+.hx-rim{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 36% 30%,transparent 62%,rgba(143,178,217,.18) 71%,rgba(160,190,230,.38) 70.6%,transparent 71%);mix-blend-mode:screen;opacity:.9}
+.hx-layer{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity;opacity:0}
+.hx-layer img{width:100%;height:100%;object-fit:cover}
+.hx-regional{-webkit-mask-image:radial-gradient(closest-side,#000 62%,transparent 100%);mask-image:radial-gradient(closest-side,#000 62%,transparent 100%)}
+.hx-terrain{perspective:1100px;-webkit-mask-image:radial-gradient(closest-side,#000 var(--f,60%),transparent 100%);mask-image:radial-gradient(closest-side,#000 var(--f,60%),transparent 100%)}
+.hx-tilt{position:absolute;inset:0;transform-origin:50% 62%;will-change:transform,filter}
+.hx-map{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.hx-entry{position:absolute;inset:-25%;opacity:0;pointer-events:none;will-change:opacity,transform;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,238,228,.13) 0deg .45deg,transparent .45deg 2.9deg),radial-gradient(circle at 50% 50%,rgba(220,176,156,0) 0%,rgba(206,150,126,.28) 26%,rgba(118,58,42,.9) 72%);
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,transparent 5%,#000 42%);mask-image:radial-gradient(circle at 50% 50%,transparent 5%,#000 42%)}
+.hero-pin::before{content:"";position:absolute;left:0;right:0;top:0;height:230px;background:linear-gradient(rgba(11,6,5,.72),rgba(11,6,5,0));z-index:2;pointer-events:none}
+.hx-haze{position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,rgba(201,160,140,.85) 0%,rgba(150,98,78,.35) 30%,transparent 55%)}
+.hx-ground{inset:0;width:100%;height:100%;transform-origin:50% 50%}
+.hx-ground::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,6,5,.35),transparent 30%,transparent 55%,rgba(11,6,5,.55))}
+.hx-ar{position:absolute;inset:0;width:100%;height:100%;opacity:0;overflow:visible}
+.hx-aoi{position:absolute;left:0;top:0;opacity:0;pointer-events:none}
+.hx-aoi i{position:absolute;inset:0;border:1px solid rgba(127,224,166,.85);box-shadow:0 0 0 1px rgba(4,30,17,.4),0 0 24px rgba(127,224,166,.25)}
+.hx-aoi span{position:absolute;left:0;top:calc(100% + 10px);white-space:nowrap}
+.hx-target{position:absolute;left:0;top:0;width:80px;height:80px;margin:-40px 0 0 -40px;opacity:0;pointer-events:none}
+.hx-target svg{width:80px;height:80px;overflow:visible}
+.hx-target .pulse{transform-origin:40px 40px;animation:hxPulse 2.4s var(--ease-out) infinite}
+@keyframes hxPulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(3.2);opacity:0}}
+.hx-target-line{position:absolute;left:58px;top:22px;width:90px;height:1px;background:linear-gradient(90deg,rgba(127,224,166,.8),rgba(127,224,166,.2));transform-origin:0 0;transform:rotate(-28deg)}
+.hx-target-label{position:absolute;left:140px;top:-34px;white-space:nowrap;line-height:1.7}
+.hx-target-label span{color:var(--faint)}
+
+/* AR navigator UI */
+.hx-arui{position:absolute;inset:0;pointer-events:none}
+.ar-card{position:absolute;left:50%;top:15%;width:min(400px,84vw);padding:16px 20px 18px;opacity:0;transform:translate(-50%,-14px)}
+.ar-card-top{display:flex;justify-content:space-between;margin-bottom:8px}
+.ar-turn{display:flex;align-items:center;gap:12px;font:600 23px/1.15 var(--font-body);color:var(--cream)}
+.ar-turn svg{width:26px;height:26px;flex:none}
+.ar-meta{margin-top:6px;font-size:14px;color:#cfeedd;padding-left:38px}
+.ar-rail{position:relative;height:3px;margin-top:14px;border-radius:2px;background:rgba(4,30,17,.8)}
+.ar-rail span{position:absolute;left:0;top:0;bottom:0;width:31%;background:var(--hud);border-radius:2px}
+.ar-rail span::after{content:"";position:absolute;right:-5px;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:var(--hud);box-shadow:0 0 10px var(--hud)}
+.ar-pills{position:absolute;right:calc(var(--gutter) + 8px);top:142px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;opacity:0}
+@media (max-width:900px){.ar-pills{right:auto;left:50%;top:calc(17% + 178px);flex-direction:row;transform:translateX(-50%);width:max-content}.ar-pills .chip{height:26px;padding:0 10px;font-size:10px}}
+.ar-pills .chip{color:#d7f3e3;background:rgba(4,30,17,.7)}
+.ar-link{position:absolute;right:calc(var(--gutter) + 8px);top:96px;opacity:0}
+.ar-link .chip{position:absolute;right:0;top:0;white-space:nowrap;transition:opacity .4s}
+.ar-lost{opacity:0}
+.hx-arui.lost .ar-up{opacity:0}.hx-arui.lost .ar-lost{opacity:1}
+.ar-banner{position:absolute;left:50%;top:calc(15% + 150px);transform:translateX(-50%);padding:10px 16px;border-color:rgba(255,95,180,.45);background:rgba(40,6,24,.62);font:500 13.5px/1.3 var(--font-body);color:#ffd9ec;white-space:nowrap;opacity:0;transition:opacity .5s}
+.hx-arui.lost .ar-banner{opacity:1}
+
+/* visor frame */
+.hx-visor{position:absolute;inset:14px;border-radius:28px;border:1px solid rgba(127,224,166,.16);pointer-events:none;box-shadow:0 0 0 40px rgba(11,6,5,.0),inset 0 0 120px rgba(0,0,0,.55)}
+.hx-visor .brk::before,.hx-visor .brk::after{width:22px;height:22px;border-color:rgba(127,224,166,.55)}
+.hx-visor .brk::before{top:-1px;left:-1px;border-radius:28px 0 0 0}.hx-visor .brk::after{bottom:-1px;right:-1px;border-radius:0 0 28px 0}
+.hero-pin::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 120% 100% at 50% 50%,transparent 62%,rgba(5,3,2,.55) 100%)}
+
+/* HUD readouts */
+.hx-hud{position:absolute;left:calc(var(--gutter) + 4px);top:96px;display:flex;gap:34px;z-index:3}
+.hx-readout{display:grid;gap:5px}
+.hx-readout .hud-num{font-size:15px;color:var(--cream);letter-spacing:.04em}
+.hx-readout i{font-style:normal;color:var(--ghost)}
+.hx-fov{color:var(--hud)!important;min-width:9ch}
+.hx-rail{position:absolute;right:calc(var(--gutter) - 6px);top:50%;transform:translateY(-50%);list-style:none;margin:0;padding:0 0 0 18px;display:grid;gap:30px;z-index:3;border-left:1px solid var(--line-2)}
+.hx-rail li{font:400 10.5px/1 var(--font-hud);letter-spacing:.16em;text-transform:uppercase;color:rgba(245,237,230,.42);position:relative;transition:color .4s;text-shadow:0 1px 6px rgba(0,0,0,.9)}
+.hx-readout .hud-label,.hx-readout .hud-num{text-shadow:0 1px 8px rgba(0,0,0,.85)}
+.hx-rail li::before{content:"";position:absolute;left:-22px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--space);border:1px solid var(--line-2);transition:background .4s,border-color .4s,box-shadow .4s}
+.hx-rail li.on{color:var(--hud)}.hx-rail li.on::before{background:var(--hud);border-color:var(--hud);box-shadow:0 0 10px var(--hud)}
+.hx-rail-fill{position:absolute;left:-1px;top:0;width:1px;height:var(--rail,0%);background:var(--hud);box-shadow:0 0 8px var(--hud)}
+
+/* copy */
+.hx-copy{position:absolute;z-index:4;will-change:opacity,transform}
+.hx-c0{left:var(--gutter);top:50%;transform:translateY(-44%);width:min(760px,58vw)}
+.hx-kicker{margin:0 0 26px}
+.hx-h1{font-size:clamp(34px,6.1vw,92px);text-wrap:balance}
+.hx-h1 em{display:inline;background:linear-gradient(100deg,var(--dust) 0%,#f2d9cc 40%,var(--sky) 120%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hx-lede{margin:28px 0 0;max-width:540px;font-size:clamp(16px,1.35vw,19px);line-height:1.6;color:var(--mute)}
+.hx-lede b{color:var(--cream);font-weight:600}
+.hx-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:38px}
+.hx-cap{left:var(--gutter);bottom:110px;width:min(500px,calc(100vw - 2*var(--gutter)));opacity:0}
+.hx-capcard{padding:24px 26px 26px;background:rgba(8,14,10,.6)}
+.hx-capcard h2{font-size:clamp(26px,2.6vw,38px);margin:12px 0 12px}
+.hx-capcard p:not(.hud-label){margin:0;color:var(--mute);font-size:15.5px;line-height:1.6}
+.hx-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.hx-foot{position:absolute;left:var(--gutter);right:var(--gutter);bottom:30px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;z-index:4}
+.hx-scroll{display:flex;align-items:center;gap:14px;text-decoration:none}
+.hx-scroll u{text-decoration:none;border-bottom:1px solid var(--faint)}
+.hx-scroll:hover .hud-label{color:var(--cream)}
+.hx-scroll-line{width:1px;height:34px;background:linear-gradient(var(--hud),transparent);position:relative;overflow:hidden}
+.hx-scroll-line::after{content:"";position:absolute;left:0;top:-40%;width:1px;height:40%;background:var(--cream);animation:hxDrop 2s var(--ease-io) infinite}
+@keyframes hxDrop{to{top:110%}}
+.hx-credit{margin:0;text-align:right;max-width:52ch;color:var(--ghost);font-size:9.5px}
+
+@media (max-width:900px){
+  .hx-hud{top:84px;gap:22px}.hx-ro-2,.hx-ro-3{display:none}
+  .hx-rail{display:none}
+  .hx-c0{top:auto;bottom:118px;transform:none;width:calc(100vw - 2*var(--gutter))}
+  .hx-kicker{margin-bottom:16px;font-size:10px}
+  .hx-lede{margin-top:18px}
+  .hx-ctas{margin-top:24px;gap:8px}.hx-ctas .btn{--h:44px;padding:0 16px;font-size:13px}
+  .hx-cap{bottom:96px}
+  .hx-capcard{padding:18px 18px 20px}
+  .hx-target-label,.hx-target-line{display:none}
+  .hx-credit{display:none}
+  .ar-link{top:84px}
+  .ar-card{top:17%;padding:14px 16px 16px}.ar-card-top .hud-label:last-child{display:none}.ar-turn{font-size:20px}
+  .ar-banner{top:calc(17% + 222px);font-size:12.5px}
+  .hx-visor{inset:8px;border-radius:20px}
+}
+@media (max-width:520px){.hx-lede{font-size:15px}.hx-ctas .btn:nth-child(n+3){display:none}}
+</style>
+
+<script>
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pin = document.querySelector('.hero'), nav = document.getElementById('topnav');
+  var stage = pin.querySelector('.hx-stage');
+  var gw = pin.querySelector('.hx-globe-wrap'), cv = pin.querySelector('.hx-globe');
+  var reg = pin.querySelector('.hx-regional'), ter = pin.querySelector('.hx-terrain'), tilt = pin.querySelector('.hx-tilt');
+  var entry = pin.querySelector('.hx-entry'), haze = pin.querySelector('.hx-haze'), ground = pin.querySelector('.hx-ground'), arSvg = pin.querySelector('.hx-ar');
+  var arui = pin.querySelector('.hx-arui'), arCard = arui.querySelector('.ar-card'), arPills = arui.querySelector('.ar-pills'), arLink = arui.querySelector('.ar-link');
+  var aoi = pin.querySelector('.hx-aoi'), target = pin.querySelector('.hx-target');
+  var fovEl = pin.querySelector('.hx-fov'), lightEl = pin.querySelector('.hx-light'), credit = pin.querySelector('.hx-credit');
+  var caps = [pin.querySelector('.hx-c0'), pin.querySelector('.hx-c1'), pin.querySelector('.hx-c2'), pin.querySelector('.hx-c3')];
+  var rail = pin.querySelectorAll('.hx-rail li'), railBox = pin.querySelector('.hx-rail');
+  var hud = pin.querySelector('.hx-hud');
+
+  var R_KM = 3396.19, DIAM = 2 * R_KM;
+  var AOI_LON = 137.388, AOI_LAT = -4.805, PHI0 = AOI_LAT * Math.PI / 180;
+  var REG = { w: 224.8, h: 236.7, ax: 0.3653, ay: 0.3513 };   // Viking regional crop (km), AOI anchor
+  var vw, vh, D, small;
+
+  var clamp = function (x, a, b) { return x < a ? a : x > b ? b : x; };
+  var lerp = function (a, b, t) { return a + (b - a) * t; };
+  var sm = function (a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  var band = function (x, a, b, c, d) { return Math.min(sm(a, b, x), 1 - sm(c, d, x)); };
+  var eio = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+
+  /* ---------- globe: per-pixel orthographic render of the Viking mosaic ---------- */
+  var TEX = null, TW = 2048, TH = 1024, N = 0, ctx = cv.getContext('2d'), imgData, out, P = null;
+  function buildTables() {
+    N = Math.round(clamp(D * Math.min(devicePixelRatio || 1, 1.5), 300, small ? 640 : 860));
+    cv.width = cv.height = N;
+    imgData = ctx.createImageData(N, N); out = new Uint32Array(imgData.data.buffer);
+    var idx = [], row = [], lon = [], shd = [], tnt = [], alp = [];
+    var L = [-0.58, 0.42, 0.70], ln = Math.hypot(L[0], L[1], L[2]); L = L.map(function (v) { return v / ln; });
+    var cp = Math.cos(PHI0), sp = Math.sin(PHI0), half = N / 2, edge = 1.6 / half;
+    for (var j = 0; j < N; j++) for (var i = 0; i < N; i++) {
+      var x = (i + .5 - half) / half, y = -(j + .5 - half) / half, r2 = x * x + y * y;
+      if (r2 >= 1) continue;
+      var z = Math.sqrt(1 - r2), r = Math.sqrt(r2);
+      var lat = Math.asin(clamp(y * cp + z * sp, -1, 1)), lo = Math.atan2(x, z * cp - y * sp);
+      var ty = clamp(Math.floor((0.5 - lat / Math.PI) * TH), 0, TH - 1);
+      var d = x * L[0] + y * L[1] + z * L[2];
+      var s = 0.07 + 1.0 * Math.pow(sm(-0.12, 0.55, d), 0.9) * (0.55 + 0.45 * Math.pow(z, 0.35));
+      var t = Math.pow(1 - z, 2.4) * 0.75 * sm(-0.25, 0.5, d);
+      idx.push(j * N + i); row.push(ty * TW); lon.push(lo / (2 * Math.PI) * TW);
+      shd.push(Math.round(clamp(s, 0, 1.25) * 256)); tnt.push(Math.round(clamp(t, 0, 1) * 256));
+      alp.push(Math.round(clamp((1 - r) / edge, 0, 1) * 255));
+    }
+    P = { n: idx.length, idx: Int32Array.from(idx), row: Int32Array.from(row), lon: Float32Array.from(lon), shd: Int32Array.from(shd), tnt: Int32Array.from(tnt), alp: Uint8Array.from(alp) };
+  }
+  function renderGlobe(lonCenter) {
+    if (!TEX || !P) return;
+    var off = ((lonCenter + 180) / 360) * TW, n = P.n, idx = P.idx, row = P.row, lon = P.lon, shd = P.shd, tnt = P.tnt, alp = P.alp;
+    var SR = 150, SG = 182, SB = 222;
+    for (var k = 0; k < n; k++) {
+      var tx = (lon[k] + off) | 0; if (tx >= TW) tx -= TW; else if (tx < 0) tx += TW; if (tx >= TW) tx -= TW;
+      var c = TEX[row[k] + tx], s = shd[k], t = tnt[k], u = 256 - t;
+      var r = (((c & 255) * s) >> 8), g = ((((c >> 8) & 255) * s) >> 8), b = ((((c >> 16) & 255) * s) >> 8);
+      r = (r * u + SR * t) >> 8; g = (g * u + SG * t) >> 8; b = (b * u + SB * t) >> 8;
+      if (r > 255) r = 255; if (g > 255) g = 255; if (b > 255) b = 255;
+      out[idx[k]] = (alp[k] << 24) | (b << 16) | (g << 8) | r;
+    }
+    ctx.putImageData(imgData, 0, 0);
+  }
+  var texImg = new Image(); texImg.decoding = 'async';
+  texImg.onload = function () {
+    try {
+      var oc = document.createElement('canvas'); oc.width = TW; oc.height = TH;
+      var o = oc.getContext('2d'); o.drawImage(texImg, 0, 0, TW, TH);
+      TEX = new Uint32Array(o.getImageData(0, 0, TW, TH).data.buffer); needGlobe = true;
+    } catch (e) { /* file:// taint: fall back to a flat textured disc */
+      cv.style.background = 'url(assets/img/mars-global.jpg) 30% 50%/200% 100%'; cv.style.filter = 'brightness(.8)';
+    }
+  };
+  texImg.src = 'assets/img/mars-global.jpg';
+
+  /* ---------- terrain map overlay (real stations, Hab-1, PR-1, contours) ---------- */
+  var mapSvg = pin.querySelector('.hx-map'), routeGo, routeNo = [], mapReady = false;
+  function buildMap() {
+    var G = window.GALE; if (!G || mapReady) return; mapReady = true;
+    var st = G.points.stations, hab = G.points.shelters[0].p, rov = G.points.shelters[1].p;
+    var s = '<g class="ctr" fill="none" stroke="#f5ede6"><path d="' + G.contours.minor + '" stroke-opacity=".16" stroke-width=".9"/><path d="' + G.contours.major + '" stroke-opacity=".34" stroke-width="1.4"/></g>';
+    var targets = st.filter(function (x) { return ['ST01', 'ST04', 'ST07', 'ST08'].indexOf(x.id) > -1; });
+    targets.forEach(function (t) { s += '<path class="nogo" d="M' + hab[0] + ',' + hab[1] + 'L' + t.p[0] + ',' + t.p[1] + '" stroke="#ff5fb4" stroke-width="2.2" stroke-dasharray="7 7" fill="none" opacity="0"/>'; });
+    s += '<path class="go" d="M' + rov[0] + ',' + rov[1] + ' C432,492 446,470 441,445.5" stroke="#04140b" stroke-width="9" fill="none" stroke-linecap="round" opacity=".55"/>';
+    s += '<path class="go" d="M' + rov[0] + ',' + rov[1] + ' C432,492 446,470 441,445.5" stroke="#7fe0a6" stroke-width="4" fill="none" stroke-linecap="round"/>';
+    st.forEach(function (t) { s += '<g><circle cx="' + t.p[0] + '" cy="' + t.p[1] + '" r="5" fill="#0b0605" stroke="#f5ede6" stroke-width="1.6"/></g>'; });
+    s += '<text x="' + (st[0].p[0] + 10) + '" y="' + (st[0].p[1] - 8) + '" class="lbl">ST01 · ALTADENA</text>';
+    s += '<rect x="' + (hab[0] - 9) + '" y="' + (hab[1] - 9) + '" width="18" height="18" fill="#0b0605" stroke="#ff5fb4" stroke-width="2.4"/><text x="' + (hab[0] + 16) + '" y="' + (hab[1] + 5) + '" class="lbl alert">HAB-1 · NO-GO</text>';
+    s += '<path d="M' + rov[0] + ',' + (rov[1] - 12) + 'L' + (rov[0] + 12) + ',' + rov[1] + 'L' + rov[0] + ',' + (rov[1] + 12) + 'L' + (rov[0] - 12) + ',' + rov[1] + 'Z" fill="#0b0605" stroke="#7fe0a6" stroke-width="2.4"/><text x="' + (rov[0] - 16) + '" y="' + (rov[1] + 5) + '" text-anchor="end" class="lbl go-l">PR-1 · GO</text>';
+    s += '<style>.lbl{font:600 12px "B612 Mono",monospace;letter-spacing:.08em;fill:#f5ede6;paint-order:stroke;stroke:#0b0605;stroke-width:4px}.alert{fill:#ff8cc8}.go-l{fill:#7fe0a6}</style>';
+    mapSvg.innerHTML = s;
+    routeNo = mapSvg.querySelectorAll('.nogo');
+    routeGo = mapSvg.querySelectorAll('.go');
+    routeGo.forEach(function (p) { var L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; p._L = L; });
+  }
+  if (window.GALE) buildMap(); else { var gs = document.createElement('script'); gs.src = 'js/gale-data.js'; gs.onload = buildMap; document.head.appendChild(gs); }
+
+  /* ---------- AR chevrons on the ground ---------- */
+  var chevs = [], WP = { x: .66, y: .40 };
+  function buildAR() {
+    arSvg.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh);
+    var s = '<defs><filter id="hxglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#hxglow)">';
+    for (var i = 0; i < 9; i++) s += '<path class="cv" d="M-1,0.1 L0,-0.62 L1,0.1 L0.66,0.26 L0,-0.2 L-0.66,0.26 Z" fill="#7fe0a6" fill-opacity=".9" stroke="#04140b" stroke-opacity=".5" stroke-width=".05" opacity="0"/>';
+    var wx = WP.x * vw, wy = WP.y * vh;
+    s += '</g><g class="wp" transform="translate(' + wx + ',' + wy + ')"><circle r="18" fill="none" stroke="#7fe0a6" stroke-width="1.6"/><circle r="4" fill="#7fe0a6"/><circle class="wpp" r="18" fill="none" stroke="#7fe0a6"/><line x1="0" y1="-18" x2="0" y2="-64" stroke="#7fe0a6" stroke-width="1.2"/><text x="10" y="-52" font-family="B612 Mono, monospace" font-size="12" letter-spacing="1.4" fill="#dff5e8">ST01 · 122 M</text></g>';
+    arSvg.innerHTML = s; chevs = arSvg.querySelectorAll('.cv');
+  }
+  function chevPos(t) { /* quadratic bezier from bottom-centre to waypoint, foreshortened */
+    var x0 = vw * (small ? .5 : .46), y0 = vh * 1.02, cx = vw * (small ? .42 : .44), cy = vh * .62, x1 = WP.x * vw, y1 = WP.y * vh + 26;
+    var u = 1 - t; return { x: u * u * x0 + 2 * u * t * cx + t * t * x1, y: u * u * y0 + 2 * u * t * cy + t * t * y1,
+      dx: 2 * u * (cx - x0) + 2 * t * (x1 - cx), dy: 2 * u * (cy - y0) + 2 * t * (y1 - cy) };
+  }
+  function drawChevs(time, vis) {
+    var flow = reduce ? 0 : (time / 2600) % 1, n = chevs.length;
+    for (var i = 0; i < n; i++) {
+      var t = ((i + flow) / n); t = t * .94;
+      var q = chevPos(t), sc = lerp(small ? 46 : 64, 12, Math.pow(t, .7)), ang = Math.atan2(q.dy, q.dx) * 180 / Math.PI + 90;
+      var a = vis * sm(0, .12, t) * (1 - sm(.8, .94, t));
+      chevs[i].setAttribute('transform', 'translate(' + q.x.toFixed(1) + ',' + q.y.toFixed(1) + ') rotate(' + ang.toFixed(1) + ') scale(' + sc.toFixed(1) + ',' + (sc * .62).toFixed(1) + ')');
+      chevs[i].setAttribute('opacity', (a * .92).toFixed(3));
+    }
+  }
+
+  /* ---------- layout ---------- */
+  var zEnd = 1;
+  function layout() {
+    vw = innerWidth; vh = pin.querySelector('.hero-pin').clientHeight; small = vw < 900;
+    D = small ? Math.min(vw * 0.98, vh * .5) : Math.min(vh * 1.18, vw * .74, 1180);
+    gw.style.setProperty('--D', D + 'px');
+    zEnd = (small ? 1.4 : 1.12) * Math.max(vw, vh) * DIAM / (5 * D);
+    buildTables(); buildAR(); needGlobe = true;
+  }
+
+  /* ---------- frame ---------- */
+  var pT = 0, pS = 0, needGlobe = true, lastLon = null, spin = 0, lastT = performance.now(), credState = -1;
+  var CRED = ['Mars: Viking MDIM 2.1 colour mosaic · NASA/USGS via JPL Mars Trek', 'Gale crater: Viking MDIM 2.1 · NASA/USGS via JPL Mars Trek',
+    'HiRISE colour · NASA/JPL/University of Arizona · 10 m contours from the USGS merged 1 m DEM (Parker & Calef 2016) · positions of Hab-1 and PR-1 are SCENARIO',
+    'Curiosity Mastcam, sol 5072 · NASA/JPL-Caltech/MSSS · AR overlay is an illustration of the Marswalk navigator'];
+  function readScroll() {
+    var r = pin.getBoundingClientRect(), total = pin.offsetHeight - vh;
+    pT = clamp(-r.top / total, 0, 1);
+    nav.classList.toggle('solid', r.bottom < vh * 0.6 || -r.top > 40);
+  }
+  function frame(now) {
+    var dt = Math.min(64, now - lastT); lastT = now;
+    pS += (pT - pS) * (reduce ? 1 : Math.min(1, dt / 90));
+    if (Math.abs(pT - pS) < 0.0004) pS = pT;
+    var p = pS;
+    if (!reduce) spin += dt * 0.003;   /* deg per ms → 3°/s */
+
+    /* phase A: orbit → centre on Gale (0 → .14) */
+    var a = eio(sm(0.015, 0.15, p));
+    var homeX = small ? vw * .78 : vw * .73, homeY = small ? vh * .19 : vh * .6, cyZ = small ? vh * .36 : vh / 2;
+    var cx = lerp(homeX, vw / 2, a), cy = lerp(homeY, cyZ, a);
+    var free = AOI_LON - 70 + spin, lonC = free + (((AOI_LON - free) % 360 + 540) % 360 - 180) * a;
+    /* phase B: dive, keyframed in log(field of view): approach + atmospheric entry → hold on Gale → punch-in */
+    var fov0 = vw * DIAM / D, fovEnd = fov0 / zEnd, lf;
+    if (p < 0.25) lf = lerp(Math.log(fov0), Math.log(270), eio(sm(0.13, 0.25, p)));
+    else if (p < 0.43) lf = lerp(Math.log(270), Math.log(200), (p - 0.25) / 0.18);
+    else lf = lerp(Math.log(200), Math.log(fovEnd), eio(sm(0.43, 0.6, p)));
+    var fov = Math.exp(lf), z = fov0 / fov, kmpx = fov / vw;
+
+    /* entry haze (globe → Gale) and punch-in streaks (Gale → terrain) hide the resolution hand-offs */
+    var eh = sm(4500, 2200, fov) * sm(330, 700, fov), ph = sm(175, 110, fov) * sm(16, 38, fov), en = Math.max(eh, ph * 0.85);
+    entry.style.opacity = en;
+    if (en > 0.001) entry.style.transform = 'scale(' + (1 + (eh > ph ? sm(4500, 330, fov) : sm(175, 16, fov)) * 0.7).toFixed(3) + ')';
+
+    /* globe */
+    var gO = sm(900, 2600, fov);
+    gw.style.opacity = gO;
+    if (gO > 0.001) {
+      gw.style.transform = 'translate(' + (cx - D / 2) + 'px,' + (cy - D / 2) + 'px) scale(' + z + ')';
+      var gb = clamp((10.4 * vw / fov - 1.6) * 1.6, 0, 18) / z;
+      if (TEX) cv.style.filter = gb > 0.05 ? 'blur(' + gb.toFixed(2) + 'px)' : 'none';
+      if (needGlobe || lastLon === null || Math.abs(lonC - lastLon) > 0.02) { renderGlobe(lonC); lastLon = lonC; needGlobe = false; }
+    }
+    /* Gale target marker on the globe (orbit phase only) */
+    var dl = (AOI_LON - lonC) * Math.PI / 180, cl = Math.cos(PHI0), x3 = cl * Math.sin(dl), y3p = Math.sin(PHI0), z3p = cl * Math.cos(dl);
+    var y3 = y3p * Math.cos(PHI0) - z3p * Math.sin(PHI0), z3 = y3p * Math.sin(PHI0) + z3p * Math.cos(PHI0);
+    var tx = cx + x3 * D / 2 * z, ty = cy - y3 * D / 2 * z;
+    var tO = sm(0.15, 0.4, z3) * (1 - sm(0.09, 0.16, p));
+    target.style.opacity = tO; target.style.transform = 'translate(' + tx + 'px,' + ty + 'px)';
+
+    /* regional (Viking) */
+    var rO = sm(1100, 520, fov) * sm(22, 60, fov);
+    reg.style.opacity = rO;
+    if (rO > 0.001) {
+      var rw = REG.w / kmpx, rh = REG.h / kmpx, rb = clamp((0.325 * vw / fov - 1.4) * 1.4, 0, 14);
+      reg.style.filter = rb > 0.3 ? 'blur(' + rb.toFixed(1) + 'px)' : 'none';
+      reg.style.width = rw + 'px'; reg.style.height = rh + 'px';
+      reg.style.transform = 'translate(' + (vw / 2 - REG.ax * rw) + 'px,' + (cyZ - REG.ay * rh) + 'px)';
+    }
+    /* terrain (HiRISE + contours) */
+    var tw = 5 / kmpx, terO = sm(70, 26, fov);
+    var tl = sm(0.7, 0.82, p);               /* phase D: tilt to the ground */
+    var gnd = sm(0.79, 0.87, p);
+    ter.style.opacity = terO * (1 - gnd * .999);
+    if (terO > 0.001) {
+      ter.style.width = tw + 'px'; ter.style.height = tw + 'px';
+      ter.style.transform = 'translate(' + (vw / 2 - tw / 2) + 'px,' + (cyZ - tw / 2) + 'px)';
+      ter.style.setProperty('--f', lerp(55, 100, sm(0.49, 0.6, p)) + '%');
+      tilt.style.transform = 'rotateX(' + (tl * 62) + 'deg) translateY(' + (tl * 6) + '%) scale(' + (1 + tl * .35) + ')';
+      tilt.style.filter = 'brightness(' + (1 - tl * .25) + ')';
+      if (mapReady) {
+        var no = sm(0.6, 0.65, p), go = sm(0.65, 0.71, p);
+        routeNo.forEach(function (e) { e.setAttribute('opacity', (no * .95).toFixed(3)); });
+        routeGo.forEach(function (e) { e.style.strokeDashoffset = e._L * (1 - go); });
+      }
+    }
+    /* AOI box (zoom phase) */
+    var aO = sm(0.235, 0.27, p) * (1 - sm(0.46, 0.5, p)) * (1 - sm(vw * .5, vw * .8, tw)), bw = Math.max(tw, 18);
+    aoi.style.opacity = aO;
+    if (aO > 0.001) { aoi.style.width = bw + 'px'; aoi.style.height = bw + 'px'; aoi.style.transform = 'translate(' + (vw / 2 - bw / 2) + 'px,' + (cyZ - bw / 2) + 'px)'; }
+
+    haze.style.opacity = tl * (1 - gnd);
+    ground.style.opacity = gnd;
+    ground.style.transform = 'scale(' + lerp(1.18, 1, eio(gnd)) + ')';
+    var arO = sm(0.86, 0.9, p);
+    arSvg.style.opacity = arO;
+    if (arO > 0.001) drawChevs(now, 1);
+    arCard.style.opacity = sm(0.87, 0.92, p); arCard.style.transform = 'translate(-50%,' + lerp(-14, 0, sm(0.87, 0.92, p)) + 'px)';
+    arPills.style.opacity = sm(0.89, 0.93, p); arLink.style.opacity = sm(0.89, 0.93, p);
+    arui.classList.toggle('lost', p > 0.955);
+
+    /* copy */
+    var c0 = 1 - sm(0.035, 0.1, p);
+    caps[0].style.opacity = c0; caps[0].style.visibility = c0 < 0.01 ? 'hidden' : 'visible';
+    caps[0].style.transform = (small ? '' : 'translateY(-44%) ') + 'translateY(' + (-40 * sm(0.035, 0.1, p)) + 'px)';
+    [[1, 0.27, 0.31, 0.41, 0.45], [2, 0.56, 0.61, 0.72, 0.76], [3, 0.88, 0.93, 1.1, 1.2]].forEach(function (c) {
+      var o = band(p, c[1], c[2], c[3], c[4]); var el = caps[c[0]];
+      el.style.opacity = o; el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
+      el.style.transform = 'translateY(' + ((1 - o) * 24) + 'px)';
+    });
+    /* HUD */
+    var ground_ = p > 0.85;
+    fovEl.textContent = ground_ ? 'On foot' : (fov >= 100 ? Math.round(fov).toLocaleString('en-US') + ' km' : fov >= 10 ? fov.toFixed(1) + ' km' : fov.toFixed(2) + ' km');
+    hud.style.opacity = small ? 1 - sm(0.84, 0.88, p) : 1;
+    var stg = p < 0.22 ? 0 : p < 0.5 ? 1 : p < 0.82 ? 2 : 3;
+    rail.forEach(function (li, i) { li.classList.toggle('on', i <= stg); });
+    railBox.style.setProperty('--rail', (p * 100).toFixed(1) + '%');
+    if (stg !== credState) { credState = stg; credit.textContent = CRED[stg]; }
+    requestAnimationFrame(frame);
+  }
+  /* light-time readout (illustrative, slowly varying) */
+  var lt0 = 12 * 60 + 38;
+  setInterval(function () { if (reduce) return; lt0 -= 1; if (lt0 < 12 * 60 + 20) lt0 = 12 * 60 + 38; lightEl.textContent = Math.floor(lt0 / 60) + ' min ' + String(lt0 % 60).padStart(2, '0') + ' s'; }, 1000);
+
+  layout(); readScroll();
+  addEventListener('scroll', readScroll, { passive: true });
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { layout(); readScroll(); }, 120); });
+  requestAnimationFrame(frame);
+})();
+</script>
+
+<main id="main">
+<!-- 10-problem.html -->
+<section class="section" id="problem" aria-labelledby="problem-title">
+<style>
+#problem .link{position:relative;margin:0 0 clamp(40px,6vw,72px);padding:clamp(28px,4vw,48px) clamp(20px,3vw,40px) 26px}
+#problem .track{position:relative;height:90px;margin:26px 0 8px}
+#problem .track::before{content:"";position:absolute;left:34px;right:34px;top:50%;height:1px;background:linear-gradient(90deg,var(--sky),var(--ghost) 30%,var(--ghost) 70%,var(--rust));}
+#problem .track::after{content:"";position:absolute;left:34px;right:34px;top:50%;height:1px;background:repeating-linear-gradient(90deg,var(--bg-gap,var(--space)) 0 6px,transparent 6px 14px);opacity:.7}
+#problem .body{position:absolute;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:50%}
+#problem .earth{left:8px;background:radial-gradient(circle at 35% 30%,#cfe3f7,var(--sky) 55%,#3d5f86);box-shadow:0 0 28px rgba(143,178,217,.55)}
+#problem .mars{right:8px;width:34px;height:34px;margin-top:-17px;background:radial-gradient(circle at 35% 30%,#e0795f,var(--rust) 55%,var(--rust-deep));box-shadow:0 0 30px rgba(181,67,44,.5)}
+#problem .pulse{position:absolute;top:50%;left:34px;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--hud);box-shadow:0 0 0 4px rgba(127,224,166,.15),0 0 22px 4px rgba(127,224,166,.7);animation:problem-fly 9s linear infinite}
+#problem .pulse.back{background:var(--sky);box-shadow:0 0 0 4px rgba(143,178,217,.15),0 0 20px 3px rgba(143,178,217,.6);animation-name:problem-back;animation-delay:-4.5s}
+@keyframes problem-fly{from{left:34px;opacity:0}8%{opacity:1}92%{opacity:1}to{left:calc(100% - 34px);opacity:0}}
+@keyframes problem-back{from{left:calc(100% - 34px);opacity:0}8%{opacity:1}92%{opacity:1}to{left:34px;opacity:0}}
+#problem .names{display:flex;justify-content:space-between;font-family:var(--font-hud);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+#problem .readout{display:flex;flex-wrap:wrap;gap:12px 40px;align-items:baseline;justify-content:center;margin-top:24px;padding-top:22px;border-top:1px solid var(--line)}
+#problem .rd b{display:block;font:300 clamp(34px,4.6vw,56px)/1 var(--font-hud);color:var(--hud);font-variant-numeric:tabular-nums;text-shadow:0 0 24px rgba(127,224,166,.35)}
+#problem .rd b small{font-size:.38em;color:var(--mute);margin-left:6px;letter-spacing:.1em}
+#problem .rd.rt b{color:var(--cream)}
+#problem .beats{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.4vw,32px);margin-bottom:clamp(64px,9vw,112px)}
+#problem .beat{padding:clamp(24px,3vw,36px)}
+#problem .big{display:block;font:200 clamp(44px,6vw,84px)/1 var(--font-display);font-stretch:125%;letter-spacing:-.02em;color:var(--dust);margin:14px 0 14px}
+#problem .big.g{color:var(--hud);font-size:clamp(28px,2.7vw,40px);line-height:1.08;padding-top:.15em}
+#problem .beat p{margin:0;color:var(--mute);font-size:16px}
+#problem .quotes{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,64px);margin-bottom:clamp(56px,8vw,96px)}
+#problem blockquote{margin:0;padding:0 0 0 26px;border-left:1px solid var(--hud-dim)}
+#problem blockquote p{margin:0 0 18px;font:300 clamp(19px,1.9vw,25px)/1.45 var(--font-display);font-stretch:112%;color:var(--cream)}
+#problem blockquote p mark{background:none;color:var(--dust)}
+#problem .today h3{margin:0 0 20px}
+#problem .tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+#problem .tcell{background:var(--space-2);padding:22px 22px 24px}
+#problem .tcell h4{margin:10px 0 6px;font:500 17px/1.25 var(--font-body);color:var(--cream)}
+#problem .tcell p{margin:0;font-size:14.5px;color:var(--mute);line-height:1.5}
+#problem .tcell.us{background:linear-gradient(180deg,rgba(20,52,34,.5),var(--space-2))}
+@media(max-width:900px){#problem .beats,#problem .quotes{grid-template-columns:1fr}#problem .tgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){#problem .tgrid{grid-template-columns:1fr}#problem .names span:nth-child(2){display:none}}
+</style>
+<div class="wrap">
+  <div class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">01 · The problem</span></div>
+    <h2 class="display sec-title" id="problem-title">Earth is <em>22 light-minutes</em> away.</h2>
+    <p class="sec-lede">On Mars nobody can phone mission control mid-walk. The signal takes minutes each way, and for about two weeks around solar conjunction <b>it cannot get through at all</b>.</p>
+  </div>
+
+  <div class="glass link reveal d1" role="img" aria-label="A signal pulse travelling between Earth and Mars; one-way light time varies between 3 and 22 minutes">
+    <i class="brk"></i>
+    <div class="names"><span>Earth</span><span>Signal at the speed of light</span><span>Mars</span></div>
+    <div class="track"><span class="body earth"></span><span class="pulse"></span><span class="pulse back"></span><span class="body mars"></span></div>
+    <div class="readout">
+      <div class="rd"><span class="hud-label">One-way light time</span><b><span id="problem-ow">12.5</span><small>MIN</small></b></div>
+      <div class="rd rt"><span class="hud-label">Ask, then wait for the answer</span><b><span id="problem-rt">25.0</span><small>MIN</small></b></div>
+    </div>
+  </div>
+
+  <div class="beats">
+    <div class="card beat reveal"><span class="hud-label is-hud">Round trip</span><span class="big hud-num" style="font-family:var(--font-display)">6–44<span style="font-size:.4em;color:var(--mute)"> min</span></span><p>Every question to Earth costs a coffee break, or most of an hour.</p></div>
+    <div class="card beat reveal d1"><span class="hud-label is-alert">Solar conjunction</span><span class="big">~2<span style="font-size:.4em;color:var(--mute)"> weeks</span></span><p>With the Sun in between, Mars cannot be reached. Blackout.</p></div>
+    <div class="card beat reveal d2"><span class="hud-label is-hud">The consequence</span><span class="big g">So the crew plans its own walks.</span><p>The planner has to live on Mars, next to the habitat.</p></div>
+  </div>
+
+  <div class="quotes">
+    <blockquote class="reveal"><p>“The crew will likely be <mark>more involved in planning their EVAs</mark> than as is currently done on ISS… crew input, ground based planners, and automated planning tools.”</p><span class="hud-label">NASA xEVA System ConOps · EVA-EXP-0042 Rev B · §8.1</span></blockquote>
+    <blockquote class="reveal d1"><p>“Earth independence starts by giving crew members, particularly during EVA, the capacity to <mark>make informed decisions</mark>… upon locally sourced information.”</p><span class="hud-label">NASA NTRS 20230014957</span></blockquote>
+  </div>
+
+  <div class="today reveal">
+    <h3 class="hud-label">What exists today</h3>
+    <div class="tgrid">
+      <div class="tcell"><span class="hud-label">Viewers</span><h4>Mars Trek · MMGIS</h4><p>Excellent maps. They show terrain; they do not plan a walk.</p></div>
+      <div class="tcell"><span class="hud-label">Ground planning</span><h4>AEGIS · EMSS</h4><p>Plans Artemis EVAs for flight controllers on the ground.</p></div>
+      <div class="tcell"><span class="hud-label">Energy paths</span><h4>SEXTANT · MoonPath</h4><p>Efficient routes, but no explicit set of EVA constraints.</p></div>
+      <div class="tcell"><span class="hud-label">Hackathon peers</span><h4>81 of 135</h4><p>Space Apps 2026 READMEs surveyed use slope-only A* or Dijkstra.</p></div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var ow=document.getElementById('problem-ow'),rt=document.getElementById('problem-rt');
+  if(!ow)return;
+  function set(v){ow.textContent=v.toFixed(1);rt.textContent=(v*2).toFixed(1);}
+  set(12.5);
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var t0=performance.now(),vis=true;
+  new IntersectionObserver(function(e){vis=e[0].isIntersecting;}).observe(ow);
+  (function tick(now){
+    if(vis){var p=((now-t0)/1000)/24*Math.PI*2;set(12.5+9.5*Math.sin(p));}
+    requestAnimationFrame(tick);
+  })(t0);
+})();
+</script>
+</section>
+
+
+<!-- 20-system.html -->
+<section class="section" id="system" aria-labelledby="system-title">
+<style>
+#system .steps{position:relative;display:grid;gap:clamp(56px,8vw,110px)}
+#system .rail{position:absolute;left:19px;top:20px;bottom:20px;width:2px;background:var(--line);overflow:hidden}
+#system .rail i{position:absolute;inset:0;background:repeating-linear-gradient(180deg,var(--hud) 0 14px,transparent 14px 34px);background-size:2px 34px;animation:system-flow 1.1s linear infinite;opacity:.85}
+#system .rail i.cut{top:auto;height:26%;bottom:0;transition:opacity .5s}
+#system .rail i.cut::after{content:"";position:absolute;inset:0;background:var(--alert);opacity:0;transition:opacity .5s}
+#system .steps.lost .rail i.cut{background:repeating-linear-gradient(180deg,var(--alert) 0 6px,transparent 6px 22px);animation-duration:2.4s;opacity:.9}
+@keyframes system-flow{to{background-position:0 34px}}
+#system .step{position:relative;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,5vw,72px);align-items:center;padding-left:72px}
+#system .mark{position:absolute;left:0;top:0;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--space);border:1px solid var(--hud);color:var(--hud);font:400 13px/1 var(--font-hud);box-shadow:0 0 0 6px var(--space),0 0 24px rgba(127,224,166,.3)}
+#system .steps.lost .step.s3 .mark{border-color:var(--alert);color:var(--alert);box-shadow:0 0 0 6px var(--space),0 0 24px rgba(255,95,180,.4)}
+#system .step h3{margin:14px 0 14px;font-size:clamp(28px,3.3vw,44px)}
+#system .step p{margin:0 0 22px;color:var(--mute);max-width:460px}
+#system .specs{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+#system .specs li{display:flex;gap:12px;align-items:baseline;font:400 12px/1.5 var(--font-hud);letter-spacing:.06em;color:var(--cream)}
+#system .specs li::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--hud);transform:translateY(-1px)}
+#system .win{position:relative;border-radius:14px;border:1px solid var(--line-2);background:var(--space-3);box-shadow:0 40px 90px -30px rgba(0,0,0,.8),0 0 0 1px rgba(0,0,0,.4),0 0 80px -30px rgba(127,224,166,.18);overflow:hidden}
+#system .bar{display:flex;align-items:center;gap:7px;height:34px;padding:0 14px;background:var(--space-4);border-bottom:1px solid var(--line)}
+#system .bar i{width:9px;height:9px;border-radius:50%;background:var(--ghost)}
+#system .bar span{margin-left:12px;flex:1;text-align:center;font:400 10.5px/1 var(--font-hud);letter-spacing:.12em;color:var(--faint);padding-right:44px}
+#system .win img{width:100%;height:auto}
+#system .inset{position:absolute;right:-3%;bottom:-8%;width:44%;border-radius:10px;border:1px solid var(--glass-edge);box-shadow:0 24px 60px rgba(0,0,0,.7);overflow:hidden;background:var(--space)}
+#system .inset span{position:absolute;left:8px;top:8px}
+#system .shot{position:relative}
+#system .route{padding:clamp(22px,3vw,34px);font-family:var(--font-hud)}
+#system .route .row{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:11px 0;border-bottom:1px dashed var(--line-2);font-size:12px;letter-spacing:.08em;color:var(--mute)}
+#system .route .row:last-of-type{border-bottom:0}
+#system .route .row b{font-weight:400;color:var(--cream);text-align:right}
+#system .route .sz{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+#system .route .sz strong{font:200 clamp(54px,7vw,96px)/1 var(--font-display);font-stretch:125%;color:var(--hud)}
+#system .bits{margin-top:16px;display:grid;gap:8px}
+#system .bitrow{height:8px;border-radius:99px;background:var(--line);position:relative;overflow:hidden}
+#system .bitrow i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:var(--hud);width:0;transition:width 1.6s var(--ease-out) .3s}
+#system .bitrow.up i{background:var(--sky);width:0}
+#system .route.in .bitrow i{width:var(--w)}
+#system .phonewrap{display:flex;gap:clamp(24px,4vw,56px);align-items:center;justify-content:center}
+#system .phone{position:relative;width:min(300px,62vw);aspect-ratio:1170/2532;border-radius:44px;padding:9px;background:linear-gradient(145deg,#2b1e1a,#0d0807);border:1px solid var(--line-2);box-shadow:0 50px 100px -30px rgba(0,0,0,.9),0 0 90px -20px rgba(127,224,166,.22)}
+#system .phone .scr{position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:#000}
+#system .phone .scr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s}
+#system .phone .scr img.on{opacity:1}
+#system .phone::before{content:"";position:absolute;top:17px;left:50%;width:74px;height:20px;margin-left:-37px;border-radius:99px;background:#000;z-index:2}
+#system .tabs{display:grid;gap:10px;min-width:150px}
+#system .tab{all:unset;cursor:pointer;display:grid;gap:3px;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:rgba(18,9,7,.5);transition:border-color .3s,background .3s}
+#system .tab:focus-visible{outline:2px solid var(--hud);outline-offset:2px}
+#system .tab .hud-label{color:var(--faint)}
+#system .tab span.t{font:500 14px/1.3 var(--font-body);color:var(--mute)}
+#system .tab[aria-selected=true]{border-color:var(--hud);background:rgba(20,52,34,.5)}
+#system .tab[aria-selected=true] .t{color:var(--cream)}
+#system .tab.lost[aria-selected=true]{border-color:var(--alert);background:rgba(40,6,24,.55)}
+#system .tab.lost[aria-selected=true] .hud-label{color:var(--alert)}
+#system .tab[aria-selected=true] .hud-label{color:var(--hud)}
+#system .cap{margin-top:16px;text-align:center}
+@media(max-width:900px){
+ #system .step{grid-template-columns:1fr;padding-left:56px;gap:28px}
+ #system .rail{left:15px}
+ #system .mark{width:32px;height:32px;font-size:11px}
+ #system .inset{display:none}
+ #system .phonewrap{flex-direction:column}
+ #system .tabs{grid-auto-flow:column;grid-auto-columns:1fr;min-width:0;width:100%}
+ #system .tab{padding:10px}
+}
+@media(max-width:480px){#system .step{padding-left:44px}#system .rail{left:12px}#system .mark{width:26px;height:26px}#system .tab .hud-label{font-size:9px;letter-spacing:.08em}#system .tab span.t{font-size:12px}}
+@media(max-width:480px){#system .bar span{font-size:9px;padding-right:0;margin-left:4px}#system .route .row{flex-wrap:wrap;gap:4px 16px}}
+</style>
+<div class="wrap">
+  <div class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">02 · The system</span></div>
+    <h2 class="display sec-title" id="system-title">From <em>habitat</em> to <strong>helmet.</strong></h2>
+    <p class="sec-lede">Three pieces, one chain. The plan is made and checked in the habitat, sent as a tiny signed file, and followed on the astronaut's own display.</p>
+  </div>
+
+  <div class="steps" id="system-steps">
+    <div class="rail" aria-hidden="true"><i></i><i class="cut"></i></div>
+
+    <article class="step s1">
+      <span class="mark">01</span>
+      <div class="reveal">
+        <span class="hud-label is-hud">Habitat console</span>
+        <h3 class="display">Plan it like a <em>map.</em></h3>
+        <p>The EVA officer picks a start (the habitat or the pressurized rover) and the places to visit, Google-Maps style. Marswalk answers GO or NO-GO, with the reason and the exact stretch where it fails.</p>
+        <ul class="specs"><li>1 m terrain model of Gale crater</li><li>Ways forward: closest safe point, move rover, start from rover</li><li>Timeline with latest safe return</li></ul>
+      </div>
+      <div class="reveal d1 shot">
+        <div class="win"><div class="bar"><i></i><i></i><i></i><span>HABITAT CONSOLE · GALE CRATER</span></div><img src="assets/shots/ux8-compare.webp" alt="Marswalk habitat console showing a GO verdict card and a table of route options" loading="lazy" width="1440" height="900"></div>
+        <div class="inset"><img src="assets/shots/ux7-nogo-highlight.webp" alt="A NO-GO plan with the failing stretch drawn in red on the map" loading="lazy"></div>
+      </div>
+    </article>
+
+    <article class="step s2">
+      <span class="mark">02</span>
+      <div class="reveal">
+        <span class="hud-label is-hud">Signed route</span>
+        <h3 class="display">Small enough for <em>any</em> link.</h3>
+        <p>The verified plan leaves the habitat as one cryptographically signed file, over the local surface link. Everything runs on the habitat server. No internet needed.</p>
+        <ul class="specs"><li>Ed25519 signature on every route</li><li>Local surface link only</li><li>Habitat-side server, offline</li></ul>
+      </div>
+      <div class="reveal d1 glass route" id="system-route"><i class="brk"></i>
+        <span class="hud-label is-hud">route.signed</span>
+        <div class="sz"><strong>~11</strong><span class="hud-label">KB</span></div>
+        <div class="bits">
+          <div><div class="bitrow"><i style="--w:39%"></i></div><div class="hud-label" style="margin-top:6px">This route · ~11 KB</div></div>
+          <div><div class="bitrow up"><i style="--w:100%"></i></div><div class="hud-label" style="margin-top:6px">Curiosity's daily uplink · ~28 KB</div></div>
+        </div>
+        <div style="margin-top:18px">
+          <div class="row"><span>Signature</span><b>Ed25519</b></div>
+          <div class="row"><span>Transport</span><b>Local surface link</b></div>
+          <div class="row"><span>Runs on</span><b>Habitat server, no internet</b></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="step s3">
+      <span class="mark">03</span>
+      <div class="reveal">
+        <span class="hud-label is-hud">AR navigator</span>
+        <h3 class="display">Follow the <strong>chevrons.</strong></h3>
+        <p>A phone stands in for the helmet display. The camera fills the screen; chevrons on the ground bend toward the next steer point. One instruction at a time. If the link drops, it keeps guiding, on its own.</p>
+        <ul class="specs"><li>Dead-reckons (Mars has no GPS), fixes every ~10 min</li><li>&gt;25 m off route: local A* reroute</li><li>Link lost: autonomous within ~3 s</li><li>Voice commands</li></ul>
+      </div>
+      <div class="reveal d1">
+        <div class="phonewrap">
+          <div class="phone"><div class="scr" id="system-scr">
+            <img class="on" src="assets/ar/ar-nav.webp" alt="AR navigator: green chevrons on the ground, distance and heading readouts, nominal" loading="lazy">
+            <img src="assets/ar/ar-link-lost.webp" alt="AR navigator with the banner LINK LOST AUTONOMOUS and white chevrons" loading="lazy">
+            <img src="assets/ar/ar-return-now.webp" alt="AR navigator in RETURN NOW state" loading="lazy">
+          </div></div>
+          <div class="tabs" role="tablist" aria-label="Navigator states" id="system-tabs">
+            <button class="tab" role="tab" aria-selected="true"><span class="hud-label">Green</span><span class="t">Nominal</span></button>
+            <button class="tab lost" role="tab" aria-selected="false"><span class="hud-label">White · pink</span><span class="t">Link lost · autonomous</span></button>
+            <button class="tab lost" role="tab" aria-selected="false"><span class="hud-label">Pink</span><span class="t">Return now</span></button>
+          </div>
+        </div>
+        <p class="hud-label cap">Real navigator screenshots · Curiosity Mastcam photo as backdrop (NASA/JPL-Caltech/MSSS)</p>
+      </div>
+    </article>
+  </div>
+</div>
+<script>
+(function(){
+  var steps=document.getElementById('system-steps'); if(!steps)return;
+  var imgs=steps.querySelectorAll('#system-scr img'),tabs=steps.querySelectorAll('.tab'),i=0,timer=null,vis=false;
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function show(n){i=n;imgs.forEach(function(m,k){m.classList.toggle('on',k===n)});tabs.forEach(function(t,k){t.setAttribute('aria-selected',k===n)});steps.classList.toggle('lost',n===1);}
+  tabs.forEach(function(t,k){t.addEventListener('click',function(){clearInterval(timer);timer=null;show(k);});});
+  function start(){if(reduce||timer)return;timer=setInterval(function(){show((i+1)%3)},3800);}
+  new IntersectionObserver(function(e){vis=e[0].isIntersecting;if(vis)start();else{clearInterval(timer);timer=null;}},{threshold:.25}).observe(document.getElementById('system-scr'));
+  var r=document.getElementById('system-route');
+  new IntersectionObserver(function(e,o){if(e[0].isIntersecting){r.classList.add('in');o.disconnect();}},{threshold:.4}).observe(r);
+})();
+</script>
+</section>
+
+
+<!-- 30-rover.html -->
+<script src="js/gale-data.js"></script>
+<section class="section" id="rover" aria-labelledby="rover-title">
+<style>
+#rover .rv-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(16px, 2vw, 28px); align-items: stretch; }
+#rover .rv-map { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+#rover .rv-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+#rover .rv-seg { position: relative; max-width: 100%; display: inline-grid; grid-template-columns: 1fr 1fr; padding: 4px; border: 1px solid var(--line-2); border-radius: 999px; background: rgba(11,6,5,.6); }
+#rover .rv-seg button { position: relative; z-index: 1; appearance: none; background: none; border: 0; color: var(--mute); font: 400 12px/1 var(--font-hud); letter-spacing: .1em; text-transform: uppercase; padding: 13px 18px; min-height: 44px; border-radius: 999px; cursor: pointer; transition: color .4s; white-space: nowrap; }
+#rover .rv-seg button[aria-pressed="true"] { color: #04140b; }
+#rover .rv-seg button:focus-visible { outline: 2px solid var(--hud); outline-offset: 2px; }
+#rover .rv-pill { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px; background: var(--alert); transition: transform .55s var(--ease-out), background .4s; }
+#rover[data-mode="rover"] .rv-pill { transform: translateX(100%); background: var(--hud); }
+#rover .rv-stage { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 340 / 380; background: #000; border: 1px solid var(--line); }
+#rover .rv-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#rover .rv-contour-minor { fill: none; stroke: var(--cream); stroke-opacity: .13; stroke-width: .8; vector-effect: non-scaling-stroke; }
+#rover .rv-contour-major { fill: none; stroke: var(--cream); stroke-opacity: .34; stroke-width: 1; vector-effect: non-scaling-stroke; }
+#rover .rv-shade { fill: url(#rv-vig); }
+#rover .rv-ray { fill: none; stroke: var(--alert); stroke-width: 1.4; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; opacity: 0; transition: opacity .6s; }
+#rover[data-mode="hab"] .rv-ray { opacity: .85; }
+#rover[data-mode="hab"] .rv-ray { animation: rv-march 1.4s linear infinite; }
+@keyframes rv-march { to { stroke-dashoffset: -18; } }
+#rover .rv-route { fill: none; stroke: var(--hud); stroke-width: 1.7; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(127,224,166,.8)); }
+#rover .rv-route-bg { fill: none; stroke: rgba(4,20,11,.7); stroke-width: 3.6; stroke-linecap: round; }
+#rover .rv-st { cursor: pointer; }
+#rover .rv-st .dot { fill: var(--cream); stroke: rgba(11,6,5,.9); stroke-width: 1.5; vector-effect: non-scaling-stroke; transition: fill .4s; }
+#rover .rv-st .ring { fill: none; stroke: var(--cream); stroke-opacity: 0; stroke-width: 1; vector-effect: non-scaling-stroke; transition: stroke-opacity .2s; }
+#rover .rv-st:hover .ring, #rover .rv-st:focus .ring, #rover .rv-st.on .ring { stroke-opacity: .9; }
+#rover .rv-st:focus { outline: none; }
+#rover[data-mode="hab"] .rv-st .dot { fill: var(--alert); }
+#rover[data-mode="rover"] .rv-st[data-id="ST01"] .dot { fill: var(--hud); }
+#rover .rv-mk { transition: opacity .5s; }
+#rover[data-mode="hab"] .rv-pr, #rover[data-mode="rover"] .rv-hb { opacity: .55; }
+#rover .rv-mk .shape { fill: rgba(6,22,14,.85); stroke: var(--hud); stroke-width: 2; vector-effect: non-scaling-stroke; }
+#rover .rv-mk text { fill: var(--cream); font: 700 9px var(--font-hud); letter-spacing: .08em; paint-order: stroke; stroke: rgba(0,0,0,.85); stroke-width: 3px; }
+#rover .rv-tip { position: absolute; z-index: 3; pointer-events: none; max-width: 230px; padding: 8px 10px; border-radius: 8px; background: rgba(6,22,14,.88); border: 1px solid var(--glass-edge); font: 400 11px/1.4 var(--font-hud); letter-spacing: .04em; color: var(--cream); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; }
+#rover .rv-tip.on { opacity: 1; transform: none; }
+#rover .rv-tip b { color: var(--hud); letter-spacing: .12em; }
+#rover .rv-scale { position: absolute; left: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+#rover .rv-scale i { display: block; height: 5px; border: 1px solid var(--cream); border-top: 0; width: 20%; min-width: 40px; }
+#rover .rv-scale span, #rover .rv-tag { font: 400 10px var(--font-hud); letter-spacing: .14em; color: var(--cream); text-shadow: 0 1px 4px #000; }
+#rover .rv-tag { position: absolute; right: 12px; top: 10px; opacity: .8; }
+#rover .rv-hint { margin: 0; }
+#rover .rv-side { display: grid; gap: clamp(16px, 2vw, 28px); grid-template-rows: auto 1fr; }
+#rover .rv-card { padding: clamp(20px, 2.4vw, 30px); display: grid; }
+#rover .rv-panes { display: grid; }
+#rover .rv-pane { grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateY(10px); transition: opacity .5s var(--ease-out), transform .6s var(--ease-out), visibility 0s .5s; }
+#rover[data-mode="hab"] .rv-pane.hab, #rover[data-mode="rover"] .rv-pane.rov { opacity: 1; visibility: visible; transform: none; transition-delay: .12s, .12s, 0s; }
+#rover .rv-verdict { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 12px 0 4px; }
+#rover .rv-verdict .big { font: 200 clamp(42px, 5vw, 64px)/1 var(--font-display); font-stretch: 125%; letter-spacing: -.02em; }
+#rover .rv-pane.hab .big { color: var(--alert); }
+#rover .rv-pane.rov .big { color: var(--hud); }
+#rover .rv-sub { color: var(--mute); font-size: 15px; margin: 6px 0 18px; }
+#rover .rv-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+#rover .rv-list li { display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+#rover .rv-list li small { grid-column: 1 / -1; color: var(--faint); font-size: 13px; line-height: 1.4; }
+#rover .rv-list .n { font: 400 15px var(--font-hud); color: var(--alert); text-align: right; white-space: nowrap; }
+#rover .rv-pane.rov .rv-list .n { color: var(--hud); }
+#rover .rv-fix { margin: 14px 0 0; font-size: 14px; color: var(--mute); }
+#rover .rv-fix b { color: var(--hud); font-weight: 600; }
+#rover .rv-photo { display: grid; grid-template-columns: 112px 1fr; gap: 16px; padding: 12px; align-items: center; }
+#rover .rv-photo img { width: 112px; height: 112px; object-fit: cover; border-radius: 8px; filter: contrast(1.05); }
+#rover .rv-photo h4 { margin: 4px 0 4px; font: 600 16px/1.25 var(--font-body); }
+#rover .rv-photo p { margin: 0; font-size: 13px; color: var(--mute); line-height: 1.45; }
+#rover .rv-photo-wrap { position: relative; }
+#rover .rv-photo-wrap .card { transition: opacity .5s, filter .5s; }
+#rover[data-mode="hab"] .rv-photo-wrap .card { opacity: .35; filter: grayscale(1); }
+#rover .rv-foot { margin-top: clamp(24px, 3vw, 36px); max-width: 880px; }
+@media (max-width: 960px) { #rover .rv-grid { grid-template-columns: minmax(0, 1fr); } #rover .rv-stage { aspect-ratio: 1 / 1.05; } }
+@media (max-width: 520px) { #rover .rv-seg button { padding: 10px 8px; font-size: 10.5px; white-space: normal; line-height: 1.25; } #rover .rv-seg { width: 100%; } #rover .rv-photo { grid-template-columns: 88px 1fr; } #rover .rv-photo img { width: 88px; height: 88px; } }
+@media (prefers-reduced-motion: reduce) { #rover * { transition-duration: .01s !important; animation: none !important; } }
+</style>
+<div class="wrap">
+  <div class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Why the rover</span></div>
+    <h2 class="display sec-title" id="rover-title">From the habitat, the answer is <em>stay in.</em></h2>
+    <p class="sec-lede">At Gale, the boxwork science stops sit about <b>220 m below the habitat</b>. Marswalk checks every stop against the limits and reports the honest answer. Flip the start point and watch the verdict change.</p>
+  </div>
+
+  <div class="rv-grid reveal d1">
+    <div class="glass rv-map"><i class="brk"></i>
+      <div class="rv-bar">
+        <div class="rv-seg" role="group" aria-label="Start point">
+          <span class="rv-pill"></span>
+          <button type="button" data-m="hab" aria-pressed="true">Start from Hab-1</button>
+          <button type="button" data-m="rover" aria-pressed="false">Start from PR-1 rover</button>
+        </div>
+        <span class="hud-label">Gale crater · 5 m / unit contours 10 m</span>
+      </div>
+      <div class="rv-stage" id="rv-stage">
+        <svg viewBox="330 400 340 380" preserveAspectRatio="xMidYMid slice" role="img" aria-label="HiRISE map of the Gale boxwork area with Hab-1, rover PR-1 and science stops ST01 to ST08">
+          <defs><radialGradient id="rv-vig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0b0605" stop-opacity=".7"/></radialGradient></defs>
+          <image href="assets/img/hirise-2400.jpg" x="0" y="0" width="1000" height="1000" style="filter:brightness(.78) saturate(.9)"/>
+          <g id="rv-cm"></g><g id="rv-cM"></g>
+          <rect class="rv-shade" x="330" y="400" width="340" height="380"/>
+          <g id="rv-rays"></g>
+          <path class="rv-route-bg" id="rv-route-bg" d=""/>
+          <path class="rv-route" id="rv-route" d=""/>
+          <g id="rv-sts"></g>
+          <g class="rv-mk rv-hb" transform="translate(576.5 621.5)"><rect class="shape" x="-6" y="-6" width="12" height="12"/><text x="11" y="3.5">HAB-1</text></g>
+          <g class="rv-mk rv-pr" transform="translate(435.5 512.5)"><path class="shape" d="M0-8L8 0 0 8-8 0Z"/><text x="-13" y="3.5" text-anchor="end">PR-1</text></g>
+        </svg>
+        <div class="rv-tip" id="rv-tip"></div>
+        <span class="rv-tag">SCENARIO</span>
+        <div class="rv-scale"><i id="rv-bar"></i><span>500 M</span></div>
+      </div>
+      <p class="hud-label rv-hint">Tap a stop to identify it · ST09 to ST12 lie further north-east, off this view</p>
+    </div>
+
+    <div class="rv-side">
+      <div class="glass rv-card"><i class="brk"></i>
+        <div class="rv-panes">
+          <div class="rv-pane hab">
+            <span class="chip nogo">NO-GO</span>
+            <div class="rv-verdict"><span class="big hud-num">0 of 12</span></div>
+            <p class="rv-sub">stops reachable on foot from Hab-1. Four limits block every stop:</p>
+            <ul class="rv-list">
+              <li><span>Suit heat on the ~220 m climb back</span><span class="n">~800 W vs 352 W</span><small>Modelled, extrapolated to 0.38 g. Forced rests overrun the 6 h EVA.</small></li>
+              <li><span>Radio contact lost over 10 min</span><span class="n">7 of 12</span></li>
+              <li><span>Shelter over 30 min away</span><span class="n">2 of 12</span></li>
+              <li><span>Beyond the 2 km radius</span><span class="n">3 of 12</span></li>
+            </ul>
+            <p class="rv-fix">Not just the heat model: with up to 1,500 W of cooling, every stop still breaks one of the other limits. <b>Marswalk answers "stay in."</b></p>
+          </div>
+          <div class="rv-pane rov">
+            <span class="chip go">GO</span>
+            <div class="rv-verdict"><span class="big hud-num">1 h 55 min</span></div>
+            <p class="rv-sub">PR-1 to ST01 Altadena drill site · 1 stop · 0.7 km round trip</p>
+            <ul class="rv-list">
+              <li><span>Airlock out / in</span><span class="n">30 + 30 min</span></li>
+              <li><span>Walking · at the stop</span><span class="n">30 · 25 min</span></li>
+              <li><span>Back at airlock</span><span class="n">+1:25</span><small>Latest safe return +5:30, so 4 h 05 min spare.</small></li>
+              <li><span>Space weather · daylight</span><span class="n">clear · to 17:48</span></li>
+              <li><span>Suit heat</span><span class="n">1 short rest</span></li>
+            </ul>
+            <p class="rv-fix">A pressurized rover parked near the stops fixes <b>all four limits at once.</b></p>
+          </div>
+        </div>
+      </div>
+      <div class="rv-photo-wrap">
+        <div class="card rv-photo">
+          <img src="assets/img/msl-4559-NRB_802226571EDR_F116189.jpg" alt="Curiosity Navcam view near the ST01 Altadena drill site" loading="lazy">
+          <div><span class="hud-label is-hud">ST01 · Station card</span><h4>Altadena drill site</h4><p>Boxwork bedrock. Curiosity Navcam, sol 4559. NASA/JPL-Caltech.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="hud-label rv-foot reveal">Our model's result, consistent with NASA's rover-based Mars reference architecture (DRA 5.0, SP-2009-566). Scenario positions labelled SCENARIO. Terrain: HiRISE, NASA/JPL/University of Arizona.</p>
+</div>
+<script>
+(function () {
+  var G = window.GALE, root = document.getElementById('rover');
+  if (!G || !root) return;
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(n, a, p) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; }
+  el('path', { 'class': 'rv-contour-minor', d: G.contours.minor }, document.getElementById('rv-cm'));
+  el('path', { 'class': 'rv-contour-major', d: G.contours.major }, document.getElementById('rv-cM'));
+  var hab = G.points.shelters.filter(function (s) { return s.id === 'HAB'; })[0].p;
+  var pr = G.points.shelters.filter(function (s) { return s.id === 'ROVER1'; })[0].p;
+  var sts = G.points.stations.filter(function (s) { return s.p[0] < 600 && s.p[1] > 400 && s.p[1] < 780; });
+  var rays = document.getElementById('rv-rays'), gs = document.getElementById('rv-sts');
+  var tip = document.getElementById('rv-tip'), stage = document.getElementById('rv-stage');
+  var svg = stage.querySelector('svg');
+  sts.forEach(function (s) {
+    el('line', { 'class': 'rv-ray', x1: hab[0], y1: hab[1], x2: s.p[0], y2: s.p[1] }, rays);
+    var g = el('g', { 'class': 'rv-st', 'data-id': s.id, tabindex: 0, role: 'button', 'aria-label': s.id + ' ' + s.name }, gs);
+    el('circle', { cx: s.p[0], cy: s.p[1], r: 9, fill: 'transparent' }, g);
+    el('circle', { 'class': 'ring', cx: s.p[0], cy: s.p[1], r: 6 }, g);
+    el('circle', { 'class': 'dot', cx: s.p[0], cy: s.p[1], r: 3 }, g);
+    function show() {
+      tip.innerHTML = '<b>' + s.id + '</b><br>' + s.name;
+      var r = svg.getBoundingClientRect(), pt = svg.createSVGPoint(); pt.x = s.p[0]; pt.y = s.p[1];
+      var c = pt.matrixTransform(svg.getScreenCTM()), sr = stage.getBoundingClientRect();
+      var x = c.x - sr.left, y = c.y - sr.top;
+      tip.style.left = Math.max(8, Math.min(x + 12, sr.width - 240)) + 'px';
+      tip.style.top = Math.max(8, Math.min(y + 12, sr.height - 70)) + 'px';
+      tip.classList.add('on'); g.classList.add('on');
+    }
+    function hide() { tip.classList.remove('on'); g.classList.remove('on'); }
+    g.addEventListener('mouseenter', show); g.addEventListener('mouseleave', hide);
+    g.addEventListener('focus', show); g.addEventListener('blur', hide);
+    g.addEventListener('click', function (e) { e.stopPropagation(); show(); });
+  });
+  stage.addEventListener('click', function () { tip.classList.remove('on'); });
+  // route PR-1 -> ST01 (slight bend)
+  var st1 = sts.filter(function (s) { return s.id === 'ST01'; })[0].p;
+  var d = 'M' + pr[0] + ' ' + (pr[1] - 8) + ' C ' + (pr[0] - 12) + ' ' + (pr[1] - 30) + ', ' + (st1[0] + 10) + ' ' + (st1[1] + 30) + ', ' + st1[0] + ' ' + (st1[1] + 4);
+  var route = document.getElementById('rv-route'), bg = document.getElementById('rv-route-bg');
+  route.setAttribute('d', d); bg.setAttribute('d', d);
+  var len = route.getTotalLength();
+  route.style.strokeDasharray = len; bg.style.strokeDasharray = len;
+  function setRoute(on, animate) {
+    [route, bg].forEach(function (p) {
+      p.style.transition = 'none'; p.style.strokeDashoffset = on && !animate ? 0 : len; void p.getBoundingClientRect();
+      if (on && animate) { p.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.65,0,.35,1) .25s'; p.style.strokeDashoffset = 0; }
+    });
+    if (!on) { route.style.opacity = 0; bg.style.opacity = 0; } else { route.style.opacity = 1; bg.style.opacity = 1; }
+  }
+  route.style.transition = bg.style.transition = 'none'; setRoute(false);
+  // scale bar: 500 m = 100 units
+  var vb = svg.viewBox.baseVal;
+  function sizeBar() { var s = Math.max(stage.clientWidth / vb.width, stage.clientHeight / vb.height); document.getElementById('rv-bar').style.width = (100 * s) + 'px'; }
+  sizeBar(); window.addEventListener('resize', sizeBar);
+
+  var btns = root.querySelectorAll('.rv-seg button'), touched = false;
+  function set(m, animate) {
+    root.setAttribute('data-mode', m);
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-m') === m)); });
+    setRoute(m === 'rover', animate !== false);
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { touched = true; set(b.getAttribute('data-m')); }); });
+  set('hab', false);
+  var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window && !rm) {
+    var io = new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) { io.disconnect(); setTimeout(function () { if (!touched) set('rover'); }, 3000); }
+    }, { threshold: 0.6 });
+    io.observe(stage);
+  }
+})();
+</script>
+</section>
+
+
+<!-- 40-pipeline.html -->
+<section class="section" id="how" aria-labelledby="how-title">
+<style>
+#how .layout{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(32px,6vw,96px);align-items:start}
+#how .sec-head{margin-bottom:0;position:sticky;top:120px}
+#how .flow{position:relative;padding-left:76px}
+#how .spine{position:absolute;left:21px;top:22px;bottom:22px;width:2px;background:var(--line)}
+#how .spine i{position:absolute;left:0;top:0;width:100%;height:var(--fill,0%);background:linear-gradient(180deg,var(--hud-dim),var(--hud));box-shadow:0 0 14px var(--hud)}
+#how .stage{position:relative;padding:0 0 clamp(36px,4.6vw,56px)}
+#how .stage:last-of-type{padding-bottom:clamp(40px,5vw,64px)}
+#how .num{position:absolute;left:-76px;top:0;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--space);border:1px solid var(--ghost);color:var(--faint);font:400 13px/1 var(--font-hud);transition:all .6s var(--ease-out)}
+#how .stage.on .num{border-color:var(--hud);color:var(--hud);box-shadow:0 0 0 5px rgba(127,224,166,.08),0 0 26px rgba(127,224,166,.35)}
+#how .stage h3{margin:2px 0 10px;font:300 clamp(22px,2.4vw,32px)/1.15 var(--font-display);font-stretch:118%;color:var(--mute);transition:color .6s}
+#how .stage.on h3{color:var(--cream)}
+#how .stage p{margin:0 0 12px;color:var(--mute);font-size:16px;max-width:560px;line-height:1.55}
+#how .stage .hud-label{display:block;padding:9px 12px;border-left:1px solid var(--hud-dim);background:rgba(127,224,166,.04);max-width:560px;letter-spacing:.1em;line-height:1.55;font-size:10.5px;text-transform:none}
+#how .stage .hud-label b{font-weight:400;color:var(--hud)}
+#how .stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+#how .stat{padding:26px 26px 24px}
+#how .stat .v{display:block;font:200 clamp(44px,5.4vw,76px)/1 var(--font-display);font-stretch:125%;letter-spacing:-.02em;color:var(--hud);margin:12px 0 10px}
+#how .stat .v small{font:300 .32em/1 var(--font-hud);letter-spacing:.1em;color:var(--mute);margin-left:6px}
+#how .stat p{margin:0;font-size:14px;color:var(--mute);line-height:1.5}
+#how .fine{margin:16px 0 0}
+@media(max-width:900px){#how .layout{grid-template-columns:1fr}#how .sec-head{position:static;margin-bottom:48px}}
+@media(max-width:480px){#how .flow{padding-left:54px}#how .num{left:-54px;width:34px;height:34px;font-size:11px}#how .spine{left:16px}#how .stats{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+  <div class="layout">
+    <div class="sec-head reveal">
+      <div class="sec-index"><span class="hud-label is-hud">03 · How it works</span></div>
+      <h2 class="display sec-title" id="how-title">How a plan <em>is checked.</em></h2>
+      <p class="sec-lede">No guesswork and no AI in the safety path. Every plan is built from real NASA data and then <b>walked step by step in a simulator</b> before it is shown as GO.</p>
+    </div>
+    <div class="flow" id="how-flow">
+      <div class="spine" aria-hidden="true"><i></i></div>
+
+      <div class="stage reveal"><span class="num">01</span>
+        <h3>Real NASA layers, one grid</h3>
+        <p>Terrain, colour imagery, thermal inertia, minerals, radio line of sight and sunlight are resampled onto a single 5 m grid.</p>
+        <span class="hud-label">USGS merged 1 m DEM (HiRISE+CTX+HRSC+MOLA) · HiRISE · THEMIS · CRISM · radio LOS · Mars24 · <b>R = 3,396,190 m</b></span></div>
+
+      <div class="stage reveal"><span class="num">02</span>
+        <h3>Walking cost from physiology</h3>
+        <p>Each step costs what it would cost a person in a suit on Mars, not just how steep it is. A heat governor adds rests when the suit would overheat.</p>
+        <span class="hud-label">Pandolf–Santee model · 121 kg suit load · 0.38 g · 30-min mean ≤ <b>352 W</b> cooling budget</span></div>
+
+      <div class="stage reveal"><span class="num">03</span>
+        <h3>Exact search, not a heuristic guess</h3>
+        <p>Optimal paths between places, then the best order and subset of stops, computed exactly.</p>
+        <span class="hud-label">A* / Dijkstra paths · stop selection by dynamic programming over <b>up to 15 stops</b></span></div>
+
+      <div class="stage reveal"><span class="num">04</span>
+        <h3>Twelve cited constraints</h3>
+        <p>Rules drawn from public NASA EVA documents, each one cited, applied as hard limits to every candidate.</p>
+        <span class="hud-label"><b>12</b> constraints · public NASA EVA documents · source shown per rule</span></div>
+
+      <div class="stage reveal"><span class="num">05</span>
+        <h3>Re-walked in a simulator</h3>
+        <p>Every candidate is replayed step by step against all hard constraints. Staying inside is always a valid answer.</p>
+        <span class="hud-label">Step-by-step replay · all hard constraints · <b>"stay in" always valid</b></span></div>
+
+      <div class="stage reveal"><span class="num">06</span>
+        <h3>A verdict, with the reason</h3>
+        <p>GO or NO-GO, the constraint that binds, the margins, and why any stop was dropped. Nothing is a black box.</p>
+        <span class="hud-label">Binding constraint · margins · latest departure from each stop · dropped-stop reason</span></div>
+
+      <div class="stats">
+        <div class="glass stat reveal"><i class="brk"></i><span class="hud-label is-hud">Plan</span><span class="v hud-num">37.9<small>MS</small></span><p>to plan, median, on a laptop.</p></div>
+        <div class="glass stat reveal d1"><i class="brk"></i><span class="hud-label is-hud">Re-plan mid-walk</span><span class="v hud-num">8.3<small>MS</small></span><p>to re-plan mid-walk, median (p95 19.8 ms).</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var flow=document.getElementById('how-flow'); if(!flow)return;
+  var fill=flow.querySelector('.spine i'),stages=[].slice.call(flow.querySelectorAll('.stage')),tk=false;
+  function upd(){
+    tk=false;
+    var r=flow.getBoundingClientRect(),vh=innerHeight,line=vh*0.62;
+    var h=Math.max(0,Math.min(r.height-44,line-r.top-22));
+    fill.style.height=h+'px';
+    stages.forEach(function(s){var b=s.getBoundingClientRect();s.classList.toggle('on',b.top<line-4);});
+  }
+  function req(){if(!tk){tk=true;requestAnimationFrame(upd);}}
+  addEventListener('scroll',req,{passive:true});addEventListener('resize',req);upd();
+})();
+</script>
+</section>
+
+
+<!-- 50-constraints.html -->
+<section class="section" id="constraints" aria-labelledby="constraints-title">
+<style>
+#constraints .cs-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+#constraints .cs-cell { position: relative; background: var(--space-2); padding: 24px 22px 22px; display: flex; flex-direction: column; gap: 8px; min-height: 270px; transition: background .4s, opacity 1s var(--ease-out), transform 1s var(--ease-out); }
+#constraints .cs-cell:hover { background: #16100d; }
+#constraints .cs-cell .brk { opacity: 0; transition: opacity .3s; inset: 8px; }
+#constraints .cs-cell:hover .brk, #constraints .cs-cell:focus-within .brk { opacity: 1; }
+#constraints .cs-top { display: flex; justify-content: space-between; align-items: center; min-height: 20px; }
+#constraints .cs-tag { font: 400 9.5px/1 var(--font-hud); letter-spacing: .14em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; border: 1px solid; }
+#constraints .cs-tag.dp { color: var(--sky); border-color: rgba(143,178,217,.45); }
+#constraints .cs-tag.sf { color: var(--faint); border-color: var(--line-2); }
+#constraints .cs-val { font: 200 clamp(40px, 4.2vw, 56px)/1.05 var(--font-display); font-stretch: 125%; letter-spacing: -.02em; color: var(--cream); margin-top: 14px; }
+#constraints .cs-cell:hover .cs-val { color: var(--hud); }
+#constraints .cs-val { transition: color .3s; }
+#constraints h3 { margin: 6px 0 0; font: 600 16px/1.3 var(--font-body); }
+#constraints .cs-cell p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--mute); }
+#constraints .cs-src { margin-top: auto; padding-top: 12px; font-size: 10px; letter-spacing: .1em; line-height: 1.5; }
+#constraints .cs-note { margin: clamp(32px, 4vw, 48px) 0 0; max-width: 820px; font-size: clamp(17px, 1.5vw, 20px); color: var(--mute); line-height: 1.6; }
+#constraints .cs-note b { color: var(--cream); font-weight: 600; }
+#constraints .cs-note em { font-style: normal; color: var(--hud); }
+@media (max-width: 1100px) { #constraints .cs-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 780px) { #constraints .cs-grid { grid-template-columns: repeat(2, 1fr); } #constraints .cs-cell { min-height: 240px; padding: 18px 16px; } }
+@media (max-width: 480px) { #constraints .cs-grid { grid-template-columns: 1fr; } #constraints .cs-cell { min-height: 0; } }
+</style>
+<div class="wrap">
+  <div class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">12 constraints</span></div>
+    <h2 class="display sec-title" id="constraints-title">Twelve limits, <em>each one cited.</em></h2>
+    <p class="sec-lede">Drawn from public NASA EVA documents. Nine come straight from a source. Three are <b>our own design parameters</b>, labelled as such.</p>
+  </div>
+  <ul class="cs-grid">
+    <li class="cs-cell reveal d1"><i class="brk"></i><div class="cs-top"><span class="hud-label">01</span></div><div class="cs-val hud-num">20°</div><h3>Maximum slope</h3><p>Suited crew never plan a walk steeper than 20°, up, down or across.</p><span class="hud-label cs-src">xEVA ConOps EVA-EXP-0042 Rev B · NTRS 20230005904</span></li>
+    <li class="cs-cell reveal d2"><i class="brk"></i><div class="cs-top"><span class="hud-label">02</span></div><div class="cs-val hud-num">6 h</div><h3>EVA duration</h3><p>A nominal spacewalk is 6 hours, start to finish.</p><span class="hud-label cs-src">xEVA ConOps EVA-EXP-0042 Rev B</span></li>
+    <li class="cs-cell reveal d3"><i class="brk"></i><div class="cs-top"><span class="hud-label">03</span></div><div class="cs-val hud-num">30 min</div><h3>Egress and ingress</h3><p>Half an hour in the airlock each way, counted inside the 6 hours.</p><span class="hud-label cs-src">xEVA ConOps EVA-EXP-0042 Rev B</span></li>
+    <li class="cs-cell reveal d1"><i class="brk"></i><div class="cs-top"><span class="hud-label">04</span></div><div class="cs-val hud-num">60 min</div><h3>Contingency oxygen</h3><p>A backup hour of oxygen that a plan never spends.</p><span class="hud-label cs-src">xEVA ConOps EVA-EXP-0042 Rev B</span></li>
+    <li class="cs-cell reveal d2"><i class="brk"></i><div class="cs-top"><span class="hud-label">05</span><span class="cs-tag dp">Design parameter</span></div><div class="cs-val hud-num">0.5×</div><h3>Walk-back at half speed</h3><p>A crew member must always be able to walk home at half speed.</p><span class="hud-label cs-src">Team assumption · Bellcomm TR-69-340-4</span></li>
+    <li class="cs-cell reveal d3"><i class="brk"></i><div class="cs-top"><span class="hud-label">06</span></div><div class="cs-val hud-num">30 min</div><h3>Shelter in reach</h3><p>Shelter from a solar storm is never more than 30 minutes away.</p><span class="hud-label cs-src">DRA 5.0 Addendum SP-2009-566-ADD · arXiv:2502.02469</span></li>
+    <li class="cs-cell reveal d1"><i class="brk"></i><div class="cs-top"><span class="hud-label">07</span><span class="cs-tag dp">Design parameter</span></div><div class="cs-val hud-num">≤10 min</div><h3>Radio gaps</h3><p>No more than 10 minutes out of radio contact with the habitat or rover.</p><span class="hud-label cs-src">Caswell et al., ASCEND 2025 · NTRS 20250006063</span></li>
+    <li class="cs-cell reveal d2"><i class="brk"></i><div class="cs-top"><span class="hud-label">08</span><span class="cs-tag dp">Design parameter</span></div><div class="cs-val hud-num">5°</div><h3>Daylight</h3><p>Sun at least 5° above the horizon. No night EVAs.</p><span class="hud-label cs-src">DRA 5.0 Addendum SP-2009-566-ADD</span></li>
+    <li class="cs-cell reveal d3"><i class="brk"></i><div class="cs-top"><span class="hud-label">09</span></div><div class="cs-val hud-num">352 W</div><h3>Suit heat</h3><p>The suit's 30-minute average heat load stays within 352 W. Rests are added when it doesn't.</p><span class="hud-label cs-src">ICES-2026-127 · NTRS 20130014146</span></li>
+    <li class="cs-cell reveal d1"><i class="brk"></i><div class="cs-top"><span class="hud-label">10</span></div><div class="cs-val hud-num">2 km</div><h3>Walking radius</h3><p>Never farther than 2 km from the habitat on foot.</p><span class="hud-label cs-src">NTRS 20230008183 · xEVA ConOps</span></li>
+    <li class="cs-cell reveal d2"><i class="brk"></i><div class="cs-top"><span class="hud-label">11</span></div><div class="cs-val hud-num">1 km</div><h3>Plume keep-out</h3><p>Stay 1 km clear of landing pads, where plume ejecta lands.</p><span class="hud-label cs-src">Hoffman et al., NTRS 20160002370</span></li>
+    <li class="cs-cell reveal d3"><i class="brk"></i><div class="cs-top"><span class="hud-label">12</span><span class="cs-tag sf">Soft</span></div><div class="cs-val hud-num">16.7°</div><h3>Slope comfort</h3><p>A softer limit where suited metabolic data ends. Steeper is flagged, not forbidden.</p><span class="hud-label cs-src">Norcross et al., NASA/TP-2010-216125</span></li>
+  </ul>
+  <p class="cs-note reveal">Every plan is re-walked in a simulator against all hard constraints before it is shown. And <em>"stay in"</em> is always a valid answer.</p>
+</div>
+</section>
+
+
+<!-- 60-results.html -->
+<section class="section" id="results">
+<style>
+#results .cmp { padding: clamp(24px,3.4vw,44px); display: grid; gap: 28px; margin-bottom: 20px; }
+#results .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px,4vw,56px); align-items: end; }
+#results .cmp-col { display: grid; gap: 14px; }
+#results .cmp-big { font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: clamp(64px,10vw,140px); line-height: .9; letter-spacing: -.03em; }
+#results .cmp-big small { font-size: .4em; font-weight: 200; opacity: .7; }
+#results .cmp-bad .cmp-big { color: var(--alert); }
+#results .cmp-good .cmp-big { color: var(--hud); }
+#results .bar { height: 10px; border-radius: 99px; background: rgba(245,237,230,.07); overflow: hidden; position: relative; }
+#results .bar i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 99px; transition: width 1.6s var(--ease-out) .2s; }
+#results .cmp-bad .bar i { background: linear-gradient(90deg, rgba(255,95,180,.45), var(--alert)); box-shadow: 0 0 18px rgba(255,95,180,.5); }
+#results .cmp-good .bar i { background: var(--hud); min-width: 3px; box-shadow: 0 0 14px var(--hud); }
+#results .cmp.in .cmp-bad .bar i { width: 99.5%; }
+#results .cmp.in .cmp-good .bar i { width: 0.6%; }
+#results .cmp-txt { font-size: 15px; color: var(--mute); margin: 0; max-width: 46ch; }
+#results .cmp-txt b { color: var(--cream); font-weight: 600; }
+#results .caveat { display: flex; gap: 12px; align-items: baseline; padding-top: 22px; border-top: 1px solid var(--line); font-size: 14px; color: var(--mute); }
+#results .caveat .hud-label { flex: none; }
+#results .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+#results .tile { padding: 28px 26px 26px; display: flex; flex-direction: column; gap: 14px; min-height: 230px; transition: border-color .4s, transform .5s var(--ease-out); }
+#results .tile:hover { border-color: var(--glass-edge); transform: translateY(-3px); }
+#results .tile.w2 { grid-column: span 2; }
+#results .tile.w4 { grid-column: span 4; min-height: 0; flex-direction: row; align-items: center; gap: 36px; }
+#results .tile.w4 p { max-width: 52ch; }
+#results .tile.w4 .hud-label { margin: 0 0 0 auto; }
+#results .num { font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: clamp(40px,4.4vw,60px); line-height: 1; letter-spacing: -.02em; color: var(--cream); font-variant-numeric: tabular-nums; }
+#results .num sub, #results .num span.u { font-size: .38em; letter-spacing: 0; color: var(--hud); font-weight: 300; margin-left: 4px; vertical-align: baseline; }
+#results .tile p { margin: 0; font-size: 14.5px; color: var(--mute); line-height: 1.55; }
+#results .tile p b { color: var(--cream); font-weight: 600; }
+#results .tile .hud-label { margin-top: auto; }
+@media (max-width: 1000px) { #results .grid { grid-template-columns: repeat(2, 1fr); } #results .tile.w4 { grid-column: span 2; flex-direction: column; align-items: flex-start; gap: 14px; } #results .tile.w4 .hud-label { margin: 0; } }
+@media (max-width: 640px) {
+  #results .cmp-grid { grid-template-columns: 1fr; }
+  #results .grid { grid-template-columns: 1fr; gap: 14px; }
+  #results .tile.w2, #results .tile.w4 { grid-column: auto; flex-direction: column; align-items: flex-start; gap: 14px; }
+  #results .tile.w4 .hud-label { margin: 0; }
+  #results .tile { min-height: 0; }
+  #results .caveat { flex-direction: column; gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { #results .bar i { transition: none; } }
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Results</span></div>
+    <h2 class="display sec-title">What the <em>numbers</em> say.</h2>
+    <p class="sec-lede">Every figure comes from code in the repository and is simulation only. Each carries its context, because a number without its baseline is just decoration.</p>
+  </header>
+
+  <div class="glass cmp reveal" id="results-cmp"><i class="brk"></i>
+    <div class="hud-label is-hud">Constraint breaks &middot; 200 simulated Gale walks</div>
+    <div class="cmp-grid">
+      <div class="cmp-col cmp-bad">
+        <div class="hud-label is-alert">Slope-only plans</div>
+        <div class="cmp-big"><span data-count="99.5" data-dec="1">99.5</span><small>%</small></div>
+        <div class="bar"><i></i></div>
+        <p class="cmp-txt"><b>break at least one constraint.</b> This is the common baseline: a route that only avoids steep ground.</p>
+      </div>
+      <div class="cmp-col cmp-good">
+        <div class="hud-label is-hud">Marswalk plans</div>
+        <div class="cmp-big"><span data-count="0" data-dec="0">0</span><small>%</small></div>
+        <div class="bar"><i></i></div>
+        <p class="cmp-txt"><b>break none.</b> Every plan is re-walked step by step in a simulator against all hard constraints before it is shown.</p>
+      </div>
+    </div>
+    <div class="caveat"><span class="hud-label">Read this fairly</span><span>The slope-only baseline is a strawman by construction: it ignores everything except slope. The fairer comparison is the next tile.</span></div>
+  </div>
+
+  <div class="grid">
+    <article class="card tile w2 reveal">
+      <div class="num">+<span data-count="5" data-dec="0">5</span><span class="u">% science</span></div>
+      <p><b>Against a nearest-first planner with the same safety checks</b>, when time is short (12 candidate stops, 2 to 4 h available). Better in <b>62.5%</b> of cases and never lower. With ample time, both pick the same stops.</p>
+      <span class="hud-label">Oversubscribed-time test</span>
+    </article>
+    <article class="card tile reveal d1">
+      <div class="num"><span data-count="60" data-dec="0">60</span><span class="u">/ 60</span></div>
+      <p><b>&ldquo;Stay in&rdquo;</b> from the habitat, in all 60 scenarios. Not going is always a valid answer.</p>
+      <span class="hud-label">v3 impact run</span>
+    </article>
+    <article class="card tile reveal d2">
+      <div class="num"><span data-count="3" data-dec="0">3</span><span class="u">s</span></div>
+      <p>The AR navigator goes <b>autonomous within about 3 s</b> of losing the link to the habitat.</p>
+      <span class="hud-label">Link-loss test</span>
+    </article>
+    <article class="card tile reveal">
+      <div class="num"><span data-count="37.9" data-dec="1">37.9</span><span class="u">ms</span></div>
+      <p><b>Plan, median</b> on a laptop. The first plan of a session takes about 1.7 s while safety fields are computed once.</p>
+      <span class="hud-label">Speed</span>
+    </article>
+    <article class="card tile reveal d1">
+      <div class="num"><span data-count="8.3" data-dec="1">8.3</span><span class="u">ms</span></div>
+      <p><b>Mid-EVA re-plan, median</b> (p95 19.8 ms).</p>
+      <span class="hud-label">Speed</span>
+    </article>
+    <article class="card tile reveal d2">
+      <div class="num">~<span data-count="11" data-dec="0">11</span><span class="u">KB</span></div>
+      <p><b>Route package.</b> For scale, Curiosity&rsquo;s daily uplink is about 28 KB.</p>
+      <span class="hud-label">Package gate</span>
+    </article>
+    <article class="card tile reveal d3">
+      <div class="num"><span data-count="122" data-dec="0">122</span><span class="u">+ 26</span></div>
+      <p><b>122 unit tests</b> and <b>26 real mouse-and-keyboard UI tests</b>.</p>
+      <span class="hud-label">Test suite</span>
+    </article>
+    <article class="card tile w4 reveal">
+      <div class="num">2<span class="u">sites, 0 code changes</span></div>
+      <p>A <b>second Mars site, Jezero</b> (Perseverance), runs with no code changes: new data pack, same engine.</p>
+      <span class="hud-label">Portability</span>
+    </article>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('results');
+  if (!root) return;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function run(el) {
+    var to = parseFloat(el.getAttribute('data-count')), dec = +el.getAttribute('data-dec') || 0;
+    if (reduce) { el.textContent = to.toFixed(dec); return; }
+    var t0 = performance.now(), dur = 1500;
+    (function f(t) {
+      var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 4);
+      el.textContent = (to * e).toFixed(dec);
+      if (p < 1) requestAnimationFrame(f);
+    })(t0);
+    setTimeout(function () { el.textContent = to.toFixed(dec); }, dur + 300);
+  }
+  var cmp = document.getElementById('results-cmp');
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      e.target.classList.add('in');
+      e.target.querySelectorAll('[data-count]').forEach(run);
+      if (e.target.hasAttribute('data-count')) run(e.target);
+    });
+  }, { threshold: 0.35 });
+  cmp.querySelectorAll('[data-count]').forEach(function (n) { n.textContent = (+n.getAttribute('data-count') === 0 ? '0' : '0.0'.slice(0, +n.getAttribute('data-dec') ? 3 : 1)); });
+  io.observe(cmp);
+  root.querySelectorAll('.tile').forEach(function (t) {
+    t.querySelectorAll('[data-count]').forEach(function (n) { n.textContent = (+n.getAttribute('data-dec') ? '0.0' : '0'); });
+    io.observe(t);
+  });
+})();
+</script>
+</section>
+
+
+<!-- 70-data.html -->
+<section class="section" id="data">
+<style>
+#data .kinds { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+#data .kinds .chip { height: 30px; }
+#data .kinds .chip.part { color: var(--sky); border-color: rgba(143,178,217,.4); background: rgba(10,20,34,.5); }
+#data .kinds .chip.add { color: var(--dust); border-color: var(--line-2); background: rgba(36,19,16,.5); }
+#data .kinds .chip.none { color: var(--faint); border-color: var(--line); background: transparent; }
+#data .layout { display: grid; grid-template-columns: minmax(0,1.7fr) minmax(0,1fr); gap: clamp(24px,3.5vw,48px); align-items: start; }
+#data .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 14px; }
+#data .legend span { display: inline-flex; gap: 8px; align-items: center; }
+#data .dep { display: inline-flex; gap: 3px; vertical-align: middle; }
+#data .dep i { width: 12px; height: 4px; border-radius: 2px; background: rgba(245,237,230,.13); }
+#data .dep[data-d="4"] i, #data .dep[data-d="3"] i:nth-child(-n+3), #data .dep[data-d="2"] i:nth-child(-n+2), #data .dep[data-d="1"] i:nth-child(1) { background: var(--hud); box-shadow: 0 0 8px rgba(127,224,166,.5); }
+#data .rows { display: grid; border-top: 1px solid var(--line); }
+#data .row { display: grid; grid-template-columns: 190px minmax(0,1fr) 110px; gap: 8px 28px; padding: 20px 6px; border-bottom: 1px solid var(--line); align-items: start; transition: background .4s; }
+#data .row:hover { background: rgba(127,224,166,.035); }
+#data .m { font-weight: 600; font-size: 15.5px; line-height: 1.3; }
+#data .m small { display: block; font: 400 11px/1.5 var(--font-hud); letter-spacing: .08em; color: var(--faint); text-transform: uppercase; margin-top: 4px; }
+#data .p { font-size: 14.5px; color: var(--mute); line-height: 1.5; }
+#data .p b { color: var(--cream); font-weight: 500; display: block; margin-bottom: 3px; }
+#data .p em { display: block; font: normal 400 11px/1.5 var(--font-hud); color: var(--faint); margin-top: 6px; letter-spacing: .02em; }
+#data .d { text-align: right; display: grid; gap: 6px; justify-items: end; }
+#data .d .hud-label { color: var(--hud); }
+#data .row[data-d="2"] .d .hud-label, #data .row[data-d="1"] .d .hud-label { color: var(--sky); }
+#data .side { position: sticky; top: 90px; display: grid; gap: 20px; }
+#data .shot { padding: 10px; overflow: hidden; }
+#data .shot img { width: 100%; border-radius: 8px; height: auto; }
+#data .shot figcaption { padding: 12px 6px 4px; font-size: 13px; color: var(--mute); }
+#data .check { padding: 26px; display: grid; gap: 10px; }
+#data .check .big { font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: 44px; line-height: 1; color: var(--hud); }
+#data .check p { margin: 0; font-size: 14px; color: var(--mute); }
+#data .check p b { color: var(--cream); font-weight: 600; }
+@media (max-width: 1060px) { #data .layout { grid-template-columns: 1fr; } #data .side { position: static; grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px) {
+  #data .side { grid-template-columns: 1fr; }
+  #data .row { grid-template-columns: 1fr; gap: 8px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(180deg, rgba(36,19,16,.6), rgba(18,9,7,.6)); }
+  #data .rows { border-top: 0; }
+  #data .d { text-align: left; justify-items: start; grid-auto-flow: column; align-items: center; gap: 10px; }
+}
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">NASA data</span></div>
+    <h2 class="display sec-title">Built on <em>six missions</em> of real data.</h2>
+    <p class="sec-lede">Orbiters, rovers and a heliophysics model, each doing a specific job in the plan. The bars show how deeply each is used: <b>deep</b> data changes the verdict, <b>display</b> data is shown but does not decide.</p>
+  </header>
+
+  <div class="kinds reveal">
+    <span class="chip go">Optical</span><span class="chip go">Topographic</span><span class="chip go">Thermal</span>
+    <span class="chip part">Spectral (partly)</span><span class="chip part">Radiation (partly)</span><span class="chip part">Atmospheric (partly)</span><span class="chip part">Geophysical (partly)</span>
+    <span class="chip add">Space weather (in addition)</span><span class="chip none plain">Chemical: not used</span>
+  </div>
+
+  <div class="layout">
+    <div class="reveal">
+      <div class="legend hud-label">
+        <span><span class="dep" data-d="4"><i></i><i></i><i></i><i></i></span> Deep</span>
+        <span><span class="dep" data-d="3"><i></i><i></i><i></i><i></i></span> Medium</span>
+        <span><span class="dep" data-d="2"><i></i><i></i><i></i><i></i></span> Display</span>
+        <span><span class="dep" data-d="1"><i></i><i></i><i></i><i></i></span> Light</span>
+      </div>
+      <div class="rows" id="data-rows"></div>
+    </div>
+    <aside class="side">
+      <div class="glass check reveal d1"><i class="brk"></i>
+        <span class="hud-label is-hud">Terrain check</span>
+        <div class="big">372</div>
+        <p>Terrain checked against <b>372 surveyed Curiosity positions</b>: median <b>&minus;0.001 m</b>, &sigma; <b>0.19 m</b>. (Jezero: 220 Perseverance positions, &sigma; 0.07 m.)</p>
+      </div>
+      <figure class="glass shot reveal d2" style="margin:0"><i class="brk"></i>
+        <img src="assets/shots/ux6-layers-panel.webp" alt="Marswalk console layers panel listing mission, instrument and resolution for each data layer" loading="lazy">
+        <figcaption>The console&rsquo;s layers panel names the mission, instrument and resolution of every row. Every product ID and checksum is in the app&rsquo;s Sources tab.</figcaption>
+      </figure>
+    </aside>
+  </div>
+</div>
+<script>
+(function () {
+  var D = [
+    ['Mars Reconnaissance Orbiter', 'HiRISE + CTX + HRSC + MOLA', 'USGS MSL Gale merged DEM, 1 m', 'Slope limit, edge grade, walking length and grade, radio line of sight, sunlight, dose shielding', 'NASA/JPL/University of Arizona; NASA/JPL/MSSS; USGS (Parker & Calef 2016)', 4, 'Deep'],
+    ['Mars Reconnaissance Orbiter', 'HiRISE', 'Colour mosaic, 0.25 m', 'Base map', 'NASA/JPL/University of Arizona', 2, 'Display'],
+    ['Mars Reconnaissance Orbiter', 'CRISM', 'FRT000058A3 summary parameters, 18 m', 'Hydrated-sulfate signal at each stop (indicative)', 'NASA/JHUAPL', 1, 'Light'],
+    ['2001 Mars Odyssey', 'THEMIS', 'Quantitative thermal inertia, 100 m', 'Terrain factor in walking energy and suit heat (indicative)', 'NASA/JPL/ASU; USGS Astrogeology mosaic', 3, 'Medium'],
+    ['Mars Science Laboratory', 'Curiosity traverse (MMGIS)', 'Traverse and waypoints', 'Real science stops; terrain check', 'NASA/JPL-Caltech', 3, 'Medium'],
+    ['Mars Science Laboratory', 'Mastcam, Navcam', 'Raw images', 'A photo at each stop, in the habitat console', 'NASA/JPL-Caltech/MSSS (Mastcam); NASA/JPL-Caltech (Navcam)', 2, 'Display'],
+    ['Mars Science Laboratory', 'RAD, REMS', 'Measured dose (PDS PPI); pressure and weather (PDS)', 'Dose model check (V5); reference pressure; weather panel', 'NASA/JPL-Caltech/SwRI (RAD); NASA/JPL-Caltech/CAB (CSIC-INTA) (REMS)', 3, 'Medium'],
+    ['Mars Global Surveyor', 'MOLA', 'Laser altimetry', 'Datum (inside the merged DEM)', 'NASA/GSFC', 1, 'Light'],
+    ['Viking', 'MDIM 2.1', 'Colour mosaic', '"Where on Mars" locator', 'NASA/USGS, via JPL Mars Trek', 1, 'Light'],
+    ['Mars 2020 (Perseverance)', 'HiRISE TRN DTM, Mastcam-Z, Navcam, MEDA', 'DTM and ortho, traverse, images, weather', 'Second site (Jezero)', 'NASA/JPL-Caltech/ASU (Mastcam-Z); NASA/JPL-Caltech; NASA/JPL-Caltech/CAB (MEDA)', 3, 'Medium'],
+    ['Heliophysics, NASA GSFC CCMC', 'DONKI', 'WSA-ENLIL CME runs and flare notices', 'Space-weather go/no-go for the EVA date', 'NASA CCMC', 4, 'Deep'],
+    ['NASA GISS', 'Mars24', 'Sun-position algorithm (Allison & McEwen 2000)', 'Daylight rule, lighting, sun position', 'NASA GISS', 3, 'Medium']
+  ];
+  var host = document.getElementById('data-rows');
+  if (!host) return;
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  host.innerHTML = D.map(function (r) {
+    return '<div class="row" data-d="' + r[5] + '"><div class="m">' + esc(r[0]) + '<small>' + esc(r[1]) + '</small></div>' +
+      '<div class="p"><b>' + esc(r[2]) + '</b>' + esc(r[3]) + '<em>Credit: ' + esc(r[4]) + '</em></div>' +
+      '<div class="d"><span class="dep" data-d="' + r[5] + '"><i></i><i></i><i></i><i></i><i></i></span><span class="hud-label">' + r[6] + '</span></div></div>';
+  }).join('');
+})();
+</script>
+</section>
+
+
+<!-- 80-limits.html -->
+<section class="section" id="limits">
+<style>
+#limits .say { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 36px; }
+#limits .chk { display: grid; grid-template-columns: 220px minmax(0,1fr) minmax(0,1fr); gap: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-bottom: 12px; background: linear-gradient(180deg, rgba(36,19,16,.55), rgba(18,9,7,.55)); transition: border-color .4s; }
+#limits .chk:hover { border-color: var(--line-2); }
+#limits .chk > div { padding: 24px 26px; }
+#limits .cols { display: grid; grid-template-columns: 220px minmax(0,1fr) minmax(0,1fr); padding: 0 0 12px; }
+#limits .cols span { padding: 0 26px; }
+#limits .cols .hud-label:nth-child(2) { padding-left: 0; }
+#limits .what { font-weight: 600; font-size: 15.5px; line-height: 1.35; }
+#limits .what small { display: block; font: 400 11px/1.5 var(--font-hud); letter-spacing: .1em; text-transform: uppercase; color: var(--hud); margin-bottom: 6px; }
+#limits .res { font-size: 14.5px; color: var(--cream); line-height: 1.55; border-left: 1px solid var(--line); }
+#limits .res .k { display: block; font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: 26px; line-height: 1.1; color: var(--hud); margin-bottom: 6px; letter-spacing: -.01em; }
+#limits .lim { font-size: 14.5px; color: var(--mute); line-height: 1.55; border-left: 1px solid var(--line); background: rgba(10,6,5,.35); }
+#limits .lbl { display: none; margin-bottom: 8px; }
+#limits .other { margin-top: clamp(56px,8vw,96px); display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.6fr); gap: clamp(24px,5vw,72px); }
+#limits .other h3 { font-size: clamp(28px,3.4vw,44px); }
+#limits .other ul { list-style: none; margin: 0; padding: 0; display: grid; }
+#limits .other li { position: relative; padding: 16px 0 16px 30px; border-top: 1px solid var(--line); font-size: 15.5px; color: var(--mute); line-height: 1.55; }
+#limits .other li:last-child { border-bottom: 1px solid var(--line); }
+#limits .other li::before { content: ""; position: absolute; left: 4px; top: 25px; width: 8px; height: 8px; border: 1.5px solid var(--sky); border-radius: 50%; }
+#limits .other li b { color: var(--cream); font-weight: 600; }
+@media (max-width: 860px) {
+  #limits .cols { display: none; }
+  #limits .chk { grid-template-columns: 1fr; }
+  #limits .chk > div { padding: 18px 20px; }
+  #limits .res, #limits .lim { border-left: 0; border-top: 1px solid var(--line); }
+  #limits .lbl { display: block; }
+  #limits .other { grid-template-columns: 1fr; }
+}
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Limits</span></div>
+    <h2 class="display sec-title">What we checked, <em>and what we didn&rsquo;t.</em></h2>
+    <p class="sec-lede">We say <b>&ldquo;calibrated&rdquo;</b> and <b>&ldquo;reproduces&rdquo;</b>. We do not say &ldquo;validated&rdquo;, and nothing here has been tested with suited people. Each check sits next to its limit.</p>
+  </header>
+
+  <div class="cols hud-label"><span>Check</span><span class="is-hud">Result</span><span class="is-alert" style="color:var(--sky)">Limit</span></div>
+  <div id="limits-rows"></div>
+
+  <div class="other">
+    <h3 class="display reveal">Other <em>limits.</em></h3>
+    <ul class="reveal d1">
+      <li><b>Simulation only.</b> No field test and no suited-human test.</li>
+      <li><b>Our assumptions, labelled in the app:</b> mapping thermal inertia to walking effort, the dose constants, and the rover radio relay.</li>
+      <li><b>Science values are ours.</b> The 12 stops are real, cited Curiosity targets, but their 0&ndash;100 science values are our team&rsquo;s scoring, not NASA rankings.</li>
+      <li><b>REMS reading is the latest outreach-feed value,</b> not the scenario sol. Sol 412 predates the feed, so the season falls back to an assumed Ls 240.</li>
+      <li><b>The AR navigator is a phone app,</b> not suit hardware, and the link is local Wi-Fi. A phone stands in for the helmet display.</li>
+      <li><b>The 12 constraints are drawn from public NASA EVA documents,</b> each cited. They are not NASA flight rules, and nothing here says a route is safe for crew.</li>
+      <li><b>No NASA relationship,</b> and no claim of hours of planning saved: there is no published baseline.</li>
+    </ul>
+  </div>
+</div>
+<script>
+(function () {
+  var R = [
+    ['V1 &middot; Radiation shielding', 'Terrain shielding reproduces Guo et al. 2026 obstructed-sky values', 'MAE 2.0 pp &middot; r 0.94 &middot; 15 comparisons', 'The metric was chosen after seeing the data (one of three readings), and disclosed. One rover, 8 events.'],
+    ['V2 &middot; Walking energy', 'Calibrated on NASA IST-2 suited data (Norcross 2010)', '10.6% mean error at 0.22&ndash;0.32 g', '36% error at 0.12&ndash;0.17 g; 20.8% overall. Mars at 0.38 g is an extrapolation: no data there.'],
+    ['V5 &middot; Radiation dose', 'Within 4% of Curiosity&rsquo;s measured year-1 mean', '198.8 vs 207.8 &micro;Gy/day &middot; 131 sols, SEP days removed', 'Largely in-sample (the published model was fitted on early RAD data). &minus;9% at the scenario season with our constants. Measured dose spans 167&ndash;296 &micro;Gy/day over the solar cycle, so route doses are &plusmn;30%. The daily pressure effect was not reproduced.'],
+    ['V4 &middot; Three-way cross-check', 'Engine, an independent Python checker and blind AI judges agree', '23 of 24 walks &middot; the one difference is a safe-side NO-GO', 'The difference (W02) is 0.22 min over the radio limit. The AI judges check rule application, not the models: consistency, not truth.'],
+    ['Search', 'A* matches an independent oracle; stop selection matches brute force', '0.000% gap on 80 real-terrain cases &middot; exact on 320', 'The uncertainty sits in the models, not the search.'],
+    ['Terrain', 'Checked against surveyed rover positions', '372 Curiosity positions: median &minus;0.001 m, &sigma; 0.19 m', 'Jezero: 220 Perseverance positions, &sigma; 0.07 m.']
+  ];
+  var h = document.getElementById('limits-rows');
+  if (!h) return;
+  h.innerHTML = R.map(function (r, i) {
+    return '<div class="chk reveal' + (i % 2 ? ' d1' : '') + '"><div class="what"><small>' + r[0] + '</small>' + r[1] + '</div>' +
+      '<div class="res"><span class="hud-label is-hud lbl">Result</span><span class="k">' + r[2].split(' &middot; ')[0] + '</span>' + (r[2].split(' &middot; ').slice(1).join(' &middot; ')) + '</div>' +
+      '<div class="lim"><span class="hud-label lbl" style="color:var(--sky)">Limit</span>' + r[3] + '</div></div>';
+  }).join('');
+  /* reveal for dynamically added rows */
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+  h.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+})();
+</script>
+</section>
+
+
+<!-- 85-research.html -->
+<section class="section" id="research">
+<style>
+#research .layout { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.5fr); gap: clamp(32px,5vw,80px); align-items: start; }
+#research .doc { position: sticky; top: 90px; display: grid; gap: 22px; }
+#research .cover { aspect-ratio: 1/1.35; background: #f4f1ec; color: #1b1715; border-radius: 6px; padding: clamp(22px,2.6vw,34px); display: flex; flex-direction: column; box-shadow: 0 40px 80px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.06); transform: rotate(-1.4deg); transition: transform .6s var(--ease-out); position: relative; }
+#research .cover:hover { transform: rotate(0) translateY(-4px); }
+#research .cover .run { font: 400 9px/1 var(--font-hud); letter-spacing: .14em; text-align: right; color: #6b625c; }
+#research .cover h3 { margin: clamp(34px,6vw,64px) 0 8px; font-family: var(--font-body); font-weight: 800; font-size: clamp(30px,3.4vw,44px); letter-spacing: -.01em; line-height: 1; }
+#research .cover .sub { font-style: italic; letter-spacing: .12em; font-size: 11px; text-transform: uppercase; color: #3a332f; }
+#research .cover .t { margin-top: 26px; font-weight: 700; font-size: 14px; }
+#research .cover .s { font-size: 11px; color: #5a514b; margin-top: 4px; line-height: 1.5; }
+#research .cover .ne { margin-top: auto; font-weight: 700; font-size: 9.5px; letter-spacing: .04em; line-height: 1.5; border-top: 1px solid #1b1715; padding-top: 10px; }
+#research .doc-actions { display: grid; gap: 12px; justify-items: start; }
+#research .meta { font-size: 13px; color: var(--faint); }
+#research .col { display: grid; gap: 40px; }
+#research .flow { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: 0; position: relative; }
+#research .flow::before { content: ""; position: absolute; left: 17px; top: 18px; bottom: 18px; width: 1px; background: linear-gradient(var(--hud-dim), var(--line)); }
+#research .flow li { counter-increment: s; position: relative; padding: 0 0 26px 58px; }
+#research .flow li:last-child { padding-bottom: 0; }
+#research .flow li::before { content: counter(s, decimal-leading-zero); position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 400 11px/1 var(--font-hud); color: var(--hud); background: var(--space-2); border: 1px solid var(--glass-edge); }
+#research .flow b { display: block; font-weight: 600; font-size: 17px; margin: 5px 0 4px; }
+#research .flow span { color: var(--mute); font-size: 15px; line-height: 1.55; }
+#research .nasa { padding: clamp(22px,2.6vw,32px); display: grid; gap: 20px; }
+#research .nasa h4 { margin: 0; font-weight: 600; font-size: 17px; line-height: 1.4; }
+#research .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+#research .st { padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; display: grid; gap: 8px; }
+#research .st .v { font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: clamp(24px,2.6vw,32px); line-height: 1.1; white-space: nowrap; }
+#research .st .v s { text-decoration: none; color: var(--faint); font-size: .62em; }
+#research .st .v em { font-style: normal; color: var(--sky); }
+#research .nasa p { margin: 0; font-size: 13.5px; color: var(--mute); }
+#research .nasa p b { color: var(--cream); font-weight: 600; }
+#research .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+#research .box { padding: 24px; display: grid; gap: 12px; align-content: start; }
+#research .box ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+#research .box li { font-size: 14.5px; color: var(--mute); line-height: 1.5; padding-left: 16px; position: relative; }
+#research .box li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 1px; background: var(--hud-dim); }
+#research .docs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+#research .docs a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 15px; transition: border-color .3s, background .3s, transform .4s var(--ease-out); }
+#research .docs a small { display: block; font: 400 10.5px/1.4 var(--font-hud); letter-spacing: .1em; color: var(--faint); text-transform: uppercase; margin-top: 3px; }
+#research .docs a svg { width: 16px; height: 16px; flex: none; color: var(--hud); transition: transform .3s var(--ease-out); }
+#research .docs a:hover { border-color: var(--glass-edge); background: rgba(127,224,166,.05); transform: translateY(-2px); }
+#research .docs a:hover svg { transform: translate(2px,-2px); }
+@media (max-width: 960px) { #research .layout { grid-template-columns: 1fr; } #research .doc { position: static; grid-template-columns: minmax(0,300px) 1fr; align-items: end; } }
+@media (max-width: 640px) { #research .doc { grid-template-columns: 1fr; } #research .cover { max-width: 300px; } #research .two, #research .docs, #research .stats { grid-template-columns: 1fr; } #research .st .v { white-space: normal; } }
+@media (prefers-reduced-motion: reduce) { #research .cover { transform: none; } }
+/* research paper (lead item) */
+#research .paper { display: grid; grid-template-columns: minmax(220px, 340px) 1fr; gap: clamp(28px, 4vw, 64px); align-items: center; padding: clamp(22px, 3vw, 40px); margin-bottom: clamp(72px, 9vw, 120px); }
+#research .paper-page { position: relative; display: block; border-radius: 6px; overflow: hidden; background: #fff; box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.08); transform: rotate(-1.5deg); transition: transform .6s var(--ease-out); }
+#research .paper-page:hover { transform: rotate(0deg) translateY(-4px); }
+#research .paper-page img { width: 100%; height: auto; }
+#research .paper-meta { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-bottom: 18px; }
+#research .paper h3 { font: 600 clamp(24px, 2.4vw, 34px)/1.15 var(--font-body); margin: 0 0 14px; letter-spacing: -.01em; text-wrap: balance; }
+#research .paper .authors { margin: 0 0 18px; color: var(--dust); font-size: 15px; }
+#research .paper .abs { margin: 0; color: var(--mute); font-size: 15.5px; line-height: 1.65; max-width: 680px; }
+#research .paper .nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin: 26px 0; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+#research .paper .num { background: rgba(11, 6, 5, .72); padding: 14px 16px; }
+#research .paper .num b { display: block; font: 300 26px/1.1 var(--font-display); font-stretch: 112%; color: var(--hud); }
+#research .paper .num span { display: block; margin-top: 6px; font-size: 12.5px; line-height: 1.4; color: var(--faint); }
+#research .paper .acts { display: flex; flex-wrap: wrap; gap: 12px; }
+#research .companion { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
+#research .companion::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+@media (max-width: 860px) { #research .paper { grid-template-columns: 1fr; } #research .paper-page { max-width: 300px; } #research .paper .nums { grid-template-columns: 1fr 1fr; } }
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Research</span></div>
+    <h2 class="display sec-title">The research, <em>written up.</em></h2>
+    <p class="sec-lede">A full research paper on the planner, its models and how we evaluated them, plus a concept study for the suit hardware. Both describe a <b>research prototype tested in simulation</b>, not flight hardware or operational guidance.</p>
+  </header>
+
+  <article class="paper glass reveal"><i class="brk"></i>
+    <a class="paper-page" data-link="researchPaper" aria-label="Open the research paper (PDF)"><img src="assets/img/paper-p1.webp" alt="First page of the Marswalk research paper" loading="lazy" width="1236" height="1600"></a>
+    <div>
+      <div class="paper-meta"><span class="hud-label is-hud">Research paper</span><span class="hud-label">15 November 2026</span><span class="hud-label">PDF · on GitHub</span></div>
+      <h3>Marswalk: Earth-Independent Planning and Guidance for Walking EVAs on Mars</h3>
+      <p class="authors">Kumar Sashank Ghanta, Ivan Chen, George Postica, Mirim Yu, Michelle Wang · Team NASASpaceHacks, Toronto</p>
+      <p class="abs">Earth can't help a Mars crew in real time, and the planners that already run on Mars are built for rovers, not for a suited human's oxygen, heat and walk home. The paper presents Marswalk: a habitat planner that checks every walk against twelve sourced EVA constraints, re-checks it in a separate simulator and explains its verdict, then hands a signed route of about 11 kB to a phone AR navigator that keeps guiding when the link drops. It covers the engine, the GPS-free navigation design, a suit hardware concept and an evaluation against measured NASA data.</p>
+      <div class="nums">
+        <div class="num"><b>199 / 200</b><span>slope-only plans broke at least one constraint</span></div>
+        <div class="num"><b>8.3 ms</b><span>median mid-walk re-plan on a laptop</span></div>
+        <div class="num"><b>10.6%</b><span>walking-model error vs NASA suited data, 0.22–0.32 g</span></div>
+        <div class="num"><b>23 / 24</b><span>verdicts matched an independent checker</span></div>
+      </div>
+      <div class="acts">
+        <a class="btn primary" data-link="researchPaper"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13"/></svg>Read the paper (PDF)</a>
+        <a class="btn" href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/tree/main/docs/paper" target="_blank" rel="noopener">Sources, data and figure scripts</a>
+      </div>
+    </div>
+  </article>
+
+  <div class="companion reveal"><span class="hud-label is-hud">Companion · suit hardware concept study</span></div>
+
+  <div class="layout">
+    <div class="doc reveal">
+      <div class="cover" aria-hidden="true">
+        <div class="run">MARS WALK / RESEARCH-INFORMED</div>
+        <h3>MARS WALK</h3>
+        <div class="sub">Astronaut augmented-reality navigation system</div>
+        <div class="t">TECHNICAL PROOF OF CONCEPT</div>
+        <div class="s">Evidence-led assessment informed by NASA Joint AR navigation evaluation<br>Prepared 14&ndash;15 November 2026 &middot; pre-prototype feasibility assessment</div>
+        <div class="ne">NOT NASA ENDORSED &bull; NO FLIGHT HARDWARE OR VERIFIED MARS-PATHFINDER PERFORMANCE</div>
+      </div>
+      <div class="doc-actions">
+        <a class="btn primary" data-link="paper"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13"/></svg>Read the concept study (PDF)</a>
+        <span class="meta">7 pages &middot; independent engineering concept &middot; not NASA endorsed</span>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="reveal">
+        <div class="hud-label is-hud" style="margin-bottom:22px">Proposed architecture</div>
+        <ol class="flow">
+          <li><b>Habitat workstation prepares the route</b><span>A terrain-aware route, with waypoints, route version, coordinate frame, hazard flags and integrity fields.</span></li>
+          <li><b>A low-data route packet is cached in the suit</b><span>Stored before EVA, so a lost radio link cannot interrupt local navigation.</span></li>
+          <li><b>Boot-mounted inertial sensors, plus camera imagery, give local pose</b><span>6-axis IMUs for pedestrian dead reckoning with zero-velocity updates, and helmet/torso camera visual odometry. Intermittent orbital-map matching may add absolute corrections. No reliance on a magnetic compass.</span></li>
+          <li><b>A monocular optical see-through display guides the walk</b><span>Next direction, distance and navigation confidence, including an explicit degraded-confidence state.</span></li>
+          <li><b>Telemetry to the habitat while in coverage; local guidance when the link drops</b><span>The habitat supervises but is not in the control loop. After a link loss, freshness and route-version checks run before new instructions are accepted.</span></li>
+        </ol>
+      </div>
+
+      <div class="glass nasa reveal"><i class="brk"></i>
+        <div class="hud-label is-hud">Built on NASA&rsquo;s published pilot, not our result</div>
+        <h4>NASA Johnson Space Center Joint AR pilot: 5 astronaut-office participants, AR navigation vs paper map, Earth field analog.</h4>
+        <div class="stats">
+          <div class="st"><span class="hud-label">Median navigation time</span><span class="v">15.87 <s>&rarr;</s> <em>13.20</em> <s>min</s></span></div>
+          <div class="st"><span class="hud-label">Median waypoint displacement</span><span class="v">4.47 <s>&rarr;</s> <em>1.79</em> <s>m</s></span></div>
+        </div>
+        <p>Paper map &rarr; Joint AR. A small pilot in an Earth analog, measured with field GPS: it motivates testing the design hypothesis and <b>does not validate Marswalk</b> or show any improvement on Mars. Reference [A1] in the study.</p>
+      </div>
+
+      <div class="two">
+        <div class="card box reveal"><span class="hud-label is-alert" style="color:var(--sky)">Principal risks the study names</span>
+          <ul><li>Helmet optical fit: eye relief, moving eyebox, glare</li><li>Yaw and camera pose uncertainty: a misaligned arrow can be worse than none</li><li>Poor orbital-map match causing a false position reset</li><li>Power, thermal and radiation effects on compute and display</li><li>Terrain blocking habitat radio; false or stale route updates</li></ul></div>
+        <div class="card box reveal d1"><span class="hud-label is-hud">Proposed validation progression</span>
+          <ul><li>Replay sensor and camera data through a software pipeline</li><li>Ground-based Mars-analog route with surveyed checkpoints</li><li>Worst-case reconnection and route-revision tests</li><li>Measure display readability with representative helmet geometry</li><li>Derive a qualified power, reliability and environmental test plan</li></ul>
+          <span class="meta" style="font-size:12.5px;color:var(--faint)">No tests are claimed as complete.</span></div>
+      </div>
+
+      <div class="reveal">
+        <div class="hud-label" style="margin-bottom:14px">Read the docs on GitHub</div>
+        <div class="docs">
+          <a href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/blob/main/docs/EXPLAINER.md" target="_blank" rel="noopener"><span>Explainer<small>How it works</small></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+          <a href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/blob/main/docs/designs/marswalk.md" target="_blank" rel="noopener"><span>Design doc<small>Architecture and rules</small></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+          <a href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/blob/main/docs/CRITERIA_ANSWERS.md" target="_blank" rel="noopener"><span>Criteria answers<small>Claims, proof, limits</small></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+          <a href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/blob/main/Research/" target="_blank" rel="noopener"><span>Research tracks<small>Sources and notes</small></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- 90-resources.html -->
+<section class="section" id="resources">
+<style>
+#resources .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+#resources .film { grid-column: span 4; grid-row: span 3; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+#resources .screen { position: relative; aspect-ratio: 16/9; background: #000 center/cover no-repeat; display: block; text-decoration: none; overflow: hidden; }
+#resources .screen::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,6,5,.15), rgba(11,6,5,.75)); }
+#resources .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
+#resources .film:hover .screen img { transform: scale(1.04); }
+#resources .screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+#resources .play { position: absolute; left: 50%; top: 50%; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 50%; display: grid; place-items: center; background: var(--glass); border: 1px solid var(--glass-edge); backdrop-filter: blur(10px); color: var(--hud); z-index: 1; }
+#resources .play svg { width: 28px; height: 28px; margin-left: 4px; }
+#resources .screen .tag { color: var(--cream); position: absolute; left: 22px; bottom: 18px; z-index: 1; }
+#resources .film .foot, #resources .tile { padding: 24px 26px; }
+#resources .tile { grid-column: span 2; display: flex; flex-direction: column; gap: 10px; text-decoration: none; transition: border-color .4s, transform .5s var(--ease-out), background .4s; min-height: 150px; }
+#resources a.tile:hover { border-color: var(--glass-edge); transform: translateY(-3px); background: linear-gradient(180deg, rgba(20,44,32,.55), rgba(18,9,7,.7)); }
+#resources a.tile[aria-disabled="true"] { opacity: .6; pointer-events: none; }
+#resources .tile h3, #resources .film h3 { margin: 0; font-size: 21px; font-weight: 600; line-height: 1.2; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#resources .tile p, #resources .film p { margin: 0; font-size: 14.5px; color: var(--mute); }
+#resources .tile .hud-label { margin-top: auto; }
+#resources .paper-tile .tile-main { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: inherit; }
+#resources .paper-tile .sub-link { text-decoration: none; color: var(--hud); }
+#resources .paper-tile .sub-link:hover { color: var(--cream); }
+#resources .tile .arrow { width: 18px; height: 18px; color: var(--hud); flex: none; transition: transform .3s var(--ease-out); }
+#resources a.tile:hover .arrow { transform: translate(3px,-3px); }
+#resources .tile .soon { align-self: flex-start; font: 400 10px/1 var(--font-hud); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); border: 1px solid var(--line); border-radius: 99px; padding: 5px 8px; }
+#resources .run { grid-column: span 6; padding: clamp(22px,3vw,34px); display: grid; grid-template-columns: minmax(0,.7fr) minmax(0,1.5fr); gap: clamp(20px,4vw,56px); align-items: center; }
+#resources .run h3 { margin: 8px 0 8px; font-size: 24px; font-weight: 600; }
+#resources .run p { margin: 0; color: var(--mute); font-size: 14.5px; }
+#resources .code { position: relative; background: rgba(4,12,8,.7); border: 1px solid var(--glass-edge); border-radius: 12px; padding: 20px 20px 20px 22px; padding-right: 120px; font: 400 13px/1.7 var(--font-hud); color: var(--hud); }
+#resources .code code { font: inherit; display: block; word-break: break-word; }
+#resources .code .pr { color: var(--faint); user-select: none; }
+#resources .copy { position: absolute; top: 12px; right: 12px; height: 36px; padding: 0 14px; font-size: 12px; --h: 36px; }
+#resources .copy.done { background: var(--hud); color: #04140b; border-color: var(--hud); }
+@media (max-width: 1000px) { #resources .film { grid-column: span 6; grid-row: auto; } #resources .tile { grid-column: span 3; } #resources .run { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { #resources .tile { grid-column: span 6; min-height: 0; } #resources .code { padding-right: 20px; padding-bottom: 66px; } #resources .copy { top: auto; bottom: 12px; } #resources .play { width: 64px; height: 64px; margin: -32px 0 0 -32px; } }
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Resources</span></div>
+    <h2 class="display sec-title">Everything, <em>in one place.</em></h2>
+    <p class="sec-lede">The film, the code, the slides, the research and a way to run it yourself.</p>
+  </header>
+  <div class="grid">
+    <article class="card film reveal">
+      <a class="screen" id="res-screen" data-link="video" aria-label="Watch the 30-second film">
+        <img src="assets/img/hirise-1200.jpg" alt="" loading="lazy">
+        <span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3.5v17l14-8.5z"/></svg></span>
+        <span class="hud-label is-hud tag" id="res-tag">Film coming soon</span>
+      </a>
+      <div class="foot"><h3>The 30-second film</h3><p>Plan, check, walk, lose the link, come home.</p></div>
+    </article>
+    <a class="card tile reveal d1" data-link="github"><h3>GitHub repository<svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></h3><p>Engine, console, AR navigator, tests and the validation scripts. Apache-2.0.</p><span class="hud-label">Source</span></a>
+    <a class="card tile reveal d2" data-link="slides"><h3>Slides<svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></h3><p>The 10-slide pitch: problem, live demo, research, hardware and software. View it here or download the PDF.</p><span class="hud-label">Deck</span></a>
+    <div class="card tile reveal paper-tile"><a class="tile-main" data-link="researchPaper"><h3>Research paper (PDF)<svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></h3><p>Earth-independent planning and guidance for walking EVAs on Mars: the engine, the models and the evaluation.</p></a><a class="hud-label sub-link" data-link="paper">+ Suit hardware concept study (PDF) &rarr;</a></div>
+    <div class="card run reveal">
+      <div><span class="hud-label is-hud">Run it yourself</span><h3>Clone it. Run it.</h3><p>Every number on this page comes from code in the repo, with history and tests.</p></div>
+      <div class="code"><code><span class="pr">$ </span><span id="res-cmd">git clone https://github.com/NASASpaceHacks/NASASpaceHacks2026 &amp;&amp; cd NASASpaceHacks2026 &amp;&amp; pnpm install &amp;&amp; pnpm demo</span></code>
+        <button type="button" class="btn copy" id="res-copy" aria-label="Copy command">Copy</button></div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var L = window.MW_LINKS || {};
+  var screen = document.getElementById('res-screen');
+  if (screen && L.videoEmbed) {
+    var f = document.createElement('iframe');
+    f.src = L.videoEmbed; f.title = 'Marswalk, 30-second film'; f.loading = 'lazy'; f.allowFullscreen = true;
+    f.allow = 'accelerometer; encrypted-media; picture-in-picture; fullscreen';
+    var d = document.createElement('div'); d.className = 'screen'; d.style.cssText = 'position:relative;aspect-ratio:16/9';
+    d.appendChild(f); screen.parentNode.replaceChild(d, screen);
+  } else if (screen && L.video) {
+    var t = document.getElementById('res-tag'); if (t) t.textContent = 'Watch the film';
+  }
+  var b = document.getElementById('res-copy'), c = document.getElementById('res-cmd');
+  if (!b || !c) return;
+  var tm;
+  function done() { b.textContent = 'Copied'; b.classList.add('done'); clearTimeout(tm); tm = setTimeout(function () { b.textContent = 'Copy'; b.classList.remove('done'); }, 2000); }
+  b.addEventListener('click', function () {
+    var txt = c.textContent;
+    function fb() { var r = document.createRange(); r.selectNodeContents(c); var s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand('copy'); done(); } catch (e) {} }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fb); else fb();
+  });
+})();
+</script>
+</section>
+
+
+<!-- 99-footer.html -->
+<footer id="credits">
+<style>
+#credits { position: relative; padding: clamp(96px,14vw,180px) 0 40px; border-top: 1px solid var(--line); overflow: hidden; background: radial-gradient(900px 400px at 50% 0, rgba(110,36,22,.28), transparent 70%); }
+#credits .sign { font-size: clamp(34px,6.4vw,92px); max-width: 15ch; margin-bottom: clamp(48px,7vw,88px); }
+#credits .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px,4vw,56px); padding: 40px 0; border-top: 1px solid var(--line); }
+#credits .cols h4 { margin: 0 0 12px; }
+#credits .cols p { margin: 0 0 10px; font-size: 14.5px; color: var(--mute); line-height: 1.6; }
+#credits .cols p b { color: var(--cream); font-weight: 600; }
+#credits .ai { padding: 28px clamp(22px,3vw,36px); display: grid; grid-template-columns: minmax(0,.5fr) minmax(0,1.5fr); gap: 24px 48px; margin-bottom: 40px; }
+#credits .ai ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+#credits .ai li { font-size: 14.5px; color: var(--mute); line-height: 1.55; padding-left: 18px; position: relative; }
+#credits .ai li::before { content: ""; position: absolute; left: 0; top: 10px; width: 7px; height: 1px; background: var(--hud); }
+#credits .ai li b { color: var(--cream); font-weight: 600; }
+#credits .credits { font-size: 13px; color: var(--faint); line-height: 1.7; padding: 28px 0; border-top: 1px solid var(--line); }
+#credits .credits b { color: var(--mute); font-weight: 500; }
+#credits .bottom { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--faint); }
+#credits .bottom a { color: var(--hud); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; }
+#credits .bottom a:hover { text-decoration: underline; }
+#credits .members { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+@media (max-width: 860px) { #credits .cols, #credits .ai { grid-template-columns: 1fr; } }
+</style>
+<div class="wrap">
+  <h2 class="display sign reveal">Plan a Mars walk that <em>brings the crew home.</em></h2>
+
+  <div class="glass ai reveal"><i class="brk"></i>
+    <div><span class="hud-label is-hud">Use of AI</span></div>
+    <ul>
+      <li><b>The team chose</b> the problem, the concept, the design, the data and the scope, and reviewed the work.</li>
+      <li><b>Most of the code</b> was written with Anthropic&rsquo;s Claude Code, under the team&rsquo;s direction.</li>
+      <li><b>AI is not in the safety path.</b> No AI decides a route; the verdict comes from the engine and its simulator.</li>
+      <li>Blind AI reviewers were used once as a consistency check of the engine&rsquo;s verdicts (V4). That shows the logic is consistent, not that the models are right.</li>
+      <li>No AI-generated imagery or video.</li>
+    </ul>
+  </div>
+
+  <div class="cols">
+    <div class="reveal"><h4 class="hud-label is-hud">Team</h4>
+      <p><b>Team NASASpaceHacks</b> &middot; Toronto</p>
+      <div class="members" id="credits-team"></div></div>
+    <div class="reveal d1"><h4 class="hud-label is-hud">Challenge</h4>
+      <p>NASA Space Apps Challenge 2026, <b>&ldquo;Interplanetary Survival Guide: Martian Map&rdquo;</b>.</p></div>
+    <div class="reveal d2"><h4 class="hud-label is-hud">Licence</h4>
+      <p><b>Apache-2.0.</b> Simulation only: no suited-human or field test. The astronaut side is an AR navigator; a phone stands in for the helmet display.</p></div>
+  </div>
+
+  <div class="credits reveal"><b>Image credits.</b> HiRISE: NASA/JPL/University of Arizona. Curiosity images: NASA/JPL-Caltech/MSSS. Viking MDIM 2.1: NASA/USGS via JPL Mars Trek. THEMIS: NASA/JPL/ASU. CRISM: NASA/JHUAPL. Space weather: DONKI, NASA CCMC.</div>
+
+  <div class="bottom">
+    <span>Not affiliated with or endorsed by NASA. No NASA logos used.</span>
+    <a href="#top" id="credits-top">Back to top <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></a>
+  </div>
+</div>
+<script>
+(function () {
+  var T = window.MW_TEAM || [], h = document.getElementById('credits-team');
+  if (h && T.length) T.forEach(function (m) {
+    var s = document.createElement('span'); s.className = 'chip plain';
+    s.textContent = m.name + (m.role ? ' · ' + m.role : ''); h.appendChild(s);
+  });
+  var up = document.getElementById('credits-top');
+  if (up) up.addEventListener('click', function (e) { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+</footer>
+
+</main>
+<script>
+/* links from js/config.js: <a data-link="video"> etc. Empty → disabled + "soon" */
+(function () {
+  var L = window.MW_LINKS || {};
+  document.querySelectorAll('[data-link]').forEach(function (a) {
+    var url = L[a.getAttribute('data-link')];
+    if (url) { a.href = url; if (/^https?:/.test(url)) { a.target = '_blank'; a.rel = 'noopener'; } }
+    else { a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); a.title = 'Coming soon';
+      if (!a.querySelector('.soon')) { var s = document.createElement('span'); s.className = 'soon'; s.textContent = 'soon'; a.appendChild(s); } }
+  });
+  /* reveal on scroll */
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>

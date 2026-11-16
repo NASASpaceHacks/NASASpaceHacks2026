@@ -1,0 +1,64 @@
+<footer id="credits">
+<style>
+#credits { position: relative; padding: clamp(96px,14vw,180px) 0 40px; border-top: 1px solid var(--line); overflow: hidden; background: radial-gradient(900px 400px at 50% 0, rgba(110,36,22,.28), transparent 70%); }
+#credits .sign { font-size: clamp(34px,6.4vw,92px); max-width: 15ch; margin-bottom: clamp(48px,7vw,88px); }
+#credits .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px,4vw,56px); padding: 40px 0; border-top: 1px solid var(--line); }
+#credits .cols h4 { margin: 0 0 12px; }
+#credits .cols p { margin: 0 0 10px; font-size: 14.5px; color: var(--mute); line-height: 1.6; }
+#credits .cols p b { color: var(--cream); font-weight: 600; }
+#credits .ai { padding: 28px clamp(22px,3vw,36px); display: grid; grid-template-columns: minmax(0,.5fr) minmax(0,1.5fr); gap: 24px 48px; margin-bottom: 40px; }
+#credits .ai ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+#credits .ai li { font-size: 14.5px; color: var(--mute); line-height: 1.55; padding-left: 18px; position: relative; }
+#credits .ai li::before { content: ""; position: absolute; left: 0; top: 10px; width: 7px; height: 1px; background: var(--hud); }
+#credits .ai li b { color: var(--cream); font-weight: 600; }
+#credits .credits { font-size: 13px; color: var(--faint); line-height: 1.7; padding: 28px 0; border-top: 1px solid var(--line); }
+#credits .credits b { color: var(--mute); font-weight: 500; }
+#credits .bottom { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--faint); }
+#credits .bottom a { color: var(--hud); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; }
+#credits .bottom a:hover { text-decoration: underline; }
+#credits .members { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+@media (max-width: 860px) { #credits .cols, #credits .ai { grid-template-columns: 1fr; } }
+</style>
+<div class="wrap">
+  <h2 class="display sign reveal">Plan a Mars walk that <em>brings the crew home.</em></h2>
+
+  <div class="glass ai reveal"><i class="brk"></i>
+    <div><span class="hud-label is-hud">Use of AI</span></div>
+    <ul>
+      <li><b>The team chose</b> the problem, the concept, the design, the data and the scope, and reviewed the work.</li>
+      <li><b>Most of the code</b> was written with Anthropic&rsquo;s Claude Code, under the team&rsquo;s direction.</li>
+      <li><b>AI is not in the safety path.</b> No AI decides a route; the verdict comes from the engine and its simulator.</li>
+      <li>Blind AI reviewers were used once as a consistency check of the engine&rsquo;s verdicts (V4). That shows the logic is consistent, not that the models are right.</li>
+      <li>No AI-generated imagery or video.</li>
+    </ul>
+  </div>
+
+  <div class="cols">
+    <div class="reveal"><h4 class="hud-label is-hud">Team</h4>
+      <p><b>Team NASASpaceHacks</b> &middot; Toronto</p>
+      <div class="members" id="credits-team"></div></div>
+    <div class="reveal d1"><h4 class="hud-label is-hud">Challenge</h4>
+      <p>NASA Space Apps Challenge 2026, <b>&ldquo;Interplanetary Survival Guide: Martian Map&rdquo;</b>.</p></div>
+    <div class="reveal d2"><h4 class="hud-label is-hud">Licence</h4>
+      <p><b>Apache-2.0.</b> Simulation only: no suited-human or field test. The astronaut side is an AR navigator; a phone stands in for the helmet display.</p></div>
+  </div>
+
+  <div class="credits reveal"><b>Image credits.</b> HiRISE: NASA/JPL/University of Arizona. Curiosity images: NASA/JPL-Caltech/MSSS. Viking MDIM 2.1: NASA/USGS via JPL Mars Trek. THEMIS: NASA/JPL/ASU. CRISM: NASA/JHUAPL. Space weather: DONKI, NASA CCMC.</div>
+
+  <div class="bottom">
+    <span>Not affiliated with or endorsed by NASA. No NASA logos used.</span>
+    <a href="#top" id="credits-top">Back to top <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></a>
+  </div>
+</div>
+<script>
+(function () {
+  var T = window.MW_TEAM || [], h = document.getElementById('credits-team');
+  if (h && T.length) T.forEach(function (m) {
+    var s = document.createElement('span'); s.className = 'chip plain';
+    s.textContent = m.name + (m.role ? ' · ' + m.role : ''); h.appendChild(s);
+  });
+  var up = document.getElementById('credits-top');
+  if (up) up.addEventListener('click', function (e) { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+</footer>

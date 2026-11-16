@@ -1,0 +1,222 @@
+<script src="js/gale-data.js"></script>
+<section class="section" id="rover" aria-labelledby="rover-title">
+<style>
+#rover .rv-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(16px, 2vw, 28px); align-items: stretch; }
+#rover .rv-map { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+#rover .rv-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+#rover .rv-seg { position: relative; max-width: 100%; display: inline-grid; grid-template-columns: 1fr 1fr; padding: 4px; border: 1px solid var(--line-2); border-radius: 999px; background: rgba(11,6,5,.6); }
+#rover .rv-seg button { position: relative; z-index: 1; appearance: none; background: none; border: 0; color: var(--mute); font: 400 12px/1 var(--font-hud); letter-spacing: .1em; text-transform: uppercase; padding: 13px 18px; min-height: 44px; border-radius: 999px; cursor: pointer; transition: color .4s; white-space: nowrap; }
+#rover .rv-seg button[aria-pressed="true"] { color: #04140b; }
+#rover .rv-seg button:focus-visible { outline: 2px solid var(--hud); outline-offset: 2px; }
+#rover .rv-pill { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px; background: var(--alert); transition: transform .55s var(--ease-out), background .4s; }
+#rover[data-mode="rover"] .rv-pill { transform: translateX(100%); background: var(--hud); }
+#rover .rv-stage { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 340 / 380; background: #000; border: 1px solid var(--line); }
+#rover .rv-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#rover .rv-contour-minor { fill: none; stroke: var(--cream); stroke-opacity: .13; stroke-width: .8; vector-effect: non-scaling-stroke; }
+#rover .rv-contour-major { fill: none; stroke: var(--cream); stroke-opacity: .34; stroke-width: 1; vector-effect: non-scaling-stroke; }
+#rover .rv-shade { fill: url(#rv-vig); }
+#rover .rv-ray { fill: none; stroke: var(--alert); stroke-width: 1.4; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; opacity: 0; transition: opacity .6s; }
+#rover[data-mode="hab"] .rv-ray { opacity: .85; }
+#rover[data-mode="hab"] .rv-ray { animation: rv-march 1.4s linear infinite; }
+@keyframes rv-march { to { stroke-dashoffset: -18; } }
+#rover .rv-route { fill: none; stroke: var(--hud); stroke-width: 1.7; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(127,224,166,.8)); }
+#rover .rv-route-bg { fill: none; stroke: rgba(4,20,11,.7); stroke-width: 3.6; stroke-linecap: round; }
+#rover .rv-st { cursor: pointer; }
+#rover .rv-st .dot { fill: var(--cream); stroke: rgba(11,6,5,.9); stroke-width: 1.5; vector-effect: non-scaling-stroke; transition: fill .4s; }
+#rover .rv-st .ring { fill: none; stroke: var(--cream); stroke-opacity: 0; stroke-width: 1; vector-effect: non-scaling-stroke; transition: stroke-opacity .2s; }
+#rover .rv-st:hover .ring, #rover .rv-st:focus .ring, #rover .rv-st.on .ring { stroke-opacity: .9; }
+#rover .rv-st:focus { outline: none; }
+#rover[data-mode="hab"] .rv-st .dot { fill: var(--alert); }
+#rover[data-mode="rover"] .rv-st[data-id="ST01"] .dot { fill: var(--hud); }
+#rover .rv-mk { transition: opacity .5s; }
+#rover[data-mode="hab"] .rv-pr, #rover[data-mode="rover"] .rv-hb { opacity: .55; }
+#rover .rv-mk .shape { fill: rgba(6,22,14,.85); stroke: var(--hud); stroke-width: 2; vector-effect: non-scaling-stroke; }
+#rover .rv-mk text { fill: var(--cream); font: 700 9px var(--font-hud); letter-spacing: .08em; paint-order: stroke; stroke: rgba(0,0,0,.85); stroke-width: 3px; }
+#rover .rv-tip { position: absolute; z-index: 3; pointer-events: none; max-width: 230px; padding: 8px 10px; border-radius: 8px; background: rgba(6,22,14,.88); border: 1px solid var(--glass-edge); font: 400 11px/1.4 var(--font-hud); letter-spacing: .04em; color: var(--cream); opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; }
+#rover .rv-tip.on { opacity: 1; transform: none; }
+#rover .rv-tip b { color: var(--hud); letter-spacing: .12em; }
+#rover .rv-scale { position: absolute; left: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+#rover .rv-scale i { display: block; height: 5px; border: 1px solid var(--cream); border-top: 0; width: 20%; min-width: 40px; }
+#rover .rv-scale span, #rover .rv-tag { font: 400 10px var(--font-hud); letter-spacing: .14em; color: var(--cream); text-shadow: 0 1px 4px #000; }
+#rover .rv-tag { position: absolute; right: 12px; top: 10px; opacity: .8; }
+#rover .rv-hint { margin: 0; }
+#rover .rv-side { display: grid; gap: clamp(16px, 2vw, 28px); grid-template-rows: auto 1fr; }
+#rover .rv-card { padding: clamp(20px, 2.4vw, 30px); display: grid; }
+#rover .rv-panes { display: grid; }
+#rover .rv-pane { grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateY(10px); transition: opacity .5s var(--ease-out), transform .6s var(--ease-out), visibility 0s .5s; }
+#rover[data-mode="hab"] .rv-pane.hab, #rover[data-mode="rover"] .rv-pane.rov { opacity: 1; visibility: visible; transform: none; transition-delay: .12s, .12s, 0s; }
+#rover .rv-verdict { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 12px 0 4px; }
+#rover .rv-verdict .big { font: 200 clamp(42px, 5vw, 64px)/1 var(--font-display); font-stretch: 125%; letter-spacing: -.02em; }
+#rover .rv-pane.hab .big { color: var(--alert); }
+#rover .rv-pane.rov .big { color: var(--hud); }
+#rover .rv-sub { color: var(--mute); font-size: 15px; margin: 6px 0 18px; }
+#rover .rv-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+#rover .rv-list li { display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+#rover .rv-list li small { grid-column: 1 / -1; color: var(--faint); font-size: 13px; line-height: 1.4; }
+#rover .rv-list .n { font: 400 15px var(--font-hud); color: var(--alert); text-align: right; white-space: nowrap; }
+#rover .rv-pane.rov .rv-list .n { color: var(--hud); }
+#rover .rv-fix { margin: 14px 0 0; font-size: 14px; color: var(--mute); }
+#rover .rv-fix b { color: var(--hud); font-weight: 600; }
+#rover .rv-photo { display: grid; grid-template-columns: 112px 1fr; gap: 16px; padding: 12px; align-items: center; }
+#rover .rv-photo img { width: 112px; height: 112px; object-fit: cover; border-radius: 8px; filter: contrast(1.05); }
+#rover .rv-photo h4 { margin: 4px 0 4px; font: 600 16px/1.25 var(--font-body); }
+#rover .rv-photo p { margin: 0; font-size: 13px; color: var(--mute); line-height: 1.45; }
+#rover .rv-photo-wrap { position: relative; }
+#rover .rv-photo-wrap .card { transition: opacity .5s, filter .5s; }
+#rover[data-mode="hab"] .rv-photo-wrap .card { opacity: .35; filter: grayscale(1); }
+#rover .rv-foot { margin-top: clamp(24px, 3vw, 36px); max-width: 880px; }
+@media (max-width: 960px) { #rover .rv-grid { grid-template-columns: minmax(0, 1fr); } #rover .rv-stage { aspect-ratio: 1 / 1.05; } }
+@media (max-width: 520px) { #rover .rv-seg button { padding: 10px 8px; font-size: 10.5px; white-space: normal; line-height: 1.25; } #rover .rv-seg { width: 100%; } #rover .rv-photo { grid-template-columns: 88px 1fr; } #rover .rv-photo img { width: 88px; height: 88px; } }
+@media (prefers-reduced-motion: reduce) { #rover * { transition-duration: .01s !important; animation: none !important; } }
+</style>
+<div class="wrap">
+  <div class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Why the rover</span></div>
+    <h2 class="display sec-title" id="rover-title">From the habitat, the answer is <em>stay in.</em></h2>
+    <p class="sec-lede">At Gale, the boxwork science stops sit about <b>220 m below the habitat</b>. Marswalk checks every stop against the limits and reports the honest answer. Flip the start point and watch the verdict change.</p>
+  </div>
+
+  <div class="rv-grid reveal d1">
+    <div class="glass rv-map"><i class="brk"></i>
+      <div class="rv-bar">
+        <div class="rv-seg" role="group" aria-label="Start point">
+          <span class="rv-pill"></span>
+          <button type="button" data-m="hab" aria-pressed="true">Start from Hab-1</button>
+          <button type="button" data-m="rover" aria-pressed="false">Start from PR-1 rover</button>
+        </div>
+        <span class="hud-label">Gale crater · 5 m / unit contours 10 m</span>
+      </div>
+      <div class="rv-stage" id="rv-stage">
+        <svg viewBox="330 400 340 380" preserveAspectRatio="xMidYMid slice" role="img" aria-label="HiRISE map of the Gale boxwork area with Hab-1, rover PR-1 and science stops ST01 to ST08">
+          <defs><radialGradient id="rv-vig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0b0605" stop-opacity=".7"/></radialGradient></defs>
+          <image href="assets/img/hirise-2400.jpg" x="0" y="0" width="1000" height="1000" style="filter:brightness(.78) saturate(.9)"/>
+          <g id="rv-cm"></g><g id="rv-cM"></g>
+          <rect class="rv-shade" x="330" y="400" width="340" height="380"/>
+          <g id="rv-rays"></g>
+          <path class="rv-route-bg" id="rv-route-bg" d=""/>
+          <path class="rv-route" id="rv-route" d=""/>
+          <g id="rv-sts"></g>
+          <g class="rv-mk rv-hb" transform="translate(576.5 621.5)"><rect class="shape" x="-6" y="-6" width="12" height="12"/><text x="11" y="3.5">HAB-1</text></g>
+          <g class="rv-mk rv-pr" transform="translate(435.5 512.5)"><path class="shape" d="M0-8L8 0 0 8-8 0Z"/><text x="-13" y="3.5" text-anchor="end">PR-1</text></g>
+        </svg>
+        <div class="rv-tip" id="rv-tip"></div>
+        <span class="rv-tag">SCENARIO</span>
+        <div class="rv-scale"><i id="rv-bar"></i><span>500 M</span></div>
+      </div>
+      <p class="hud-label rv-hint">Tap a stop to identify it · ST09 to ST12 lie further north-east, off this view</p>
+    </div>
+
+    <div class="rv-side">
+      <div class="glass rv-card"><i class="brk"></i>
+        <div class="rv-panes">
+          <div class="rv-pane hab">
+            <span class="chip nogo">NO-GO</span>
+            <div class="rv-verdict"><span class="big hud-num">0 of 12</span></div>
+            <p class="rv-sub">stops reachable on foot from Hab-1. Four limits block every stop:</p>
+            <ul class="rv-list">
+              <li><span>Suit heat on the ~220 m climb back</span><span class="n">~800 W vs 352 W</span><small>Modelled, extrapolated to 0.38 g. Forced rests overrun the 6 h EVA.</small></li>
+              <li><span>Radio contact lost over 10 min</span><span class="n">7 of 12</span></li>
+              <li><span>Shelter over 30 min away</span><span class="n">2 of 12</span></li>
+              <li><span>Beyond the 2 km radius</span><span class="n">3 of 12</span></li>
+            </ul>
+            <p class="rv-fix">Not just the heat model: with up to 1,500 W of cooling, every stop still breaks one of the other limits. <b>Marswalk answers "stay in."</b></p>
+          </div>
+          <div class="rv-pane rov">
+            <span class="chip go">GO</span>
+            <div class="rv-verdict"><span class="big hud-num">1 h 55 min</span></div>
+            <p class="rv-sub">PR-1 to ST01 Altadena drill site · 1 stop · 0.7 km round trip</p>
+            <ul class="rv-list">
+              <li><span>Airlock out / in</span><span class="n">30 + 30 min</span></li>
+              <li><span>Walking · at the stop</span><span class="n">30 · 25 min</span></li>
+              <li><span>Back at airlock</span><span class="n">+1:25</span><small>Latest safe return +5:30, so 4 h 05 min spare.</small></li>
+              <li><span>Space weather · daylight</span><span class="n">clear · to 17:48</span></li>
+              <li><span>Suit heat</span><span class="n">1 short rest</span></li>
+            </ul>
+            <p class="rv-fix">A pressurized rover parked near the stops fixes <b>all four limits at once.</b></p>
+          </div>
+        </div>
+      </div>
+      <div class="rv-photo-wrap">
+        <div class="card rv-photo">
+          <img src="assets/img/msl-4559-NRB_802226571EDR_F116189.jpg" alt="Curiosity Navcam view near the ST01 Altadena drill site" loading="lazy">
+          <div><span class="hud-label is-hud">ST01 · Station card</span><h4>Altadena drill site</h4><p>Boxwork bedrock. Curiosity Navcam, sol 4559. NASA/JPL-Caltech.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="hud-label rv-foot reveal">Our model's result, consistent with NASA's rover-based Mars reference architecture (DRA 5.0, SP-2009-566). Scenario positions labelled SCENARIO. Terrain: HiRISE, NASA/JPL/University of Arizona.</p>
+</div>
+<script>
+(function () {
+  var G = window.GALE, root = document.getElementById('rover');
+  if (!G || !root) return;
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(n, a, p) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; }
+  el('path', { 'class': 'rv-contour-minor', d: G.contours.minor }, document.getElementById('rv-cm'));
+  el('path', { 'class': 'rv-contour-major', d: G.contours.major }, document.getElementById('rv-cM'));
+  var hab = G.points.shelters.filter(function (s) { return s.id === 'HAB'; })[0].p;
+  var pr = G.points.shelters.filter(function (s) { return s.id === 'ROVER1'; })[0].p;
+  var sts = G.points.stations.filter(function (s) { return s.p[0] < 600 && s.p[1] > 400 && s.p[1] < 780; });
+  var rays = document.getElementById('rv-rays'), gs = document.getElementById('rv-sts');
+  var tip = document.getElementById('rv-tip'), stage = document.getElementById('rv-stage');
+  var svg = stage.querySelector('svg');
+  sts.forEach(function (s) {
+    el('line', { 'class': 'rv-ray', x1: hab[0], y1: hab[1], x2: s.p[0], y2: s.p[1] }, rays);
+    var g = el('g', { 'class': 'rv-st', 'data-id': s.id, tabindex: 0, role: 'button', 'aria-label': s.id + ' ' + s.name }, gs);
+    el('circle', { cx: s.p[0], cy: s.p[1], r: 9, fill: 'transparent' }, g);
+    el('circle', { 'class': 'ring', cx: s.p[0], cy: s.p[1], r: 6 }, g);
+    el('circle', { 'class': 'dot', cx: s.p[0], cy: s.p[1], r: 3 }, g);
+    function show() {
+      tip.innerHTML = '<b>' + s.id + '</b><br>' + s.name;
+      var r = svg.getBoundingClientRect(), pt = svg.createSVGPoint(); pt.x = s.p[0]; pt.y = s.p[1];
+      var c = pt.matrixTransform(svg.getScreenCTM()), sr = stage.getBoundingClientRect();
+      var x = c.x - sr.left, y = c.y - sr.top;
+      tip.style.left = Math.max(8, Math.min(x + 12, sr.width - 240)) + 'px';
+      tip.style.top = Math.max(8, Math.min(y + 12, sr.height - 70)) + 'px';
+      tip.classList.add('on'); g.classList.add('on');
+    }
+    function hide() { tip.classList.remove('on'); g.classList.remove('on'); }
+    g.addEventListener('mouseenter', show); g.addEventListener('mouseleave', hide);
+    g.addEventListener('focus', show); g.addEventListener('blur', hide);
+    g.addEventListener('click', function (e) { e.stopPropagation(); show(); });
+  });
+  stage.addEventListener('click', function () { tip.classList.remove('on'); });
+  // route PR-1 -> ST01 (slight bend)
+  var st1 = sts.filter(function (s) { return s.id === 'ST01'; })[0].p;
+  var d = 'M' + pr[0] + ' ' + (pr[1] - 8) + ' C ' + (pr[0] - 12) + ' ' + (pr[1] - 30) + ', ' + (st1[0] + 10) + ' ' + (st1[1] + 30) + ', ' + st1[0] + ' ' + (st1[1] + 4);
+  var route = document.getElementById('rv-route'), bg = document.getElementById('rv-route-bg');
+  route.setAttribute('d', d); bg.setAttribute('d', d);
+  var len = route.getTotalLength();
+  route.style.strokeDasharray = len; bg.style.strokeDasharray = len;
+  function setRoute(on, animate) {
+    [route, bg].forEach(function (p) {
+      p.style.transition = 'none'; p.style.strokeDashoffset = on && !animate ? 0 : len; void p.getBoundingClientRect();
+      if (on && animate) { p.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.65,0,.35,1) .25s'; p.style.strokeDashoffset = 0; }
+    });
+    if (!on) { route.style.opacity = 0; bg.style.opacity = 0; } else { route.style.opacity = 1; bg.style.opacity = 1; }
+  }
+  route.style.transition = bg.style.transition = 'none'; setRoute(false);
+  // scale bar: 500 m = 100 units
+  var vb = svg.viewBox.baseVal;
+  function sizeBar() { var s = Math.max(stage.clientWidth / vb.width, stage.clientHeight / vb.height); document.getElementById('rv-bar').style.width = (100 * s) + 'px'; }
+  sizeBar(); window.addEventListener('resize', sizeBar);
+
+  var btns = root.querySelectorAll('.rv-seg button'), touched = false;
+  function set(m, animate) {
+    root.setAttribute('data-mode', m);
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-m') === m)); });
+    setRoute(m === 'rover', animate !== false);
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { touched = true; set(b.getAttribute('data-m')); }); });
+  set('hab', false);
+  var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window && !rm) {
+    var io = new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) { io.disconnect(); setTimeout(function () { if (!touched) set('rover'); }, 3000); }
+    }, { threshold: 0.6 });
+    io.observe(stage);
+  }
+})();
+</script>
+</section>

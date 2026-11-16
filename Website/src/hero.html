@@ -1,0 +1,484 @@
+<!-- HERO: "Descent" — orbit → Gale crater → 5×5 km terrain → on foot, through the AR navigator's visor -->
+<nav class="topnav" id="topnav" aria-label="Main">
+  <a class="tn-brand" href="#top" aria-label="Marswalk, back to top">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".5"/><circle cx="12" cy="12" r="4" fill="none" stroke="#7fe0a6" stroke-width="1.6"/><path d="M12 0v5M12 19v5M0 12h5M19 12h5" stroke="currentColor" stroke-width="1.2"/></svg>
+    <span>MARSWALK</span>
+  </a>
+  <div class="tn-links">
+    <a href="#problem">Problem</a><a href="#system">System</a><a href="#rover">Why the rover</a><a href="#how">How it works</a><a href="#results">Results</a><a href="#resources">Resources</a>
+  </div>
+  <a class="btn primary tn-cta" data-link="video"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>Watch the film</a>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-pin">
+    <!-- world layers -->
+    <div class="hx-stage" aria-hidden="true">
+      <div class="hx-stars"></div>
+      <div class="hx-globe-wrap"><div class="hx-atmo"></div><canvas class="hx-globe" width="10" height="10"></canvas><div class="hx-rim"></div></div>
+      <div class="hx-layer hx-regional"><img src="assets/img/gale-regional.jpg" alt="" decoding="async"></div>
+      <div class="hx-entry"></div>
+      <div class="hx-layer hx-terrain">
+        <div class="hx-tilt">
+          <img src="assets/img/hirise-2400.jpg" alt="" decoding="async">
+          <svg class="hx-map" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+      <div class="hx-haze"></div>
+      <div class="hx-layer hx-ground"><img src="assets/img/msl-5072-5072MR1102610012602321C0.jpg" alt="" decoding="async"></div>
+      <svg class="hx-ar" preserveAspectRatio="none"></svg>
+      <div class="hx-aoi"><i></i><span class="hud-label is-hud">Study area · 5 × 5 km</span></div>
+      <div class="hx-target"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="16" fill="none" stroke="#7fe0a6" stroke-width="1.5"/><circle cx="40" cy="40" r="2.5" fill="#7fe0a6"/><path d="M40 6v14M40 60v14M6 40h14M60 40h14" stroke="#7fe0a6" stroke-width="1.5"/><circle class="pulse" cx="40" cy="40" r="16" fill="none" stroke="#7fe0a6" stroke-width="1"/></svg><span class="hx-target-line"></span><span class="hx-target-label hud-label is-hud">Target · Gale crater<br><span>4.805°S 137.388°E</span></span></div>
+    </div>
+
+    <!-- AR navigator cards (ground stage) -->
+    <div class="hx-arui" aria-hidden="true">
+      <div class="ar-card glass"><i class="brk"></i>
+        <div class="ar-card-top"><span class="hud-label is-hud">Next stop · ST01</span><span class="hud-label hud-num">122 m · ETA 4 min</span></div>
+        <div class="ar-turn"><svg viewBox="0 0 24 24"><path d="M6 20v-7a5 5 0 0 1 5-5h7m-4-4 4 4-4 4" fill="none" stroke="#7fe0a6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Walk to Altadena drill site</div>
+        <div class="ar-meta">Follow the path</div>
+        <div class="ar-rail"><span></span></div>
+      </div>
+      <div class="ar-pills"><span class="chip plain hud-num">PET 00:31:44</span><span class="chip plain hud-num">HDG 293°</span><span class="chip plain hud-num">CRS 295°</span></div>
+      <div class="ar-link"><span class="chip go ar-up">Link up</span><span class="chip nogo ar-lost">Link lost · autonomous</span></div>
+      <div class="ar-banner glass"><span class="hud-label is-alert">Link lost</span> Guiding on last confirmed route v1</div>
+    </div>
+
+    <!-- visor frame -->
+    <div class="hx-visor" aria-hidden="true"><i class="brk"></i></div>
+
+    <!-- HUD readouts -->
+    <div class="hx-hud" aria-hidden="true">
+      <div class="hx-readout"><span class="hud-label">Field of view</span><span class="hud-num hx-fov">6,780 km</span></div>
+      <div class="hx-readout hx-ro-2"><span class="hud-label">Sol 412 · LTST</span><span class="hud-num">09:40</span></div>
+      <div class="hx-readout hx-ro-3"><span class="hud-label">Earth → Mars, one way <i>(example)</i></span><span class="hud-num hx-light">12 min 38 s</span></div>
+    </div>
+    <ol class="hx-rail" aria-hidden="true"><li data-i="0">Orbit</li><li data-i="1">Gale</li><li data-i="2">The plan</li><li data-i="3">On foot</li><span class="hx-rail-fill"></span></ol>
+
+    <!-- copy -->
+    <div class="hx-copy hx-c0">
+      <p class="hud-label is-hud hx-kicker">NASA Space Apps 2026 · Interplanetary Survival Guide: Martian Map</p>
+      <h1 class="display hx-h1">First steps on Mars, <em>without Earth in the&nbsp;loop.</em></h1>
+      <p class="hx-lede">Marswalk plans a surface walk on real NASA terrain, checks it against <b>12 cited NASA EVA constraints</b>, and guides the astronaut through an AR navigator, even when the link to the habitat drops.</p>
+      <div class="hx-ctas">
+        <a class="btn primary" data-link="video"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>Watch the 30-second film</a>
+        <a class="btn" data-link="github"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.8.06 1.23.83 1.23.83.71 1.23 1.87.87 2.33.67.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.22 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 8 0Z"/></svg>GitHub</a>
+        <a class="btn" data-link="slides">Slides</a>
+        <a class="btn" data-link="researchPaper">Research paper</a>
+      </div>
+    </div>
+    <div class="hx-copy hx-cap hx-c1"><div class="glass hx-capcard"><i class="brk"></i>
+      <p class="hud-label is-hud">01 · Gale crater</p>
+      <h2 class="display">Mount Sharp, where <em>Curiosity</em> is driving.</h2>
+      <p>A 5 × 5 km study area on Curiosity's 2025–26 boxwork traverse at 4.805°S 137.388°E, the challenge's own example.</p>
+    </div></div>
+    <div class="hx-copy hx-cap hx-c2"><div class="glass hx-capcard"><i class="brk"></i>
+      <p class="hud-label is-hud">02 · The plan</p>
+      <h2 class="display">Planned in the habitat, on <em>1-metre terrain.</em></h2>
+      <p>From Hab-1, no science stop passes all 12 constraints. Staged from the PR-1 rover, it's a GO. Every plan is re-walked in a simulator in about 38 ms.</p>
+      <div class="hx-chips"><span class="chip nogo">No-go · from Hab-1</span><span class="chip go">Go · from PR-1</span></div>
+    </div></div>
+    <div class="hx-copy hx-cap hx-c3"><div class="glass hx-capcard"><i class="brk"></i>
+      <p class="hud-label is-hud">03 · On foot</p>
+      <h2 class="display">The AR navigator <em>brings her home.</em></h2>
+      <p>Chevrons on the ground and one instruction at a time. Mars has no GPS, so it dead-reckons between landmark fixes. If the link to the habitat drops, it goes autonomous within about 3 seconds.</p>
+    </div></div>
+
+    <div class="hx-foot">
+      <a class="hx-scroll" href="#problem"><span class="hx-scroll-line"></span><span class="hud-label">Scroll to descend · <u>skip</u></span></a>
+      <p class="hx-credit hud-label"></p>
+    </div>
+  </div>
+</header>
+
+<style>
+.skip{position:absolute;left:-9999px;top:8px;z-index:200;background:var(--hud);color:#04140b;padding:10px 14px;border-radius:8px;font-weight:600}
+.skip:focus{left:8px}
+/* ---------- top nav ---------- */
+.topnav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;gap:28px;height:72px;padding:0 var(--gutter);transition:background .4s,border-color .4s,height .4s;border-bottom:1px solid transparent}
+.topnav.solid{background:rgba(11,6,5,.72);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border-bottom-color:var(--line);height:64px}
+.tn-brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+.tn-brand svg{width:22px;height:22px}
+.tn-brand span{font:600 15px/1 var(--font-display);font-stretch:125%;letter-spacing:.28em}
+.tn-links{display:flex;gap:26px;margin-left:auto}
+.tn-links a{font:500 13.5px/1 var(--font-body);color:var(--mute);text-decoration:none;transition:color .25s}
+.tn-links a:hover{color:var(--cream)}
+.tn-cta{--h:40px;padding:0 18px;font-size:13px}
+@media (max-width:1080px){.tn-links{display:none}.tn-cta{margin-left:auto}}
+@media (max-width:520px){.tn-cta .soon{display:none}.tn-brand span{font-size:13px;letter-spacing:.22em}}
+
+/* ---------- pinned stage ---------- */
+.hero{position:relative;height:460vh;height:460svh;background:var(--space)}
+.hero-pin{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;isolation:isolate}
+.hx-stage{position:absolute;inset:0;overflow:hidden;contain:strict}
+.hx-stars{position:absolute;inset:-10%;background:
+  radial-gradient(1px 1px at 12% 18%,rgba(255,255,255,.55),transparent 60%),radial-gradient(1px 1px at 33% 72%,rgba(255,255,255,.35),transparent 60%),
+  radial-gradient(1.5px 1.5px at 58% 9%,rgba(200,220,255,.6),transparent 60%),radial-gradient(1px 1px at 81% 31%,rgba(255,255,255,.4),transparent 60%),
+  radial-gradient(1px 1px at 7% 88%,rgba(255,255,255,.3),transparent 60%),radial-gradient(1px 1px at 46% 41%,rgba(255,255,255,.25),transparent 60%),
+  radial-gradient(1.2px 1.2px at 92% 64%,rgba(220,230,255,.45),transparent 60%),radial-gradient(1px 1px at 24% 52%,rgba(255,255,255,.3),transparent 60%),
+  radial-gradient(1px 1px at 68% 84%,rgba(255,255,255,.3),transparent 60%),radial-gradient(1px 1px at 75% 12%,rgba(255,255,255,.35),transparent 60%),
+  radial-gradient(ellipse 80% 60% at 70% 70%,rgba(110,36,22,.28),transparent 70%),radial-gradient(ellipse 60% 50% at 10% 0%,rgba(143,178,217,.06),transparent 70%)}
+.hx-globe-wrap{position:absolute;left:0;top:0;width:var(--D,800px);height:var(--D,800px);transform-origin:50% 50%;will-change:transform,opacity}
+.hx-globe{position:absolute;inset:0;width:100%;height:100%;border-radius:50%}
+.hx-atmo{position:absolute;inset:-6%;border-radius:50%;background:radial-gradient(circle,transparent 46%,rgba(143,178,217,.22) 47.2%,rgba(143,178,217,.07) 52%,transparent 62%);filter:blur(2px)}
+.hx-rim{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 36% 30%,transparent 62%,rgba(143,178,217,.18) 71%,rgba(160,190,230,.38) 70.6%,transparent 71%);mix-blend-mode:screen;opacity:.9}
+.hx-layer{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity;opacity:0}
+.hx-layer img{width:100%;height:100%;object-fit:cover}
+.hx-regional{-webkit-mask-image:radial-gradient(closest-side,#000 62%,transparent 100%);mask-image:radial-gradient(closest-side,#000 62%,transparent 100%)}
+.hx-terrain{perspective:1100px;-webkit-mask-image:radial-gradient(closest-side,#000 var(--f,60%),transparent 100%);mask-image:radial-gradient(closest-side,#000 var(--f,60%),transparent 100%)}
+.hx-tilt{position:absolute;inset:0;transform-origin:50% 62%;will-change:transform,filter}
+.hx-map{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.hx-entry{position:absolute;inset:-25%;opacity:0;pointer-events:none;will-change:opacity,transform;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,238,228,.13) 0deg .45deg,transparent .45deg 2.9deg),radial-gradient(circle at 50% 50%,rgba(220,176,156,0) 0%,rgba(206,150,126,.28) 26%,rgba(118,58,42,.9) 72%);
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,transparent 5%,#000 42%);mask-image:radial-gradient(circle at 50% 50%,transparent 5%,#000 42%)}
+.hero-pin::before{content:"";position:absolute;left:0;right:0;top:0;height:230px;background:linear-gradient(rgba(11,6,5,.72),rgba(11,6,5,0));z-index:2;pointer-events:none}
+.hx-haze{position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,rgba(201,160,140,.85) 0%,rgba(150,98,78,.35) 30%,transparent 55%)}
+.hx-ground{inset:0;width:100%;height:100%;transform-origin:50% 50%}
+.hx-ground::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,6,5,.35),transparent 30%,transparent 55%,rgba(11,6,5,.55))}
+.hx-ar{position:absolute;inset:0;width:100%;height:100%;opacity:0;overflow:visible}
+.hx-aoi{position:absolute;left:0;top:0;opacity:0;pointer-events:none}
+.hx-aoi i{position:absolute;inset:0;border:1px solid rgba(127,224,166,.85);box-shadow:0 0 0 1px rgba(4,30,17,.4),0 0 24px rgba(127,224,166,.25)}
+.hx-aoi span{position:absolute;left:0;top:calc(100% + 10px);white-space:nowrap}
+.hx-target{position:absolute;left:0;top:0;width:80px;height:80px;margin:-40px 0 0 -40px;opacity:0;pointer-events:none}
+.hx-target svg{width:80px;height:80px;overflow:visible}
+.hx-target .pulse{transform-origin:40px 40px;animation:hxPulse 2.4s var(--ease-out) infinite}
+@keyframes hxPulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(3.2);opacity:0}}
+.hx-target-line{position:absolute;left:58px;top:22px;width:90px;height:1px;background:linear-gradient(90deg,rgba(127,224,166,.8),rgba(127,224,166,.2));transform-origin:0 0;transform:rotate(-28deg)}
+.hx-target-label{position:absolute;left:140px;top:-34px;white-space:nowrap;line-height:1.7}
+.hx-target-label span{color:var(--faint)}
+
+/* AR navigator UI */
+.hx-arui{position:absolute;inset:0;pointer-events:none}
+.ar-card{position:absolute;left:50%;top:15%;width:min(400px,84vw);padding:16px 20px 18px;opacity:0;transform:translate(-50%,-14px)}
+.ar-card-top{display:flex;justify-content:space-between;margin-bottom:8px}
+.ar-turn{display:flex;align-items:center;gap:12px;font:600 23px/1.15 var(--font-body);color:var(--cream)}
+.ar-turn svg{width:26px;height:26px;flex:none}
+.ar-meta{margin-top:6px;font-size:14px;color:#cfeedd;padding-left:38px}
+.ar-rail{position:relative;height:3px;margin-top:14px;border-radius:2px;background:rgba(4,30,17,.8)}
+.ar-rail span{position:absolute;left:0;top:0;bottom:0;width:31%;background:var(--hud);border-radius:2px}
+.ar-rail span::after{content:"";position:absolute;right:-5px;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:var(--hud);box-shadow:0 0 10px var(--hud)}
+.ar-pills{position:absolute;right:calc(var(--gutter) + 8px);top:142px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;opacity:0}
+@media (max-width:900px){.ar-pills{right:auto;left:50%;top:calc(17% + 178px);flex-direction:row;transform:translateX(-50%);width:max-content}.ar-pills .chip{height:26px;padding:0 10px;font-size:10px}}
+.ar-pills .chip{color:#d7f3e3;background:rgba(4,30,17,.7)}
+.ar-link{position:absolute;right:calc(var(--gutter) + 8px);top:96px;opacity:0}
+.ar-link .chip{position:absolute;right:0;top:0;white-space:nowrap;transition:opacity .4s}
+.ar-lost{opacity:0}
+.hx-arui.lost .ar-up{opacity:0}.hx-arui.lost .ar-lost{opacity:1}
+.ar-banner{position:absolute;left:50%;top:calc(15% + 150px);transform:translateX(-50%);padding:10px 16px;border-color:rgba(255,95,180,.45);background:rgba(40,6,24,.62);font:500 13.5px/1.3 var(--font-body);color:#ffd9ec;white-space:nowrap;opacity:0;transition:opacity .5s}
+.hx-arui.lost .ar-banner{opacity:1}
+
+/* visor frame */
+.hx-visor{position:absolute;inset:14px;border-radius:28px;border:1px solid rgba(127,224,166,.16);pointer-events:none;box-shadow:0 0 0 40px rgba(11,6,5,.0),inset 0 0 120px rgba(0,0,0,.55)}
+.hx-visor .brk::before,.hx-visor .brk::after{width:22px;height:22px;border-color:rgba(127,224,166,.55)}
+.hx-visor .brk::before{top:-1px;left:-1px;border-radius:28px 0 0 0}.hx-visor .brk::after{bottom:-1px;right:-1px;border-radius:0 0 28px 0}
+.hero-pin::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 120% 100% at 50% 50%,transparent 62%,rgba(5,3,2,.55) 100%)}
+
+/* HUD readouts */
+.hx-hud{position:absolute;left:calc(var(--gutter) + 4px);top:96px;display:flex;gap:34px;z-index:3}
+.hx-readout{display:grid;gap:5px}
+.hx-readout .hud-num{font-size:15px;color:var(--cream);letter-spacing:.04em}
+.hx-readout i{font-style:normal;color:var(--ghost)}
+.hx-fov{color:var(--hud)!important;min-width:9ch}
+.hx-rail{position:absolute;right:calc(var(--gutter) - 6px);top:50%;transform:translateY(-50%);list-style:none;margin:0;padding:0 0 0 18px;display:grid;gap:30px;z-index:3;border-left:1px solid var(--line-2)}
+.hx-rail li{font:400 10.5px/1 var(--font-hud);letter-spacing:.16em;text-transform:uppercase;color:rgba(245,237,230,.42);position:relative;transition:color .4s;text-shadow:0 1px 6px rgba(0,0,0,.9)}
+.hx-readout .hud-label,.hx-readout .hud-num{text-shadow:0 1px 8px rgba(0,0,0,.85)}
+.hx-rail li::before{content:"";position:absolute;left:-22px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--space);border:1px solid var(--line-2);transition:background .4s,border-color .4s,box-shadow .4s}
+.hx-rail li.on{color:var(--hud)}.hx-rail li.on::before{background:var(--hud);border-color:var(--hud);box-shadow:0 0 10px var(--hud)}
+.hx-rail-fill{position:absolute;left:-1px;top:0;width:1px;height:var(--rail,0%);background:var(--hud);box-shadow:0 0 8px var(--hud)}
+
+/* copy */
+.hx-copy{position:absolute;z-index:4;will-change:opacity,transform}
+.hx-c0{left:var(--gutter);top:50%;transform:translateY(-44%);width:min(760px,58vw)}
+.hx-kicker{margin:0 0 26px}
+.hx-h1{font-size:clamp(34px,6.1vw,92px);text-wrap:balance}
+.hx-h1 em{display:inline;background:linear-gradient(100deg,var(--dust) 0%,#f2d9cc 40%,var(--sky) 120%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hx-lede{margin:28px 0 0;max-width:540px;font-size:clamp(16px,1.35vw,19px);line-height:1.6;color:var(--mute)}
+.hx-lede b{color:var(--cream);font-weight:600}
+.hx-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:38px}
+.hx-cap{left:var(--gutter);bottom:110px;width:min(500px,calc(100vw - 2*var(--gutter)));opacity:0}
+.hx-capcard{padding:24px 26px 26px;background:rgba(8,14,10,.6)}
+.hx-capcard h2{font-size:clamp(26px,2.6vw,38px);margin:12px 0 12px}
+.hx-capcard p:not(.hud-label){margin:0;color:var(--mute);font-size:15.5px;line-height:1.6}
+.hx-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.hx-foot{position:absolute;left:var(--gutter);right:var(--gutter);bottom:30px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;z-index:4}
+.hx-scroll{display:flex;align-items:center;gap:14px;text-decoration:none}
+.hx-scroll u{text-decoration:none;border-bottom:1px solid var(--faint)}
+.hx-scroll:hover .hud-label{color:var(--cream)}
+.hx-scroll-line{width:1px;height:34px;background:linear-gradient(var(--hud),transparent);position:relative;overflow:hidden}
+.hx-scroll-line::after{content:"";position:absolute;left:0;top:-40%;width:1px;height:40%;background:var(--cream);animation:hxDrop 2s var(--ease-io) infinite}
+@keyframes hxDrop{to{top:110%}}
+.hx-credit{margin:0;text-align:right;max-width:52ch;color:var(--ghost);font-size:9.5px}
+
+@media (max-width:900px){
+  .hx-hud{top:84px;gap:22px}.hx-ro-2,.hx-ro-3{display:none}
+  .hx-rail{display:none}
+  .hx-c0{top:auto;bottom:118px;transform:none;width:calc(100vw - 2*var(--gutter))}
+  .hx-kicker{margin-bottom:16px;font-size:10px}
+  .hx-lede{margin-top:18px}
+  .hx-ctas{margin-top:24px;gap:8px}.hx-ctas .btn{--h:44px;padding:0 16px;font-size:13px}
+  .hx-cap{bottom:96px}
+  .hx-capcard{padding:18px 18px 20px}
+  .hx-target-label,.hx-target-line{display:none}
+  .hx-credit{display:none}
+  .ar-link{top:84px}
+  .ar-card{top:17%;padding:14px 16px 16px}.ar-card-top .hud-label:last-child{display:none}.ar-turn{font-size:20px}
+  .ar-banner{top:calc(17% + 222px);font-size:12.5px}
+  .hx-visor{inset:8px;border-radius:20px}
+}
+@media (max-width:520px){.hx-lede{font-size:15px}.hx-ctas .btn:nth-child(n+3){display:none}}
+</style>
+
+<script>
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pin = document.querySelector('.hero'), nav = document.getElementById('topnav');
+  var stage = pin.querySelector('.hx-stage');
+  var gw = pin.querySelector('.hx-globe-wrap'), cv = pin.querySelector('.hx-globe');
+  var reg = pin.querySelector('.hx-regional'), ter = pin.querySelector('.hx-terrain'), tilt = pin.querySelector('.hx-tilt');
+  var entry = pin.querySelector('.hx-entry'), haze = pin.querySelector('.hx-haze'), ground = pin.querySelector('.hx-ground'), arSvg = pin.querySelector('.hx-ar');
+  var arui = pin.querySelector('.hx-arui'), arCard = arui.querySelector('.ar-card'), arPills = arui.querySelector('.ar-pills'), arLink = arui.querySelector('.ar-link');
+  var aoi = pin.querySelector('.hx-aoi'), target = pin.querySelector('.hx-target');
+  var fovEl = pin.querySelector('.hx-fov'), lightEl = pin.querySelector('.hx-light'), credit = pin.querySelector('.hx-credit');
+  var caps = [pin.querySelector('.hx-c0'), pin.querySelector('.hx-c1'), pin.querySelector('.hx-c2'), pin.querySelector('.hx-c3')];
+  var rail = pin.querySelectorAll('.hx-rail li'), railBox = pin.querySelector('.hx-rail');
+  var hud = pin.querySelector('.hx-hud');
+
+  var R_KM = 3396.19, DIAM = 2 * R_KM;
+  var AOI_LON = 137.388, AOI_LAT = -4.805, PHI0 = AOI_LAT * Math.PI / 180;
+  var REG = { w: 224.8, h: 236.7, ax: 0.3653, ay: 0.3513 };   // Viking regional crop (km), AOI anchor
+  var vw, vh, D, small;
+
+  var clamp = function (x, a, b) { return x < a ? a : x > b ? b : x; };
+  var lerp = function (a, b, t) { return a + (b - a) * t; };
+  var sm = function (a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  var band = function (x, a, b, c, d) { return Math.min(sm(a, b, x), 1 - sm(c, d, x)); };
+  var eio = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+
+  /* ---------- globe: per-pixel orthographic render of the Viking mosaic ---------- */
+  var TEX = null, TW = 2048, TH = 1024, N = 0, ctx = cv.getContext('2d'), imgData, out, P = null;
+  function buildTables() {
+    N = Math.round(clamp(D * Math.min(devicePixelRatio || 1, 1.5), 300, small ? 640 : 860));
+    cv.width = cv.height = N;
+    imgData = ctx.createImageData(N, N); out = new Uint32Array(imgData.data.buffer);
+    var idx = [], row = [], lon = [], shd = [], tnt = [], alp = [];
+    var L = [-0.58, 0.42, 0.70], ln = Math.hypot(L[0], L[1], L[2]); L = L.map(function (v) { return v / ln; });
+    var cp = Math.cos(PHI0), sp = Math.sin(PHI0), half = N / 2, edge = 1.6 / half;
+    for (var j = 0; j < N; j++) for (var i = 0; i < N; i++) {
+      var x = (i + .5 - half) / half, y = -(j + .5 - half) / half, r2 = x * x + y * y;
+      if (r2 >= 1) continue;
+      var z = Math.sqrt(1 - r2), r = Math.sqrt(r2);
+      var lat = Math.asin(clamp(y * cp + z * sp, -1, 1)), lo = Math.atan2(x, z * cp - y * sp);
+      var ty = clamp(Math.floor((0.5 - lat / Math.PI) * TH), 0, TH - 1);
+      var d = x * L[0] + y * L[1] + z * L[2];
+      var s = 0.07 + 1.0 * Math.pow(sm(-0.12, 0.55, d), 0.9) * (0.55 + 0.45 * Math.pow(z, 0.35));
+      var t = Math.pow(1 - z, 2.4) * 0.75 * sm(-0.25, 0.5, d);
+      idx.push(j * N + i); row.push(ty * TW); lon.push(lo / (2 * Math.PI) * TW);
+      shd.push(Math.round(clamp(s, 0, 1.25) * 256)); tnt.push(Math.round(clamp(t, 0, 1) * 256));
+      alp.push(Math.round(clamp((1 - r) / edge, 0, 1) * 255));
+    }
+    P = { n: idx.length, idx: Int32Array.from(idx), row: Int32Array.from(row), lon: Float32Array.from(lon), shd: Int32Array.from(shd), tnt: Int32Array.from(tnt), alp: Uint8Array.from(alp) };
+  }
+  function renderGlobe(lonCenter) {
+    if (!TEX || !P) return;
+    var off = ((lonCenter + 180) / 360) * TW, n = P.n, idx = P.idx, row = P.row, lon = P.lon, shd = P.shd, tnt = P.tnt, alp = P.alp;
+    var SR = 150, SG = 182, SB = 222;
+    for (var k = 0; k < n; k++) {
+      var tx = (lon[k] + off) | 0; if (tx >= TW) tx -= TW; else if (tx < 0) tx += TW; if (tx >= TW) tx -= TW;
+      var c = TEX[row[k] + tx], s = shd[k], t = tnt[k], u = 256 - t;
+      var r = (((c & 255) * s) >> 8), g = ((((c >> 8) & 255) * s) >> 8), b = ((((c >> 16) & 255) * s) >> 8);
+      r = (r * u + SR * t) >> 8; g = (g * u + SG * t) >> 8; b = (b * u + SB * t) >> 8;
+      if (r > 255) r = 255; if (g > 255) g = 255; if (b > 255) b = 255;
+      out[idx[k]] = (alp[k] << 24) | (b << 16) | (g << 8) | r;
+    }
+    ctx.putImageData(imgData, 0, 0);
+  }
+  var texImg = new Image(); texImg.decoding = 'async';
+  texImg.onload = function () {
+    try {
+      var oc = document.createElement('canvas'); oc.width = TW; oc.height = TH;
+      var o = oc.getContext('2d'); o.drawImage(texImg, 0, 0, TW, TH);
+      TEX = new Uint32Array(o.getImageData(0, 0, TW, TH).data.buffer); needGlobe = true;
+    } catch (e) { /* file:// taint: fall back to a flat textured disc */
+      cv.style.background = 'url(assets/img/mars-global.jpg) 30% 50%/200% 100%'; cv.style.filter = 'brightness(.8)';
+    }
+  };
+  texImg.src = 'assets/img/mars-global.jpg';
+
+  /* ---------- terrain map overlay (real stations, Hab-1, PR-1, contours) ---------- */
+  var mapSvg = pin.querySelector('.hx-map'), routeGo, routeNo = [], mapReady = false;
+  function buildMap() {
+    var G = window.GALE; if (!G || mapReady) return; mapReady = true;
+    var st = G.points.stations, hab = G.points.shelters[0].p, rov = G.points.shelters[1].p;
+    var s = '<g class="ctr" fill="none" stroke="#f5ede6"><path d="' + G.contours.minor + '" stroke-opacity=".16" stroke-width=".9"/><path d="' + G.contours.major + '" stroke-opacity=".34" stroke-width="1.4"/></g>';
+    var targets = st.filter(function (x) { return ['ST01', 'ST04', 'ST07', 'ST08'].indexOf(x.id) > -1; });
+    targets.forEach(function (t) { s += '<path class="nogo" d="M' + hab[0] + ',' + hab[1] + 'L' + t.p[0] + ',' + t.p[1] + '" stroke="#ff5fb4" stroke-width="2.2" stroke-dasharray="7 7" fill="none" opacity="0"/>'; });
+    s += '<path class="go" d="M' + rov[0] + ',' + rov[1] + ' C432,492 446,470 441,445.5" stroke="#04140b" stroke-width="9" fill="none" stroke-linecap="round" opacity=".55"/>';
+    s += '<path class="go" d="M' + rov[0] + ',' + rov[1] + ' C432,492 446,470 441,445.5" stroke="#7fe0a6" stroke-width="4" fill="none" stroke-linecap="round"/>';
+    st.forEach(function (t) { s += '<g><circle cx="' + t.p[0] + '" cy="' + t.p[1] + '" r="5" fill="#0b0605" stroke="#f5ede6" stroke-width="1.6"/></g>'; });
+    s += '<text x="' + (st[0].p[0] + 10) + '" y="' + (st[0].p[1] - 8) + '" class="lbl">ST01 · ALTADENA</text>';
+    s += '<rect x="' + (hab[0] - 9) + '" y="' + (hab[1] - 9) + '" width="18" height="18" fill="#0b0605" stroke="#ff5fb4" stroke-width="2.4"/><text x="' + (hab[0] + 16) + '" y="' + (hab[1] + 5) + '" class="lbl alert">HAB-1 · NO-GO</text>';
+    s += '<path d="M' + rov[0] + ',' + (rov[1] - 12) + 'L' + (rov[0] + 12) + ',' + rov[1] + 'L' + rov[0] + ',' + (rov[1] + 12) + 'L' + (rov[0] - 12) + ',' + rov[1] + 'Z" fill="#0b0605" stroke="#7fe0a6" stroke-width="2.4"/><text x="' + (rov[0] - 16) + '" y="' + (rov[1] + 5) + '" text-anchor="end" class="lbl go-l">PR-1 · GO</text>';
+    s += '<style>.lbl{font:600 12px "B612 Mono",monospace;letter-spacing:.08em;fill:#f5ede6;paint-order:stroke;stroke:#0b0605;stroke-width:4px}.alert{fill:#ff8cc8}.go-l{fill:#7fe0a6}</style>';
+    mapSvg.innerHTML = s;
+    routeNo = mapSvg.querySelectorAll('.nogo');
+    routeGo = mapSvg.querySelectorAll('.go');
+    routeGo.forEach(function (p) { var L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; p._L = L; });
+  }
+  if (window.GALE) buildMap(); else { var gs = document.createElement('script'); gs.src = 'js/gale-data.js'; gs.onload = buildMap; document.head.appendChild(gs); }
+
+  /* ---------- AR chevrons on the ground ---------- */
+  var chevs = [], WP = { x: .66, y: .40 };
+  function buildAR() {
+    arSvg.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh);
+    var s = '<defs><filter id="hxglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#hxglow)">';
+    for (var i = 0; i < 9; i++) s += '<path class="cv" d="M-1,0.1 L0,-0.62 L1,0.1 L0.66,0.26 L0,-0.2 L-0.66,0.26 Z" fill="#7fe0a6" fill-opacity=".9" stroke="#04140b" stroke-opacity=".5" stroke-width=".05" opacity="0"/>';
+    var wx = WP.x * vw, wy = WP.y * vh;
+    s += '</g><g class="wp" transform="translate(' + wx + ',' + wy + ')"><circle r="18" fill="none" stroke="#7fe0a6" stroke-width="1.6"/><circle r="4" fill="#7fe0a6"/><circle class="wpp" r="18" fill="none" stroke="#7fe0a6"/><line x1="0" y1="-18" x2="0" y2="-64" stroke="#7fe0a6" stroke-width="1.2"/><text x="10" y="-52" font-family="B612 Mono, monospace" font-size="12" letter-spacing="1.4" fill="#dff5e8">ST01 · 122 M</text></g>';
+    arSvg.innerHTML = s; chevs = arSvg.querySelectorAll('.cv');
+  }
+  function chevPos(t) { /* quadratic bezier from bottom-centre to waypoint, foreshortened */
+    var x0 = vw * (small ? .5 : .46), y0 = vh * 1.02, cx = vw * (small ? .42 : .44), cy = vh * .62, x1 = WP.x * vw, y1 = WP.y * vh + 26;
+    var u = 1 - t; return { x: u * u * x0 + 2 * u * t * cx + t * t * x1, y: u * u * y0 + 2 * u * t * cy + t * t * y1,
+      dx: 2 * u * (cx - x0) + 2 * t * (x1 - cx), dy: 2 * u * (cy - y0) + 2 * t * (y1 - cy) };
+  }
+  function drawChevs(time, vis) {
+    var flow = reduce ? 0 : (time / 2600) % 1, n = chevs.length;
+    for (var i = 0; i < n; i++) {
+      var t = ((i + flow) / n); t = t * .94;
+      var q = chevPos(t), sc = lerp(small ? 46 : 64, 12, Math.pow(t, .7)), ang = Math.atan2(q.dy, q.dx) * 180 / Math.PI + 90;
+      var a = vis * sm(0, .12, t) * (1 - sm(.8, .94, t));
+      chevs[i].setAttribute('transform', 'translate(' + q.x.toFixed(1) + ',' + q.y.toFixed(1) + ') rotate(' + ang.toFixed(1) + ') scale(' + sc.toFixed(1) + ',' + (sc * .62).toFixed(1) + ')');
+      chevs[i].setAttribute('opacity', (a * .92).toFixed(3));
+    }
+  }
+
+  /* ---------- layout ---------- */
+  var zEnd = 1;
+  function layout() {
+    vw = innerWidth; vh = pin.querySelector('.hero-pin').clientHeight; small = vw < 900;
+    D = small ? Math.min(vw * 0.98, vh * .5) : Math.min(vh * 1.18, vw * .74, 1180);
+    gw.style.setProperty('--D', D + 'px');
+    zEnd = (small ? 1.4 : 1.12) * Math.max(vw, vh) * DIAM / (5 * D);
+    buildTables(); buildAR(); needGlobe = true;
+  }
+
+  /* ---------- frame ---------- */
+  var pT = 0, pS = 0, needGlobe = true, lastLon = null, spin = 0, lastT = performance.now(), credState = -1;
+  var CRED = ['Mars: Viking MDIM 2.1 colour mosaic · NASA/USGS via JPL Mars Trek', 'Gale crater: Viking MDIM 2.1 · NASA/USGS via JPL Mars Trek',
+    'HiRISE colour · NASA/JPL/University of Arizona · 10 m contours from the USGS merged 1 m DEM (Parker & Calef 2016) · positions of Hab-1 and PR-1 are SCENARIO',
+    'Curiosity Mastcam, sol 5072 · NASA/JPL-Caltech/MSSS · AR overlay is an illustration of the Marswalk navigator'];
+  function readScroll() {
+    var r = pin.getBoundingClientRect(), total = pin.offsetHeight - vh;
+    pT = clamp(-r.top / total, 0, 1);
+    nav.classList.toggle('solid', r.bottom < vh * 0.6 || -r.top > 40);
+  }
+  function frame(now) {
+    var dt = Math.min(64, now - lastT); lastT = now;
+    pS += (pT - pS) * (reduce ? 1 : Math.min(1, dt / 90));
+    if (Math.abs(pT - pS) < 0.0004) pS = pT;
+    var p = pS;
+    if (!reduce) spin += dt * 0.003;   /* deg per ms → 3°/s */
+
+    /* phase A: orbit → centre on Gale (0 → .14) */
+    var a = eio(sm(0.015, 0.15, p));
+    var homeX = small ? vw * .78 : vw * .73, homeY = small ? vh * .19 : vh * .6, cyZ = small ? vh * .36 : vh / 2;
+    var cx = lerp(homeX, vw / 2, a), cy = lerp(homeY, cyZ, a);
+    var free = AOI_LON - 70 + spin, lonC = free + (((AOI_LON - free) % 360 + 540) % 360 - 180) * a;
+    /* phase B: dive, keyframed in log(field of view): approach + atmospheric entry → hold on Gale → punch-in */
+    var fov0 = vw * DIAM / D, fovEnd = fov0 / zEnd, lf;
+    if (p < 0.25) lf = lerp(Math.log(fov0), Math.log(270), eio(sm(0.13, 0.25, p)));
+    else if (p < 0.43) lf = lerp(Math.log(270), Math.log(200), (p - 0.25) / 0.18);
+    else lf = lerp(Math.log(200), Math.log(fovEnd), eio(sm(0.43, 0.6, p)));
+    var fov = Math.exp(lf), z = fov0 / fov, kmpx = fov / vw;
+
+    /* entry haze (globe → Gale) and punch-in streaks (Gale → terrain) hide the resolution hand-offs */
+    var eh = sm(4500, 2200, fov) * sm(330, 700, fov), ph = sm(175, 110, fov) * sm(16, 38, fov), en = Math.max(eh, ph * 0.85);
+    entry.style.opacity = en;
+    if (en > 0.001) entry.style.transform = 'scale(' + (1 + (eh > ph ? sm(4500, 330, fov) : sm(175, 16, fov)) * 0.7).toFixed(3) + ')';
+
+    /* globe */
+    var gO = sm(900, 2600, fov);
+    gw.style.opacity = gO;
+    if (gO > 0.001) {
+      gw.style.transform = 'translate(' + (cx - D / 2) + 'px,' + (cy - D / 2) + 'px) scale(' + z + ')';
+      var gb = clamp((10.4 * vw / fov - 1.6) * 1.6, 0, 18) / z;
+      if (TEX) cv.style.filter = gb > 0.05 ? 'blur(' + gb.toFixed(2) + 'px)' : 'none';
+      if (needGlobe || lastLon === null || Math.abs(lonC - lastLon) > 0.02) { renderGlobe(lonC); lastLon = lonC; needGlobe = false; }
+    }
+    /* Gale target marker on the globe (orbit phase only) */
+    var dl = (AOI_LON - lonC) * Math.PI / 180, cl = Math.cos(PHI0), x3 = cl * Math.sin(dl), y3p = Math.sin(PHI0), z3p = cl * Math.cos(dl);
+    var y3 = y3p * Math.cos(PHI0) - z3p * Math.sin(PHI0), z3 = y3p * Math.sin(PHI0) + z3p * Math.cos(PHI0);
+    var tx = cx + x3 * D / 2 * z, ty = cy - y3 * D / 2 * z;
+    var tO = sm(0.15, 0.4, z3) * (1 - sm(0.09, 0.16, p));
+    target.style.opacity = tO; target.style.transform = 'translate(' + tx + 'px,' + ty + 'px)';
+
+    /* regional (Viking) */
+    var rO = sm(1100, 520, fov) * sm(22, 60, fov);
+    reg.style.opacity = rO;
+    if (rO > 0.001) {
+      var rw = REG.w / kmpx, rh = REG.h / kmpx, rb = clamp((0.325 * vw / fov - 1.4) * 1.4, 0, 14);
+      reg.style.filter = rb > 0.3 ? 'blur(' + rb.toFixed(1) + 'px)' : 'none';
+      reg.style.width = rw + 'px'; reg.style.height = rh + 'px';
+      reg.style.transform = 'translate(' + (vw / 2 - REG.ax * rw) + 'px,' + (cyZ - REG.ay * rh) + 'px)';
+    }
+    /* terrain (HiRISE + contours) */
+    var tw = 5 / kmpx, terO = sm(70, 26, fov);
+    var tl = sm(0.7, 0.82, p);               /* phase D: tilt to the ground */
+    var gnd = sm(0.79, 0.87, p);
+    ter.style.opacity = terO * (1 - gnd * .999);
+    if (terO > 0.001) {
+      ter.style.width = tw + 'px'; ter.style.height = tw + 'px';
+      ter.style.transform = 'translate(' + (vw / 2 - tw / 2) + 'px,' + (cyZ - tw / 2) + 'px)';
+      ter.style.setProperty('--f', lerp(55, 100, sm(0.49, 0.6, p)) + '%');
+      tilt.style.transform = 'rotateX(' + (tl * 62) + 'deg) translateY(' + (tl * 6) + '%) scale(' + (1 + tl * .35) + ')';
+      tilt.style.filter = 'brightness(' + (1 - tl * .25) + ')';
+      if (mapReady) {
+        var no = sm(0.6, 0.65, p), go = sm(0.65, 0.71, p);
+        routeNo.forEach(function (e) { e.setAttribute('opacity', (no * .95).toFixed(3)); });
+        routeGo.forEach(function (e) { e.style.strokeDashoffset = e._L * (1 - go); });
+      }
+    }
+    /* AOI box (zoom phase) */
+    var aO = sm(0.235, 0.27, p) * (1 - sm(0.46, 0.5, p)) * (1 - sm(vw * .5, vw * .8, tw)), bw = Math.max(tw, 18);
+    aoi.style.opacity = aO;
+    if (aO > 0.001) { aoi.style.width = bw + 'px'; aoi.style.height = bw + 'px'; aoi.style.transform = 'translate(' + (vw / 2 - bw / 2) + 'px,' + (cyZ - bw / 2) + 'px)'; }
+
+    haze.style.opacity = tl * (1 - gnd);
+    ground.style.opacity = gnd;
+    ground.style.transform = 'scale(' + lerp(1.18, 1, eio(gnd)) + ')';
+    var arO = sm(0.86, 0.9, p);
+    arSvg.style.opacity = arO;
+    if (arO > 0.001) drawChevs(now, 1);
+    arCard.style.opacity = sm(0.87, 0.92, p); arCard.style.transform = 'translate(-50%,' + lerp(-14, 0, sm(0.87, 0.92, p)) + 'px)';
+    arPills.style.opacity = sm(0.89, 0.93, p); arLink.style.opacity = sm(0.89, 0.93, p);
+    arui.classList.toggle('lost', p > 0.955);
+
+    /* copy */
+    var c0 = 1 - sm(0.035, 0.1, p);
+    caps[0].style.opacity = c0; caps[0].style.visibility = c0 < 0.01 ? 'hidden' : 'visible';
+    caps[0].style.transform = (small ? '' : 'translateY(-44%) ') + 'translateY(' + (-40 * sm(0.035, 0.1, p)) + 'px)';
+    [[1, 0.27, 0.31, 0.41, 0.45], [2, 0.56, 0.61, 0.72, 0.76], [3, 0.88, 0.93, 1.1, 1.2]].forEach(function (c) {
+      var o = band(p, c[1], c[2], c[3], c[4]); var el = caps[c[0]];
+      el.style.opacity = o; el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
+      el.style.transform = 'translateY(' + ((1 - o) * 24) + 'px)';
+    });
+    /* HUD */
+    var ground_ = p > 0.85;
+    fovEl.textContent = ground_ ? 'On foot' : (fov >= 100 ? Math.round(fov).toLocaleString('en-US') + ' km' : fov >= 10 ? fov.toFixed(1) + ' km' : fov.toFixed(2) + ' km');
+    hud.style.opacity = small ? 1 - sm(0.84, 0.88, p) : 1;
+    var stg = p < 0.22 ? 0 : p < 0.5 ? 1 : p < 0.82 ? 2 : 3;
+    rail.forEach(function (li, i) { li.classList.toggle('on', i <= stg); });
+    railBox.style.setProperty('--rail', (p * 100).toFixed(1) + '%');
+    if (stg !== credState) { credState = stg; credit.textContent = CRED[stg]; }
+    requestAnimationFrame(frame);
+  }
+  /* light-time readout (illustrative, slowly varying) */
+  var lt0 = 12 * 60 + 38;
+  setInterval(function () { if (reduce) return; lt0 -= 1; if (lt0 < 12 * 60 + 20) lt0 = 12 * 60 + 38; lightEl.textContent = Math.floor(lt0 / 60) + ' min ' + String(lt0 % 60).padStart(2, '0') + ' s'; }, 1000);
+
+  layout(); readScroll();
+  addEventListener('scroll', readScroll, { passive: true });
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { layout(); readScroll(); }, 120); });
+  requestAnimationFrame(frame);
+})();
+</script>

@@ -1,0 +1,88 @@
+<section class="section" id="how" aria-labelledby="how-title">
+<style>
+#how .layout{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(32px,6vw,96px);align-items:start}
+#how .sec-head{margin-bottom:0;position:sticky;top:120px}
+#how .flow{position:relative;padding-left:76px}
+#how .spine{position:absolute;left:21px;top:22px;bottom:22px;width:2px;background:var(--line)}
+#how .spine i{position:absolute;left:0;top:0;width:100%;height:var(--fill,0%);background:linear-gradient(180deg,var(--hud-dim),var(--hud));box-shadow:0 0 14px var(--hud)}
+#how .stage{position:relative;padding:0 0 clamp(36px,4.6vw,56px)}
+#how .stage:last-of-type{padding-bottom:clamp(40px,5vw,64px)}
+#how .num{position:absolute;left:-76px;top:0;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--space);border:1px solid var(--ghost);color:var(--faint);font:400 13px/1 var(--font-hud);transition:all .6s var(--ease-out)}
+#how .stage.on .num{border-color:var(--hud);color:var(--hud);box-shadow:0 0 0 5px rgba(127,224,166,.08),0 0 26px rgba(127,224,166,.35)}
+#how .stage h3{margin:2px 0 10px;font:300 clamp(22px,2.4vw,32px)/1.15 var(--font-display);font-stretch:118%;color:var(--mute);transition:color .6s}
+#how .stage.on h3{color:var(--cream)}
+#how .stage p{margin:0 0 12px;color:var(--mute);font-size:16px;max-width:560px;line-height:1.55}
+#how .stage .hud-label{display:block;padding:9px 12px;border-left:1px solid var(--hud-dim);background:rgba(127,224,166,.04);max-width:560px;letter-spacing:.1em;line-height:1.55;font-size:10.5px;text-transform:none}
+#how .stage .hud-label b{font-weight:400;color:var(--hud)}
+#how .stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+#how .stat{padding:26px 26px 24px}
+#how .stat .v{display:block;font:200 clamp(44px,5.4vw,76px)/1 var(--font-display);font-stretch:125%;letter-spacing:-.02em;color:var(--hud);margin:12px 0 10px}
+#how .stat .v small{font:300 .32em/1 var(--font-hud);letter-spacing:.1em;color:var(--mute);margin-left:6px}
+#how .stat p{margin:0;font-size:14px;color:var(--mute);line-height:1.5}
+#how .fine{margin:16px 0 0}
+@media(max-width:900px){#how .layout{grid-template-columns:1fr}#how .sec-head{position:static;margin-bottom:48px}}
+@media(max-width:480px){#how .flow{padding-left:54px}#how .num{left:-54px;width:34px;height:34px;font-size:11px}#how .spine{left:16px}#how .stats{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+  <div class="layout">
+    <div class="sec-head reveal">
+      <div class="sec-index"><span class="hud-label is-hud">03 · How it works</span></div>
+      <h2 class="display sec-title" id="how-title">How a plan <em>is checked.</em></h2>
+      <p class="sec-lede">No guesswork and no AI in the safety path. Every plan is built from real NASA data and then <b>walked step by step in a simulator</b> before it is shown as GO.</p>
+    </div>
+    <div class="flow" id="how-flow">
+      <div class="spine" aria-hidden="true"><i></i></div>
+
+      <div class="stage reveal"><span class="num">01</span>
+        <h3>Real NASA layers, one grid</h3>
+        <p>Terrain, colour imagery, thermal inertia, minerals, radio line of sight and sunlight are resampled onto a single 5 m grid.</p>
+        <span class="hud-label">USGS merged 1 m DEM (HiRISE+CTX+HRSC+MOLA) · HiRISE · THEMIS · CRISM · radio LOS · Mars24 · <b>R = 3,396,190 m</b></span></div>
+
+      <div class="stage reveal"><span class="num">02</span>
+        <h3>Walking cost from physiology</h3>
+        <p>Each step costs what it would cost a person in a suit on Mars, not just how steep it is. A heat governor adds rests when the suit would overheat.</p>
+        <span class="hud-label">Pandolf–Santee model · 121 kg suit load · 0.38 g · 30-min mean ≤ <b>352 W</b> cooling budget</span></div>
+
+      <div class="stage reveal"><span class="num">03</span>
+        <h3>Exact search, not a heuristic guess</h3>
+        <p>Optimal paths between places, then the best order and subset of stops, computed exactly.</p>
+        <span class="hud-label">A* / Dijkstra paths · stop selection by dynamic programming over <b>up to 15 stops</b></span></div>
+
+      <div class="stage reveal"><span class="num">04</span>
+        <h3>Twelve cited constraints</h3>
+        <p>Rules drawn from public NASA EVA documents, each one cited, applied as hard limits to every candidate.</p>
+        <span class="hud-label"><b>12</b> constraints · public NASA EVA documents · source shown per rule</span></div>
+
+      <div class="stage reveal"><span class="num">05</span>
+        <h3>Re-walked in a simulator</h3>
+        <p>Every candidate is replayed step by step against all hard constraints. Staying inside is always a valid answer.</p>
+        <span class="hud-label">Step-by-step replay · all hard constraints · <b>"stay in" always valid</b></span></div>
+
+      <div class="stage reveal"><span class="num">06</span>
+        <h3>A verdict, with the reason</h3>
+        <p>GO or NO-GO, the constraint that binds, the margins, and why any stop was dropped. Nothing is a black box.</p>
+        <span class="hud-label">Binding constraint · margins · latest departure from each stop · dropped-stop reason</span></div>
+
+      <div class="stats">
+        <div class="glass stat reveal"><i class="brk"></i><span class="hud-label is-hud">Plan</span><span class="v hud-num">37.9<small>MS</small></span><p>to plan, median, on a laptop.</p></div>
+        <div class="glass stat reveal d1"><i class="brk"></i><span class="hud-label is-hud">Re-plan mid-walk</span><span class="v hud-num">8.3<small>MS</small></span><p>to re-plan mid-walk, median (p95 19.8 ms).</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var flow=document.getElementById('how-flow'); if(!flow)return;
+  var fill=flow.querySelector('.spine i'),stages=[].slice.call(flow.querySelectorAll('.stage')),tk=false;
+  function upd(){
+    tk=false;
+    var r=flow.getBoundingClientRect(),vh=innerHeight,line=vh*0.62;
+    var h=Math.max(0,Math.min(r.height-44,line-r.top-22));
+    fill.style.height=h+'px';
+    stages.forEach(function(s){var b=s.getBoundingClientRect();s.classList.toggle('on',b.top<line-4);});
+  }
+  function req(){if(!tk){tk=true;requestAnimationFrame(upd);}}
+  addEventListener('scroll',req,{passive:true});addEventListener('resize',req);upd();
+})();
+</script>
+</section>
