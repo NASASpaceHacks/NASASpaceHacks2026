@@ -382,7 +382,7 @@ export function App({ ctl, nav: navModel }: { ctl: VisorController; nav: NavMode
       act: { kind: 'say', text: allDone ? 'Depart' : 'Task done', run: ctl.next },
     };
   } else if (s.display === 'NAV' && target) {
-    ins = { title: `Walk to ${target.name}`, detail: det ? 'Local reroute (amber on map)' : undefined, act: { kind: 'none', text: 'Follow the path' } };
+    ins = { title: `Walk to ${target.name}`, detail: det ? 'Local reroute (white on map)' : undefined, act: { kind: 'none', text: 'Follow the path' } };
   } else if (s.display === 'COMPLETE') {
     ins = { title: 'EVA complete', detail: `At ${s.homeName} · ${dist(s.odoM)} walked`, act: { kind: 'admin', text: 'Review the EVA report' } };
   }
@@ -397,21 +397,24 @@ export function App({ ctl, nav: navModel }: { ctl: VisorController; nav: NavMode
       <div className="safe">
         <div className="top">
           <ProgressRail leg={leg} target={target} />
-          {!returning && s.autonomous && <div className="chip tone-warn">LINK LOST · AUTONOMOUS</div>}
-          {!s.autonomous && offRoute && nav && (s.display === 'NAV' || returning) && (
-            <div className="chip tone-warn">OFF ROUTE {Math.round(nav.offRouteM)} M</div>
-          )}
-          {nav && nav.offRouteM <= OFF_ROUTE_M && nav.note && <div className={`note ${nav.note.kind}`}>{nav.note.text}</div>}
-          {nav && nav.offRouteM > OFF_ROUTE_M && nav.note?.kind === 'noroute' && <div className="note noroute">{nav.note.text}</div>}
-          {nav && (
-            <div className="pos-err">
-              Position error: ±{Math.round(nav.errM)} m · last fix {Math.floor(nav.lastFixMinAgo)} min ago
-            </div>
-          )}
+          {/* Status stack in the centre lane; the PET/HDG/CRS corner has its own column, so long notes wrap instead of running under it. */}
+          <div className="top-stack">
+            {!returning && s.autonomous && <div className="chip tone-warn">LINK LOST · AUTONOMOUS</div>}
+            {!s.autonomous && offRoute && nav && (s.display === 'NAV' || returning) && (
+              <div className="chip tone-warn">OFF ROUTE {Math.round(nav.offRouteM)} M</div>
+            )}
+            {nav && nav.offRouteM <= OFF_ROUTE_M && nav.note && <div className={`note ${nav.note.kind}`}>{nav.note.text}</div>}
+            {nav && nav.offRouteM > OFF_ROUTE_M && nav.note?.kind === 'noroute' && <div className="note noroute">{nav.note.text}</div>}
+            {nav && (
+              <div className="pos-err">
+                Position error: ±{Math.round(nav.errM)} m · last fix {Math.floor(nav.lastFixMinAgo)} min ago
+              </div>
+            )}
+          </div>
+          <Corner t={s.t} heading={heading} target={target} />
         </div>
 
         {rel !== null && <GroundArrow rel={rel} />}
-        <Corner t={s.t} heading={heading} target={target} />
         <MicStatus state={mic.state} />
 
         {started && ins && <Instruction ins={ins} />}
