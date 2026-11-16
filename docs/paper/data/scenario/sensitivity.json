@@ -1,0 +1,360 @@
+[
+ {
+  "base": "Hab-1",
+  "variant": "baseline",
+  "status": "STAY_IN",
+  "n": 0,
+  "order": [],
+  "value": 0,
+  "durationMin": null,
+  "binding": "Stay in: EVA duration rules out every station — staging from ROVER1 allows 6 stations",
+  "dropped": {
+   "eva_duration_max_min": 7,
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 1847
+ },
+ {
+  "base": "Hab-1",
+  "variant": "heat budget 530 W",
+  "status": "STAY_IN",
+  "n": 0,
+  "order": [],
+  "value": 0,
+  "durationMin": null,
+  "binding": "Stay in: comm LOS gap rules out every station — staging from ROVER1 allows 7 stations",
+  "dropped": {
+   "los_gap_max_min": 7,
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 880
+ },
+ {
+  "base": "Hab-1",
+  "variant": "heat limit off",
+  "status": "STAY_IN",
+  "n": 0,
+  "order": [],
+  "value": 0,
+  "durationMin": null,
+  "binding": "Stay in: comm LOS gap rules out every station — staging from ROVER1 allows 7 stations",
+  "dropped": {
+   "los_gap_max_min": 7,
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 101
+ },
+ {
+  "base": "Hab-1",
+  "variant": "radio gap 20 min",
+  "status": "STAY_IN",
+  "n": 0,
+  "order": [],
+  "value": 0,
+  "durationMin": null,
+  "binding": "Stay in: EVA duration rules out every station — staging from ROVER1 allows 7 stations",
+  "dropped": {
+   "eva_duration_max_min": 7,
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 1020
+ },
+ {
+  "base": "Hab-1",
+  "variant": "radio gap rule off",
+  "status": "STAY_IN",
+  "n": 0,
+  "order": [],
+  "value": 0,
+  "durationMin": null,
+  "binding": "Stay in: EVA duration rules out every station — staging from ROVER1 allows 7 stations",
+  "dropped": {
+   "eva_duration_max_min": 7,
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 927
+ },
+ {
+  "base": "Hab-1",
+  "variant": "walk-back factor 0.67",
+  "status": "STAY_IN",
+  "n": 0,
+  "order": [],
+  "value": 0,
+  "durationMin": null,
+  "binding": "Stay in: EVA duration rules out every station — staging from ROVER1 allows 6 stations",
+  "dropped": {
+   "eva_duration_max_min": 7,
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 1402
+ },
+ {
+  "base": "Hab-1",
+  "variant": "shelter limit 45 min",
+  "status": "STAY_IN",
+  "n": 0,
+  "order": [],
+  "value": 0,
+  "durationMin": null,
+  "binding": "Stay in: EVA duration rules out every station — staging from ROVER1 allows 6 stations",
+  "dropped": {
+   "eva_duration_max_min": 7,
+   "los_gap_max_min": 1,
+   "shelter_time_max_min": 1,
+   "walk_radius_max_m": 3
+  },
+  "ms": 1569
+ },
+ {
+  "base": "Hab-1",
+  "variant": "radius 3 km",
+  "status": "STAY_IN",
+  "n": 0,
+  "order": [],
+  "value": 0,
+  "durationMin": null,
+  "binding": "Stay in: EVA duration rules out every station — staging from ROVER1 allows 6 stations",
+  "dropped": {
+   "eva_duration_max_min": 7,
+   "shelter_time_max_min": 5
+  },
+  "ms": 928
+ },
+ {
+  "base": "Hab-1",
+  "variant": "heat off + radio off",
+  "status": "OK",
+  "n": 6,
+  "order": [
+   "ST01",
+   "ST04",
+   "ST02",
+   "ST03",
+   "ST06",
+   "ST05"
+  ],
+  "value": 470,
+  "durationMin": 300.85217620240167,
+  "binding": "Limited by EVA duration at the return to HAB (+10% would add 85 science value)",
+  "dropped": {
+   "walkback_speed_factor": 1,
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 276
+ },
+ {
+  "base": "PR-1",
+  "variant": "baseline",
+  "status": "OK",
+  "n": 6,
+  "order": [
+   "ST04",
+   "ST02",
+   "ST03",
+   "ST06",
+   "ST07",
+   "ST05"
+  ],
+  "value": 475,
+  "durationMin": 243.25204842344203,
+  "binding": "Limited by comm LOS gap at ST01 (−2 min)",
+  "dropped": {
+   "los_gap_max_min": 1,
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 846
+ },
+ {
+  "base": "PR-1",
+  "variant": "heat budget 530 W",
+  "status": "OK",
+  "n": 7,
+  "order": [
+   "ST01",
+   "ST04",
+   "ST02",
+   "ST03",
+   "ST07",
+   "ST06",
+   "ST05"
+  ],
+  "value": 555,
+  "durationMin": 274.91748796083544,
+  "binding": "Limited by walk radius at ST10 (−3 min)",
+  "dropped": {
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 802
+ },
+ {
+  "base": "PR-1",
+  "variant": "heat limit off",
+  "status": "OK",
+  "n": 7,
+  "order": [
+   "ST01",
+   "ST04",
+   "ST02",
+   "ST03",
+   "ST07",
+   "ST06",
+   "ST05"
+  ],
+  "value": 555,
+  "durationMin": 274.6905457506497,
+  "binding": "Limited by walk radius at ST10 (−3 min)",
+  "dropped": {
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 69
+ },
+ {
+  "base": "PR-1",
+  "variant": "radio gap 20 min",
+  "status": "OK",
+  "n": 7,
+  "order": [
+   "ST05",
+   "ST06",
+   "ST07",
+   "ST03",
+   "ST02",
+   "ST04",
+   "ST01"
+  ],
+  "value": 555,
+  "durationMin": 302.6340407872142,
+  "binding": "Limited by walk radius at ST10 (−3 min)",
+  "dropped": {
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 818
+ },
+ {
+  "base": "PR-1",
+  "variant": "radio gap rule off",
+  "status": "OK",
+  "n": 7,
+  "order": [
+   "ST05",
+   "ST06",
+   "ST07",
+   "ST03",
+   "ST02",
+   "ST04",
+   "ST01"
+  ],
+  "value": 555,
+  "durationMin": 302.6340407872142,
+  "binding": "Limited by walk radius at ST10 (−3 min)",
+  "dropped": {
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 845
+ },
+ {
+  "base": "PR-1",
+  "variant": "walk-back factor 0.67",
+  "status": "OK",
+  "n": 6,
+  "order": [
+   "ST04",
+   "ST02",
+   "ST03",
+   "ST06",
+   "ST07",
+   "ST05"
+  ],
+  "value": 475,
+  "durationMin": 243.25204842344203,
+  "binding": "Limited by comm LOS gap at ST01 (−2 min)",
+  "dropped": {
+   "los_gap_max_min": 1,
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 1562
+ },
+ {
+  "base": "PR-1",
+  "variant": "shelter limit 45 min",
+  "status": "OK",
+  "n": 6,
+  "order": [
+   "ST04",
+   "ST02",
+   "ST03",
+   "ST06",
+   "ST07",
+   "ST05"
+  ],
+  "value": 475,
+  "durationMin": 243.25204842344203,
+  "binding": "Limited by comm LOS gap at ST01 (−2 min)",
+  "dropped": {
+   "los_gap_max_min": 1,
+   "walkback_speed_factor": 1,
+   "shelter_time_max_min": 1,
+   "walk_radius_max_m": 3
+  },
+  "ms": 1422
+ },
+ {
+  "base": "PR-1",
+  "variant": "radius 3 km",
+  "status": "OK",
+  "n": 6,
+  "order": [
+   "ST04",
+   "ST02",
+   "ST03",
+   "ST06",
+   "ST07",
+   "ST05"
+  ],
+  "value": 475,
+  "durationMin": 243.25204842344203,
+  "binding": "Limited by comm LOS gap at ST01 (−2 min)",
+  "dropped": {
+   "los_gap_max_min": 1,
+   "shelter_time_max_min": 5
+  },
+  "ms": 1058
+ },
+ {
+  "base": "PR-1",
+  "variant": "heat off + radio off",
+  "status": "OK",
+  "n": 7,
+  "order": [
+   "ST01",
+   "ST04",
+   "ST02",
+   "ST03",
+   "ST07",
+   "ST06",
+   "ST05"
+  ],
+  "value": 555,
+  "durationMin": 274.6905457506497,
+  "binding": "Limited by walk radius at ST10 (−3 min)",
+  "dropped": {
+   "shelter_time_max_min": 2,
+   "walk_radius_max_m": 3
+  },
+  "ms": 77
+ }
+]

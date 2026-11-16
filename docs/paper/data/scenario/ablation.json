@@ -1,0 +1,56 @@
+{
+ "hab": [
+  [
+   "walkable cells (slope, keep-out, data)",
+   17.707775,
+   12
+  ],
+  [
+   "+ within 2 km of base",
+   9.754675,
+   9
+  ],
+  [
+   "+ within 30 min of a shelter",
+   2.855225,
+   7
+  ],
+  [
+   "+ out-and-back within surface time",
+   2.855225,
+   7
+  ],
+  [
+   "+ inside radio coverage",
+   1.557025,
+   7
+  ]
+ ],
+ "rover": [
+  [
+   "walkable cells (slope, keep-out, data)",
+   17.707775,
+   12
+  ],
+  [
+   "+ within 2 km of base",
+   9.38725,
+   9
+  ],
+  [
+   "+ within 30 min of a shelter",
+   2.855225,
+   7
+  ],
+  [
+   "+ out-and-back within surface time",
+   2.855225,
+   7
+  ],
+  [
+   "+ inside radio coverage",
+   1.557025,
+   7
+  ]
+ ]
+}

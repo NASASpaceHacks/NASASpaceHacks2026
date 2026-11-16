@@ -1,0 +1,92 @@
+\section{Candidate science stations}
+\label{app:stations}
+\Cref{tab:stations} lists the twelve candidate stations, their values and dwell times, their positions relative to both bases, and the engine's result for each in the default scenario.
+
+\begin{table*}[t]
+  \centering\footnotesize
+  \caption{The twelve candidate stations in the \code{gale-v1} site pack, each a Curiosity target positioned from the rover's waypoint on the sol it was studied. Value (0--100) is the team's science-traceability heuristic, not a NASA ranking. $\Delta z$ and distances are relative to Hab-1 (and PR-1). The last two columns give the engine's result in the default scenario.}
+  \label{tab:stations}
+  \begin{tabularx}{\textwidth}{@{}l L r r r r r l l@{}}
+    \toprule
+    ID & Curiosity target & Value & Dwell (min) & $\Delta z$ (m) & Hab-1 (km) & PR-1 (km) & From Hab-1 & From PR-1 \\
+    \midrule
+ST01 & Altadena drill site (boxwork bedrock) & 80 & 25 & -217 & 1.11 & 0.34 & EVA duration & radio gap \\
+ST02 & Monte Grande hollow: Valle de la Luna drill site & 95 & 30 & -184 & 0.91 & 0.14 & EVA duration & stop 2 \\
+ST03 & Nevado Sajama ridge-top drill site & 90 & 25 & -181 & 0.90 & 0.15 & EVA duration & stop 3 \\
+ST04 & Peace-sign ridge intersection and Laguna Miniques\ldots & 70 & 20 & -187 & 1.04 & 0.18 & EVA duration & stop 1 \\
+ST05 & Thola: dark float rock (possible meteorite) & 60 & 10 & -182 & 0.79 & 0.16 & EVA duration & stop 6 \\
+ST06 & Southern boxwork edge and contact with the\ldots & 75 & 20 & -177 & 0.79 & 0.22 & EVA duration & stop 4 \\
+ST07 & Antofagasta crater rim and Atacama sulfate block & 85 & 30 & -144 & 0.75 & 0.49 & EVA duration & stop 5 \\
+ST08 & Valle Grande: post-boxwork layered sulfate buttes\ldots & 65 & 20 & -45 & 0.72 & 1.24 & shelter time & shelter time \\
+ST09 & Kings Canyon drill site (sulfate unit) & 60 & 20 & -247 & 1.87 & 1.92 & shelter time & shelter time \\
+ST10 & Fascination Turret (upper Gediz Vallis ridge) & 70 & 25 & -296 & 2.15 & 2.07 & distance & distance \\
+ST11 & Mineral King drill site (typical sulfate unit) & 72 & 20 & -302 & 2.22 & 2.13 & distance & distance \\
+ST12 & Upper Gediz Vallis ridge float rocks (steep\ldots & 92 & 30 & -345 & 2.51 & 2.22 & distance & distance \\
+    \bottomrule
+  \end{tabularx}
+\end{table*}
+
+\section{Supporting tables}
+\label{app:tables}
+\Cref{tab:layers} lists every site-pack layer and its role, \cref{tab:bench} gives the leg-search benchmark, and \cref{tab:ablation} gives the per-cell constraint ablation discussed in \cref{sec:eval-scenario}.
+
+\begin{table*}[t]
+  \centering\footnotesize
+  \caption{Layers in the Gale site pack and the decision each one changes. ``Indicative'' layers are labelled as such in the console. All products are public domain; the manifest records product identifiers, resolution, accuracy notes and SHA-256 digests. MRO: Mars Reconnaissance Orbiter; MEX: Mars Express; MGS: Mars Global Surveyor; MSL: Mars Science Laboratory; HiRISE: High Resolution Imaging Science Experiment; CTX: Context Camera; HRSC: High Resolution Stereo Camera; MOLA: Mars Orbiter Laser Altimeter; THEMIS: Thermal Emission Imaging System; CRISM: Compact Reconnaissance Imaging Spectrometer for Mars; REMS: Rover Environmental Monitoring Station.}
+  \label{tab:layers}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.2\textwidth} >{\raggedright\arraybackslash}p{0.27\textwidth} c L@{}}
+    \toprule
+    Layer & Mission / instrument & Native res. & Role in \Marswalk \\
+    \midrule
+    Elevation, slope, normals & MRO HiRISE + CTX, MEX HRSC, MGS MOLA (USGS merged DEM) & 1\,m & Walkable cells, step grade, 3-D step length, walking energy, radio viewshed, sun relief, pressure for dose \\
+    Colour orthoimage & MRO HiRISE (78-quad colour basemap) & 0.25\,m & Base map, station context \\
+    Thermal inertia & Mars Odyssey THEMIS & 100\,m & Terrain factor in walking cost (indicative) \\
+    Sulfate, hydration signals & MRO CRISM (FRT000058A3) & 18\,m & Science context at each stop (indicative) \\
+    Sky-view fraction & derived from the DEM & 5\,m & Terrain shielding of dose (indicative) \\
+    Traverse, waypoints & MSL Curiosity (MMGIS) & ${\sim}$1\,m & Station positions, DEM check \\
+    Point-of-view images & MSL Mastcam, Navcam & native & ``What you'll see'' at each stop \\
+    Weather & MSL REMS (30 sols) & per sol & Conditions panel, season for sun geometry \\
+    Space weather & CCMC DONKI (31 WSA--ENLIL runs, 2 flares) & event & Forecast \go/\textsc{caution} banner \\
+    Sun position & Mars24 (NASA GISS) & --- & Daylight rule, lighting, heading cue \\
+    Locator & Viking MDIM 2.1 & 232\,m & ``Where on Mars'' context \\
+    \bottomrule
+  \end{tabularx}
+\end{table*}
+
+\begin{table*}[t]
+  \centering\footnotesize
+  \caption{Leg-search benchmark on the Gale grid: 40 static and 40 hidden-hazard scenarios, scored under the Pandolf--Santee cost against an independent Dijkstra oracle. Latency is the median (p50) single-machine wall-clock time for static scenarios; hazard success is the share of hidden-hazard scenarios in which the walker reaches the goal. Violations are steps into blocked cells or over the 20$^\circ$ step grade, summed over all 80 scenarios.}
+  \label{tab:bench}
+  \begin{tabular}{@{}l l S[table-format=1.3] S[table-format=6.0] S[table-format=2.1] c S[table-format=3.0]@{}}
+    \toprule
+    Search & Cost model & {Gap (\%)} & {Expanded} & {p50 (ms)} & {Hazard success} & {Violations} \\
+    \midrule
+    A$^\ast$ & Pandolf--Santee & 0.000 & 73575 & 11.2 & 100\% & 0 \\
+    Dijkstra (Dial) & Pandolf--Santee & 0.036 & 267523 & 36.0 & 100\% & 0 \\
+    Weighted A$^\ast$ ($w=1.5$) & Pandolf--Santee & 2.847 & 44839 & 8.8 & 100\% & 0 \\
+    A$^\ast$ & slope-weighted & {---} & 103593 & 31.0 & 100\% & 148 \\
+    Dijkstra (Dial) & slope-weighted & {---} & 268407 & 79.4 & 100\% & 140 \\
+    Weighted A$^\ast$ ($w=1.5$) & slope-weighted & {---} & 51228 & 14.9 & 100\% & 166 \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\begin{table}[t]
+  \centering\footnotesize
+  \caption{Constraint ablation with per-cell rules only, applied in sequence: walkable area (km$^2$) and number of the twelve stations inside it, from each base. Trajectory constraints (heat rests, accumulated radio gap, daylight, EVA duration) are not included; they are what separate the two bases.}
+  \label{tab:ablation}
+  \begin{tabular}{@{}l S[table-format=2.2] c S[table-format=2.2] c@{}}
+    \toprule
+    & \multicolumn{2}{c}{From Hab-1} & \multicolumn{2}{c}{From PR-1} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+    Rule added & {Area} & Stations & {Area} & Stations \\
+    \midrule
+    Walkable (slope, keep-out, data) & 17.71 & 12 & 17.71 & 12 \\
+    + within 2\,km of the base & 9.75 & 9 & 9.39 & 9 \\
+    + within 30\,min of a shelter & 2.86 & 7 & 2.86 & 7 \\
+    + out-and-back in surface time & 2.86 & 7 & 2.86 & 7 \\
+    + inside radio coverage & 1.56 & 7 & 1.56 & 7 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+

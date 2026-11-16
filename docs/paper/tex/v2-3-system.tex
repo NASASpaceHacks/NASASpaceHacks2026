@@ -1,0 +1,47 @@
+\section{System and problem}
+\label{sec:system}
+
+\begin{figure*}[t]
+  \centering
+  \input{fig-arch}
+  \caption{\Marswalk architecture. The habitat runs the full engine and holds the signing key. The navigator carries only the signed route package, the habitat's 32-byte public key and a small safety core, so it keeps working when the habitat is silent. The pressurized rover is a mobile EVA base and a radio relay. Earth exchanges delayed bundles that nothing safety-critical reads.}
+  \label{fig:arch}
+\end{figure*}
+
+\subsection{Setting and architecture}
+We follow NASA's Mars Design Reference Architecture (DRA) 5.0: a crew lives in a habitat and uses pressurized rovers as mobile bases \citep{drake2009dra5}. On a given sol, two suited extravehicular (EV) crewmembers walk from an \emph{EVA base}, either the habitat (Hab-1 in our scenario) or a parked pressurized rover (PR-1). The IV crewmember inside, whom the ConOps describes as performing ``the roles of IV, Flight Director, partial EVA Officer'' \citep{coan2020conops}, plans and confirms the walk. \Marswalk follows one rule: \emph{heavy in the habitat, light on the helmet, asynchronous with Earth} (\cref{fig:arch}).
+
+The habitat server (Node.js) runs the engine, signs route packages, serves site-pack data and appends every event to a log. The IV uses a map-based console. Each EV crewmember carries the navigator, a phone AR application (a full-screen visor display shares the same flight logic). Navigator and server exchange six message types as binary CBOR \citep{rfc8949} over a WebSocket on the habitat network: route push, acknowledgement, telemetry, alert, crew request and a 1\,Hz heartbeat. The link counts as \emph{down} after 3\,s of silence. Messages are queued while it is down and flushed once each on recovery.
+
+A confirmed plan becomes a \emph{route package}. The package holds the stop order, the route, latest-departure (``bingo'') times and a coarse safety grid (\cref{sec:package}). The habitat signs its canonical encoding with Ed25519 \citep{bernstein2012,rfc8032}. The navigator verifies the signature, rejects stale or tampered packages, and installs a route only after the astronaut accepts it. The signature shows that a package came from the habitat server; consoles are not authenticated, so it does not prove the IV approved it. Both ends assume they will crash, since commercial electronics on Mars are exposed to radiation. The server rebuilds route, sequence and acknowledgement state from its log on restart, and the navigator restores its checkpoint (in 263\,ms for the visor in our measurement). Earth contact is optional: delayed bundles carry forecasts, plans and logs, and neither the engine nor the navigator's safety core reads Earth data.
+
+\subsection{Plans and constraints}
+The terrain is a grid of 5\,m cells $c$ with elevation $z_c$, slope $\theta_c$ and thermal inertia $I_c$, treated as an 8-connected graph. A cell is blocked if $\theta_c>\theta_{\max}=20^\circ$, if it lies in a keep-out zone, or if its data are missing; unknown terrain is never walkable. An edge is admissible only if both ends are open, its own grade satisfies $|\Delta z|\le d_h\tan\theta_{\max}$ (where $d_h$ is the horizontal step length), and, for a diagonal step, both orthogonal neighbours are open. The step rule matters because slope computed on a smoothed $3\times3$ window can hide a steep step between two cells that each pass. A plan $\mathcal{P}=(b,t_0,\sigma,\pi)$ is an EVA base $b$, a start time, an ordered sequence $\sigma$ of distinct stations (each with value $v_i$ and dwell $\delta_i$), and a path $\pi$ from $b$ through the stations and back. Walking $\pi$ at the planning pace, with rests from the heat model (\cref{sec:heat}) and dwells at stations, yields a time-stamped trajectory $\xi(\mathcal{P})$.
+
+\Cref{tab:rules} lists the twelve constraints. Most come from public NASA EVA documents \citep{coan2020conops,kagey2023tenets,caswell2025eva,ogilvie2026marsmass,bussey2016landing}; the shelter limit comes from an analysis of Curiosity radiation data \citep{lowe2025nowcast}. Because Mars EVA flight rules are not public, we do not call these constraints flight rules. Each carries an evidence class: \textbf{M} measured, \textbf{A} analog or flight experience, \textbf{D} NASA requirement or derived from NASA documents, \textbf{E} team assumption. Eleven are hard and ten are enforced by the engine. Eight are re-checked along the trajectory by the simulator; egress and ingress set the timeline; and the keep-out is a blocked polygon. The oxygen reserve lies outside the 360-minute EVA by definition, so a plan that respects EVA duration never draws on it. Walk-back is checked at every sample as $(t-t_s)+W_b(c(t))\le A$, where $t_s$ is the start of surface time after egress, $A=300$\,min is the surface time available, and $W_b(c)$ is the time to walk from $c$ back to the base at half pace.
+
+\begin{table*}[t]
+  \centering\small
+  \caption{Constraints. Check: \emph{sim} = re-checked at every step by the simulator; \emph{mask} = blocks cells or edges in every search; \emph{timeline} = sets the time budget; \emph{none} = shown but not enforced. Evidence classes are those assigned in the software. $\dagger$ team design parameter; $\ddagger$ NASA value, averaging window our assumption.}
+  \label{tab:rules}
+  \begin{tabularx}{\textwidth}{@{}l l c l L@{}}
+    \toprule
+    Constraint & Limit & Ev. & Check & Source \\
+    \midrule
+    Maximum slope & $20^\circ$ (cell and step) & A & mask, sim & ConOps: suited crew on slopes up to $20^\circ$ \citep{coan2020conops} \\
+    Metabolic-data limit & $16.7^\circ$ & M & none & Edge of NASA suited data (30\% grade) \citep{norcross2010incline} \\
+    EVA duration & 360\,min & D & sim & ConOps: $6\pm2$\,h \citep{coan2020conops} \\
+    Egress and ingress & 60\,min & D & timeline & ConOps \citep{coan2020conops} \\
+    Contingency O$_2$ & 60\,min & D & none & Outside the 360-min EVA; never planned into \citep{coan2020conops} \\
+    Walk-back pace & $0.5\times$ nominal$^\dagger$ & E & sim & Degraded-crew return, after the Apollo walk-back limit \citep{benjamin1969apollo} \\
+    Time to shelter & 30\,min & D & mask, sim & RAD-data analysis (preprint): ${\ge}30$\,min to avoid peak SEP dose \citep{lowe2025nowcast} \\
+    Time out of radio contact & 10\,min$^\dagger$ & E & sim & Flight-operations constraint, max time without line of sight \citep{caswell2025eva} \\
+    Daylight & sun $\ge5^\circ$$^\dagger$ & E & sim & No nominal night EVAs \citep{drake2009dra5add} \\
+    Suit heat rejection & 352\,W (30-min avg.) & D$^\ddagger$ & sim & Sizing average for future suits, 1,200\,BTU/h \citep{ogilvie2026marsmass} \\
+    Distance from base & 2,000\,m & D & mask, sim & Artemis~III tenets: walking EVAs within 2\,km \citep{kagey2023tenets} \\
+    Landing-plume keep-out & 1,000\,m & D & mask & ``1000\,m radius plume ejecta hazard zone'' \citep{bussey2016landing} \\
+    \bottomrule
+  \end{tabularx}
+\end{table*}
+
+Among plans whose trajectories satisfy every hard constraint, \Marswalk maximizes total science value $\sum_{i\in\sigma}v_i$ and breaks ties by earlier return. If no plan is feasible the answer is \stayin, which satisfies every trajectory constraint trivially. This is an orienteering problem with state-dependent travel times, because rests depend on the suit's heat history, and with constraints evaluated along the whole trajectory. Beyond the plan, R4 and R5 require a binding constraint, a reason for every dropped station, bingo times, margins over time and a compact verifiable package.

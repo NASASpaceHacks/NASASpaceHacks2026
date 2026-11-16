@@ -1,0 +1,10 @@
+event,background_period,measured_drop_pct,predicted_drop_pct_two_term_ours_ROS,predicted_drop_pct_two_term_paper_ROS,predicted_drop_pct_linear_LOO,our_dB_pp,paper_dB_pp,note
+P1,BG1,4.0,4.43,5.47,5.95,4.6,5.8,
+P2,BG2,7.1,6.28,8.66,8.85,6.8,9.4,
+P3,BG3,6.5,4.52,5.15,6.05,4.8,5.5,
+P4,BG45,3.8,-0.55,2.55,-0.76,-0.6,2.6,
+P5,BG45,2.1,-2.72,-0.39,-3.54,-2.7,-0.4,
+P6,BG6,19.4,10.19,20.74,10.0,10.0,19.9,
+P7,BG7,9.8,5.86,11.65,6.2,5.1,10.7,
+P8,BG8,9.9,11.68,12.27,16.84,11.3,11.8,
+MB_P,MB_BG,4.0,8.39,8.66,,8.7,9.0,held out (Murray Buttes; BG is a proxy position; measured 4% from Ehresmann 2021)

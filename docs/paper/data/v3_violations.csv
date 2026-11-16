@@ -1,0 +1,7 @@
+set,planner,n_scenarios,n_scenarios_with_ge1_violation,pct,note,plans_violating_walk_radius_max_m,plans_violating_walkback_speed_factor,plans_violating_shelter_time_max_min,plans_violating_los_gap_max_min,plans_violating_daylight_min_sun_elev_deg,plans_violating_eva_duration_max_min,plans_violating_slope_max_deg,plans_violating_unsafe_edge_grade_gt_20deg,plans_violating_plume_keepout_m
+PR1,Marswalk plan(),200,,,not measured in results.csv; plan() returns only plans passing the engine hard rules (by construction); V4 checks 24 walks independently,,,,,,,,,
+PR1,Nearest-first with safety check,200,,,not measured; a stop is added only if the whole plan passes the same hard-rule checker (by construction),,,,,,,,,
+PR1,Naive slope-only,200,199,99.5,plans breaking >=1 rule (one plan can break several),158,182,182,187,169,182,150,150,0
+HAB1,Marswalk plan(),60,,,not measured in results.csv; plan() returns only plans passing the engine hard rules (by construction); V4 checks 24 walks independently,,,,,,,,,
+HAB1,Nearest-first with safety check,60,,,not measured; a stop is added only if the whole plan passes the same hard-rule checker (by construction),,,,,,,,,
+HAB1,Naive slope-only,60,60,100.0,plans breaking >=1 rule (one plan can break several),50,60,57,60,58,60,60,60,0

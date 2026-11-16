@@ -1,0 +1,73 @@
+\section{Route engine}
+\label{sec:engine}
+
+The engine is written in TypeScript on typed arrays and is shared by the habitat server, the navigator and the benchmark harness. \Cref{alg:plan} summarizes one planning call.
+
+\begin{algorithm*}[t]
+\caption{One planning call. Every returned plan has passed the simulator; otherwise the result is \stayin.}
+\label{alg:plan}
+\small
+\begin{algorithmic}[1]
+\If{an onboard SEP nowcast is active} \Return a direct return to the nearest shelter \EndIf
+\State compute daylight and surface deadlines; \textbf{if} either precedes $t_0$ \textbf{then return} \stayin
+\State build the blocked mask; compute the fields $W_b$, $S$, $O$ and radio line of sight (cached) \Comment{\cref{sec:fields}}
+\State prune stations (blocked, beyond 2\,km, beyond 30\,min of shelter, static walk-back); keep the 15 highest-valued
+\State compute pairwise legs with one-to-many searches on the route mask
+\State run the subset DP with Pareto labels $(t,H,\gamma)$; rank feasible subsets by value, then by return time \Comment{\cref{sec:dp}}
+\For{the DP's earliest-return order of each of the top 20 subsets, then every feasible single station}
+  \State simulate step by step; \textbf{if} every enforced hard rule passes \textbf{then return} the plan and its explanations
+\EndFor
+\State \Return \stayin, with a reason for every station and, if a rover exists, the result of staging from it
+\end{algorithmic}
+\end{algorithm*}
+
+\subsection{Suited walking cost}
+\label{sec:cost}
+Metabolic power follows the Pandolf load-carriage equation \citep{pandolf1977} with the Santee downhill correction \citep{santee2001}, the formulation NASA Johnson Space Center has adapted for EVA traverse planning \citep{kim2024metabolic}. With body mass $W$, carried load $L$ (suit and tools), speed $V$, grade $G$ in percent and terrain factor $\eta$,
+\begin{align}
+  M_P &= 1.5\,W + 2.0\,(W+L)\left(L/W\right)^{2} \nonumber\\
+      &\quad + \eta\,(W+L)\left(1.5\,V^{2} + 0.35\,V G\right), \label{eq:pandolf}\\
+  M_{1g} &= M_P - \eta\Big[\tfrac{G(W+L)V}{3.5} - \tfrac{(W+L)(G+6)^{2}}{W} \nonumber\\
+      &\qquad + 25 - V^{2}\Big] \quad (G<0), \label{eq:santee}\\
+  M_{\text{Mars}} &= \left(\gmars/g_{\oplus}\right) M_{1g}, \quad \gmars/g_{\oplus} \approx 0.378, \label{eq:gscale}
+\end{align}
+in watts, with masses in kilograms and speed in m/s; $M_{1g}=M_P$ for $G\ge0$, and $\gmars/g_\oplus=3.711/9.807$. The default crew has $W=80$\,kg and $L=131$\,kg (a 121\,kg suit, as in NASA's suited partial-gravity tests \citep{norcross2010incline}, plus 10\,kg of tools), at a planning pace of $v_0=0.56$\,m/s. Step grade and three-dimensional length come from the DEM, and pace is held constant, so terrain changes power, heat and rest time rather than speed. Thermal inertia maps to $\eta=1.0$ ($I\ge350$), 1.2 ($100\le I<350$) or 2.1 ($I<100$\,J\,m$^{-2}$\,K$^{-1}$\,s$^{-1/2}$), a team assumption. On Mars, level walking costs 511\,W, a 10\% uphill grade 668\,W and a 20\% grade 824\,W.
+
+Two limits of this model matter. First, Mars gravity (0.38\,$g$) and grades above 30\% are outside the data we compare with (\cref{sec:eval-models}). Second, 474\,W of the 511\,W comes from Pandolf's standing and load terms scaled by gravity. Our load ratio $L/W=1.64$ is far beyond the backpack loads the equation was fitted on, and a pressurized suit is not carried like a backpack. The heat governor therefore does not use the model at zero speed: rest and station-task power are set to 250\,W, a team assumption below the model's own standing value.
+
+\subsection{Suit heat-rejection governor}
+\label{sec:heat}
+NASA sizes future planetary suits for an average of 1,200\,BTU/h (352\,W), with a design maximum near 530\,W \citep{ogilvie2026marsmass,lobmeyer2025mxplss}; evaporative cooling at Mars pressure still needs testing \citep{ogilvie2026plss,bue2013hofi}. We found no public source for the averaging window, so we impose $B=352$\,W on an exponentially weighted average $H$ of metabolic power with time constant $\tau=30$\,min (a team assumption). Working for $\Delta t$ at power $P$ and resting for $t_r$ at $P_{\text{rest}}=250$\,W update it as
+\begin{align}
+  H &\leftarrow P + (H-P)\,e^{-\Delta t/\tau}, \nonumber\\
+  H &\leftarrow P_{\text{rest}} + (H-P_{\text{rest}})\,e^{-t_r/\tau}.
+\end{align}
+Before a chunk with $P>B$, the governor computes the largest starting heat that ends the chunk at the budget, $h^\ast=P+(B-P)\,e^{\Delta t/\tau}$, and rests for $t_r=\tau\ln[(H-P_{\text{rest}})/(h^\ast-P_{\text{rest}})]$ if $H>h^\ast$. The chunk is infeasible if $h^\ast\le P_{\text{rest}}$. Because $H$ relaxes monotonically within a chunk, staying within budget at chunk ends implies staying within budget throughout. The rule inserts the shortest rest that keeps the average within budget at each chunk end; we have not proven that it minimizes total time. Leg duration and ending heat do not decrease with starting heat, which makes the dominance pruning in \cref{sec:dp} valid. Level walking at 511\,W exceeds the budget, so heat rejection sets the sustainable pace on long legs. The initial heat state is 250\,W at the start of an EVA and is set to the budget, conservatively, when re-planning mid-EVA.
+
+\subsection{Safety fields}
+\label{sec:fields}
+Four fields are computed once per site, base and rule set: walk-back time $W_b(c)$ to the base at half pace, time to the nearest shelter $S(c)$ at full pace (habitat or any rover), outbound time $O(c)$, and radio line of sight. The searches use Dijkstra's algorithm \citep{dijkstra1959} with Dial's bucket queue \citep{dial1969} on integer-decisecond edge costs, over $10^6$ cells. Line of sight is a max-angle sweep from the habitat mast and a relay mast on each rover (3\,m masts, 1.8\,m antenna; the rover relay is our assumption). It covers 14.6\% of the Gale area and ignores curvature (about 1\,m of drop at 2.5\,km), refraction and Fresnel clearance, so grazing paths are optimistic. Daylight comes from a Mars24 port \citep{allison2000,allison1997}; sol 412 is notional, so the engine assumes a solar longitude of 240$^\circ$ and says so.
+
+The walk-back and shelter fields are travel times \emph{without} heat rests. Under the model, walking costs 511\,W at full pace and 483\,W at half pace on level ground, both above the budget. At the full-pace steady-state duty factor $(P-P_{\text{rest}})/(B-P_{\text{rest}})=2.56$, a 15-minute return to shelter would take about 38 minutes. We therefore assume that in a contingency the crew may exceed the nominal heat budget for the duration of the return. On level ground and gentle grades that stays within the suit's roughly 530\,W design maximum, but on steeper climbs it does not.
+
+\subsection{Station selection}
+\label{sec:dp}
+After pruning, one-to-many searches on a route mask give an asymmetric matrix of legs, each with per-edge time and power and runs in and out of radio contact. A dynamic program over (subset, last station) \citep{bellman1962,heldkarp1962} keeps Pareto labels over departure time $t$, heat state $H$ and the time $\gamma$ already spent out of radio contact, as in resource-constrained shortest-path algorithms \citep{feillet2004,irnich2005}. Dominance pruning is valid because every check is monotone in these variables. On 320 random instances with up to seven stations, the DP equals brute-force enumeration of every order of every subset.
+
+``Exact'' has a precise, limited meaning here. The DP is exact for choosing a subset and order of stations when each leg is fixed to the path precomputed for that pair. Its mid-leg walk-back and radio-gap checks use rest-free times, so it solves an optimistic relaxation. The simulator then tests the earliest-return order of each of the 20 highest-valued subsets. Alternative paths, other orders of the same subset, and candidates beyond the 15 highest-valued are not tried.
+
+\subsection{Re-checking and \stayin}
+\label{sec:sim}
+The simulator replays the chosen path cell by cell, with rests and dwells in steps of at most one minute. At every sample it re-checks slope, distance from base, walk-back, time to shelter, accumulated radio gap, sun elevation, heat state and EVA duration. It shares fields and cost code with the planner but none of the DP's bookkeeping, so it catches search errors rather than model errors. A plan is returned only if every check passes; otherwise the result is \stayin. A property test over 1,000 random terrains, rule values, cuts, hazards and nowcasts found that every result was either \stayin or a plan that passed independent re-verification; 227 of the 1,000 cases produced plans.
+
+\subsection{Explanations}
+\label{sec:explain}
+The \emph{binding constraint} comes from a counterfactual heuristic. The engine re-solves the DP with each enforced rule relaxed by 10\% and reports the rule whose relaxation gains the most science value. A 10\% step means different things for different rules, and single-rule relaxation misses limits that bind jointly (\cref{sec:eval-scenario}). Every dropped station gets a reason and a deficit (``ST07 dropped: EVA duration, $-160$\,min''). Bingo times give the latest departure from each stop, and burndowns record margins about once a minute. If a plan from the habitat yields \stayin and a rover exists, the engine also plans from the rover and reports what that allows. For any infeasible stop the operator picks, it simulates the cheapest out-and-back walk and reports where and by how much a rule breaks.
+
+\subsection{Radiation and space weather}
+\label{sec:spacewx}
+The route dose is reported as indicative and is not constrained. The absorbed dose rate follows \citet{guo2015}, $D=267-0.13\,(p-840)-0.11\,\Phi$\,µGy/day, with surface pressure $p$ (Pa) referenced to 910\,Pa at $-4{,}500$\,m from measured REMS data, an assumed solar modulation potential $\Phi=600$\,MV, and the dose-equivalent factor 3.05 implied by \citet{hassler2014}. Terrain shielding uses the two-term form of \citet{guo2026}, $(1-f)(1-w\beta)+f(1+\beta)$. Here $\beta$ is the obstructed-sky fraction, $f=0.21$ lies within the paper's albedo share, and $w=1.377$ is a weighting we derived from its tables. Terrain is never treated as shelter, since the largest measured drop is 19\%. Space weather has three tiers. WSA--ENLIL forecasts give a go or caution call for the EVA date. Flare alerts relayed from Earth arrive 3--22 minutes late and serve as a heads-up. Only a nowcast, a rise of at least 25\% in the onboard dose rate, triggers \textsc{return now}. A retrospective RAD analysis supports a working lead time of 30\,min \citep{lowe2025nowcast}, which is why time to shelter must stay within 30\,min everywhere on the route.
+
+\subsection{Route package and safety core}
+\label{sec:package}
+The package encodes the route as a chain code (one byte per step) together with stops, bingo times and a 50\,m coarse grid (100\,$\times$\,100 blocks). Each block stores the \emph{maximum} walk-back and shelter time over its cells, rounded up, so coarse lookups are conservative for the true position; radio coverage is one bit per block. The package is canonical CBOR compressed with DEFLATE. The six-stop Gale plan encodes to 11,062\,bytes in a unit test, and the signed package in the end-to-end run was 10,994\,bytes, both within a 25\,kB budget. The navigator's safety core is built from the package alone. Each update finds the nearest route index in a bounded window, looks up margins and returns \textsc{return now}, \textsc{caution} (under 15\,min of walk-back margin) or nominal. Updates allocate no memory and took 0.56\,µs in one unit-test run. Lookups are not yet inflated by position uncertainty.
