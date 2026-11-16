@@ -1,0 +1,62 @@
+[
+ {
+  "n": 1,
+  "id": "title",
+  "title": "Marswalk",
+  "appendix": false
+ },
+ {
+  "n": 2,
+  "id": "problem",
+  "title": "Problem",
+  "appendix": false
+ },
+ {
+  "n": 3,
+  "id": "gaps",
+  "title": "Nobody routes humans on Mars",
+  "appendix": false
+ },
+ {
+  "n": 4,
+  "id": "how",
+  "title": "Plan in the habitat. Follow in the helmet.",
+  "appendix": false
+ },
+ {
+  "n": 5,
+  "id": "demo",
+  "title": "Live demo",
+  "appendix": false
+ },
+ {
+  "n": 6,
+  "id": "research",
+  "title": "Humans need a different cost function than rovers",
+  "appendix": false
+ },
+ {
+  "n": 7,
+  "id": "research2",
+  "title": "One 5 m step: walking time, stretched by cooling rests",
+  "appendix": false
+ },
+ {
+  "n": 8,
+  "id": "hardware",
+  "title": "A helmet that navigates without GPS",
+  "appendix": false
+ },
+ {
+  "n": 9,
+  "id": "software",
+  "title": "Heavy in the habitat, light on the helmet",
+  "appendix": false
+ },
+ {
+  "n": 10,
+  "id": "qna",
+  "title": "Q&A",
+  "appendix": false
+ }
+]

@@ -1,0 +1,17 @@
+<script>
+/* links from js/config.js: <a data-link="video"> etc. Empty → disabled + "soon" */
+(function () {
+  var L = window.MW_LINKS || {};
+  document.querySelectorAll('[data-link]').forEach(function (a) {
+    var url = L[a.getAttribute('data-link')];
+    if (url) { a.href = url; if (/^https?:/.test(url)) { a.target = '_blank'; a.rel = 'noopener'; } }
+    else { a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); a.title = 'Coming soon';
+      if (!a.querySelector('.soon')) { var s = document.createElement('span'); s.className = 'soon'; s.textContent = 'soon'; a.appendChild(s); } }
+  });
+  /* reveal on scroll */
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>

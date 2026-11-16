@@ -1,0 +1,77 @@
+<section class="section" id="limits">
+<style>
+#limits .say { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 36px; }
+#limits .chk { display: grid; grid-template-columns: 220px minmax(0,1fr) minmax(0,1fr); gap: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-bottom: 12px; background: linear-gradient(180deg, rgba(36,19,16,.55), rgba(18,9,7,.55)); transition: border-color .4s; }
+#limits .chk:hover { border-color: var(--line-2); }
+#limits .chk > div { padding: 24px 26px; }
+#limits .cols { display: grid; grid-template-columns: 220px minmax(0,1fr) minmax(0,1fr); padding: 0 0 12px; }
+#limits .cols span { padding: 0 26px; }
+#limits .cols .hud-label:nth-child(2) { padding-left: 0; }
+#limits .what { font-weight: 600; font-size: 15.5px; line-height: 1.35; }
+#limits .what small { display: block; font: 400 11px/1.5 var(--font-hud); letter-spacing: .1em; text-transform: uppercase; color: var(--hud); margin-bottom: 6px; }
+#limits .res { font-size: 14.5px; color: var(--cream); line-height: 1.55; border-left: 1px solid var(--line); }
+#limits .res .k { display: block; font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: 26px; line-height: 1.1; color: var(--hud); margin-bottom: 6px; letter-spacing: -.01em; }
+#limits .lim { font-size: 14.5px; color: var(--mute); line-height: 1.55; border-left: 1px solid var(--line); background: rgba(10,6,5,.35); }
+#limits .lbl { display: none; margin-bottom: 8px; }
+#limits .other { margin-top: clamp(56px,8vw,96px); display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.6fr); gap: clamp(24px,5vw,72px); }
+#limits .other h3 { font-size: clamp(28px,3.4vw,44px); }
+#limits .other ul { list-style: none; margin: 0; padding: 0; display: grid; }
+#limits .other li { position: relative; padding: 16px 0 16px 30px; border-top: 1px solid var(--line); font-size: 15.5px; color: var(--mute); line-height: 1.55; }
+#limits .other li:last-child { border-bottom: 1px solid var(--line); }
+#limits .other li::before { content: ""; position: absolute; left: 4px; top: 25px; width: 8px; height: 8px; border: 1.5px solid var(--sky); border-radius: 50%; }
+#limits .other li b { color: var(--cream); font-weight: 600; }
+@media (max-width: 860px) {
+  #limits .cols { display: none; }
+  #limits .chk { grid-template-columns: 1fr; }
+  #limits .chk > div { padding: 18px 20px; }
+  #limits .res, #limits .lim { border-left: 0; border-top: 1px solid var(--line); }
+  #limits .lbl { display: block; }
+  #limits .other { grid-template-columns: 1fr; }
+}
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Limits</span></div>
+    <h2 class="display sec-title">What we checked, <em>and what we didn&rsquo;t.</em></h2>
+    <p class="sec-lede">We say <b>&ldquo;calibrated&rdquo;</b> and <b>&ldquo;reproduces&rdquo;</b>. We do not say &ldquo;validated&rdquo;, and nothing here has been tested with suited people. Each check sits next to its limit.</p>
+  </header>
+
+  <div class="cols hud-label"><span>Check</span><span class="is-hud">Result</span><span class="is-alert" style="color:var(--sky)">Limit</span></div>
+  <div id="limits-rows"></div>
+
+  <div class="other">
+    <h3 class="display reveal">Other <em>limits.</em></h3>
+    <ul class="reveal d1">
+      <li><b>Simulation only.</b> No field test and no suited-human test.</li>
+      <li><b>Our assumptions, labelled in the app:</b> mapping thermal inertia to walking effort, the dose constants, and the rover radio relay.</li>
+      <li><b>Science values are ours.</b> The 12 stops are real, cited Curiosity targets, but their 0&ndash;100 science values are our team&rsquo;s scoring, not NASA rankings.</li>
+      <li><b>REMS reading is the latest outreach-feed value,</b> not the scenario sol. Sol 412 predates the feed, so the season falls back to an assumed Ls 240.</li>
+      <li><b>The AR navigator is a phone app,</b> not suit hardware, and the link is local Wi-Fi. A phone stands in for the helmet display.</li>
+      <li><b>The 12 constraints are drawn from public NASA EVA documents,</b> each cited. They are not NASA flight rules, and nothing here says a route is safe for crew.</li>
+      <li><b>No NASA relationship,</b> and no claim of hours of planning saved: there is no published baseline.</li>
+    </ul>
+  </div>
+</div>
+<script>
+(function () {
+  var R = [
+    ['V1 &middot; Radiation shielding', 'Terrain shielding reproduces Guo et al. 2026 obstructed-sky values', 'MAE 2.0 pp &middot; r 0.94 &middot; 15 comparisons', 'The metric was chosen after seeing the data (one of three readings), and disclosed. One rover, 8 events.'],
+    ['V2 &middot; Walking energy', 'Calibrated on NASA IST-2 suited data (Norcross 2010)', '10.6% mean error at 0.22&ndash;0.32 g', '36% error at 0.12&ndash;0.17 g; 20.8% overall. Mars at 0.38 g is an extrapolation: no data there.'],
+    ['V5 &middot; Radiation dose', 'Within 4% of Curiosity&rsquo;s measured year-1 mean', '198.8 vs 207.8 &micro;Gy/day &middot; 131 sols, SEP days removed', 'Largely in-sample (the published model was fitted on early RAD data). &minus;9% at the scenario season with our constants. Measured dose spans 167&ndash;296 &micro;Gy/day over the solar cycle, so route doses are &plusmn;30%. The daily pressure effect was not reproduced.'],
+    ['V4 &middot; Three-way cross-check', 'Engine, an independent Python checker and blind AI judges agree', '23 of 24 walks &middot; the one difference is a safe-side NO-GO', 'The difference (W02) is 0.22 min over the radio limit. The AI judges check rule application, not the models: consistency, not truth.'],
+    ['Search', 'A* matches an independent oracle; stop selection matches brute force', '0.000% gap on 80 real-terrain cases &middot; exact on 320', 'The uncertainty sits in the models, not the search.'],
+    ['Terrain', 'Checked against surveyed rover positions', '372 Curiosity positions: median &minus;0.001 m, &sigma; 0.19 m', 'Jezero: 220 Perseverance positions, &sigma; 0.07 m.']
+  ];
+  var h = document.getElementById('limits-rows');
+  if (!h) return;
+  h.innerHTML = R.map(function (r, i) {
+    return '<div class="chk reveal' + (i % 2 ? ' d1' : '') + '"><div class="what"><small>' + r[0] + '</small>' + r[1] + '</div>' +
+      '<div class="res"><span class="hud-label is-hud lbl">Result</span><span class="k">' + r[2].split(' &middot; ')[0] + '</span>' + (r[2].split(' &middot; ').slice(1).join(' &middot; ')) + '</div>' +
+      '<div class="lim"><span class="hud-label lbl" style="color:var(--sky)">Limit</span>' + r[3] + '</div></div>';
+  }).join('');
+  /* reveal for dynamically added rows */
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+  h.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+})();
+</script>
+</section>

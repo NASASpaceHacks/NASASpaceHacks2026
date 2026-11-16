@@ -1,0 +1,90 @@
+<section class="section" id="problem" aria-labelledby="problem-title">
+<style>
+#problem .link{position:relative;margin:0 0 clamp(40px,6vw,72px);padding:clamp(28px,4vw,48px) clamp(20px,3vw,40px) 26px}
+#problem .track{position:relative;height:90px;margin:26px 0 8px}
+#problem .track::before{content:"";position:absolute;left:34px;right:34px;top:50%;height:1px;background:linear-gradient(90deg,var(--sky),var(--ghost) 30%,var(--ghost) 70%,var(--rust));}
+#problem .track::after{content:"";position:absolute;left:34px;right:34px;top:50%;height:1px;background:repeating-linear-gradient(90deg,var(--bg-gap,var(--space)) 0 6px,transparent 6px 14px);opacity:.7}
+#problem .body{position:absolute;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:50%}
+#problem .earth{left:8px;background:radial-gradient(circle at 35% 30%,#cfe3f7,var(--sky) 55%,#3d5f86);box-shadow:0 0 28px rgba(143,178,217,.55)}
+#problem .mars{right:8px;width:34px;height:34px;margin-top:-17px;background:radial-gradient(circle at 35% 30%,#e0795f,var(--rust) 55%,var(--rust-deep));box-shadow:0 0 30px rgba(181,67,44,.5)}
+#problem .pulse{position:absolute;top:50%;left:34px;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--hud);box-shadow:0 0 0 4px rgba(127,224,166,.15),0 0 22px 4px rgba(127,224,166,.7);animation:problem-fly 9s linear infinite}
+#problem .pulse.back{background:var(--sky);box-shadow:0 0 0 4px rgba(143,178,217,.15),0 0 20px 3px rgba(143,178,217,.6);animation-name:problem-back;animation-delay:-4.5s}
+@keyframes problem-fly{from{left:34px;opacity:0}8%{opacity:1}92%{opacity:1}to{left:calc(100% - 34px);opacity:0}}
+@keyframes problem-back{from{left:calc(100% - 34px);opacity:0}8%{opacity:1}92%{opacity:1}to{left:34px;opacity:0}}
+#problem .names{display:flex;justify-content:space-between;font-family:var(--font-hud);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+#problem .readout{display:flex;flex-wrap:wrap;gap:12px 40px;align-items:baseline;justify-content:center;margin-top:24px;padding-top:22px;border-top:1px solid var(--line)}
+#problem .rd b{display:block;font:300 clamp(34px,4.6vw,56px)/1 var(--font-hud);color:var(--hud);font-variant-numeric:tabular-nums;text-shadow:0 0 24px rgba(127,224,166,.35)}
+#problem .rd b small{font-size:.38em;color:var(--mute);margin-left:6px;letter-spacing:.1em}
+#problem .rd.rt b{color:var(--cream)}
+#problem .beats{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.4vw,32px);margin-bottom:clamp(64px,9vw,112px)}
+#problem .beat{padding:clamp(24px,3vw,36px)}
+#problem .big{display:block;font:200 clamp(44px,6vw,84px)/1 var(--font-display);font-stretch:125%;letter-spacing:-.02em;color:var(--dust);margin:14px 0 14px}
+#problem .big.g{color:var(--hud);font-size:clamp(28px,2.7vw,40px);line-height:1.08;padding-top:.15em}
+#problem .beat p{margin:0;color:var(--mute);font-size:16px}
+#problem .quotes{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,64px);margin-bottom:clamp(56px,8vw,96px)}
+#problem blockquote{margin:0;padding:0 0 0 26px;border-left:1px solid var(--hud-dim)}
+#problem blockquote p{margin:0 0 18px;font:300 clamp(19px,1.9vw,25px)/1.45 var(--font-display);font-stretch:112%;color:var(--cream)}
+#problem blockquote p mark{background:none;color:var(--dust)}
+#problem .today h3{margin:0 0 20px}
+#problem .tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+#problem .tcell{background:var(--space-2);padding:22px 22px 24px}
+#problem .tcell h4{margin:10px 0 6px;font:500 17px/1.25 var(--font-body);color:var(--cream)}
+#problem .tcell p{margin:0;font-size:14.5px;color:var(--mute);line-height:1.5}
+#problem .tcell.us{background:linear-gradient(180deg,rgba(20,52,34,.5),var(--space-2))}
+@media(max-width:900px){#problem .beats,#problem .quotes{grid-template-columns:1fr}#problem .tgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){#problem .tgrid{grid-template-columns:1fr}#problem .names span:nth-child(2){display:none}}
+</style>
+<div class="wrap">
+  <div class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">01 · The problem</span></div>
+    <h2 class="display sec-title" id="problem-title">Earth is <em>22 light-minutes</em> away.</h2>
+    <p class="sec-lede">On Mars nobody can phone mission control mid-walk. The signal takes minutes each way, and for about two weeks around solar conjunction <b>it cannot get through at all</b>.</p>
+  </div>
+
+  <div class="glass link reveal d1" role="img" aria-label="A signal pulse travelling between Earth and Mars; one-way light time varies between 3 and 22 minutes">
+    <i class="brk"></i>
+    <div class="names"><span>Earth</span><span>Signal at the speed of light</span><span>Mars</span></div>
+    <div class="track"><span class="body earth"></span><span class="pulse"></span><span class="pulse back"></span><span class="body mars"></span></div>
+    <div class="readout">
+      <div class="rd"><span class="hud-label">One-way light time</span><b><span id="problem-ow">12.5</span><small>MIN</small></b></div>
+      <div class="rd rt"><span class="hud-label">Ask, then wait for the answer</span><b><span id="problem-rt">25.0</span><small>MIN</small></b></div>
+    </div>
+  </div>
+
+  <div class="beats">
+    <div class="card beat reveal"><span class="hud-label is-hud">Round trip</span><span class="big hud-num" style="font-family:var(--font-display)">6–44<span style="font-size:.4em;color:var(--mute)"> min</span></span><p>Every question to Earth costs a coffee break, or most of an hour.</p></div>
+    <div class="card beat reveal d1"><span class="hud-label is-alert">Solar conjunction</span><span class="big">~2<span style="font-size:.4em;color:var(--mute)"> weeks</span></span><p>With the Sun in between, Mars cannot be reached. Blackout.</p></div>
+    <div class="card beat reveal d2"><span class="hud-label is-hud">The consequence</span><span class="big g">So the crew plans its own walks.</span><p>The planner has to live on Mars, next to the habitat.</p></div>
+  </div>
+
+  <div class="quotes">
+    <blockquote class="reveal"><p>“The crew will likely be <mark>more involved in planning their EVAs</mark> than as is currently done on ISS… crew input, ground based planners, and automated planning tools.”</p><span class="hud-label">NASA xEVA System ConOps · EVA-EXP-0042 Rev B · §8.1</span></blockquote>
+    <blockquote class="reveal d1"><p>“Earth independence starts by giving crew members, particularly during EVA, the capacity to <mark>make informed decisions</mark>… upon locally sourced information.”</p><span class="hud-label">NASA NTRS 20230014957</span></blockquote>
+  </div>
+
+  <div class="today reveal">
+    <h3 class="hud-label">What exists today</h3>
+    <div class="tgrid">
+      <div class="tcell"><span class="hud-label">Viewers</span><h4>Mars Trek · MMGIS</h4><p>Excellent maps. They show terrain; they do not plan a walk.</p></div>
+      <div class="tcell"><span class="hud-label">Ground planning</span><h4>AEGIS · EMSS</h4><p>Plans Artemis EVAs for flight controllers on the ground.</p></div>
+      <div class="tcell"><span class="hud-label">Energy paths</span><h4>SEXTANT · MoonPath</h4><p>Efficient routes, but no explicit set of EVA constraints.</p></div>
+      <div class="tcell"><span class="hud-label">Hackathon peers</span><h4>81 of 135</h4><p>Space Apps 2026 READMEs surveyed use slope-only A* or Dijkstra.</p></div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var ow=document.getElementById('problem-ow'),rt=document.getElementById('problem-rt');
+  if(!ow)return;
+  function set(v){ow.textContent=v.toFixed(1);rt.textContent=(v*2).toFixed(1);}
+  set(12.5);
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var t0=performance.now(),vis=true;
+  new IntersectionObserver(function(e){vis=e[0].isIntersecting;}).observe(ow);
+  (function tick(now){
+    if(vis){var p=((now-t0)/1000)/24*Math.PI*2;set(12.5+9.5*Math.sin(p));}
+    requestAnimationFrame(tick);
+  })(t0);
+})();
+</script>
+</section>

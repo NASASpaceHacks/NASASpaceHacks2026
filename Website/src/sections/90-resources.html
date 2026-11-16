@@ -1,0 +1,86 @@
+<section class="section" id="resources">
+<style>
+#resources .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+#resources .film { grid-column: span 4; grid-row: span 3; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+#resources .screen { position: relative; aspect-ratio: 16/9; background: #000 center/cover no-repeat; display: block; text-decoration: none; overflow: hidden; }
+#resources .screen::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,6,5,.15), rgba(11,6,5,.75)); }
+#resources .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
+#resources .film:hover .screen img { transform: scale(1.04); }
+#resources .screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+#resources .play { position: absolute; left: 50%; top: 50%; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 50%; display: grid; place-items: center; background: var(--glass); border: 1px solid var(--glass-edge); backdrop-filter: blur(10px); color: var(--hud); z-index: 1; }
+#resources .play svg { width: 28px; height: 28px; margin-left: 4px; }
+#resources .screen .tag { color: var(--cream); position: absolute; left: 22px; bottom: 18px; z-index: 1; }
+#resources .film .foot, #resources .tile { padding: 24px 26px; }
+#resources .tile { grid-column: span 2; display: flex; flex-direction: column; gap: 10px; text-decoration: none; transition: border-color .4s, transform .5s var(--ease-out), background .4s; min-height: 150px; }
+#resources a.tile:hover { border-color: var(--glass-edge); transform: translateY(-3px); background: linear-gradient(180deg, rgba(20,44,32,.55), rgba(18,9,7,.7)); }
+#resources a.tile[aria-disabled="true"] { opacity: .6; pointer-events: none; }
+#resources .tile h3, #resources .film h3 { margin: 0; font-size: 21px; font-weight: 600; line-height: 1.2; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#resources .tile p, #resources .film p { margin: 0; font-size: 14.5px; color: var(--mute); }
+#resources .tile .hud-label { margin-top: auto; }
+#resources .paper-tile .tile-main { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: inherit; }
+#resources .paper-tile .sub-link { text-decoration: none; color: var(--hud); }
+#resources .paper-tile .sub-link:hover { color: var(--cream); }
+#resources .tile .arrow { width: 18px; height: 18px; color: var(--hud); flex: none; transition: transform .3s var(--ease-out); }
+#resources a.tile:hover .arrow { transform: translate(3px,-3px); }
+#resources .tile .soon { align-self: flex-start; font: 400 10px/1 var(--font-hud); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); border: 1px solid var(--line); border-radius: 99px; padding: 5px 8px; }
+#resources .run { grid-column: span 6; padding: clamp(22px,3vw,34px); display: grid; grid-template-columns: minmax(0,.7fr) minmax(0,1.5fr); gap: clamp(20px,4vw,56px); align-items: center; }
+#resources .run h3 { margin: 8px 0 8px; font-size: 24px; font-weight: 600; }
+#resources .run p { margin: 0; color: var(--mute); font-size: 14.5px; }
+#resources .code { position: relative; background: rgba(4,12,8,.7); border: 1px solid var(--glass-edge); border-radius: 12px; padding: 20px 20px 20px 22px; padding-right: 120px; font: 400 13px/1.7 var(--font-hud); color: var(--hud); }
+#resources .code code { font: inherit; display: block; word-break: break-word; }
+#resources .code .pr { color: var(--faint); user-select: none; }
+#resources .copy { position: absolute; top: 12px; right: 12px; height: 36px; padding: 0 14px; font-size: 12px; --h: 36px; }
+#resources .copy.done { background: var(--hud); color: #04140b; border-color: var(--hud); }
+@media (max-width: 1000px) { #resources .film { grid-column: span 6; grid-row: auto; } #resources .tile { grid-column: span 3; } #resources .run { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { #resources .tile { grid-column: span 6; min-height: 0; } #resources .code { padding-right: 20px; padding-bottom: 66px; } #resources .copy { top: auto; bottom: 12px; } #resources .play { width: 64px; height: 64px; margin: -32px 0 0 -32px; } }
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Resources</span></div>
+    <h2 class="display sec-title">Everything, <em>in one place.</em></h2>
+    <p class="sec-lede">The film, the code, the slides, the research and a way to run it yourself.</p>
+  </header>
+  <div class="grid">
+    <article class="card film reveal">
+      <a class="screen" id="res-screen" data-link="video" aria-label="Watch the 30-second film">
+        <img src="assets/img/hirise-1200.jpg" alt="" loading="lazy">
+        <span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3.5v17l14-8.5z"/></svg></span>
+        <span class="hud-label is-hud tag" id="res-tag">Film coming soon</span>
+      </a>
+      <div class="foot"><h3>The 30-second film</h3><p>Plan, check, walk, lose the link, come home.</p></div>
+    </article>
+    <a class="card tile reveal d1" data-link="github"><h3>GitHub repository<svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></h3><p>Engine, console, AR navigator, tests and the validation scripts. Apache-2.0.</p><span class="hud-label">Source</span></a>
+    <a class="card tile reveal d2" data-link="slides"><h3>Slides<svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></h3><p>The 10-slide pitch: problem, live demo, research, hardware and software. View it here or download the PDF.</p><span class="hud-label">Deck</span></a>
+    <div class="card tile reveal paper-tile"><a class="tile-main" data-link="researchPaper"><h3>Research paper (PDF)<svg class="arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></h3><p>Earth-independent planning and guidance for walking EVAs on Mars: the engine, the models and the evaluation.</p></a><a class="hud-label sub-link" data-link="paper">+ Suit hardware concept study (PDF) &rarr;</a></div>
+    <div class="card run reveal">
+      <div><span class="hud-label is-hud">Run it yourself</span><h3>Clone it. Run it.</h3><p>Every number on this page comes from code in the repo, with history and tests.</p></div>
+      <div class="code"><code><span class="pr">$ </span><span id="res-cmd">git clone https://github.com/NASASpaceHacks/NASASpaceHacks2026 &amp;&amp; cd NASASpaceHacks2026 &amp;&amp; pnpm install &amp;&amp; pnpm demo</span></code>
+        <button type="button" class="btn copy" id="res-copy" aria-label="Copy command">Copy</button></div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var L = window.MW_LINKS || {};
+  var screen = document.getElementById('res-screen');
+  if (screen && L.videoEmbed) {
+    var f = document.createElement('iframe');
+    f.src = L.videoEmbed; f.title = 'Marswalk, 30-second film'; f.loading = 'lazy'; f.allowFullscreen = true;
+    f.allow = 'accelerometer; encrypted-media; picture-in-picture; fullscreen';
+    var d = document.createElement('div'); d.className = 'screen'; d.style.cssText = 'position:relative;aspect-ratio:16/9';
+    d.appendChild(f); screen.parentNode.replaceChild(d, screen);
+  } else if (screen && L.video) {
+    var t = document.getElementById('res-tag'); if (t) t.textContent = 'Watch the film';
+  }
+  var b = document.getElementById('res-copy'), c = document.getElementById('res-cmd');
+  if (!b || !c) return;
+  var tm;
+  function done() { b.textContent = 'Copied'; b.classList.add('done'); clearTimeout(tm); tm = setTimeout(function () { b.textContent = 'Copy'; b.classList.remove('done'); }, 2000); }
+  b.addEventListener('click', function () {
+    var txt = c.textContent;
+    function fb() { var r = document.createRange(); r.selectNodeContents(c); var s = getSelection(); s.removeAllRanges(); s.addRange(r); try { document.execCommand('copy'); done(); } catch (e) {} }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fb); else fb();
+  });
+})();
+</script>
+</section>

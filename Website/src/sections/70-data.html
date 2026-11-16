@@ -1,0 +1,103 @@
+<section class="section" id="data">
+<style>
+#data .kinds { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+#data .kinds .chip { height: 30px; }
+#data .kinds .chip.part { color: var(--sky); border-color: rgba(143,178,217,.4); background: rgba(10,20,34,.5); }
+#data .kinds .chip.add { color: var(--dust); border-color: var(--line-2); background: rgba(36,19,16,.5); }
+#data .kinds .chip.none { color: var(--faint); border-color: var(--line); background: transparent; }
+#data .layout { display: grid; grid-template-columns: minmax(0,1.7fr) minmax(0,1fr); gap: clamp(24px,3.5vw,48px); align-items: start; }
+#data .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 14px; }
+#data .legend span { display: inline-flex; gap: 8px; align-items: center; }
+#data .dep { display: inline-flex; gap: 3px; vertical-align: middle; }
+#data .dep i { width: 12px; height: 4px; border-radius: 2px; background: rgba(245,237,230,.13); }
+#data .dep[data-d="4"] i, #data .dep[data-d="3"] i:nth-child(-n+3), #data .dep[data-d="2"] i:nth-child(-n+2), #data .dep[data-d="1"] i:nth-child(1) { background: var(--hud); box-shadow: 0 0 8px rgba(127,224,166,.5); }
+#data .rows { display: grid; border-top: 1px solid var(--line); }
+#data .row { display: grid; grid-template-columns: 190px minmax(0,1fr) 110px; gap: 8px 28px; padding: 20px 6px; border-bottom: 1px solid var(--line); align-items: start; transition: background .4s; }
+#data .row:hover { background: rgba(127,224,166,.035); }
+#data .m { font-weight: 600; font-size: 15.5px; line-height: 1.3; }
+#data .m small { display: block; font: 400 11px/1.5 var(--font-hud); letter-spacing: .08em; color: var(--faint); text-transform: uppercase; margin-top: 4px; }
+#data .p { font-size: 14.5px; color: var(--mute); line-height: 1.5; }
+#data .p b { color: var(--cream); font-weight: 500; display: block; margin-bottom: 3px; }
+#data .p em { display: block; font: normal 400 11px/1.5 var(--font-hud); color: var(--faint); margin-top: 6px; letter-spacing: .02em; }
+#data .d { text-align: right; display: grid; gap: 6px; justify-items: end; }
+#data .d .hud-label { color: var(--hud); }
+#data .row[data-d="2"] .d .hud-label, #data .row[data-d="1"] .d .hud-label { color: var(--sky); }
+#data .side { position: sticky; top: 90px; display: grid; gap: 20px; }
+#data .shot { padding: 10px; overflow: hidden; }
+#data .shot img { width: 100%; border-radius: 8px; height: auto; }
+#data .shot figcaption { padding: 12px 6px 4px; font-size: 13px; color: var(--mute); }
+#data .check { padding: 26px; display: grid; gap: 10px; }
+#data .check .big { font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: 44px; line-height: 1; color: var(--hud); }
+#data .check p { margin: 0; font-size: 14px; color: var(--mute); }
+#data .check p b { color: var(--cream); font-weight: 600; }
+@media (max-width: 1060px) { #data .layout { grid-template-columns: 1fr; } #data .side { position: static; grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px) {
+  #data .side { grid-template-columns: 1fr; }
+  #data .row { grid-template-columns: 1fr; gap: 8px; padding: 18px 16px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 14px; background: linear-gradient(180deg, rgba(36,19,16,.6), rgba(18,9,7,.6)); }
+  #data .rows { border-top: 0; }
+  #data .d { text-align: left; justify-items: start; grid-auto-flow: column; align-items: center; gap: 10px; }
+}
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">NASA data</span></div>
+    <h2 class="display sec-title">Built on <em>six missions</em> of real data.</h2>
+    <p class="sec-lede">Orbiters, rovers and a heliophysics model, each doing a specific job in the plan. The bars show how deeply each is used: <b>deep</b> data changes the verdict, <b>display</b> data is shown but does not decide.</p>
+  </header>
+
+  <div class="kinds reveal">
+    <span class="chip go">Optical</span><span class="chip go">Topographic</span><span class="chip go">Thermal</span>
+    <span class="chip part">Spectral (partly)</span><span class="chip part">Radiation (partly)</span><span class="chip part">Atmospheric (partly)</span><span class="chip part">Geophysical (partly)</span>
+    <span class="chip add">Space weather (in addition)</span><span class="chip none plain">Chemical: not used</span>
+  </div>
+
+  <div class="layout">
+    <div class="reveal">
+      <div class="legend hud-label">
+        <span><span class="dep" data-d="4"><i></i><i></i><i></i><i></i></span> Deep</span>
+        <span><span class="dep" data-d="3"><i></i><i></i><i></i><i></i></span> Medium</span>
+        <span><span class="dep" data-d="2"><i></i><i></i><i></i><i></i></span> Display</span>
+        <span><span class="dep" data-d="1"><i></i><i></i><i></i><i></i></span> Light</span>
+      </div>
+      <div class="rows" id="data-rows"></div>
+    </div>
+    <aside class="side">
+      <div class="glass check reveal d1"><i class="brk"></i>
+        <span class="hud-label is-hud">Terrain check</span>
+        <div class="big">372</div>
+        <p>Terrain checked against <b>372 surveyed Curiosity positions</b>: median <b>&minus;0.001 m</b>, &sigma; <b>0.19 m</b>. (Jezero: 220 Perseverance positions, &sigma; 0.07 m.)</p>
+      </div>
+      <figure class="glass shot reveal d2" style="margin:0"><i class="brk"></i>
+        <img src="assets/shots/ux6-layers-panel.webp" alt="Marswalk console layers panel listing mission, instrument and resolution for each data layer" loading="lazy">
+        <figcaption>The console&rsquo;s layers panel names the mission, instrument and resolution of every row. Every product ID and checksum is in the app&rsquo;s Sources tab.</figcaption>
+      </figure>
+    </aside>
+  </div>
+</div>
+<script>
+(function () {
+  var D = [
+    ['Mars Reconnaissance Orbiter', 'HiRISE + CTX + HRSC + MOLA', 'USGS MSL Gale merged DEM, 1 m', 'Slope limit, edge grade, walking length and grade, radio line of sight, sunlight, dose shielding', 'NASA/JPL/University of Arizona; NASA/JPL/MSSS; USGS (Parker & Calef 2016)', 4, 'Deep'],
+    ['Mars Reconnaissance Orbiter', 'HiRISE', 'Colour mosaic, 0.25 m', 'Base map', 'NASA/JPL/University of Arizona', 2, 'Display'],
+    ['Mars Reconnaissance Orbiter', 'CRISM', 'FRT000058A3 summary parameters, 18 m', 'Hydrated-sulfate signal at each stop (indicative)', 'NASA/JHUAPL', 1, 'Light'],
+    ['2001 Mars Odyssey', 'THEMIS', 'Quantitative thermal inertia, 100 m', 'Terrain factor in walking energy and suit heat (indicative)', 'NASA/JPL/ASU; USGS Astrogeology mosaic', 3, 'Medium'],
+    ['Mars Science Laboratory', 'Curiosity traverse (MMGIS)', 'Traverse and waypoints', 'Real science stops; terrain check', 'NASA/JPL-Caltech', 3, 'Medium'],
+    ['Mars Science Laboratory', 'Mastcam, Navcam', 'Raw images', 'A photo at each stop, in the habitat console', 'NASA/JPL-Caltech/MSSS (Mastcam); NASA/JPL-Caltech (Navcam)', 2, 'Display'],
+    ['Mars Science Laboratory', 'RAD, REMS', 'Measured dose (PDS PPI); pressure and weather (PDS)', 'Dose model check (V5); reference pressure; weather panel', 'NASA/JPL-Caltech/SwRI (RAD); NASA/JPL-Caltech/CAB (CSIC-INTA) (REMS)', 3, 'Medium'],
+    ['Mars Global Surveyor', 'MOLA', 'Laser altimetry', 'Datum (inside the merged DEM)', 'NASA/GSFC', 1, 'Light'],
+    ['Viking', 'MDIM 2.1', 'Colour mosaic', '"Where on Mars" locator', 'NASA/USGS, via JPL Mars Trek', 1, 'Light'],
+    ['Mars 2020 (Perseverance)', 'HiRISE TRN DTM, Mastcam-Z, Navcam, MEDA', 'DTM and ortho, traverse, images, weather', 'Second site (Jezero)', 'NASA/JPL-Caltech/ASU (Mastcam-Z); NASA/JPL-Caltech; NASA/JPL-Caltech/CAB (MEDA)', 3, 'Medium'],
+    ['Heliophysics, NASA GSFC CCMC', 'DONKI', 'WSA-ENLIL CME runs and flare notices', 'Space-weather go/no-go for the EVA date', 'NASA CCMC', 4, 'Deep'],
+    ['NASA GISS', 'Mars24', 'Sun-position algorithm (Allison & McEwen 2000)', 'Daylight rule, lighting, sun position', 'NASA GISS', 3, 'Medium']
+  ];
+  var host = document.getElementById('data-rows');
+  if (!host) return;
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  host.innerHTML = D.map(function (r) {
+    return '<div class="row" data-d="' + r[5] + '"><div class="m">' + esc(r[0]) + '<small>' + esc(r[1]) + '</small></div>' +
+      '<div class="p"><b>' + esc(r[2]) + '</b>' + esc(r[3]) + '<em>Credit: ' + esc(r[4]) + '</em></div>' +
+      '<div class="d"><span class="dep" data-d="' + r[5] + '"><i></i><i></i><i></i><i></i><i></i></span><span class="hud-label">' + r[6] + '</span></div></div>';
+  }).join('');
+})();
+</script>
+</section>

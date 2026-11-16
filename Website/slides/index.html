@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Marswalk Slides</title>
+<meta name="description" content="The Marswalk pitch deck for NASA Space Apps 2026: 10 slides, from the problem to the live demo, the research, the hardware and the software.">
+<meta name="theme-color" content="#0b0605">
+<meta property="og:title" content="Marswalk · Slides">
+<meta property="og:image" content="https://marswalk-gale.vercel.app/slides/img/01.webp">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23b5432c'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%237fe0a6' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=B612+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles/base.css">
+<style>
+body::after{opacity:.05}
+.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:20px;height:64px;padding:0 var(--gutter);background:rgba(11,6,5,.8);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+.brand svg{width:22px;height:22px}
+.brand span{font:600 14px/1 var(--font-display);font-stretch:125%;letter-spacing:.28em}
+.bar .sep{width:1px;height:20px;background:var(--line-2)}
+.bar .acts{margin-left:auto;display:flex;gap:10px}
+.bar .btn{--h:40px;padding:0 16px;font-size:13px}
+main{padding:clamp(24px,4vw,48px) var(--gutter) 96px;max-width:1520px;margin:0 auto}
+.head{max-width:none;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:22px}
+.head h1{font-size:clamp(28px,3.4vw,46px)}
+.viewer{width:min(100%,calc((100vh - 260px) * 1.7778));width:min(100%,calc((100svh - 260px) * 1.7778));min-width:min(100%,560px);margin:0 auto}
+.stage{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--line-2);box-shadow:0 40px 120px rgba(0,0,0,.6)}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:opacity .25s}
+.stage img.loading{opacity:.35}
+.nav{position:absolute;top:0;bottom:0;width:18%;display:flex;align-items:center;border:0;background:transparent;color:var(--cream);cursor:pointer;opacity:0;transition:opacity .25s}
+.stage:hover .nav{opacity:1}
+.nav.prev{left:0;justify-content:flex-start;padding-left:18px;background:linear-gradient(90deg,rgba(0,0,0,.35),transparent)}
+.nav.next{right:0;justify-content:flex-end;padding-right:18px;background:linear-gradient(270deg,rgba(0,0,0,.35),transparent)}
+.nav span{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-edge)}
+.nav svg{width:20px;height:20px}
+.nav:focus-visible{opacity:1;outline:2px solid var(--hud);outline-offset:-4px}
+.meta{display:flex;align-items:center;gap:16px;margin:18px 2px 0;flex-wrap:wrap}
+.meta .count{font:400 15px/1 var(--font-hud);color:var(--hud);letter-spacing:.06em}
+.meta .title{color:var(--mute);font-size:15.5px;flex:1;min-width:200px}
+.meta .ctl{display:flex;gap:8px}
+.meta .ctl button{--h:40px;padding:0 14px}
+.group{margin-top:56px}
+.group h2{display:flex;align-items:center;gap:14px;margin:0 0 18px}
+.group h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.thumb{position:relative;display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#000;cursor:pointer;padding:0;transition:border-color .25s,transform .35s var(--ease-out)}
+.thumb:hover{border-color:var(--line-2);transform:translateY(-2px)}
+.thumb.on{border-color:var(--hud);box-shadow:0 0 0 1px var(--hud)}
+.thumb img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.thumb b{position:absolute;left:8px;top:8px;font:400 11px/1 var(--font-hud);color:var(--cream);background:rgba(11,6,5,.75);padding:5px 7px;border-radius:6px;letter-spacing:.06em}
+.foot{margin-top:56px;color:var(--faint);font-size:13px;line-height:1.6;max-width:900px}
+@media (max-width:720px){.bar .sep,.bar .hide-sm{display:none}.nav{opacity:1;width:22%}.nav span{width:40px;height:40px}.thumbs{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="../" aria-label="Marswalk home">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".5"/><circle cx="12" cy="12" r="4" fill="none" stroke="#7fe0a6" stroke-width="1.6"/><path d="M12 0v5M12 19v5M0 12h5M19 12h5" stroke="currentColor" stroke-width="1.2"/></svg>
+    <span>MARSWALK</span>
+  </a>
+  <span class="sep"></span><span class="hud-label hide-sm">Slides</span>
+  <div class="acts">
+    <a class="btn primary" href="../files/marswalk-slides.pdf" download><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8m-3.5-3.5L8 10l3.5-3.5M3 13.5h10"/></svg>PDF</a>
+    <a class="btn hide-sm" href="../">Back to the site</a>
+  </div>
+</header>
+<main>
+  <div class="head">
+    <div>
+      <p class="hud-label is-hud" style="margin:0 0 12px">Pitch deck · NASA Space Apps 2026</p>
+      <h1 class="display">Plan it in the habitat. <em>Walk it in the helmet.</em></h1>
+    </div>
+  </div>
+
+  <div class="viewer">
+  <div class="stage" id="stage">
+    <img id="slide" src="img/01.webp" alt="Slide 1" width="1600" height="900">
+    <button class="nav prev" id="prev" aria-label="Previous slide"><span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.5 4 6.5 10l6 6"/></svg></span></button>
+    <button class="nav next" id="next" aria-label="Next slide"><span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="m7.5 4 6 6-6 6"/></svg></span></button>
+  </div>
+  <div class="meta">
+    <span class="count" id="count">01 / 10</span>
+    <span class="title" id="title"></span>
+    <span class="ctl"><button class="btn" id="b-prev" aria-label="Previous slide">←</button><button class="btn" id="b-next" aria-label="Next slide">→</button></span>
+  </div>
+  </div>
+
+  <section class="group"><h2><span class="hud-label is-hud">All slides · 10</span></h2><div class="thumbs" id="t-main"></div></section>
+
+  <p class="foot">Use ← and → to move between slides. Images: NASA/JPL/University of Arizona (HiRISE), NASA/JPL-Caltech/MSSS (Curiosity Mastcam), USGS MSL Gale DEM. AR navigator screenshots are the real app on real Gale terrain, with the camera feed replaced by a Curiosity Mastcam image. Habitat and rover are scenario.</p>
+</main>
+<script>
+(function () {
+  var slides = [], i = 0, img = document.getElementById('slide');
+  var count = document.getElementById('count'), title = document.getElementById('title');
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+  function show(k, push) {
+    if (!slides.length) return;
+    i = Math.max(0, Math.min(slides.length - 1, k)); var s = slides[i];
+    img.classList.add('loading'); var src = 'img/' + pad(s.n) + '.webp';
+    var pre = new Image(); pre.onload = function () { img.src = src; img.alt = 'Slide ' + s.n + ': ' + s.title; img.classList.remove('loading'); }; pre.src = src;
+    count.textContent = pad(s.n) + ' / ' + slides.length; title.textContent = s.title;
+    document.querySelectorAll('.thumb').forEach(function (t, j) { t.classList.toggle('on', j === i); if (j === i) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current'); });
+    [i - 1, i + 1].forEach(function (j) { if (slides[j]) { var p = new Image(); p.src = 'img/' + pad(slides[j].n) + '.webp'; } });
+    if (push !== false) history.replaceState(null, '', '#' + s.n);
+  }
+  fetch('slides.json').then(function (r) { return r.json(); }).then(function (data) {
+    slides = data;
+    var tm = document.getElementById('t-main');
+    slides.forEach(function (s, j) {
+      var b = document.createElement('button'); b.className = 'thumb'; b.type = 'button'; b.setAttribute('aria-label', 'Slide ' + s.n + ': ' + s.title);
+      b.innerHTML = '<img loading="lazy" src="img/t' + pad(s.n) + '.webp" alt=""><b>' + pad(s.n) + '</b>';
+      b.addEventListener('click', function () { show(j); document.getElementById('stage').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+      tm.appendChild(b);
+    });
+    var h = parseInt(location.hash.slice(1), 10); show(h ? h - 1 : 0, false);
+  });
+  document.getElementById('prev').onclick = document.getElementById('b-prev').onclick = function () { show(i - 1); };
+  document.getElementById('next').onclick = document.getElementById('b-next').onclick = function () { show(i + 1); };
+  addEventListener('keydown', function (e) {
+    if (e.target.closest && e.target.closest('input,textarea')) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0); else if (e.key === 'End') show(slides.length - 1);
+  });
+  var x0 = null, st = document.getElementById('stage');
+  st.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  st.addEventListener('touchend', function (e) { if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1)); x0 = null; });
+})();
+</script>
+</body>
+</html>

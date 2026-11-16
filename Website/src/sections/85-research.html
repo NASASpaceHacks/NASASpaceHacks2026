@@ -1,0 +1,151 @@
+<section class="section" id="research">
+<style>
+#research .layout { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.5fr); gap: clamp(32px,5vw,80px); align-items: start; }
+#research .doc { position: sticky; top: 90px; display: grid; gap: 22px; }
+#research .cover { aspect-ratio: 1/1.35; background: #f4f1ec; color: #1b1715; border-radius: 6px; padding: clamp(22px,2.6vw,34px); display: flex; flex-direction: column; box-shadow: 0 40px 80px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.06); transform: rotate(-1.4deg); transition: transform .6s var(--ease-out); position: relative; }
+#research .cover:hover { transform: rotate(0) translateY(-4px); }
+#research .cover .run { font: 400 9px/1 var(--font-hud); letter-spacing: .14em; text-align: right; color: #6b625c; }
+#research .cover h3 { margin: clamp(34px,6vw,64px) 0 8px; font-family: var(--font-body); font-weight: 800; font-size: clamp(30px,3.4vw,44px); letter-spacing: -.01em; line-height: 1; }
+#research .cover .sub { font-style: italic; letter-spacing: .12em; font-size: 11px; text-transform: uppercase; color: #3a332f; }
+#research .cover .t { margin-top: 26px; font-weight: 700; font-size: 14px; }
+#research .cover .s { font-size: 11px; color: #5a514b; margin-top: 4px; line-height: 1.5; }
+#research .cover .ne { margin-top: auto; font-weight: 700; font-size: 9.5px; letter-spacing: .04em; line-height: 1.5; border-top: 1px solid #1b1715; padding-top: 10px; }
+#research .doc-actions { display: grid; gap: 12px; justify-items: start; }
+#research .meta { font-size: 13px; color: var(--faint); }
+#research .col { display: grid; gap: 40px; }
+#research .flow { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: 0; position: relative; }
+#research .flow::before { content: ""; position: absolute; left: 17px; top: 18px; bottom: 18px; width: 1px; background: linear-gradient(var(--hud-dim), var(--line)); }
+#research .flow li { counter-increment: s; position: relative; padding: 0 0 26px 58px; }
+#research .flow li:last-child { padding-bottom: 0; }
+#research .flow li::before { content: counter(s, decimal-leading-zero); position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 400 11px/1 var(--font-hud); color: var(--hud); background: var(--space-2); border: 1px solid var(--glass-edge); }
+#research .flow b { display: block; font-weight: 600; font-size: 17px; margin: 5px 0 4px; }
+#research .flow span { color: var(--mute); font-size: 15px; line-height: 1.55; }
+#research .nasa { padding: clamp(22px,2.6vw,32px); display: grid; gap: 20px; }
+#research .nasa h4 { margin: 0; font-weight: 600; font-size: 17px; line-height: 1.4; }
+#research .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+#research .st { padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; display: grid; gap: 8px; }
+#research .st .v { font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: clamp(24px,2.6vw,32px); line-height: 1.1; white-space: nowrap; }
+#research .st .v s { text-decoration: none; color: var(--faint); font-size: .62em; }
+#research .st .v em { font-style: normal; color: var(--sky); }
+#research .nasa p { margin: 0; font-size: 13.5px; color: var(--mute); }
+#research .nasa p b { color: var(--cream); font-weight: 600; }
+#research .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+#research .box { padding: 24px; display: grid; gap: 12px; align-content: start; }
+#research .box ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+#research .box li { font-size: 14.5px; color: var(--mute); line-height: 1.5; padding-left: 16px; position: relative; }
+#research .box li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 1px; background: var(--hud-dim); }
+#research .docs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+#research .docs a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 15px; transition: border-color .3s, background .3s, transform .4s var(--ease-out); }
+#research .docs a small { display: block; font: 400 10.5px/1.4 var(--font-hud); letter-spacing: .1em; color: var(--faint); text-transform: uppercase; margin-top: 3px; }
+#research .docs a svg { width: 16px; height: 16px; flex: none; color: var(--hud); transition: transform .3s var(--ease-out); }
+#research .docs a:hover { border-color: var(--glass-edge); background: rgba(127,224,166,.05); transform: translateY(-2px); }
+#research .docs a:hover svg { transform: translate(2px,-2px); }
+@media (max-width: 960px) { #research .layout { grid-template-columns: 1fr; } #research .doc { position: static; grid-template-columns: minmax(0,300px) 1fr; align-items: end; } }
+@media (max-width: 640px) { #research .doc { grid-template-columns: 1fr; } #research .cover { max-width: 300px; } #research .two, #research .docs, #research .stats { grid-template-columns: 1fr; } #research .st .v { white-space: normal; } }
+@media (prefers-reduced-motion: reduce) { #research .cover { transform: none; } }
+/* research paper (lead item) */
+#research .paper { display: grid; grid-template-columns: minmax(220px, 340px) 1fr; gap: clamp(28px, 4vw, 64px); align-items: center; padding: clamp(22px, 3vw, 40px); margin-bottom: clamp(72px, 9vw, 120px); }
+#research .paper-page { position: relative; display: block; border-radius: 6px; overflow: hidden; background: #fff; box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.08); transform: rotate(-1.5deg); transition: transform .6s var(--ease-out); }
+#research .paper-page:hover { transform: rotate(0deg) translateY(-4px); }
+#research .paper-page img { width: 100%; height: auto; }
+#research .paper-meta { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-bottom: 18px; }
+#research .paper h3 { font: 600 clamp(24px, 2.4vw, 34px)/1.15 var(--font-body); margin: 0 0 14px; letter-spacing: -.01em; text-wrap: balance; }
+#research .paper .authors { margin: 0 0 18px; color: var(--dust); font-size: 15px; }
+#research .paper .abs { margin: 0; color: var(--mute); font-size: 15.5px; line-height: 1.65; max-width: 680px; }
+#research .paper .nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin: 26px 0; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+#research .paper .num { background: rgba(11, 6, 5, .72); padding: 14px 16px; }
+#research .paper .num b { display: block; font: 300 26px/1.1 var(--font-display); font-stretch: 112%; color: var(--hud); }
+#research .paper .num span { display: block; margin-top: 6px; font-size: 12.5px; line-height: 1.4; color: var(--faint); }
+#research .paper .acts { display: flex; flex-wrap: wrap; gap: 12px; }
+#research .companion { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
+#research .companion::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+@media (max-width: 860px) { #research .paper { grid-template-columns: 1fr; } #research .paper-page { max-width: 300px; } #research .paper .nums { grid-template-columns: 1fr 1fr; } }
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Research</span></div>
+    <h2 class="display sec-title">The research, <em>written up.</em></h2>
+    <p class="sec-lede">A full research paper on the planner, its models and how we evaluated them, plus a concept study for the suit hardware. Both describe a <b>research prototype tested in simulation</b>, not flight hardware or operational guidance.</p>
+  </header>
+
+  <article class="paper glass reveal"><i class="brk"></i>
+    <a class="paper-page" data-link="researchPaper" aria-label="Open the research paper (PDF)"><img src="assets/img/paper-p1.webp" alt="First page of the Marswalk research paper" loading="lazy" width="1236" height="1600"></a>
+    <div>
+      <div class="paper-meta"><span class="hud-label is-hud">Research paper</span><span class="hud-label">15 November 2026</span><span class="hud-label">PDF · on GitHub</span></div>
+      <h3>Marswalk: Earth-Independent Planning and Guidance for Walking EVAs on Mars</h3>
+      <p class="authors">Kumar Sashank Ghanta, Ivan Chen, George Postica, Mirim Yu, Michelle Wang · Team NASASpaceHacks, Toronto</p>
+      <p class="abs">Earth can't help a Mars crew in real time, and the planners that already run on Mars are built for rovers, not for a suited human's oxygen, heat and walk home. The paper presents Marswalk: a habitat planner that checks every walk against twelve sourced EVA constraints, re-checks it in a separate simulator and explains its verdict, then hands a signed route of about 11 kB to a phone AR navigator that keeps guiding when the link drops. It covers the engine, the GPS-free navigation design, a suit hardware concept and an evaluation against measured NASA data.</p>
+      <div class="nums">
+        <div class="num"><b>199 / 200</b><span>slope-only plans broke at least one constraint</span></div>
+        <div class="num"><b>8.3 ms</b><span>median mid-walk re-plan on a laptop</span></div>
+        <div class="num"><b>10.6%</b><span>walking-model error vs NASA suited data, 0.22–0.32 g</span></div>
+        <div class="num"><b>23 / 24</b><span>verdicts matched an independent checker</span></div>
+      </div>
+      <div class="acts">
+        <a class="btn primary" data-link="researchPaper"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13"/></svg>Read the paper (PDF)</a>
+        <a class="btn" href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/tree/main/docs/paper" target="_blank" rel="noopener">Sources, data and figure scripts</a>
+      </div>
+    </div>
+  </article>
+
+  <div class="companion reveal"><span class="hud-label is-hud">Companion · suit hardware concept study</span></div>
+
+  <div class="layout">
+    <div class="doc reveal">
+      <div class="cover" aria-hidden="true">
+        <div class="run">MARS WALK / RESEARCH-INFORMED</div>
+        <h3>MARS WALK</h3>
+        <div class="sub">Astronaut augmented-reality navigation system</div>
+        <div class="t">TECHNICAL PROOF OF CONCEPT</div>
+        <div class="s">Evidence-led assessment informed by NASA Joint AR navigation evaluation<br>Prepared 14&ndash;15 November 2026 &middot; pre-prototype feasibility assessment</div>
+        <div class="ne">NOT NASA ENDORSED &bull; NO FLIGHT HARDWARE OR VERIFIED MARS-PATHFINDER PERFORMANCE</div>
+      </div>
+      <div class="doc-actions">
+        <a class="btn primary" data-link="paper"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13"/></svg>Read the concept study (PDF)</a>
+        <span class="meta">7 pages &middot; independent engineering concept &middot; not NASA endorsed</span>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="reveal">
+        <div class="hud-label is-hud" style="margin-bottom:22px">Proposed architecture</div>
+        <ol class="flow">
+          <li><b>Habitat workstation prepares the route</b><span>A terrain-aware route, with waypoints, route version, coordinate frame, hazard flags and integrity fields.</span></li>
+          <li><b>A low-data route packet is cached in the suit</b><span>Stored before EVA, so a lost radio link cannot interrupt local navigation.</span></li>
+          <li><b>Boot-mounted inertial sensors, plus camera imagery, give local pose</b><span>6-axis IMUs for pedestrian dead reckoning with zero-velocity updates, and helmet/torso camera visual odometry. Intermittent orbital-map matching may add absolute corrections. No reliance on a magnetic compass.</span></li>
+          <li><b>A monocular optical see-through display guides the walk</b><span>Next direction, distance and navigation confidence, including an explicit degraded-confidence state.</span></li>
+          <li><b>Telemetry to the habitat while in coverage; local guidance when the link drops</b><span>The habitat supervises but is not in the control loop. After a link loss, freshness and route-version checks run before new instructions are accepted.</span></li>
+        </ol>
+      </div>
+
+      <div class="glass nasa reveal"><i class="brk"></i>
+        <div class="hud-label is-hud">Built on NASA&rsquo;s published pilot, not our result</div>
+        <h4>NASA Johnson Space Center Joint AR pilot: 5 astronaut-office participants, AR navigation vs paper map, Earth field analog.</h4>
+        <div class="stats">
+          <div class="st"><span class="hud-label">Median navigation time</span><span class="v">15.87 <s>&rarr;</s> <em>13.20</em> <s>min</s></span></div>
+          <div class="st"><span class="hud-label">Median waypoint displacement</span><span class="v">4.47 <s>&rarr;</s> <em>1.79</em> <s>m</s></span></div>
+        </div>
+        <p>Paper map &rarr; Joint AR. A small pilot in an Earth analog, measured with field GPS: it motivates testing the design hypothesis and <b>does not validate Marswalk</b> or show any improvement on Mars. Reference [A1] in the study.</p>
+      </div>
+
+      <div class="two">
+        <div class="card box reveal"><span class="hud-label is-alert" style="color:var(--sky)">Principal risks the study names</span>
+          <ul><li>Helmet optical fit: eye relief, moving eyebox, glare</li><li>Yaw and camera pose uncertainty: a misaligned arrow can be worse than none</li><li>Poor orbital-map match causing a false position reset</li><li>Power, thermal and radiation effects on compute and display</li><li>Terrain blocking habitat radio; false or stale route updates</li></ul></div>
+        <div class="card box reveal d1"><span class="hud-label is-hud">Proposed validation progression</span>
+          <ul><li>Replay sensor and camera data through a software pipeline</li><li>Ground-based Mars-analog route with surveyed checkpoints</li><li>Worst-case reconnection and route-revision tests</li><li>Measure display readability with representative helmet geometry</li><li>Derive a qualified power, reliability and environmental test plan</li></ul>
+          <span class="meta" style="font-size:12.5px;color:var(--faint)">No tests are claimed as complete.</span></div>
+      </div>
+
+      <div class="reveal">
+        <div class="hud-label" style="margin-bottom:14px">Read the docs on GitHub</div>
+        <div class="docs">
+          <a href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/blob/main/docs/EXPLAINER.md" target="_blank" rel="noopener"><span>Explainer<small>How it works</small></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+          <a href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/blob/main/docs/designs/marswalk.md" target="_blank" rel="noopener"><span>Design doc<small>Architecture and rules</small></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+          <a href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/blob/main/docs/CRITERIA_ANSWERS.md" target="_blank" rel="noopener"><span>Criteria answers<small>Claims, proof, limits</small></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+          <a href="https://github.com/NASASpaceHacks/NASASpaceHacks2026/blob/main/Research/" target="_blank" rel="noopener"><span>Research tracks<small>Sources and notes</small></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 11l6-6M6 5h5v5"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>

@@ -1,0 +1,146 @@
+<section class="section" id="results">
+<style>
+#results .cmp { padding: clamp(24px,3.4vw,44px); display: grid; gap: 28px; margin-bottom: 20px; }
+#results .cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px,4vw,56px); align-items: end; }
+#results .cmp-col { display: grid; gap: 14px; }
+#results .cmp-big { font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: clamp(64px,10vw,140px); line-height: .9; letter-spacing: -.03em; }
+#results .cmp-big small { font-size: .4em; font-weight: 200; opacity: .7; }
+#results .cmp-bad .cmp-big { color: var(--alert); }
+#results .cmp-good .cmp-big { color: var(--hud); }
+#results .bar { height: 10px; border-radius: 99px; background: rgba(245,237,230,.07); overflow: hidden; position: relative; }
+#results .bar i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 99px; transition: width 1.6s var(--ease-out) .2s; }
+#results .cmp-bad .bar i { background: linear-gradient(90deg, rgba(255,95,180,.45), var(--alert)); box-shadow: 0 0 18px rgba(255,95,180,.5); }
+#results .cmp-good .bar i { background: var(--hud); min-width: 3px; box-shadow: 0 0 14px var(--hud); }
+#results .cmp.in .cmp-bad .bar i { width: 99.5%; }
+#results .cmp.in .cmp-good .bar i { width: 0.6%; }
+#results .cmp-txt { font-size: 15px; color: var(--mute); margin: 0; max-width: 46ch; }
+#results .cmp-txt b { color: var(--cream); font-weight: 600; }
+#results .caveat { display: flex; gap: 12px; align-items: baseline; padding-top: 22px; border-top: 1px solid var(--line); font-size: 14px; color: var(--mute); }
+#results .caveat .hud-label { flex: none; }
+#results .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+#results .tile { padding: 28px 26px 26px; display: flex; flex-direction: column; gap: 14px; min-height: 230px; transition: border-color .4s, transform .5s var(--ease-out); }
+#results .tile:hover { border-color: var(--glass-edge); transform: translateY(-3px); }
+#results .tile.w2 { grid-column: span 2; }
+#results .tile.w4 { grid-column: span 4; min-height: 0; flex-direction: row; align-items: center; gap: 36px; }
+#results .tile.w4 p { max-width: 52ch; }
+#results .tile.w4 .hud-label { margin: 0 0 0 auto; }
+#results .num { font-family: var(--font-display); font-stretch: 125%; font-weight: 200; font-size: clamp(40px,4.4vw,60px); line-height: 1; letter-spacing: -.02em; color: var(--cream); font-variant-numeric: tabular-nums; }
+#results .num sub, #results .num span.u { font-size: .38em; letter-spacing: 0; color: var(--hud); font-weight: 300; margin-left: 4px; vertical-align: baseline; }
+#results .tile p { margin: 0; font-size: 14.5px; color: var(--mute); line-height: 1.55; }
+#results .tile p b { color: var(--cream); font-weight: 600; }
+#results .tile .hud-label { margin-top: auto; }
+@media (max-width: 1000px) { #results .grid { grid-template-columns: repeat(2, 1fr); } #results .tile.w4 { grid-column: span 2; flex-direction: column; align-items: flex-start; gap: 14px; } #results .tile.w4 .hud-label { margin: 0; } }
+@media (max-width: 640px) {
+  #results .cmp-grid { grid-template-columns: 1fr; }
+  #results .grid { grid-template-columns: 1fr; gap: 14px; }
+  #results .tile.w2, #results .tile.w4 { grid-column: auto; flex-direction: column; align-items: flex-start; gap: 14px; }
+  #results .tile.w4 .hud-label { margin: 0; }
+  #results .tile { min-height: 0; }
+  #results .caveat { flex-direction: column; gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { #results .bar i { transition: none; } }
+</style>
+<div class="wrap">
+  <header class="sec-head reveal">
+    <div class="sec-index"><span class="hud-label is-hud">Results</span></div>
+    <h2 class="display sec-title">What the <em>numbers</em> say.</h2>
+    <p class="sec-lede">Every figure comes from code in the repository and is simulation only. Each carries its context, because a number without its baseline is just decoration.</p>
+  </header>
+
+  <div class="glass cmp reveal" id="results-cmp"><i class="brk"></i>
+    <div class="hud-label is-hud">Constraint breaks &middot; 200 simulated Gale walks</div>
+    <div class="cmp-grid">
+      <div class="cmp-col cmp-bad">
+        <div class="hud-label is-alert">Slope-only plans</div>
+        <div class="cmp-big"><span data-count="99.5" data-dec="1">99.5</span><small>%</small></div>
+        <div class="bar"><i></i></div>
+        <p class="cmp-txt"><b>break at least one constraint.</b> This is the common baseline: a route that only avoids steep ground.</p>
+      </div>
+      <div class="cmp-col cmp-good">
+        <div class="hud-label is-hud">Marswalk plans</div>
+        <div class="cmp-big"><span data-count="0" data-dec="0">0</span><small>%</small></div>
+        <div class="bar"><i></i></div>
+        <p class="cmp-txt"><b>break none.</b> Every plan is re-walked step by step in a simulator against all hard constraints before it is shown.</p>
+      </div>
+    </div>
+    <div class="caveat"><span class="hud-label">Read this fairly</span><span>The slope-only baseline is a strawman by construction: it ignores everything except slope. The fairer comparison is the next tile.</span></div>
+  </div>
+
+  <div class="grid">
+    <article class="card tile w2 reveal">
+      <div class="num">+<span data-count="5" data-dec="0">5</span><span class="u">% science</span></div>
+      <p><b>Against a nearest-first planner with the same safety checks</b>, when time is short (12 candidate stops, 2 to 4 h available). Better in <b>62.5%</b> of cases and never lower. With ample time, both pick the same stops.</p>
+      <span class="hud-label">Oversubscribed-time test</span>
+    </article>
+    <article class="card tile reveal d1">
+      <div class="num"><span data-count="60" data-dec="0">60</span><span class="u">/ 60</span></div>
+      <p><b>&ldquo;Stay in&rdquo;</b> from the habitat, in all 60 scenarios. Not going is always a valid answer.</p>
+      <span class="hud-label">v3 impact run</span>
+    </article>
+    <article class="card tile reveal d2">
+      <div class="num"><span data-count="3" data-dec="0">3</span><span class="u">s</span></div>
+      <p>The AR navigator goes <b>autonomous within about 3 s</b> of losing the link to the habitat.</p>
+      <span class="hud-label">Link-loss test</span>
+    </article>
+    <article class="card tile reveal">
+      <div class="num"><span data-count="37.9" data-dec="1">37.9</span><span class="u">ms</span></div>
+      <p><b>Plan, median</b> on a laptop. The first plan of a session takes about 1.7 s while safety fields are computed once.</p>
+      <span class="hud-label">Speed</span>
+    </article>
+    <article class="card tile reveal d1">
+      <div class="num"><span data-count="8.3" data-dec="1">8.3</span><span class="u">ms</span></div>
+      <p><b>Mid-EVA re-plan, median</b> (p95 19.8 ms).</p>
+      <span class="hud-label">Speed</span>
+    </article>
+    <article class="card tile reveal d2">
+      <div class="num">~<span data-count="11" data-dec="0">11</span><span class="u">KB</span></div>
+      <p><b>Route package.</b> For scale, Curiosity&rsquo;s daily uplink is about 28 KB.</p>
+      <span class="hud-label">Package gate</span>
+    </article>
+    <article class="card tile reveal d3">
+      <div class="num"><span data-count="122" data-dec="0">122</span><span class="u">+ 26</span></div>
+      <p><b>122 unit tests</b> and <b>26 real mouse-and-keyboard UI tests</b>.</p>
+      <span class="hud-label">Test suite</span>
+    </article>
+    <article class="card tile w4 reveal">
+      <div class="num">2<span class="u">sites, 0 code changes</span></div>
+      <p>A <b>second Mars site, Jezero</b> (Perseverance), runs with no code changes: new data pack, same engine.</p>
+      <span class="hud-label">Portability</span>
+    </article>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('results');
+  if (!root) return;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function run(el) {
+    var to = parseFloat(el.getAttribute('data-count')), dec = +el.getAttribute('data-dec') || 0;
+    if (reduce) { el.textContent = to.toFixed(dec); return; }
+    var t0 = performance.now(), dur = 1500;
+    (function f(t) {
+      var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 4);
+      el.textContent = (to * e).toFixed(dec);
+      if (p < 1) requestAnimationFrame(f);
+    })(t0);
+    setTimeout(function () { el.textContent = to.toFixed(dec); }, dur + 300);
+  }
+  var cmp = document.getElementById('results-cmp');
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      e.target.classList.add('in');
+      e.target.querySelectorAll('[data-count]').forEach(run);
+      if (e.target.hasAttribute('data-count')) run(e.target);
+    });
+  }, { threshold: 0.35 });
+  cmp.querySelectorAll('[data-count]').forEach(function (n) { n.textContent = (+n.getAttribute('data-count') === 0 ? '0' : '0.0'.slice(0, +n.getAttribute('data-dec') ? 3 : 1)); });
+  io.observe(cmp);
+  root.querySelectorAll('.tile').forEach(function (t) {
+    t.querySelectorAll('[data-count]').forEach(function (n) { n.textContent = (+n.getAttribute('data-dec') ? '0.0' : '0'); });
+    io.observe(t);
+  });
+})();
+</script>
+</section>
