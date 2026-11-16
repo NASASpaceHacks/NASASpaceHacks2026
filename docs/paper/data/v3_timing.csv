@@ -1,0 +1,857 @@
+family,scenario,planner,kind,ms
+PR1_full_eva,0,Marswalk plan(),plan,1325.6
+PR1_full_eva,0,Marswalk plan(resume),replan,6.3
+PR1_full_eva,1,Marswalk plan(),plan,56.8
+PR1_full_eva,1,Marswalk plan(resume),replan,9.4
+PR1_full_eva,2,Marswalk plan(),plan,56.5
+PR1_full_eva,2,Marswalk plan(resume),replan,9.4
+PR1_full_eva,3,Marswalk plan(),plan,57
+PR1_full_eva,3,Marswalk plan(resume),replan,9.5
+PR1_full_eva,4,Marswalk plan(),plan,61.9
+PR1_full_eva,4,Marswalk plan(resume),replan,12
+PR1_full_eva,5,Marswalk plan(),plan,37.2
+PR1_full_eva,5,Marswalk plan(resume),replan,5.3
+PR1_full_eva,6,Marswalk plan(),plan,59.9
+PR1_full_eva,6,Marswalk plan(resume),replan,29.4
+PR1_full_eva,7,Marswalk plan(),plan,64.5
+PR1_full_eva,7,Marswalk plan(resume),replan,10.7
+PR1_full_eva,8,Marswalk plan(),plan,59.7
+PR1_full_eva,8,Marswalk plan(resume),replan,15
+PR1_full_eva,9,Marswalk plan(),plan,38.9
+PR1_full_eva,9,Marswalk plan(resume),replan,9.5
+PR1_full_eva,10,Marswalk plan(),plan,58.5
+PR1_full_eva,10,Marswalk plan(resume),replan,14.4
+PR1_full_eva,11,Marswalk plan(),plan,47.2
+PR1_full_eva,11,Marswalk plan(resume),replan,12.7
+PR1_full_eva,12,Marswalk plan(),plan,41.9
+PR1_full_eva,12,Marswalk plan(resume),replan,10.2
+PR1_full_eva,13,Marswalk plan(),plan,23.7
+PR1_full_eva,13,Marswalk plan(resume),replan,5.1
+PR1_full_eva,14,Marswalk plan(),plan,19.8
+PR1_full_eva,14,Marswalk plan(resume),replan,9.9
+PR1_full_eva,15,Marswalk plan(),plan,46
+PR1_full_eva,15,Marswalk plan(resume),replan,5.3
+PR1_full_eva,16,Marswalk plan(),plan,66.9
+PR1_full_eva,16,Marswalk plan(resume),replan,16.2
+PR1_full_eva,17,Marswalk plan(),plan,22.3
+PR1_full_eva,17,Marswalk plan(resume),replan,5.6
+PR1_full_eva,18,Marswalk plan(),plan,45.5
+PR1_full_eva,18,Marswalk plan(resume),replan,10.8
+PR1_full_eva,19,Marswalk plan(),plan,47.8
+PR1_full_eva,19,Marswalk plan(resume),replan,10.4
+PR1_full_eva,20,Marswalk plan(),plan,37.8
+PR1_full_eva,20,Marswalk plan(resume),replan,9.1
+PR1_full_eva,21,Marswalk plan(),plan,79.2
+PR1_full_eva,21,Marswalk plan(resume),replan,21
+PR1_full_eva,22,Marswalk plan(),plan,24.1
+PR1_full_eva,22,Marswalk plan(resume),replan,5.4
+PR1_full_eva,23,Marswalk plan(),plan,19.2
+PR1_full_eva,23,Marswalk plan(resume),replan,4.8
+PR1_full_eva,24,Marswalk plan(),plan,108.5
+PR1_full_eva,24,Marswalk plan(resume),replan,27.3
+PR1_full_eva,25,Marswalk plan(),plan,30.2
+PR1_full_eva,25,Marswalk plan(resume),replan,8
+PR1_full_eva,26,Marswalk plan(),plan,49.4
+PR1_full_eva,26,Marswalk plan(resume),replan,13.2
+PR1_full_eva,27,Marswalk plan(),plan,19.8
+PR1_full_eva,27,Marswalk plan(resume),replan,4.4
+PR1_full_eva,28,Marswalk plan(),plan,18.8
+PR1_full_eva,28,Marswalk plan(resume),replan,4.3
+PR1_full_eva,29,Marswalk plan(),plan,39.5
+PR1_full_eva,29,Marswalk plan(resume),replan,9.6
+PR1_full_eva,30,Marswalk plan(),plan,19.8
+PR1_full_eva,30,Marswalk plan(resume),replan,4.4
+PR1_full_eva,31,Marswalk plan(),plan,66.1
+PR1_full_eva,31,Marswalk plan(resume),replan,16.6
+PR1_full_eva,32,Marswalk plan(),plan,25.7
+PR1_full_eva,32,Marswalk plan(resume),replan,5.9
+PR1_full_eva,33,Marswalk plan(),plan,47.1
+PR1_full_eva,33,Marswalk plan(resume),replan,12.8
+PR1_full_eva,34,Marswalk plan(),plan,39.1
+PR1_full_eva,34,Marswalk plan(resume),replan,10.5
+PR1_full_eva,35,Marswalk plan(),plan,18.4
+PR1_full_eva,35,Marswalk plan(resume),replan,5.2
+PR1_full_eva,36,Marswalk plan(),plan,43
+PR1_full_eva,36,Marswalk plan(resume),replan,9.3
+PR1_full_eva,37,Marswalk plan(),plan,106.9
+PR1_full_eva,37,Marswalk plan(resume),replan,16
+PR1_full_eva,38,Marswalk plan(),plan,59.3
+PR1_full_eva,38,Marswalk plan(resume),replan,12.5
+PR1_full_eva,39,Marswalk plan(),plan,45.2
+PR1_full_eva,39,Marswalk plan(resume),replan,9.5
+PR1_full_eva,40,Marswalk plan(),plan,25
+PR1_full_eva,40,Marswalk plan(resume),replan,5.3
+PR1_full_eva,41,Marswalk plan(),plan,62.7
+PR1_full_eva,41,Marswalk plan(resume),replan,15.6
+PR1_full_eva,42,Marswalk plan(),plan,21.6
+PR1_full_eva,42,Marswalk plan(resume),replan,4.9
+PR1_full_eva,43,Marswalk plan(),plan,23.5
+PR1_full_eva,43,Marswalk plan(resume),replan,5.1
+PR1_full_eva,44,Marswalk plan(),plan,40.3
+PR1_full_eva,44,Marswalk plan(resume),replan,9.7
+PR1_full_eva,45,Marswalk plan(),plan,63.3
+PR1_full_eva,45,Marswalk plan(resume),replan,15.4
+PR1_full_eva,46,Marswalk plan(),plan,43.4
+PR1_full_eva,46,Marswalk plan(resume),replan,12.3
+PR1_full_eva,47,Marswalk plan(),plan,23.5
+PR1_full_eva,47,Marswalk plan(resume),replan,5
+PR1_full_eva,48,Marswalk plan(),plan,63.5
+PR1_full_eva,48,Marswalk plan(resume),replan,15.7
+PR1_full_eva,49,Marswalk plan(),plan,24
+PR1_full_eva,49,Marswalk plan(resume),replan,5.3
+PR1_full_eva,50,Marswalk plan(),plan,8.1
+PR1_full_eva,51,Marswalk plan(),plan,42.4
+PR1_full_eva,51,Marswalk plan(resume),replan,9.3
+PR1_full_eva,52,Marswalk plan(),plan,36.9
+PR1_full_eva,52,Marswalk plan(resume),replan,6.7
+PR1_full_eva,53,Marswalk plan(),plan,42.4
+PR1_full_eva,53,Marswalk plan(resume),replan,9.2
+PR1_full_eva,54,Marswalk plan(),plan,19.5
+PR1_full_eva,54,Marswalk plan(resume),replan,4.6
+PR1_full_eva,55,Marswalk plan(),plan,31.8
+PR1_full_eva,55,Marswalk plan(resume),replan,6.6
+PR1_full_eva,56,Marswalk plan(),plan,23.1
+PR1_full_eva,56,Marswalk plan(resume),replan,5.1
+PR1_full_eva,57,Marswalk plan(),plan,29.3
+PR1_full_eva,57,Marswalk plan(resume),replan,6.6
+PR1_full_eva,58,Marswalk plan(),plan,68.4
+PR1_full_eva,58,Marswalk plan(resume),replan,17.4
+PR1_full_eva,59,Marswalk plan(),plan,41.6
+PR1_full_eva,59,Marswalk plan(resume),replan,8.5
+PR1_full_eva,60,Marswalk plan(),plan,41.8
+PR1_full_eva,60,Marswalk plan(resume),replan,9.7
+PR1_full_eva,61,Marswalk plan(),plan,31.7
+PR1_full_eva,61,Marswalk plan(resume),replan,6.7
+PR1_full_eva,62,Marswalk plan(),plan,23.7
+PR1_full_eva,62,Marswalk plan(resume),replan,6.1
+PR1_full_eva,63,Marswalk plan(),plan,79.7
+PR1_full_eva,63,Marswalk plan(resume),replan,23.8
+PR1_full_eva,64,Marswalk plan(),plan,36.6
+PR1_full_eva,64,Marswalk plan(resume),replan,8.4
+PR1_full_eva,65,Marswalk plan(),plan,45.8
+PR1_full_eva,65,Marswalk plan(resume),replan,11.8
+PR1_full_eva,66,Marswalk plan(),plan,18.5
+PR1_full_eva,66,Marswalk plan(resume),replan,4.3
+PR1_full_eva,67,Marswalk plan(),plan,73.1
+PR1_full_eva,67,Marswalk plan(resume),replan,21.4
+PR1_full_eva,68,Marswalk plan(),plan,32.2
+PR1_full_eva,68,Marswalk plan(resume),replan,6.9
+PR1_full_eva,69,Marswalk plan(),plan,24.1
+PR1_full_eva,69,Marswalk plan(resume),replan,5.3
+PR1_full_eva,70,Marswalk plan(),plan,23.9
+PR1_full_eva,70,Marswalk plan(resume),replan,5.3
+PR1_full_eva,71,Marswalk plan(),plan,37.9
+PR1_full_eva,71,Marswalk plan(resume),replan,6.9
+PR1_full_eva,72,Marswalk plan(),plan,21.1
+PR1_full_eva,72,Marswalk plan(resume),replan,4.9
+PR1_full_eva,73,Marswalk plan(),plan,22.2
+PR1_full_eva,73,Marswalk plan(resume),replan,5
+PR1_full_eva,74,Marswalk plan(),plan,24.7
+PR1_full_eva,74,Marswalk plan(resume),replan,5.3
+PR1_full_eva,75,Marswalk plan(),plan,41.7
+PR1_full_eva,75,Marswalk plan(resume),replan,9.7
+PR1_full_eva,76,Marswalk plan(),plan,54.7
+PR1_full_eva,76,Marswalk plan(resume),replan,12.7
+PR1_full_eva,77,Marswalk plan(),plan,21.2
+PR1_full_eva,77,Marswalk plan(resume),replan,4.7
+PR1_full_eva,78,Marswalk plan(),plan,32.4
+PR1_full_eva,78,Marswalk plan(resume),replan,7
+PR1_full_eva,79,Marswalk plan(),plan,47.6
+PR1_full_eva,79,Marswalk plan(resume),replan,10.9
+PR1_full_eva,80,Marswalk plan(),plan,36.5
+PR1_full_eva,80,Marswalk plan(resume),replan,6.6
+PR1_full_eva,81,Marswalk plan(),plan,79.2
+PR1_full_eva,81,Marswalk plan(resume),replan,21.1
+PR1_full_eva,82,Marswalk plan(),plan,80
+PR1_full_eva,82,Marswalk plan(resume),replan,22.5
+PR1_full_eva,83,Marswalk plan(),plan,21.5
+PR1_full_eva,83,Marswalk plan(resume),replan,4.8
+PR1_full_eva,84,Marswalk plan(),plan,51.5
+PR1_full_eva,84,Marswalk plan(resume),replan,8.5
+PR1_full_eva,85,Marswalk plan(),plan,7.9
+PR1_full_eva,86,Marswalk plan(),plan,40.4
+PR1_full_eva,86,Marswalk plan(resume),replan,7.2
+PR1_full_eva,87,Marswalk plan(),plan,71.3
+PR1_full_eva,87,Marswalk plan(resume),replan,19
+PR1_full_eva,88,Marswalk plan(),plan,38.2
+PR1_full_eva,88,Marswalk plan(resume),replan,9.5
+PR1_full_eva,89,Marswalk plan(),plan,31.6
+PR1_full_eva,89,Marswalk plan(resume),replan,7.6
+PR1_full_eva,90,Marswalk plan(),plan,18.2
+PR1_full_eva,90,Marswalk plan(resume),replan,4.3
+PR1_full_eva,91,Marswalk plan(),plan,59.9
+PR1_full_eva,91,Marswalk plan(resume),replan,15
+PR1_full_eva,92,Marswalk plan(),plan,25.9
+PR1_full_eva,92,Marswalk plan(resume),replan,7.1
+PR1_full_eva,93,Marswalk plan(),plan,19.2
+PR1_full_eva,93,Marswalk plan(resume),replan,4.4
+PR1_full_eva,94,Marswalk plan(),plan,35.8
+PR1_full_eva,94,Marswalk plan(resume),replan,6.4
+PR1_full_eva,95,Marswalk plan(),plan,40.3
+PR1_full_eva,95,Marswalk plan(resume),replan,8.5
+PR1_full_eva,96,Marswalk plan(),plan,24.5
+PR1_full_eva,96,Marswalk plan(resume),replan,5.4
+PR1_full_eva,97,Marswalk plan(),plan,18.4
+PR1_full_eva,97,Marswalk plan(resume),replan,5.1
+PR1_full_eva,98,Marswalk plan(),plan,19.8
+PR1_full_eva,98,Marswalk plan(resume),replan,4.4
+PR1_full_eva,99,Marswalk plan(),plan,19.8
+PR1_full_eva,99,Marswalk plan(resume),replan,4.4
+PR1_full_eva,100,Marswalk plan(),plan,21.7
+PR1_full_eva,100,Marswalk plan(resume),replan,4.8
+PR1_full_eva,101,Marswalk plan(),plan,63
+PR1_full_eva,101,Marswalk plan(resume),replan,16.7
+PR1_full_eva,102,Marswalk plan(),plan,36.3
+PR1_full_eva,102,Marswalk plan(resume),replan,8.3
+PR1_full_eva,103,Marswalk plan(),plan,40.1
+PR1_full_eva,103,Marswalk plan(resume),replan,7.3
+PR1_full_eva,104,Marswalk plan(),plan,22.3
+PR1_full_eva,104,Marswalk plan(resume),replan,5
+PR1_full_eva,105,Marswalk plan(),plan,18.3
+PR1_full_eva,105,Marswalk plan(resume),replan,4.1
+PR1_full_eva,106,Marswalk plan(),plan,52.9
+PR1_full_eva,106,Marswalk plan(resume),replan,8.8
+PR1_full_eva,107,Marswalk plan(),plan,18.2
+PR1_full_eva,107,Marswalk plan(resume),replan,4.4
+PR1_full_eva,108,Marswalk plan(),plan,19.8
+PR1_full_eva,108,Marswalk plan(resume),replan,5.3
+PR1_full_eva,109,Marswalk plan(),plan,42.1
+PR1_full_eva,109,Marswalk plan(resume),replan,9.1
+PR1_full_eva,110,Marswalk plan(),plan,52.1
+PR1_full_eva,110,Marswalk plan(resume),replan,12.5
+PR1_full_eva,111,Marswalk plan(),plan,38.4
+PR1_full_eva,111,Marswalk plan(resume),replan,9.4
+PR1_full_eva,112,Marswalk plan(),plan,18.2
+PR1_full_eva,112,Marswalk plan(resume),replan,4.3
+PR1_full_eva,113,Marswalk plan(),plan,40.8
+PR1_full_eva,113,Marswalk plan(resume),replan,7.2
+PR1_full_eva,114,Marswalk plan(),plan,17.8
+PR1_full_eva,114,Marswalk plan(resume),replan,4.2
+PR1_full_eva,115,Marswalk plan(),plan,18.4
+PR1_full_eva,115,Marswalk plan(resume),replan,4.1
+PR1_full_eva,116,Marswalk plan(),plan,27.7
+PR1_full_eva,116,Marswalk plan(resume),replan,6.4
+PR1_full_eva,117,Marswalk plan(),plan,20.4
+PR1_full_eva,117,Marswalk plan(resume),replan,4.5
+PR1_full_eva,118,Marswalk plan(),plan,38.5
+PR1_full_eva,118,Marswalk plan(resume),replan,8.8
+PR1_full_eva,119,Marswalk plan(),plan,62.4
+PR1_full_eva,119,Marswalk plan(resume),replan,15.5
+PR1_full_eva,120,Marswalk plan(),plan,23.4
+PR1_full_eva,120,Marswalk plan(resume),replan,5.2
+PR1_full_eva,121,Marswalk plan(),plan,29.6
+PR1_full_eva,121,Marswalk plan(resume),replan,6.5
+PR1_full_eva,122,Marswalk plan(),plan,19.8
+PR1_full_eva,122,Marswalk plan(resume),replan,4.5
+PR1_full_eva,123,Marswalk plan(),plan,46.5
+PR1_full_eva,123,Marswalk plan(resume),replan,10.6
+PR1_full_eva,124,Marswalk plan(),plan,4.2
+PR1_full_eva,125,Marswalk plan(),plan,40.1
+PR1_full_eva,125,Marswalk plan(resume),replan,9.5
+PR1_full_eva,126,Marswalk plan(),plan,17.9
+PR1_full_eva,126,Marswalk plan(resume),replan,4.7
+PR1_full_eva,127,Marswalk plan(),plan,37.9
+PR1_full_eva,127,Marswalk plan(resume),replan,9.3
+PR1_full_eva,128,Marswalk plan(),plan,46.5
+PR1_full_eva,128,Marswalk plan(resume),replan,11.7
+PR1_full_eva,129,Marswalk plan(),plan,59.1
+PR1_full_eva,129,Marswalk plan(resume),replan,15
+PR1_full_eva,130,Marswalk plan(),plan,21.2
+PR1_full_eva,130,Marswalk plan(resume),replan,4.6
+PR1_full_eva,131,Marswalk plan(),plan,41.1
+PR1_full_eva,131,Marswalk plan(resume),replan,8.6
+PR1_full_eva,132,Marswalk plan(),plan,53
+PR1_full_eva,132,Marswalk plan(resume),replan,12.3
+PR1_full_eva,133,Marswalk plan(),plan,46
+PR1_full_eva,133,Marswalk plan(resume),replan,12.1
+PR1_full_eva,134,Marswalk plan(),plan,36.3
+PR1_full_eva,134,Marswalk plan(resume),replan,6.7
+PR1_full_eva,135,Marswalk plan(),plan,35.3
+PR1_full_eva,135,Marswalk plan(resume),replan,6.3
+PR1_full_eva,136,Marswalk plan(),plan,40.9
+PR1_full_eva,136,Marswalk plan(resume),replan,8.3
+PR1_full_eva,137,Marswalk plan(),plan,19.9
+PR1_full_eva,137,Marswalk plan(resume),replan,5.5
+PR1_full_eva,138,Marswalk plan(),plan,41
+PR1_full_eva,138,Marswalk plan(resume),replan,9.7
+PR1_full_eva,139,Marswalk plan(),plan,26.2
+PR1_full_eva,139,Marswalk plan(resume),replan,5.2
+PR1_full_eva,140,Marswalk plan(),plan,40.3
+PR1_full_eva,140,Marswalk plan(resume),replan,9.7
+PR1_full_eva,141,Marswalk plan(),plan,36.9
+PR1_full_eva,141,Marswalk plan(resume),replan,6.6
+PR1_full_eva,142,Marswalk plan(),plan,48.4
+PR1_full_eva,142,Marswalk plan(resume),replan,10.6
+PR1_full_eva,143,Marswalk plan(),plan,70.8
+PR1_full_eva,143,Marswalk plan(resume),replan,19.1
+PR1_full_eva,144,Marswalk plan(),plan,39.9
+PR1_full_eva,144,Marswalk plan(resume),replan,9.1
+PR1_full_eva,145,Marswalk plan(),plan,60.3
+PR1_full_eva,145,Marswalk plan(resume),replan,14.9
+PR1_full_eva,146,Marswalk plan(),plan,68.5
+PR1_full_eva,146,Marswalk plan(resume),replan,17.1
+PR1_full_eva,147,Marswalk plan(),plan,46.6
+PR1_full_eva,147,Marswalk plan(resume),replan,10.4
+PR1_full_eva,148,Marswalk plan(),plan,18.5
+PR1_full_eva,148,Marswalk plan(resume),replan,4.3
+PR1_full_eva,149,Marswalk plan(),plan,24.5
+PR1_full_eva,149,Marswalk plan(resume),replan,6
+PR1_full_eva,150,Marswalk plan(),plan,23.4
+PR1_full_eva,150,Marswalk plan(resume),replan,5
+PR1_full_eva,151,Marswalk plan(),plan,46.8
+PR1_full_eva,151,Marswalk plan(resume),replan,11.9
+PR1_full_eva,152,Marswalk plan(),plan,48.5
+PR1_full_eva,152,Marswalk plan(resume),replan,10.8
+PR1_full_eva,153,Marswalk plan(),plan,79
+PR1_full_eva,153,Marswalk plan(resume),replan,21.3
+PR1_full_eva,154,Marswalk plan(),plan,38.1
+PR1_full_eva,154,Marswalk plan(resume),replan,8.8
+PR1_full_eva,155,Marswalk plan(),plan,41
+PR1_full_eva,155,Marswalk plan(resume),replan,8.2
+PR1_full_eva,156,Marswalk plan(),plan,48.2
+PR1_full_eva,156,Marswalk plan(resume),replan,10.7
+PR1_full_eva,157,Marswalk plan(),plan,22.4
+PR1_full_eva,157,Marswalk plan(resume),replan,4.9
+PR1_full_eva,158,Marswalk plan(),plan,42.4
+PR1_full_eva,158,Marswalk plan(resume),replan,8.7
+PR1_full_eva,159,Marswalk plan(),plan,48
+PR1_full_eva,159,Marswalk plan(resume),replan,9.5
+PR1_full_eva,160,Marswalk plan(),plan,25
+PR1_full_eva,160,Marswalk plan(resume),replan,5.3
+PR1_full_eva,161,Marswalk plan(),plan,18.7
+PR1_full_eva,161,Marswalk plan(resume),replan,4.2
+PR1_full_eva,162,Marswalk plan(),plan,70.7
+PR1_full_eva,162,Marswalk plan(resume),replan,19.8
+PR1_full_eva,163,Marswalk plan(),plan,19.8
+PR1_full_eva,163,Marswalk plan(resume),replan,4.6
+PR1_full_eva,164,Marswalk plan(),plan,36.7
+PR1_full_eva,164,Marswalk plan(resume),replan,8.8
+PR1_full_eva,165,Marswalk plan(),plan,48.8
+PR1_full_eva,165,Marswalk plan(resume),replan,10.7
+PR1_full_eva,166,Marswalk plan(),plan,74.1
+PR1_full_eva,166,Marswalk plan(resume),replan,21
+PR1_full_eva,167,Marswalk plan(),plan,50.5
+PR1_full_eva,167,Marswalk plan(resume),replan,13.2
+PR1_full_eva,168,Marswalk plan(),plan,18.9
+PR1_full_eva,168,Marswalk plan(resume),replan,4.5
+PR1_full_eva,169,Marswalk plan(),plan,20
+PR1_full_eva,169,Marswalk plan(resume),replan,6
+PR1_full_eva,170,Marswalk plan(),plan,48.2
+PR1_full_eva,170,Marswalk plan(resume),replan,10.6
+PR1_full_eva,171,Marswalk plan(),plan,33.6
+PR1_full_eva,171,Marswalk plan(resume),replan,7.9
+PR1_full_eva,172,Marswalk plan(),plan,73.8
+PR1_full_eva,172,Marswalk plan(resume),replan,19.3
+PR1_full_eva,173,Marswalk plan(),plan,21.3
+PR1_full_eva,173,Marswalk plan(resume),replan,4.9
+PR1_full_eva,174,Marswalk plan(),plan,21.5
+PR1_full_eva,174,Marswalk plan(resume),replan,4.8
+PR1_full_eva,175,Marswalk plan(),plan,37.1
+PR1_full_eva,175,Marswalk plan(resume),replan,6.8
+PR1_full_eva,176,Marswalk plan(),plan,35.5
+PR1_full_eva,176,Marswalk plan(resume),replan,7.4
+PR1_full_eva,177,Marswalk plan(),plan,18.9
+PR1_full_eva,177,Marswalk plan(resume),replan,4.3
+PR1_full_eva,178,Marswalk plan(),plan,49.7
+PR1_full_eva,178,Marswalk plan(resume),replan,11
+PR1_full_eva,179,Marswalk plan(),plan,18.7
+PR1_full_eva,179,Marswalk plan(resume),replan,4.4
+PR1_full_eva,180,Marswalk plan(),plan,22.3
+PR1_full_eva,180,Marswalk plan(resume),replan,5
+PR1_full_eva,181,Marswalk plan(),plan,18.3
+PR1_full_eva,181,Marswalk plan(resume),replan,4.2
+PR1_full_eva,182,Marswalk plan(),plan,40
+PR1_full_eva,182,Marswalk plan(resume),replan,9.7
+PR1_full_eva,183,Marswalk plan(),plan,34.9
+PR1_full_eva,183,Marswalk plan(resume),replan,7.7
+PR1_full_eva,184,Marswalk plan(),plan,61.8
+PR1_full_eva,184,Marswalk plan(resume),replan,15.1
+PR1_full_eva,185,Marswalk plan(),plan,52.9
+PR1_full_eva,185,Marswalk plan(resume),replan,13.5
+PR1_full_eva,186,Marswalk plan(),plan,42.3
+PR1_full_eva,186,Marswalk plan(resume),replan,10.2
+PR1_full_eva,187,Marswalk plan(),plan,48.1
+PR1_full_eva,187,Marswalk plan(resume),replan,10.7
+PR1_full_eva,188,Marswalk plan(),plan,48
+PR1_full_eva,188,Marswalk plan(resume),replan,12.5
+PR1_full_eva,189,Marswalk plan(),plan,21.1
+PR1_full_eva,189,Marswalk plan(resume),replan,4.5
+PR1_full_eva,190,Marswalk plan(),plan,20.4
+PR1_full_eva,190,Marswalk plan(resume),replan,4.7
+PR1_full_eva,191,Marswalk plan(),plan,8.2
+PR1_full_eva,192,Marswalk plan(),plan,47
+PR1_full_eva,192,Marswalk plan(resume),replan,11.5
+PR1_full_eva,193,Marswalk plan(),plan,59.3
+PR1_full_eva,193,Marswalk plan(resume),replan,7.6
+PR1_full_eva,194,Marswalk plan(),plan,23.5
+PR1_full_eva,194,Marswalk plan(resume),replan,5.1
+PR1_full_eva,195,Marswalk plan(),plan,26.6
+PR1_full_eva,195,Marswalk plan(resume),replan,5.6
+PR1_full_eva,196,Marswalk plan(),plan,34.8
+PR1_full_eva,196,Marswalk plan(resume),replan,7.1
+PR1_full_eva,197,Marswalk plan(),plan,20.1
+PR1_full_eva,197,Marswalk plan(resume),replan,4.7
+PR1_full_eva,198,Marswalk plan(),plan,25.5
+PR1_full_eva,198,Marswalk plan(resume),replan,6.4
+PR1_full_eva,199,Marswalk plan(),plan,23.1
+PR1_full_eva,199,Marswalk plan(resume),replan,4.8
+HAB1_full_eva,0,Marswalk plan(),plan,222.3
+HAB1_full_eva,1,Marswalk plan(),plan,35.6
+HAB1_full_eva,2,Marswalk plan(),plan,74.9
+HAB1_full_eva,3,Marswalk plan(),plan,45.5
+HAB1_full_eva,4,Marswalk plan(),plan,35.5
+HAB1_full_eva,5,Marswalk plan(),plan,94.3
+HAB1_full_eva,6,Marswalk plan(),plan,54
+HAB1_full_eva,7,Marswalk plan(),plan,55
+HAB1_full_eva,8,Marswalk plan(),plan,38.6
+HAB1_full_eva,9,Marswalk plan(),plan,43.6
+HAB1_full_eva,10,Marswalk plan(),plan,71.6
+HAB1_full_eva,11,Marswalk plan(),plan,45.3
+HAB1_full_eva,12,Marswalk plan(),plan,43.9
+HAB1_full_eva,13,Marswalk plan(),plan,72
+HAB1_full_eva,14,Marswalk plan(),plan,85
+HAB1_full_eva,15,Marswalk plan(),plan,100.6
+HAB1_full_eva,16,Marswalk plan(),plan,36.7
+HAB1_full_eva,17,Marswalk plan(),plan,100.6
+HAB1_full_eva,18,Marswalk plan(),plan,28.4
+HAB1_full_eva,19,Marswalk plan(),plan,45.4
+HAB1_full_eva,20,Marswalk plan(),plan,100.1
+HAB1_full_eva,21,Marswalk plan(),plan,44.7
+HAB1_full_eva,22,Marswalk plan(),plan,45.4
+HAB1_full_eva,23,Marswalk plan(),plan,84.4
+HAB1_full_eva,24,Marswalk plan(),plan,49
+HAB1_full_eva,25,Marswalk plan(),plan,61
+HAB1_full_eva,26,Marswalk plan(),plan,85.4
+HAB1_full_eva,27,Marswalk plan(),plan,55.2
+HAB1_full_eva,28,Marswalk plan(),plan,103.2
+HAB1_full_eva,29,Marswalk plan(),plan,97.7
+HAB1_full_eva,30,Marswalk plan(),plan,87.8
+HAB1_full_eva,31,Marswalk plan(),plan,87.8
+HAB1_full_eva,32,Marswalk plan(),plan,115.2
+HAB1_full_eva,33,Marswalk plan(),plan,37.4
+HAB1_full_eva,34,Marswalk plan(),plan,82
+HAB1_full_eva,35,Marswalk plan(),plan,72.9
+HAB1_full_eva,36,Marswalk plan(),plan,40.4
+HAB1_full_eva,37,Marswalk plan(),plan,121.6
+HAB1_full_eva,38,Marswalk plan(),plan,55.6
+HAB1_full_eva,39,Marswalk plan(),plan,72.2
+HAB1_full_eva,40,Marswalk plan(),plan,56.4
+HAB1_full_eva,41,Marswalk plan(),plan,88.7
+HAB1_full_eva,42,Marswalk plan(),plan,90.9
+HAB1_full_eva,43,Marswalk plan(),plan,36.8
+HAB1_full_eva,44,Marswalk plan(),plan,10.7
+HAB1_full_eva,45,Marswalk plan(),plan,73.6
+HAB1_full_eva,46,Marswalk plan(),plan,9.1
+HAB1_full_eva,47,Marswalk plan(),plan,79.3
+HAB1_full_eva,48,Marswalk plan(),plan,44.6
+HAB1_full_eva,49,Marswalk plan(),plan,79.8
+HAB1_full_eva,50,Marswalk plan(),plan,92
+HAB1_full_eva,51,Marswalk plan(),plan,62
+HAB1_full_eva,52,Marswalk plan(),plan,44.9
+HAB1_full_eva,53,Marswalk plan(),plan,52.3
+HAB1_full_eva,54,Marswalk plan(),plan,54.1
+HAB1_full_eva,55,Marswalk plan(),plan,79.8
+HAB1_full_eva,56,Marswalk plan(),plan,38
+HAB1_full_eva,57,Marswalk plan(),plan,36.9
+HAB1_full_eva,58,Marswalk plan(),plan,36.5
+HAB1_full_eva,59,Marswalk plan(),plan,37.1
+oversub,0,Marswalk plan(),plan,1586.5
+oversub,0,"nearest-first (route matrix prebuilt, untimed)",plan,6.1
+oversub,1,Marswalk plan(),plan,131.7
+oversub,1,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,2,Marswalk plan(),plan,125.3
+oversub,2,"nearest-first (route matrix prebuilt, untimed)",plan,5.3
+oversub,3,Marswalk plan(),plan,105.3
+oversub,3,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,4,Marswalk plan(),plan,105.9
+oversub,4,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,5,Marswalk plan(),plan,106.7
+oversub,5,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,6,Marswalk plan(),plan,104.9
+oversub,6,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,7,Marswalk plan(),plan,104.7
+oversub,7,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,8,Marswalk plan(),plan,105.4
+oversub,8,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,9,Marswalk plan(),plan,109.1
+oversub,9,"nearest-first (route matrix prebuilt, untimed)",plan,5.4
+oversub,10,Marswalk plan(),plan,108.2
+oversub,10,"nearest-first (route matrix prebuilt, untimed)",plan,3.9
+oversub,11,Marswalk plan(),plan,104.5
+oversub,11,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,12,Marswalk plan(),plan,107.5
+oversub,12,"nearest-first (route matrix prebuilt, untimed)",plan,6.1
+oversub,13,Marswalk plan(),plan,105.3
+oversub,13,"nearest-first (route matrix prebuilt, untimed)",plan,2.5
+oversub,14,Marswalk plan(),plan,108.7
+oversub,14,"nearest-first (route matrix prebuilt, untimed)",plan,3.2
+oversub,15,Marswalk plan(),plan,107.3
+oversub,15,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,16,Marswalk plan(),plan,105.1
+oversub,16,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,17,Marswalk plan(),plan,104.1
+oversub,17,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,18,Marswalk plan(),plan,104.6
+oversub,18,"nearest-first (route matrix prebuilt, untimed)",plan,6.2
+oversub,19,Marswalk plan(),plan,101.5
+oversub,19,"nearest-first (route matrix prebuilt, untimed)",plan,2.7
+oversub,20,Marswalk plan(),plan,105.1
+oversub,20,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,21,Marswalk plan(),plan,106.7
+oversub,21,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,22,Marswalk plan(),plan,105.9
+oversub,22,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,23,Marswalk plan(),plan,102.7
+oversub,23,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,24,Marswalk plan(),plan,105.2
+oversub,24,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,25,Marswalk plan(),plan,105.1
+oversub,25,"nearest-first (route matrix prebuilt, untimed)",plan,3.6
+oversub,26,Marswalk plan(),plan,106.5
+oversub,26,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,27,Marswalk plan(),plan,108.2
+oversub,27,"nearest-first (route matrix prebuilt, untimed)",plan,4.3
+oversub,28,Marswalk plan(),plan,114.2
+oversub,28,"nearest-first (route matrix prebuilt, untimed)",plan,4.1
+oversub,29,Marswalk plan(),plan,113.7
+oversub,29,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,30,Marswalk plan(),plan,104.6
+oversub,30,"nearest-first (route matrix prebuilt, untimed)",plan,2
+oversub,31,Marswalk plan(),plan,104.8
+oversub,31,"nearest-first (route matrix prebuilt, untimed)",plan,3.9
+oversub,32,Marswalk plan(),plan,105.3
+oversub,32,"nearest-first (route matrix prebuilt, untimed)",plan,3.2
+oversub,33,Marswalk plan(),plan,104.8
+oversub,33,"nearest-first (route matrix prebuilt, untimed)",plan,4.7
+oversub,34,Marswalk plan(),plan,106.7
+oversub,34,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,35,Marswalk plan(),plan,107.3
+oversub,35,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,36,Marswalk plan(),plan,107.4
+oversub,36,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,37,Marswalk plan(),plan,108.3
+oversub,37,"nearest-first (route matrix prebuilt, untimed)",plan,5.6
+oversub,38,Marswalk plan(),plan,109.3
+oversub,38,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,39,Marswalk plan(),plan,105.3
+oversub,39,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,40,Marswalk plan(),plan,102.9
+oversub,40,"nearest-first (route matrix prebuilt, untimed)",plan,2.6
+oversub,41,Marswalk plan(),plan,103.7
+oversub,41,"nearest-first (route matrix prebuilt, untimed)",plan,2.5
+oversub,42,Marswalk plan(),plan,106.5
+oversub,42,"nearest-first (route matrix prebuilt, untimed)",plan,4.3
+oversub,43,Marswalk plan(),plan,106.9
+oversub,43,"nearest-first (route matrix prebuilt, untimed)",plan,4.1
+oversub,44,Marswalk plan(),plan,107.1
+oversub,44,"nearest-first (route matrix prebuilt, untimed)",plan,5.2
+oversub,45,Marswalk plan(),plan,103.4
+oversub,45,"nearest-first (route matrix prebuilt, untimed)",plan,4.8
+oversub,46,Marswalk plan(),plan,106.5
+oversub,46,"nearest-first (route matrix prebuilt, untimed)",plan,4.1
+oversub,47,Marswalk plan(),plan,107.5
+oversub,47,"nearest-first (route matrix prebuilt, untimed)",plan,4.5
+oversub,48,Marswalk plan(),plan,109.3
+oversub,48,"nearest-first (route matrix prebuilt, untimed)",plan,2.9
+oversub,49,Marswalk plan(),plan,103.4
+oversub,49,"nearest-first (route matrix prebuilt, untimed)",plan,2.7
+oversub,50,Marswalk plan(),plan,105.2
+oversub,50,"nearest-first (route matrix prebuilt, untimed)",plan,3.9
+oversub,51,Marswalk plan(),plan,103.3
+oversub,51,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,52,Marswalk plan(),plan,105.6
+oversub,52,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,53,Marswalk plan(),plan,108.1
+oversub,53,"nearest-first (route matrix prebuilt, untimed)",plan,4.3
+oversub,54,Marswalk plan(),plan,104.6
+oversub,54,"nearest-first (route matrix prebuilt, untimed)",plan,2.9
+oversub,55,Marswalk plan(),plan,106.9
+oversub,55,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,56,Marswalk plan(),plan,105.5
+oversub,56,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,57,Marswalk plan(),plan,105
+oversub,57,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,58,Marswalk plan(),plan,110.2
+oversub,58,"nearest-first (route matrix prebuilt, untimed)",plan,2.4
+oversub,59,Marswalk plan(),plan,106.6
+oversub,59,"nearest-first (route matrix prebuilt, untimed)",plan,4.4
+oversub,60,Marswalk plan(),plan,113.1
+oversub,60,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,61,Marswalk plan(),plan,106.6
+oversub,61,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,62,Marswalk plan(),plan,105.7
+oversub,62,"nearest-first (route matrix prebuilt, untimed)",plan,4.7
+oversub,63,Marswalk plan(),plan,104
+oversub,63,"nearest-first (route matrix prebuilt, untimed)",plan,3.6
+oversub,64,Marswalk plan(),plan,103.9
+oversub,64,"nearest-first (route matrix prebuilt, untimed)",plan,2.4
+oversub,65,Marswalk plan(),plan,105.7
+oversub,65,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,66,Marswalk plan(),plan,108.4
+oversub,66,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,67,Marswalk plan(),plan,105.4
+oversub,67,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,68,Marswalk plan(),plan,108.6
+oversub,68,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,69,Marswalk plan(),plan,111.4
+oversub,69,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,70,Marswalk plan(),plan,106.8
+oversub,70,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,71,Marswalk plan(),plan,106.9
+oversub,71,"nearest-first (route matrix prebuilt, untimed)",plan,3.6
+oversub,72,Marswalk plan(),plan,105
+oversub,72,"nearest-first (route matrix prebuilt, untimed)",plan,4.3
+oversub,73,Marswalk plan(),plan,105.1
+oversub,73,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,74,Marswalk plan(),plan,106.3
+oversub,74,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,75,Marswalk plan(),plan,108
+oversub,75,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,76,Marswalk plan(),plan,105.2
+oversub,76,"nearest-first (route matrix prebuilt, untimed)",plan,5.9
+oversub,77,Marswalk plan(),plan,105.6
+oversub,77,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,78,Marswalk plan(),plan,105.4
+oversub,78,"nearest-first (route matrix prebuilt, untimed)",plan,2.6
+oversub,79,Marswalk plan(),plan,107.1
+oversub,79,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,80,Marswalk plan(),plan,109.1
+oversub,80,"nearest-first (route matrix prebuilt, untimed)",plan,2.5
+oversub,81,Marswalk plan(),plan,110.2
+oversub,81,"nearest-first (route matrix prebuilt, untimed)",plan,3.9
+oversub,82,Marswalk plan(),plan,108.9
+oversub,82,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,83,Marswalk plan(),plan,107.6
+oversub,83,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,84,Marswalk plan(),plan,105.7
+oversub,84,"nearest-first (route matrix prebuilt, untimed)",plan,3.2
+oversub,85,Marswalk plan(),plan,105.8
+oversub,85,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,86,Marswalk plan(),plan,104.8
+oversub,86,"nearest-first (route matrix prebuilt, untimed)",plan,4.5
+oversub,87,Marswalk plan(),plan,105.1
+oversub,87,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,88,Marswalk plan(),plan,105.3
+oversub,88,"nearest-first (route matrix prebuilt, untimed)",plan,4.5
+oversub,89,Marswalk plan(),plan,105.9
+oversub,89,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,90,Marswalk plan(),plan,106.9
+oversub,90,"nearest-first (route matrix prebuilt, untimed)",plan,3.9
+oversub,91,Marswalk plan(),plan,107.6
+oversub,91,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,92,Marswalk plan(),plan,105.8
+oversub,92,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,93,Marswalk plan(),plan,107.2
+oversub,93,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,94,Marswalk plan(),plan,104.9
+oversub,94,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,95,Marswalk plan(),plan,105.4
+oversub,95,"nearest-first (route matrix prebuilt, untimed)",plan,3.2
+oversub,96,Marswalk plan(),plan,111.4
+oversub,96,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,97,Marswalk plan(),plan,108.5
+oversub,97,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,98,Marswalk plan(),plan,106.8
+oversub,98,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,99,Marswalk plan(),plan,106.4
+oversub,99,"nearest-first (route matrix prebuilt, untimed)",plan,2.9
+oversub,100,Marswalk plan(),plan,112.2
+oversub,100,"nearest-first (route matrix prebuilt, untimed)",plan,2.9
+oversub,101,Marswalk plan(),plan,106.1
+oversub,101,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,102,Marswalk plan(),plan,107.7
+oversub,102,"nearest-first (route matrix prebuilt, untimed)",plan,3.9
+oversub,103,Marswalk plan(),plan,106.1
+oversub,103,"nearest-first (route matrix prebuilt, untimed)",plan,3.6
+oversub,104,Marswalk plan(),plan,106.2
+oversub,104,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,105,Marswalk plan(),plan,106.6
+oversub,105,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,106,Marswalk plan(),plan,109.6
+oversub,106,"nearest-first (route matrix prebuilt, untimed)",plan,5.7
+oversub,107,Marswalk plan(),plan,110.7
+oversub,107,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,108,Marswalk plan(),plan,104.8
+oversub,108,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,109,Marswalk plan(),plan,103.8
+oversub,109,"nearest-first (route matrix prebuilt, untimed)",plan,3.6
+oversub,110,Marswalk plan(),plan,112
+oversub,110,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,111,Marswalk plan(),plan,107.2
+oversub,111,"nearest-first (route matrix prebuilt, untimed)",plan,3.2
+oversub,112,Marswalk plan(),plan,107.2
+oversub,112,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,113,Marswalk plan(),plan,105.9
+oversub,113,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,114,Marswalk plan(),plan,104.1
+oversub,114,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,115,Marswalk plan(),plan,106.6
+oversub,115,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,116,Marswalk plan(),plan,110.7
+oversub,116,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,117,Marswalk plan(),plan,109.6
+oversub,117,"nearest-first (route matrix prebuilt, untimed)",plan,6.7
+oversub,118,Marswalk plan(),plan,106.1
+oversub,118,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,119,Marswalk plan(),plan,106.8
+oversub,119,"nearest-first (route matrix prebuilt, untimed)",plan,3.9
+oversub,120,Marswalk plan(),plan,107.2
+oversub,120,"nearest-first (route matrix prebuilt, untimed)",plan,3.2
+oversub,121,Marswalk plan(),plan,107.9
+oversub,121,"nearest-first (route matrix prebuilt, untimed)",plan,4.3
+oversub,122,Marswalk plan(),plan,111.5
+oversub,122,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,123,Marswalk plan(),plan,105.2
+oversub,123,"nearest-first (route matrix prebuilt, untimed)",plan,4.1
+oversub,124,Marswalk plan(),plan,106.6
+oversub,124,"nearest-first (route matrix prebuilt, untimed)",plan,2.1
+oversub,125,Marswalk plan(),plan,106.7
+oversub,125,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,126,Marswalk plan(),plan,105.3
+oversub,126,"nearest-first (route matrix prebuilt, untimed)",plan,2.8
+oversub,127,Marswalk plan(),plan,110.2
+oversub,127,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,128,Marswalk plan(),plan,105.3
+oversub,128,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,129,Marswalk plan(),plan,105
+oversub,129,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,130,Marswalk plan(),plan,104.3
+oversub,130,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,131,Marswalk plan(),plan,105.5
+oversub,131,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,132,Marswalk plan(),plan,111.3
+oversub,132,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,133,Marswalk plan(),plan,110.5
+oversub,133,"nearest-first (route matrix prebuilt, untimed)",plan,4.4
+oversub,134,Marswalk plan(),plan,109
+oversub,134,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,135,Marswalk plan(),plan,109.9
+oversub,135,"nearest-first (route matrix prebuilt, untimed)",plan,2.4
+oversub,136,Marswalk plan(),plan,107.2
+oversub,136,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,137,Marswalk plan(),plan,107.3
+oversub,137,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,138,Marswalk plan(),plan,104.6
+oversub,138,"nearest-first (route matrix prebuilt, untimed)",plan,2.9
+oversub,139,Marswalk plan(),plan,105.5
+oversub,139,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,140,Marswalk plan(),plan,107.2
+oversub,140,"nearest-first (route matrix prebuilt, untimed)",plan,2.5
+oversub,141,Marswalk plan(),plan,105.8
+oversub,141,"nearest-first (route matrix prebuilt, untimed)",plan,3.1
+oversub,142,Marswalk plan(),plan,105.5
+oversub,142,"nearest-first (route matrix prebuilt, untimed)",plan,4.2
+oversub,143,Marswalk plan(),plan,109.7
+oversub,143,"nearest-first (route matrix prebuilt, untimed)",plan,4.1
+oversub,144,Marswalk plan(),plan,107.4
+oversub,144,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,145,Marswalk plan(),plan,106.3
+oversub,145,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,146,Marswalk plan(),plan,103.6
+oversub,146,"nearest-first (route matrix prebuilt, untimed)",plan,2.4
+oversub,147,Marswalk plan(),plan,104.2
+oversub,147,"nearest-first (route matrix prebuilt, untimed)",plan,4.2
+oversub,148,Marswalk plan(),plan,107.8
+oversub,148,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,149,Marswalk plan(),plan,108.7
+oversub,149,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,150,Marswalk plan(),plan,104.5
+oversub,150,"nearest-first (route matrix prebuilt, untimed)",plan,3.6
+oversub,151,Marswalk plan(),plan,104.5
+oversub,151,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,152,Marswalk plan(),plan,109
+oversub,152,"nearest-first (route matrix prebuilt, untimed)",plan,4
+oversub,153,Marswalk plan(),plan,104.2
+oversub,153,"nearest-first (route matrix prebuilt, untimed)",plan,2.5
+oversub,154,Marswalk plan(),plan,109.4
+oversub,154,"nearest-first (route matrix prebuilt, untimed)",plan,4.7
+oversub,155,Marswalk plan(),plan,107.3
+oversub,155,"nearest-first (route matrix prebuilt, untimed)",plan,3.4
+oversub,156,Marswalk plan(),plan,106.1
+oversub,156,"nearest-first (route matrix prebuilt, untimed)",plan,7.2
+oversub,157,Marswalk plan(),plan,105.6
+oversub,157,"nearest-first (route matrix prebuilt, untimed)",plan,4.2
+oversub,158,Marswalk plan(),plan,108.4
+oversub,158,"nearest-first (route matrix prebuilt, untimed)",plan,4.1
+oversub,159,Marswalk plan(),plan,104.7
+oversub,159,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,160,Marswalk plan(),plan,108.2
+oversub,160,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,161,Marswalk plan(),plan,104.5
+oversub,161,"nearest-first (route matrix prebuilt, untimed)",plan,3.6
+oversub,162,Marswalk plan(),plan,108.5
+oversub,162,"nearest-first (route matrix prebuilt, untimed)",plan,4.5
+oversub,163,Marswalk plan(),plan,112.1
+oversub,163,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,164,Marswalk plan(),plan,106.1
+oversub,164,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,165,Marswalk plan(),plan,109.5
+oversub,165,"nearest-first (route matrix prebuilt, untimed)",plan,4.8
+oversub,166,Marswalk plan(),plan,105.7
+oversub,166,"nearest-first (route matrix prebuilt, untimed)",plan,3.2
+oversub,167,Marswalk plan(),plan,105.2
+oversub,167,"nearest-first (route matrix prebuilt, untimed)",plan,4.1
+oversub,168,Marswalk plan(),plan,109.4
+oversub,168,"nearest-first (route matrix prebuilt, untimed)",plan,3.6
+oversub,169,Marswalk plan(),plan,106.3
+oversub,169,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,170,Marswalk plan(),plan,121.7
+oversub,170,"nearest-first (route matrix prebuilt, untimed)",plan,4.5
+oversub,171,Marswalk plan(),plan,107.5
+oversub,171,"nearest-first (route matrix prebuilt, untimed)",plan,6.5
+oversub,172,Marswalk plan(),plan,105.2
+oversub,172,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,173,Marswalk plan(),plan,105.2
+oversub,173,"nearest-first (route matrix prebuilt, untimed)",plan,5.3
+oversub,174,Marswalk plan(),plan,118.5
+oversub,174,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,175,Marswalk plan(),plan,107.3
+oversub,175,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,176,Marswalk plan(),plan,109.7
+oversub,176,"nearest-first (route matrix prebuilt, untimed)",plan,3.5
+oversub,177,Marswalk plan(),plan,107.3
+oversub,177,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,178,Marswalk plan(),plan,105.6
+oversub,178,"nearest-first (route matrix prebuilt, untimed)",plan,4.3
+oversub,179,Marswalk plan(),plan,110.5
+oversub,179,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,180,Marswalk plan(),plan,107.1
+oversub,180,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,181,Marswalk plan(),plan,103.4
+oversub,181,"nearest-first (route matrix prebuilt, untimed)",plan,2.7
+oversub,182,Marswalk plan(),plan,108.8
+oversub,182,"nearest-first (route matrix prebuilt, untimed)",plan,4.2
+oversub,183,Marswalk plan(),plan,106.4
+oversub,183,"nearest-first (route matrix prebuilt, untimed)",plan,3.3
+oversub,184,Marswalk plan(),plan,104.8
+oversub,184,"nearest-first (route matrix prebuilt, untimed)",plan,4.4
+oversub,185,Marswalk plan(),plan,108.4
+oversub,185,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,186,Marswalk plan(),plan,106.7
+oversub,186,"nearest-first (route matrix prebuilt, untimed)",plan,3.7
+oversub,187,Marswalk plan(),plan,109.1
+oversub,187,"nearest-first (route matrix prebuilt, untimed)",plan,3.8
+oversub,188,Marswalk plan(),plan,108.5
+oversub,188,"nearest-first (route matrix prebuilt, untimed)",plan,4.3
+oversub,189,Marswalk plan(),plan,103.9
+oversub,189,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,190,Marswalk plan(),plan,105.4
+oversub,190,"nearest-first (route matrix prebuilt, untimed)",plan,2.6
+oversub,191,Marswalk plan(),plan,105.8
+oversub,191,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,192,Marswalk plan(),plan,106.7
+oversub,192,"nearest-first (route matrix prebuilt, untimed)",plan,6.8
+oversub,193,Marswalk plan(),plan,108.4
+oversub,193,"nearest-first (route matrix prebuilt, untimed)",plan,2.4
+oversub,194,Marswalk plan(),plan,107.4
+oversub,194,"nearest-first (route matrix prebuilt, untimed)",plan,3
+oversub,195,Marswalk plan(),plan,110
+oversub,195,"nearest-first (route matrix prebuilt, untimed)",plan,6.7
+oversub,196,Marswalk plan(),plan,106.1
+oversub,196,"nearest-first (route matrix prebuilt, untimed)",plan,4.5
+oversub,197,Marswalk plan(),plan,110.6
+oversub,197,"nearest-first (route matrix prebuilt, untimed)",plan,10.8
+oversub,198,Marswalk plan(),plan,267.2
+oversub,198,"nearest-first (route matrix prebuilt, untimed)",plan,8.2
+oversub,199,Marswalk plan(),plan,155.3
+oversub,199,"nearest-first (route matrix prebuilt, untimed)",plan,4.5

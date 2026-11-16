@@ -261,8 +261,42 @@ export interface PlanRequest {
   /** Mid-EVA replan: where the crew is now and what is done. */
   resume?: { elapsedMin: number; cell: Cell; visited: string[]; o2UsedPct: number };
   planner?: { pathSearch: string; costModel: string };
+  /** Operator route priorities (soft preferences). Absent = DEFAULT_ROUTE_PREFS = today's fastest-safe routing. */
+  prefs?: RoutePrefs;
   seed: number;
 }
+
+/**
+ * Route priorities set by the EVA officer: which SAFE route to prefer. Each weight is 0..1 and shapes only the
+ * path search's cost (never the safety fields, never a rule limit); every plan is still checked against all hard
+ * rules by the simulator, so no setting can turn an unsafe walk into a GO. Team design: Research/docs/requirement.md
+ * ("Weight Control", "Route Comparison") and the mirim prototype's Priorities panel.
+ */
+export interface RoutePrefs {
+  /** Named preset this came from ('default' | 'fastest' | 'safest' | 'science' | 'radio' | 'custom'). */
+  preset?: string;
+  /** Walking time (always kept ≥ 0.05 so time still counts). */
+  distance: number;
+  /** Slope effort: prefer flatter ground (slope / slope limit, squared). */
+  slope: number;
+  /** Terrain safety: prefer smoother ground (DEM roughness). */
+  rough: number;
+  /** Firm ground: prefer high THEMIS thermal inertia (rock over loose sand). */
+  thermal: number;
+  /** Stay in radio contact: prefer ground in line of sight of a radio mast. */
+  radio: number;
+  /** Science-rich: bend toward stronger CRISM hydrated-sulfate signal (no effect where the site has no CRISM layer). */
+  science: number;
+}
+
+export const DEFAULT_ROUTE_PREFS: RoutePrefs = { preset: 'default', distance: 1, slope: 0, rough: 0, thermal: 0, radio: 0, science: 0 };
+
+export const ROUTE_PRESETS: { id: string; label: string; blurb: string; prefs: RoutePrefs }[] = [
+  { id: 'default', label: 'Fastest safe', blurb: 'Shortest walking time that keeps every safety rule', prefs: DEFAULT_ROUTE_PREFS },
+  { id: 'safest', label: 'Easiest ground', blurb: 'Avoids steep, rough and loose ground', prefs: { preset: 'safest', distance: 0.3, slope: 1, rough: 1, thermal: 0.5, radio: 0, science: 0 } },
+  { id: 'radio', label: 'Stay in contact', blurb: 'Keeps the crew in radio line of sight where it can', prefs: { preset: 'radio', distance: 0.5, slope: 0.2, rough: 0, thermal: 0, radio: 1, science: 0 } },
+  { id: 'science', label: 'Science-rich', blurb: 'Bends toward stronger orbital mineral signal (CRISM)', prefs: { preset: 'science', distance: 0.5, slope: 0.3, rough: 0.3, thermal: 0, radio: 0, science: 1 } },
+];
 
 export interface Check {
   rule: RuleId;
@@ -335,6 +369,8 @@ export interface PlanResult {
     energyKJ: number;
     o2UsedPct: number;
     doseUSv: number;
+    /** Dose of the same route with no terrain shielding (open sky); doseUSv <= this. Absent on old results. */
+    doseOpenSkyUSv?: number;
     scienceValue: number;
     maxDistHabM: number;
   };

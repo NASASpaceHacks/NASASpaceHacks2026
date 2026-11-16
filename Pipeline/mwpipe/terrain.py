@@ -1,4 +1,6 @@
-"""Stage 1 — terrain rasters (dem, slope, rough, normals) and the Curiosity traverse."""
+"""Stage 1 — terrain rasters (dem, slope, rough, normals) and the rover traverse (Curiosity or Perseverance).
+
+Per-site sources come from site.cfg (see common.SITES); without them the Gale constants below are used."""
 from __future__ import annotations
 
 import json
@@ -33,7 +35,11 @@ DEM_PROV = {
 
 
 def fetch_dem_window(site: Site, half_m: float = 2700.0) -> Path:
-    """Read only the AOI window of the 3.87 GB stripped GeoTIFF via /vsicurl/ and cache it (≈45 MB)."""
+    """Read only the AOI window of the (multi-GB, stripped) source GeoTIFF via /vsicurl/ and cache it (≈45 MB).
+
+    Both DEM sources (MSL Gale 1 m v3, Mars 2020 TRN HiRISE 1 m) are global equirectangular, clon 0, lat_ts 0, on the
+    Mars 2000 sphere. The Jezero file is uncompressed with one row per strip, so GTIFF_DIRECT_IO reads only the
+    window's columns of each row (~117 MB of range requests instead of ~460 MB of whole rows)."""
     import rasterio
     from rasterio.windows import from_bounds
 
@@ -45,7 +51,8 @@ def fetch_dem_window(site: Site, half_m: float = 2700.0) -> Path:
         return out
     xc, yc = MARS_R * math.radians(site.lon), MARS_R * math.radians(site.lat)  # source: eqc clon0, lat_ts 0
     t0 = time.time()
-    with rasterio.open("/vsicurl/" + DEM_URL) as src:
+    env = {"GTIFF_DIRECT_IO": "YES"} if site.opt("dem_direct_io") else {}
+    with rasterio.Env(**env), rasterio.open("/vsicurl/" + site.opt("dem_url", DEM_URL)) as src:
         win = from_bounds(xc - half_m, yc - half_m, xc + half_m, yc + half_m, src.transform).round_offsets().round_lengths()
         print(f"  DEM: reading window {win} via /vsicurl/ ...", flush=True)
         arr = src.read(1, window=win)
@@ -144,8 +151,9 @@ def build_terrain(site: Site, pack: Path, m: dict) -> dict:
     dem, rough, slope, nx, ny = dem_m[crop], rough_m[crop], slope_m[crop], nx_m[crop], ny_m[crop]
     assert dem.shape == (site.h, site.w)
 
-    acc = DEM_PROV["accuracy"] + (f" {n_fill} nodata 1 m samples filled by nearest neighbour." if n_fill else "")
-    prov = {**DEM_PROV, "accuracy": acc}
+    dem_prov = site.opt("dem_prov", DEM_PROV)
+    acc = dem_prov["accuracy"] + (f" {n_fill} nodata 1 m samples filled by nearest neighbour." if n_fill else "")
+    prov = {**dem_prov, "accuracy": acc}
     deriv = lambda what: {**prov, "accuracy": f"Derived ({what}) from the 1 m DEM. " + acc}  # noqa: E731
     layers = {
         "dem": dict(id="dem", label="Elevation (MOLA areoid)", kind="continuous", file="dem.bin", dtype="f32", bands=1,
@@ -203,8 +211,10 @@ def _dp(pts: np.ndarray, tol: float) -> np.ndarray:
 
 
 def build_traverse(site: Site, pack: Path, m: dict, context_m: float = 3000.0) -> dict:
-    trav = json.loads(cached_download(TRAVERSE_URL, "MSL_traverse.json", max_age_h=24).read_text())
-    wps = json.loads(cached_download(WAYPOINTS_URL, "MSL_waypoints.json", max_age_h=24).read_text())
+    trav_url, wp_url = site.opt("traverse_url", TRAVERSE_URL), site.opt("waypoints_url", WAYPOINTS_URL)
+    rover, mission = site.opt("rover_name", "Curiosity"), site.opt("mission", "Mars Science Laboratory (Curiosity)")
+    trav = json.loads(cached_download(trav_url, trav_url.rsplit("/", 1)[-1], max_age_h=24).read_text())
+    wps = json.loads(cached_download(wp_url, wp_url.rsplit("/", 1)[-1], max_age_h=24).read_text())
     x0, y0, x1, y1 = site.extent
     bx0, by0, bx1, by1 = x0 - context_m, y0 - context_m, x1 + context_m, y1 + context_m
 
@@ -237,18 +247,19 @@ def build_traverse(site: Site, pack: Path, m: dict, context_m: float = 3000.0) -
         i = j + 1
     n_pts = sum(len(l) for l in lines)
     m["traverse"] = {
-        "label": "Curiosity (MSL) traverse",
+        "label": site.opt("traverse_label", "Curiosity (MSL) traverse"),
         "lines": lines,
         "provenance": {
-            "mission": "Mars Science Laboratory (Curiosity)",
-            "instrument": "Rover localization (MSL operations team, MMGIS)",
-            "product": "MSL_traverse.json",
-            "url": TRAVERSE_URL,
+            "mission": mission,
+            "instrument": f"Rover localization ({site.opt('rover', 'MSL').upper()} operations team, MMGIS)",
+            "product": trav_url.rsplit("/", 1)[-1],
+            "url": trav_url,
             "license": "Public domain (NASA/JPL-Caltech)",
-            "citation": "NASA/JPL-Caltech MSL mission traverse map (MMGIS layer MSL_traverse.json, waypoints MSL_waypoints.json); "
-                        "rover positions localized on the HiRISE base map. Fetched " + time.strftime("%Y-%m-%d", time.gmtime()) + ".",
+            "citation": f"NASA/JPL-Caltech {site.opt('mission_short', 'MSL mission')} traverse map (MMGIS layer {trav_url.rsplit('/', 1)[-1]}, waypoints "
+                        f"{wp_url.rsplit('/', 1)[-1]}); rover positions localized on the HiRISE base map. Fetched "
+                        + time.strftime("%Y-%m-%d", time.gmtime()) + ".",
             "resolutionM": 1.0,
-            "accuracy": f"Localized against the MSL HiRISE base map (~1 m relative). Clipped to the AOI ± {context_m / 1000:g} km "
+            "accuracy": f"Localized against the {site.opt('basemap', 'MSL HiRISE base map')} (~1 m relative). Clipped to the AOI ± {context_m / 1000:g} km "
                         "and simplified (Douglas–Peucker, 0.25 m).",
         },
     }
@@ -263,8 +274,8 @@ def build_traverse(site: Site, pack: Path, m: dict, context_m: float = 3000.0) -
                            "y": round(float(wy), 2), "elevM": pr["elev_geoid"], "lon": pr["lon"], "lat": pr["lat"],
                            "cell": site.xy_to_cell(float(wx), float(wy))})
     (pack / "traverse_waypoints.json").write_text(json.dumps({
-        "source": WAYPOINTS_URL, "credit": "NASA/JPL-Caltech", "proj4": site.proj4,
-        "note": "Curiosity end-of-drive waypoints within the AOI ± 3 km, projected to the site eqc. cell = -1 outside the engine grid.",
+        "source": wp_url, "credit": "NASA/JPL-Caltech", "proj4": site.proj4,
+        "note": f"{rover} end-of-drive waypoints within the AOI ± 3 km, projected to the site eqc. cell = -1 outside the engine grid.",
         "waypoints": wp_out}, indent=0) + "\n")
     extra = m.setdefault("_extraFiles", [])
     if "traverse_waypoints.json" not in extra:

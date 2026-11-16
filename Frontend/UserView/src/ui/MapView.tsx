@@ -30,8 +30,8 @@ const ROSE_R = MAP_H * 0.62;
 const RES = 0.8; // m per px
 const D2R = Math.PI / 180;
 
-const G = '#4dff94', G2 = '#33c46f', G3 = '#1d7a45', A = '#ffb627', C = '#4ee6ff', R = '#ff4534';
-const FONT = (px: number) => `700 ${px}px "B612", "DIN Alternate", "Bahnschrift", "Arial Narrow", sans-serif`;
+const G = '#2dff6f', G2 = '#9aa3ad', G3 = '#5a636d', A = '#00e5ff', C = '#e9edf2', R = '#ff3b30', M = '#ff2bd6', W = '#e9edf2';
+const FONT = (px: number) => `700 ${px}px "Roboto Mono", "Barlow Condensed", sans-serif`;
 
 function hatch(color: string, gap = 16, width = 2): CanvasPattern | string {
   const cv = document.createElement('canvas');
@@ -54,7 +54,7 @@ function hatch(color: string, gap = 16, width = 2): CanvasPattern | string {
 const ownIcon =
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><path d="M32 4 L54 56 L32 44 L10 56 Z" fill="#f2fff7" stroke="#000" stroke-width="4" stroke-linejoin="round"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><path d="M32 4 L54 56 L32 44 L10 56 Z" fill="#e9edf2" stroke="#000" stroke-width="4" stroke-linejoin="round"/></svg>`,
   );
 
 const textStyle = (text: string, color: string, px: number, offsetY = 0, offsetX = 0, textAlign?: CanvasTextAlign) =>
@@ -97,12 +97,12 @@ function stopStyle(f: FeatureLike): Style | Style[] {
     });
   if (kind === 'home')
     return new Style({
-      image: new RegularShape({ points: 4, radius: 20, angle: Math.PI / 4, stroke: new Stroke({ color: C, width: 4 }), fill: new Fill({ color: 'rgba(78,230,255,0.15)' }) }),
+      image: new RegularShape({ points: 4, radius: 20, angle: Math.PI / 4, stroke: new Stroke({ color: C, width: 4 }), fill: new Fill({ color: 'rgba(233,237,242,0.15)' }) }),
       text: sideText(id, C, 24, side, 36, 20),
       zIndex: 9,
     });
   return new Style({
-    image: new CircleStyle({ radius: 13, stroke: new Stroke({ color: C, width: 3 }), fill: new Fill({ color: 'rgba(78,230,255,0.10)' }) }),
+    image: new CircleStyle({ radius: 13, stroke: new Stroke({ color: C, width: 3 }), fill: new Fill({ color: 'rgba(233,237,242,0.10)' }) }),
     text: sideText(id, C, 20, side, 32, 13),
     zIndex: 7,
   });
@@ -154,25 +154,25 @@ function buildMap(target: HTMLDivElement, ctl: VisorController): MapCtx | null {
   };
   const vl = (source: VectorSource, style: Style | Style[] | ((f: FeatureLike) => Style | Style[]), z: number) =>
     new VectorLayer({ source, style, zIndex: z, updateWhileAnimating: true, updateWhileInteracting: true });
-  const demMinor = new Style({ stroke: new Stroke({ color: 'rgba(77,255,148,0.13)', width: 2 }) });
-  const demMajor = new Style({ stroke: new Stroke({ color: 'rgba(77,255,148,0.28)', width: 2 }) });
-  const shadowStyle = new Style({ fill: new Fill({ color: hatch('rgba(255,182,39,0.30)', 18, 2) }), stroke: new Stroke({ color: 'rgba(255,182,39,0.45)', width: 2, lineDash: [6, 8] }) });
-  const keepFill = hatch('rgba(255,69,52,0.45)', 14, 2);
+  const demMinor = new Style({ stroke: new Stroke({ color: 'rgba(45,255,111,0.13)', width: 2 }) });
+  const demMajor = new Style({ stroke: new Stroke({ color: 'rgba(45,255,111,0.28)', width: 2 }) });
+  const shadowStyle = new Style({ fill: new Fill({ color: hatch('rgba(176,43,255,0.55)', 14, 3) }), stroke: new Stroke({ color: 'rgba(176,43,255,0.9)', width: 2, lineDash: [6, 8] }) });
+  const keepFill = hatch('rgba(255,59,48,0.45)', 14, 2);
   const zoneStyle = [
     new Style({ stroke: new Stroke({ color: 'rgba(0,0,0,0.9)', width: 8 }) }),
     new Style({ stroke: new Stroke({ color: C, width: 3, lineDash: [18, 12] }) }),
   ];
   const aheadStyle = [
     new Style({ stroke: new Stroke({ color: '#000', width: 16, lineCap: 'round', lineJoin: 'round' }), zIndex: 1 }),
-    new Style({ stroke: new Stroke({ color: G, width: 7, lineCap: 'round', lineJoin: 'round' }), zIndex: 2 }),
+    new Style({ stroke: new Stroke({ color: M, width: 7, lineCap: 'round', lineJoin: 'round' }), zIndex: 2 }),
   ];
   const laterStyle = [
     new Style({ stroke: new Stroke({ color: '#000', width: 10, lineCap: 'round', lineJoin: 'round' }), zIndex: 1 }),
-    new Style({ stroke: new Stroke({ color: 'rgba(51,196,111,0.55)', width: 4, lineCap: 'round', lineJoin: 'round' }), zIndex: 2 }),
+    new Style({ stroke: new Stroke({ color: 'rgba(255,43,214,0.5)', width: 4, lineCap: 'round', lineJoin: 'round' }), zIndex: 2 }),
   ];
   const doneStyle = new Style({ stroke: new Stroke({ color: G3, width: 4, lineDash: [3, 12], lineCap: 'round' }) });
-  const ringStyle = new Style({ stroke: new Stroke({ color: 'rgba(77,255,148,0.38)', width: 2, lineDash: [6, 10] }) });
-  const leaderStyle = new Style({ stroke: new Stroke({ color: 'rgba(255,182,39,0.75)', width: 2, lineDash: [4, 10] }) });
+  const ringStyle = new Style({ stroke: new Stroke({ color: 'rgba(45,255,111,0.38)', width: 2, lineDash: [6, 10] }) });
+  const leaderStyle = new Style({ stroke: new Stroke({ color: 'rgba(233,237,242,0.8)', width: 2, lineDash: [4, 10] }) });
 
   const map = new OLMap({
     target,
@@ -192,7 +192,7 @@ function buildMap(target: HTMLDivElement, ctl: VisorController): MapCtx | null {
       vl(src.stops, stopStyle, 9),
       vl(src.own, (f) =>
         f.get('k') === 'ellipse'
-          ? new Style({ fill: new Fill({ color: 'rgba(77,255,148,0.10)' }), stroke: new Stroke({ color: G2, width: 2 }) })
+          ? new Style({ fill: new Fill({ color: 'rgba(45,255,111,0.10)' }), stroke: new Stroke({ color: G2, width: 2 }) })
           : new Style({ image: new Icon({ src: ownIcon, width: 52, height: 52, rotateWithView: false }) }), 10),
     ],
     view: new View({ projection: proj, center: [L.grid.originX + (L.grid.w * L.grid.cellM) / 2, L.grid.originY - (L.grid.h * L.grid.cellM) / 2], resolution: RES, rotation: 0 }),

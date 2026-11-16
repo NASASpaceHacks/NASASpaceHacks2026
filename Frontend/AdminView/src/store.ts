@@ -1,9 +1,14 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import type { Cell, FieldSet, LoadedSitePack, PlanEvent, PlanRequest, PlanResult, Rule, Telem } from '@mw/shared/contracts';
-import { DEFAULT_RULES } from '@mw/shared/contracts';
+import type { Cell, FieldSet, Station, LoadedSitePack, PlanEvent, PlanRequest, PlanResult, RoutePrefs, Rule, Telem } from '@mw/shared/contracts';
+import { DEFAULT_ROUTE_PREFS, DEFAULT_RULES } from '@mw/shared/contracts';
 import type { SafeZoneInputs, SafeZoneLimits } from '@mw/shared/map';
+import type { SiteInfo } from './api';
+import type { AttemptView } from './lib/failure';
 import type {
+  ActionKind,
+  ConsoleAlert,
+  DetailsTab,
   EarthView,
   FieldsSource,
   LinkCtl,
@@ -11,9 +16,8 @@ import type {
   LogEntry,
   LogLevel,
   OverlayId,
-  PresetId,
   RequestMsg,
-  TabId,
+  UiMode,
   VectorId,
 } from './lib/types';
 
@@ -28,6 +32,47 @@ export interface ExplainState {
   areaTo: number;
 }
 
+/** "Way forward" for a destination that can't be included: closest safe point, or a rover parking spot. */
+export interface FixState {
+  destId: string;
+  kind: 'closest' | 'rover';
+  status: 'searching' | 'found' | 'none';
+  cell?: Cell;
+  /** closest: metres short of the original destination · rover: metres from the rover's current spot. */
+  distM?: number;
+  /** Plain reason when nothing was found. */
+  note?: string;
+}
+
+/** Full check of a dropped pin (same rules and request as the plan): verdict + the attempted walk. */
+export interface PinCheck {
+  cell: Cell;
+  destId: string;
+  status: 'checking' | 'done';
+  verdict?: 'GO' | 'NO-GO';
+  /** Rule behind a NO-GO. */
+  rule?: string;
+  /** Plain text after the verdict word. */
+  text?: string;
+  walkMin?: number;
+  spareMin?: number;
+}
+
+/** One row of "Compare routes": the same destinations planned with one priority preset. All values come from that PlanResult. */
+export interface CompareRow {
+  id: string;
+  label: string;
+  verdict: 'GO' | 'CAUTION' | 'NO-GO';
+  timeMin: number | null;
+  distM: number | null;
+  steepDeg: number | null;
+  radioGapMin: number | null;
+  spareMin: number | null;
+  /** Stops kept and their summed science value (the team spec compares routes on science too). */
+  stops: number | null;
+  science: number | null;
+}
+
 export interface ConsoleState {
   mode: 'boot' | 'live' | 'mock';
   bootSteps: string[];
@@ -35,10 +80,33 @@ export interface ConsoleState {
   sourceLabel: string;
   sourceReason: string;
   pack: LoadedSitePack | null;
+  /** The site on screen (= pack.manifest.id once loaded) and every site the hab server offers. */
+  siteId: string | null;
+  sites: SiteInfo[];
+  /** A site switch is loading (id of the target). */
+  switchingTo: string | null;
 
   // Planning inputs
   rules: Rule[];
   stationOn: Record<string, boolean>;
+  /** Route builder: chosen destinations (B, C…) in the order added (station ids and custom stops). */
+  destinations: string[];
+  /** Custom stops the officer dropped on the map (WP1, WP2…). */
+  customStops: Station[];
+  /** Small map popover for a clicked target or empty terrain (px = map pixel). */
+  mapPopover: { kind: 'station' | 'terrain'; id?: string; cell: Cell; px: [number, number] } | null;
+  /** "Choose on map" (picked from the To dropdown): the next map click sets that field. */
+  pickOnMap: boolean;
+  /** Right-click context menu on the map (px = map pixel). */
+  ctxMenu: { cell: Cell; px: [number, number]; stationId?: string | null } | null;
+  /** "Must visit" pins: the planner gives these stations priority (still dropped, with the reason, if unsafe). */
+  mustVisit: Record<string, boolean>;
+  /** Route priorities (Options in the Directions card); sent in every plan request. */
+  prefs: RoutePrefs;
+  /** Route options panel open. */
+  routeOptions: boolean;
+  /** Compare routes: one plan per preset for the current destinations. */
+  compare: { status: 'running' | 'done' | 'error'; rows: CompareRow[] } | null;
   startLtstMin: number;
   lsDeg: number;
   shelterCells: Record<string, Cell>;
@@ -64,23 +132,40 @@ export interface ConsoleState {
   dirty: boolean;
 
   // Display
-  preset: PresetId;
+  /** Top stepper: ① Plan → ② Send → ③ EVA live. */
+  uiMode: UiMode;
+  /** The attempted walk of a NO-GO plan (where it breaks the rule), and of a dropped pin that would be a NO-GO. */
+  attemptPlan: AttemptView | null;
+  attemptPin: AttemptView | null;
+  pinCheck: PinCheck | null;
+  /** NO-GO way forward (search in progress / suggestion shown on the map). */
+  fix: FixState | null;
   overlays: OverlayId[];
   opacity: Record<OverlayId, number>;
   vectors: Record<VectorId, boolean>;
-  tab: TabId;
-  leftSection: 'layers' | 'sources';
+  /** Details drawer (expert depth): closed, or open on a section. */
+  details: { open: boolean; tab: DetailsTab };
+  layersOpen: boolean;
+  simOpen: boolean;
+  /** EVA live: guided response sheet (action → engine's new plan as a change → Send to crew). */
+  sheet: { kind: ActionKind; cutMin?: number; before?: { order: string[]; durationMin: number; endT: number } } | null;
+  /** EVA live: the map keeps the crew in view. */
+  follow: boolean;
+  alerts: ConsoleAlert[];
   explain: ExplainState;
   hazardPick: boolean;
   selectedStation: string | null;
   hoverStation: { id: string; x: number; y: number } | null;
+  hoverShelter: { id: string; x: number; y: number } | null;
   showHelp: boolean;
   /** Evidence panel (Validity): closed, open, or open scrolled to the limitations list. */
   evidence: 'closed' | 'open' | 'limitations';
 
   // Confirm / link / live
-  confirm: { stage: ConfirmStage; seq?: number; id?: string; bytes?: number; estimated?: boolean; error?: string };
+  confirm: { stage: ConfirmStage; seq?: number; id?: string; bytes?: number; estimated?: boolean; error?: string; ackUtcMs?: number };
   route: { seq: number; id: string; acked: boolean; bytes: number; estimated?: boolean; reqHash: string } | null;
+  /** The plan behind the route the crew has (EVA live shows this; a drafted change lives in `plan`). */
+  sentPlan: PlanResult | null;
   link: LinkStatus;
   linkCtl: LinkCtl;
   telem: Telem[];
@@ -94,13 +179,6 @@ export interface ConsoleState {
 
 export const OVERLAY_LIMIT = 3;
 
-export const PRESETS: Record<PresetId, { label: string; overlays: OverlayId[]; vectors: Partial<Record<VectorId, boolean>>; hint: string }> = {
-  plan: { label: 'Plan', overlays: ['safezone'], vectors: { contours: true, route: true, stations: true, keepouts: true, traverse: false }, hint: 'Safe region, route and stations' },
-  safety: { label: 'Safety', overlays: ['shelter', 'slope'], vectors: { contours: true, route: true, stations: true, keepouts: true, traverse: false }, hint: 'Time to shelter and slope hazards' },
-  science: { label: 'Science', overlays: ['ti'], vectors: { contours: false, route: true, stations: true, keepouts: false, traverse: true }, hint: 'Stations, thermal inertia and Curiosity traverse' },
-  comms: { label: 'Comms', overlays: ['los'], vectors: { contours: false, route: true, stations: true, keepouts: false, traverse: false }, hint: 'Comm line of sight (hab mast ∪ rover relay) and comm shadow' },
-};
-
 let logId = 1;
 
 export const useConsole = create<ConsoleState>()(
@@ -111,9 +189,21 @@ export const useConsole = create<ConsoleState>()(
     sourceLabel: '',
     sourceReason: '',
     pack: null,
+    siteId: null,
+    sites: [],
+    switchingTo: null,
 
     rules: DEFAULT_RULES.map((r) => ({ ...r })),
     stationOn: {},
+    destinations: [],
+    customStops: [],
+    mapPopover: null,
+    pickOnMap: false,
+    ctxMenu: null,
+    mustVisit: {},
+    prefs: DEFAULT_ROUTE_PREFS,
+    routeOptions: false,
+    compare: null,
     startLtstMin: 9 * 60 + 40,
     lsDeg: 150,
     shelterCells: {},
@@ -135,21 +225,32 @@ export const useConsole = create<ConsoleState>()(
     planVersion: 0,
     dirty: false,
 
-    preset: 'plan',
-    overlays: ['safezone'],
-    opacity: { safezone: 1, shelter: 0.9, walkback: 0.85, los: 0.9, slope: 0.7, ti: 0.6 },
-    vectors: { contours: true, keepouts: true, traverse: false, stations: true, route: true, shelters: true, imagery: true },
-    tab: 'plan',
-    leftSection: 'layers',
+    uiMode: 'plan',
+    fix: null,
+    attemptPlan: null,
+    attemptPin: null,
+    pinCheck: null,
+    overlays: ['safezone'], // exact walkable-area shading on from the start (testers: "where can I go?")
+    opacity: { safezone: 0.6, elevation: 0.8, slope: 0.85, rough: 0.85, ti: 0.75, crism: 0.8, shelter: 0.9, walkback: 0.85, los: 0.9 },
+    // Calm default: imagery (+ lighting), route, science targets, base and rover, safe-area outline.
+    vectors: { outline: true, contours: false, keepouts: false, traverse: false, stations: true, stationDetail: false, route: true, shelters: true, imagery: true, relief: true },
+    details: { open: false, tab: 'report' },
+    layersOpen: false,
+    simOpen: false,
+    sheet: null,
+    follow: true,
+    alerts: [],
     explain: { running: false, step: 0, caption: '', detail: '', areaFrom: 0, areaTo: 0 },
     hazardPick: false,
     selectedStation: null,
     hoverStation: null,
+    hoverShelter: null,
     showHelp: false,
     evidence: 'closed',
 
     confirm: { stage: 'idle' },
     route: null,
+    sentPlan: null,
     link: 'up',
     linkCtl: { latencyMs: 0, lossPct: 0, drop: false },
     telem: [],
@@ -163,6 +264,15 @@ export const useConsole = create<ConsoleState>()(
 
 export const get = () => useConsole.getState();
 export const set = (p: Partial<ConsoleState> | ((s: ConsoleState) => Partial<ConsoleState>)) => useConsole.setState(p);
+
+let alertId = 1;
+
+/** Push an alert onto the banner queue (newest first). */
+export function pushAlert(a: Omit<ConsoleAlert, 'id' | 'utcMs' | 'acked'>) {
+  const e: ConsoleAlert = { ...a, id: alertId++, utcMs: Date.now(), acked: false };
+  set((s) => ({ alerts: [e, ...s.alerts].slice(0, 40) }));
+  return e.id;
+}
 
 export function log(text: string, level: LogLevel = 'info', source: LogEntry['source'] = 'hab', tMin?: number) {
   const e: LogEntry = { id: logId++, utcMs: Date.now(), text, level, source, tMin };

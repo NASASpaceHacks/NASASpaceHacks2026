@@ -1,0 +1,25 @@
+walk,base,dest,start_ltst_min,engine_verdict,engine_primary_rule,independent_checker_verdict,independent_failing_rules,ai_judge_verdict,ai_judge_failing_rules,ai_judge_batch,engine_eq_independent,engine_eq_ai,route_source
+W01,PR-1,rand,580,NO-GO,walk_radius_max_m,NO-GO,shelter_time_max_min walk_radius_max_m,NO-GO,daylight_min_sun_elev_deg eva_duration_max_min los_gap_max_min shelter_time_max_min walk_radius_max_m walkback_speed_factor,batch1,1,1,path_search
+W02,PR-1,rand,580,NO-GO,los_gap_max_min,GO,,GO,,batch1,0,0,path_search
+W03,PR-1,rand,580,GO,,GO,,GO,,batch1,1,1,engine_plan
+W04,PR-1,ST06,660,GO,,GO,,GO,,batch1,1,1,engine_plan
+W05,PR-1,rand,580,NO-GO,los_gap_max_min,NO-GO,los_gap_max_min,NO-GO,los_gap_max_min,batch1,1,1,path_search
+W06,PR-1,rand,660,GO,,GO,,GO,,batch1,1,1,engine_plan
+W07,Hab-1,rand,580,NO-GO,shelter_time_max_min,NO-GO,los_gap_max_min shelter_time_max_min,NO-GO,daylight_min_sun_elev_deg eva_duration_max_min los_gap_max_min shelter_time_max_min walkback_speed_factor,batch1,1,1,path_search
+W08,PR-1,rand,900,GO,,GO,,GO,,batch1,1,1,engine_plan
+W09,PR-1,rand,580,NO-GO,eva_duration_max_min,NO-GO,los_gap_max_min,NO-GO,daylight_min_sun_elev_deg eva_duration_max_min los_gap_max_min walkback_speed_factor,batch1,1,1,path_search
+W10,PR-1,rand,580,GO,,GO,,GO,,batch1,1,1,engine_plan
+W11,PR-1,rand,900,NO-GO,shelter_time_max_min,NO-GO,daylight_min_sun_elev_deg shelter_time_max_min walk_radius_max_m walkback_speed_factor,NO-GO,daylight_min_sun_elev_deg eva_duration_max_min los_gap_max_min shelter_time_max_min walk_radius_max_m walkback_speed_factor,batch1,1,1,path_search
+W12,PR-1,rand,580,GO,,GO,,GO,,batch1,1,1,engine_plan
+W13,PR-1,rand,900,GO,,GO,,GO,,batch2,1,1,engine_plan
+W14,PR-1,rand,480,NO-GO,walk_radius_max_m,NO-GO,los_gap_max_min shelter_time_max_min walk_radius_max_m walkback_speed_factor,NO-GO,daylight_min_sun_elev_deg eva_duration_max_min los_gap_max_min shelter_time_max_min walk_radius_max_m walkback_speed_factor,batch2,1,1,path_search
+W15,PR-1,rand,580,GO,,GO,,GO,,batch2,1,1,engine_plan
+W16,PR-1,rand,580,GO,,GO,,GO,,batch2,1,1,engine_plan
+W17,PR-1,rand,580,GO,,GO,,GO,,batch2,1,1,engine_plan
+W18,PR-1,rand,900,NO-GO,daylight_min_sun_elev_deg,NO-GO,los_gap_max_min,NO-GO,daylight_min_sun_elev_deg los_gap_max_min,batch2,1,1,path_search
+W19,Hab-1,rand,580,NO-GO,los_gap_max_min,NO-GO,los_gap_max_min,NO-GO,eva_duration_max_min los_gap_max_min walkback_speed_factor,batch2,1,1,path_search
+W20,Hab-1,rand,900,NO-GO,daylight_min_sun_elev_deg,NO-GO,los_gap_max_min,NO-GO,daylight_min_sun_elev_deg los_gap_max_min,batch2,1,1,path_search
+W21,PR-1,rand,900,GO,,GO,,GO,,batch2,1,1,engine_plan
+W22,Hab-1,ST03,580,NO-GO,eva_duration_max_min,NO-GO,los_gap_max_min,NO-GO,eva_duration_max_min los_gap_max_min walkback_speed_factor,batch2,1,1,path_search
+W23,PR-1,ST03,480,GO,,GO,,GO,,batch2,1,1,engine_plan
+W24,PR-1,rand,580,NO-GO,shelter_time_max_min,NO-GO,shelter_time_max_min,NO-GO,eva_duration_max_min shelter_time_max_min walkback_speed_factor,batch2,1,1,path_search

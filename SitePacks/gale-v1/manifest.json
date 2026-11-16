@@ -3,7 +3,7 @@
  "id": "gale-v1",
  "name": "Gale Crater — Mount Sharp boxwork",
  "body": "mars",
- "createdUtc": "2026-11-14T19:31:27Z",
+ "createdUtc": "2026-11-15T02:55:04Z",
  "grid": {
   "w": 1000,
   "h": 1000,
@@ -131,6 +131,80 @@
      "citation": "THEMIS quantitative thermal inertia global mosaic, 100 m/px (USGS Astrogeology). Method: Fergason, Christensen & Kieffer (2006), JGR 111, E12004, doi:10.1029/2006JE002735; mosaicking: Edwards et al. (2011), JGR 116, E10008, doi:10.1029/2010JE003755.",
      "resolutionM": 100.0,
      "accuracy": "Native 100 m/px, bilinearly interpolated to 5 m (does not resolve features smaller than ~100 m). Stated thermal-inertia uncertainty ~±20 % (Fergason et al. 2006). Used only as an indicative terrain/sand proxy."
+    }
+   ]
+  },
+  "crism_sindex2": {
+   "id": "crism_sindex2",
+   "label": "Polyhydrated sulfate signal (CRISM SINDEX2, 18 m)",
+   "kind": "continuous",
+   "file": "crism_sindex2.bin",
+   "dtype": "i16",
+   "bands": 1,
+   "scale": 2e-05,
+   "offset": 0,
+   "nodata": -32768,
+   "unit": "index",
+   "indicative": true,
+   "provenance": [
+    {
+     "mission": "Mars Reconnaissance Orbiter",
+     "instrument": "CRISM (Compact Reconnaissance Imaging Spectrometer for Mars), targeted observation FRT000058A3",
+     "product": "frt000058a3_07_sr165j_mtr3.img (MTRDR refined summary parameters, SR, 18 m/px)",
+     "url": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2007/2007_112/frt000058a3/frt000058a3_07_sr165j_mtr3.img",
+     "license": "Public domain (NASA PDS Geosciences Node)",
+     "citation": "Murchie et al. (2007), JGR 112, E05S03, doi:10.1029/2006JE002682 (CRISM); Seelos et al. (2016) MTRDR; Viviano-Beck et al. (2014), JGR Planets 119, 1403-1431, doi:10.1002/2014JE004627 (summary parameters).",
+     "resolutionM": 18.0,
+     "accuracy": "Spectral summary parameters indicate a spectral absorption signature, not a mineral abundance; the values are small and noisy over dust-free dark terrain, and strength is read relative to the AOI. Native 18 m/px, bilinearly resampled to 5 m (features smaller than ~36 m are not resolved). Observed 2007-04-22; surface unchanged at this scale. Georeference: the shipped MTRDR footprint sits ~205 m south and ~175 m east of the same features in the HiRISE ortho; co-registered with a rigid shift measured against the HiRISE ortho and confirmed against the DEM hillshade (within ~35 m); residual <=10 m overall, <=30 m in sub-windows (some rotation remains). AOI coverage 97.2 %."
+    }
+   ]
+  },
+  "crism_bd1900": {
+   "id": "crism_bd1900",
+   "label": "Hydration signal (CRISM BD1900_2, 18 m)",
+   "kind": "continuous",
+   "file": "crism_bd1900.bin",
+   "dtype": "i16",
+   "bands": 1,
+   "scale": 2e-05,
+   "offset": 0,
+   "nodata": -32768,
+   "unit": "index",
+   "indicative": true,
+   "provenance": [
+    {
+     "mission": "Mars Reconnaissance Orbiter",
+     "instrument": "CRISM (Compact Reconnaissance Imaging Spectrometer for Mars), targeted observation FRT000058A3",
+     "product": "frt000058a3_07_sr165j_mtr3.img (MTRDR refined summary parameters, SR, 18 m/px)",
+     "url": "https://pds-geosciences.wustl.edu/mro/mro-m-crism-5-rdr-mptargeted-v1/mrocr_4001/mtrdr/2007/2007_112/frt000058a3/frt000058a3_07_sr165j_mtr3.img",
+     "license": "Public domain (NASA PDS Geosciences Node)",
+     "citation": "Murchie et al. (2007), JGR 112, E05S03, doi:10.1029/2006JE002682 (CRISM); Seelos et al. (2016) MTRDR; Viviano-Beck et al. (2014), JGR Planets 119, 1403-1431, doi:10.1002/2014JE004627 (summary parameters).",
+     "resolutionM": 18.0,
+     "accuracy": "Spectral summary parameters indicate a spectral absorption signature, not a mineral abundance; the values are small and noisy over dust-free dark terrain, and strength is read relative to the AOI. Native 18 m/px, bilinearly resampled to 5 m (features smaller than ~36 m are not resolved). Observed 2007-04-22; surface unchanged at this scale. Georeference: the shipped MTRDR footprint sits ~205 m south and ~175 m east of the same features in the HiRISE ortho; co-registered with a rigid shift measured against the HiRISE ortho and confirmed against the DEM hillshade (within ~35 m); residual <=10 m overall, <=30 m in sub-windows (some rotation remains). AOI coverage 97.2 %."
+    }
+   ]
+  },
+  "skyview": {
+   "id": "skyview",
+   "label": "Visible sky fraction (terrain shielding)",
+   "kind": "continuous",
+   "file": "skyview.bin",
+   "dtype": "u16",
+   "bands": 1,
+   "scale": 0.0001,
+   "offset": 0,
+   "unit": "fraction",
+   "indicative": true,
+   "provenance": [
+    {
+     "mission": "Mars Reconnaissance Orbiter + Mars Express + Mars Global Surveyor",
+     "instrument": "HiRISE stereo DTMs, merged with CTX, HRSC and MOLA DEMs",
+     "product": "Derived from MSL_Gale_DEM_Mosaic_1m_v3.tif (MSL Gale Merged DEM, 1 m)",
+     "url": "https://planetarymaps.usgs.gov/mosaic/Mars/MSL/MSL_Gale_DEM_Mosaic_1m_v3.tif",
+     "license": "Public domain (USGS Astrogeology / NASA PDS Annex)",
+     "citation": "Horizon method and obstructed-sky definition reproduced in Validation/v1_shielding against Guo et al. (2026), JGR Planets, doi:10.1029/2026JE009704 (MAE 2.0 pp, r = 0.94, 15 periods). Parker, T. J. & Calef, F. J. III (2016), MSL Gale Merged Digital Elevation Model, 1 m/px, PDS Annex, U.S. Geological Survey. https://astrogeology.usgs.gov/search/map/mars_msl_gale_merged_dem_1m",
+     "resolutionM": 1.0,
+     "accuracy": "Derived. Horizon at 25 m spacing (1 deg azimuth steps, 5 m DEM samples, rays truncated at the 5 km pack edge), bilinearly upsampled to 5 m. Versus a V1-style full-resolution computation (1 m DEM, 0.25 deg rays) at 60 random cells: MAE 0.9 pp, 95th percentile 3.5 pp, max 10.5 pp (obstructed fraction, solid-angle weighted). Terrain far outside the pack is not seen. Indicative."
     }
    ]
   }
@@ -1658,6 +1732,8 @@
   "label": "Sol 412 — 09:40 LTST"
  },
  "files": {
+  "crism_bd1900.bin": "21eb4d16ab4382a8ad1e3b35c8e424c200546b7b459d8e5ae7e131c2f55cec88",
+  "crism_sindex2.bin": "091d1c63f11a7eabc247e6d39d2187a9b814d4e8d4d41cd7b97c1541cde4c440",
   "dem.bin": "ce06e0408692daaf8e2154702aaa7dc0079a1d7a0b2afdbebbce8120f030baf6",
   "images/msl-3925-NLB_745925296EDR_F103159.jpg": "fcc5b1c1b4bde1b1ed148a1d085be93adfbd9832159a073cc786efead7d06ee5",
   "images/msl-4104-4104MR1053930062003588C0.jpg": "4c7ee0b5aa5efe7c015a7abd51aadcffbedeb4494c3c6c0f8060bf130fdc4297",
@@ -1673,6 +1749,7 @@
   "ortho.webp": "903a0a24cec4dd198a8b0fee5096abd2d6f63c503cd3b9ec9b2693452d94d535",
   "ortho_cog.tif": "807487ef026ea388e95c0d9242aa9d8a3664eb5f190588a6b5dd636a07601bc7",
   "rough.bin": "14e316bc7c94761c38258ab4c1b87c6d11c56fcef4607552429337b0b00a1b50",
+  "skyview.bin": "993ab9bafabf81c9a44c1056c8012800fdfa23a1ef53909e5e5582919697f0ec",
   "slope.bin": "4e188f4fe69eb4958ffb2135f08e4353aa11b7b14d3298f4276756661cb10349",
   "ti.bin": "16acb79d47b9de0cee9192faa63055c9ddd62d731a9752ab952f69dc48de0dfb",
   "traverse_waypoints.json": "ba5e06e6106f5a085fb6f53621553579f3a75a21cd8fc59ffa6986129529dee5"

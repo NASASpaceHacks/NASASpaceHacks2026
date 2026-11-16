@@ -3,3 +3,4 @@ packages:
   - Backend
   - Frontend/AdminView
   - Frontend/UserView
+  - Frontend/UserView_AR

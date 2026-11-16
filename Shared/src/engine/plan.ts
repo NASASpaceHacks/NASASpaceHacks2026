@@ -7,6 +7,7 @@ import { requestHash, resolve, ruleVals, type Resolved, type RuleVals } from './
 import { dwellChunks, HEAT_INITIAL_W, HEAT_TAU_MIN, REST_W, Seg, TASK_W_DEFAULT, type HeatParams } from './heat';
 import { formatLtst, ltstAt, sunAtLtst } from './marstime';
 import { evalSequence, solveDP, type DPResult, type Leg, type OrInstance } from './orienteer';
+import { describePrefs, ROUGH_REF_M } from './prefs';
 import { getPathSearch } from './registry';
 import { fin, simulate, type SimOutput, type SimStop, type Timeline } from './simulate';
 
@@ -406,7 +407,7 @@ function stayIn(
     });
     segments = sim.segments;
     burndown = sim.burndown;
-    totals = { ...totals, distM: sim.distM, durationMin: sim.tReturn + tl.ingressHalf, energyKJ: sim.energyKJ, doseUSv: sim.doseUSv, maxDistHabM: sim.maxDistHabM, o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)) };
+    totals = { ...totals, distM: sim.distM, durationMin: sim.tReturn + tl.ingressHalf, energyKJ: sim.energyKJ, doseUSv: sim.doseUSv, doseOpenSkyUSv: sim.doseOpenSkyUSv, maxDistHabM: sim.maxDistHabM, o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)) };
     notes.push('Crew is outside: the attached segment is the direct contingency return to the hab.');
   }
   return {
@@ -432,11 +433,20 @@ function modelNotes(lsAssumed: boolean, ls: number): string[] {
   const n = [
     'Metabolic model: Pandolf–Santee × g ratio (NASA JSC formulation, NTRS 20240001423); 0.38 g is an extrapolation of the 0.12–0.32 g calibration (NASA/TP-2010-216125).',
     'Suit heat: 30-min leaky-bucket average ≤ budget; rests at 250 W inserted by the governor.',
-    'Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding indicative, never a shelter).',
+    'Radiation dose is indicative (Guo et al. 2015 pressure model; terrain shielding from the sky-view raster, Guo et al. 2026 two-term model reproduced in V1; never a shelter).',
     'Comm LOS = hab mast ∪ pressurized-rover relay masts (team assumption: the rover carries a relay radio, cf. Apollo LRV LCRU).',
   ];
   if (lsAssumed) n.push(`Season: no REMS Ls for this sol, Ls ${ls}° assumed for daylight.`);
   return n;
+}
+
+/** Note for PlanResult.notes when operator route priorities are set (never added for neutral priorities). */
+function prefsNote(R: Resolved): string {
+  const p = R.prefs!;
+  const head = `Route priorities${p.preset ? ` (${p.preset})` : ''}: ${describePrefs(p)}`;
+  const noCrism = p.science > 0 && !R.pack.rasters.crism_sindex2 ? ' Science priority has no effect here: this site pack has no CRISM layer.' : '';
+  if (!R.routeMult) return `${head}. No effect on this ground: the fastest safe routing is used.${noCrism}`;
+  return `${head}. They choose among safe paths only: times, safety fields and every hard rule are unchanged and re-checked by the simulator.${noCrism}`;
 }
 
 function sepPlan(R: Resolved, req: PlanRequest, tl: Timeline, rv: RuleVals, leadMin: number, t0: number, notes: string[]): PlanResult {
@@ -481,7 +491,7 @@ function sepPlan(R: Resolved, req: PlanRequest, tl: Timeline, rv: RuleVals, lead
     bingo: [],
     totals: {
       distM: sim.distM, durationMin: sim.tReturn + tl.ingressHalf, energyKJ: sim.energyKJ,
-      o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)), doseUSv: sim.doseUSv, scienceValue: 0, maxDistHabM: sim.maxDistHabM,
+      o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)), doseUSv: sim.doseUSv, doseOpenSkyUSv: sim.doseOpenSkyUSv, scienceValue: 0, maxDistHabM: sim.maxDistHabM,
     },
     notes: [
       ...notes,
@@ -594,7 +604,8 @@ function planImpl(pack: LoadedSitePack, req: PlanRequest, t0: number): PlanResul
   if (req.resume) notes.push(`Replan from the current position at +${req.resume.elapsedMin.toFixed(0)} min; heat state assumed at the budget (conservative).`);
 
   const sep = [...(req.events ?? [])].reverse().find((e) => e.t === 'SEP_NOWCAST');
-  if (sep && sep.t === 'SEP_NOWCAST') return sepPlan(R, req, tl, rv, sep.leadMin, t0, notes);
+  if (sep && sep.t === 'SEP_NOWCAST') return sepPlan(R, req, tl, rv, sep.leadMin, t0, notes); // safety return: shelter tree, pure time
+  if (R.prefs) notes.push(prefsNote(R));
 
   const allDropped = (rule: RuleId, why: string): Dropped[] =>
     req.stations.filter((s) => !(req.resume?.visited ?? []).includes(s.id)).map((s) => ({ id: s.id, rule, deficitMin: 0, text: `${s.id} dropped: ${why}` }));
@@ -757,6 +768,7 @@ function planImpl(pack: LoadedSitePack, req: PlanRequest, t0: number): PlanResul
       energyKJ: sim.energyKJ,
       o2UsedPct: fin(100 * (1 - (tl.deadline - sim.tReturn) / tl.A)),
       doseUSv: sim.doseUSv,
+      doseOpenSkyUSv: sim.doseOpenSkyUSv,
       scienceValue: value,
       maxDistHabM: sim.maxDistHabM,
     },
@@ -773,4 +785,157 @@ export function stageFromShelter(req: PlanRequest, shelterId: string): PlanReque
   const s = req.shelters.find((x) => x.id === shelterId);
   if (!s) throw new Error(`shelter ${shelterId} not in request`);
   return { ...req, hab: s.cell };
+}
+
+export interface OrderEval {
+  pass: boolean;
+  /** Hard rules broken by the fixed order (same simulator and checks as plan()). */
+  failures: { rule: RuleId; seg: number; worst: number; limit: number }[];
+  /** Set when the order could not be simulated (a station is outside the route mask: radius / shelter limits). */
+  reason?: string;
+  order: string[];
+  scienceValue: number;
+  /** Total EVA minutes including egress/ingress; NaN if not simulated. */
+  durationMin: number;
+  /** Walking time (min, incl. heat rests, excl. dwell) of each leg; the last is the return. */
+  legMin: number[];
+  segments: Segment[];
+}
+
+/**
+ * Evaluate a FIXED stop order (station ids, visited in this order, then back to the base) against the
+ * request's hard rules with the same simulator plan() uses. Legs default to the engine's
+ * cheapest routes inside the safety mask (under the request's route priorities, if any); pass `legs` (cell
+ * paths: base→s1, …, sn→base) to check an externally produced route instead (e.g. a slope-only planner's).
+ */
+export function evaluateOrder(pack: LoadedSitePack, req: PlanRequest, order: string[], legs?: number[][]): OrderEval {
+  return makeOrderEvaluator(pack, req)(order, legs);
+}
+
+/** Same as evaluateOrder but builds the request's route matrix once, for many orders. */
+export function makeOrderEvaluator(pack: LoadedSitePack, req: PlanRequest): (order: string[], legs?: number[][]) => OrderEval {
+  const R = resolve(pack, req);
+  const rv = R.rv;
+  const ls = lsFor(pack, req.sol) ?? DEFAULT_LS_DEG;
+  const tl = makeTimeline(R, req, rv, ls);
+  const core = buildCore(R, req, tl, rv);
+  const byId = new Map(req.stations.map((s) => [s.id, s]));
+  return (order, legs) => {
+    const value = order.reduce((a, id) => a + (byId.get(id)?.value ?? 0), 0);
+    const base = { order, scienceValue: value, durationMin: NaN, legMin: [] as number[], segments: [] as Segment[], failures: [] as OrderEval['failures'] };
+    let legCells = legs;
+    if (!legCells) {
+      const idx = order.map((id) => core.cands.findIndex((c) => c.id === id) + 1);
+      if (idx.some((j) => j === 0)) return { ...base, pass: false, reason: 'station outside the safe route mask (radius / shelter / walkback limits)' };
+      legCells = legPaths(core, idx, new Map()) ?? undefined;
+      if (!legCells) return { ...base, pass: false, reason: 'no route' };
+    }
+    const stops: SimStop[] = order.map((id) => {
+      const s = byId.get(id)!;
+      return { id, cell: s.cell, dwellMin: s.dwellMin, taskW: s.taskW ?? TASK_W_DEFAULT, value: s.value };
+    });
+    const sim = simulate({ R, tl, hp: core.hp, H0: core.H0, startLabel: core.startLabel, legs: legCells, stops, endLabel: 'HAB', checks: enforcedChecks(rv) });
+    return { ...base, pass: sim.pass, failures: sim.failures, durationMin: sim.tReturn + tl.ingressHalf, legMin: sim.segments.map((x) => x.t1Min - x.t0Min), segments: sim.segments };
+  };
+}
+
+export interface AttemptResult {
+  /** Set when no walkable path to the stop exists at all (nothing to simulate). */
+  reason?: string;
+  sim?: SimOutput;
+  /** Comm line-of-sight field used by the check (1 = in contact), for locating radio gaps. */
+  los?: Uint8Array;
+  /** Cells of the out leg and the return leg. */
+  legs?: number[][];
+  /** Latest safe return (EVA min) and EVA time at which the request's limits end. */
+  deadlineMin?: number;
+}
+
+/**
+ * What a NO-GO walk would have looked like: the cheapest path base -> stop -> base found over all walkable
+ * ground (not limited to the safety mask; "cheapest" under the request's route priorities, if any), simulated
+ * with the same rules plan() applies. Lets the console show the attempted walk's real totals and WHERE it
+ * breaks a rule. Does not decide GO/NO-GO.
+ */
+export function attemptRoute(pack: LoadedSitePack, req: PlanRequest, stationId: string): AttemptResult {
+  const R = resolve(pack, req);
+  const rv = R.rv;
+  const st = req.stations.find((s) => s.id === stationId);
+  if (!st) return { reason: 'unknown stop' };
+  const ls = lsFor(pack, req.sol) ?? DEFAULT_LS_DEG;
+  const tl = makeTimeline(R, req, rv, ls);
+  const blocked = R.mask.slice();
+  blocked[R.hab] = 0;
+  blocked[st.cell] = 0;
+  const g: CostGrid = { ...R.grid, blocked };
+  const ps = getPathSearch(R.pathSearchId);
+  const out = ps.search(g, R.routeModel, R.ctx1, R.hab, st.cell);
+  const back = ps.search(g, R.routeModel, R.ctx1, st.cell, R.hab);
+  if (!out || !back) return { reason: 'no walkable path' };
+  const legs = [Array.from(out.cells), Array.from(back.cells)];
+  const hp: HeatParams = { budgetW: rv.heatMax, restW: REST_W, tauMin: HEAT_TAU_MIN };
+  const sim = simulate({
+    R, tl, hp, H0: Math.min(HEAT_INITIAL_W, rv.heatMax), startLabel: 'HAB', legs,
+    stops: [{ id: st.id, cell: st.cell, dwellMin: st.dwellMin, taskW: st.taskW ?? TASK_W_DEFAULT, value: st.value }],
+    endLabel: 'HAB', checks: enforcedChecks(rv),
+  });
+  return { sim, los: R.fields.los, legs, deadlineMin: tl.deadline };
+}
+
+export interface RouteStats {
+  /** Minutes out of comm line of sight: true walking time onto cells outside the LOS field + dwell at stops outside it (heat rests excluded). */
+  outOfContactMin: number;
+  /** True walking minutes along the path cells (base cost model; heat rests and dwell excluded). */
+  walkMin: number;
+  distM: number;
+  /** Slope (deg) along the path cells: cell average and maximum. */
+  meanSlopeDeg: number;
+  maxSlopeDeg: number;
+  /** Share (0..1) of path cells rougher than ROUGH_REF_M (10 cm detrended-height std-dev). */
+  roughFrac: number;
+  /** Cell-averaged CRISM SINDEX2 along the path; null when the site pack has no CRISM layer. */
+  meanCrism: number | null;
+}
+
+/**
+ * Route-comparison metrics of a plan (or attempt) path, for the console's priority comparison table. Pure
+ * terrain/LOS statistics along `segments` cells with true travel time; does not re-plan. The LOS field and
+ * grid come from `req` (cached), so pass the request the result was planned with (prefs do not change them).
+ * Accepts a PlanResult or an AttemptResult's `sim`.
+ */
+export function routeStats(pack: LoadedSitePack, req: PlanRequest, res: { segments: Segment[]; stops?: { id: string; arriveMin: number; departMin: number }[] }): RouteStats {
+  const R = resolve(pack, req);
+  const los = R.fields.los, slope = R.grid.slopeDeg, rough = R.grid.rough;
+  const cr = pack.rasters.crism_sindex2 && pack.rasters.crism_sindex2.length === R.n ? pack.rasters.crism_sindex2 : null;
+  let out = 0, walk = 0, dist = 0, n = 0, sSum = 0, sMax = 0, rN = 0, cSum = 0, cN = 0;
+  for (const s of res.segments) {
+    dist += s.distM;
+    for (let k = 0; k < s.cells.length; k++) {
+      const c = s.cells[k];
+      n++;
+      const sl = slope[c];
+      if (sl === sl) {
+        sSum += sl;
+        if (sl > sMax) sMax = sl;
+      }
+      if (rough[c] > ROUGH_REF_M) rN++;
+      if (cr && cr[c] === cr[c]) {
+        cSum += cr[c];
+        cN++;
+      }
+      if (k > 0) {
+        const dt = R.model.edgeCost(R.grid, s.cells[k - 1], c, R.ctx1) / 60;
+        if (dt < Infinity) {
+          walk += dt;
+          if (los[c] !== 1) out += dt;
+        }
+      }
+    }
+  }
+  const cellOf = new Map(req.stations.map((s) => [s.id, s.cell]));
+  for (const st of res.stops ?? []) {
+    const c = cellOf.get(st.id);
+    if (c !== undefined && los[c] !== 1) out += st.departMin - st.arriveMin;
+  }
+  return { outOfContactMin: out, walkMin: walk, distM: dist, meanSlopeDeg: n ? sSum / n : 0, maxSlopeDeg: sMax, roughFrac: n ? rN / n : 0, meanCrism: cr && cN ? cSum / cN : null };
 }

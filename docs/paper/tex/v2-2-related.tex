@@ -1,0 +1,37 @@
+\section{Related work}
+\label{sec:related}
+
+\paragraph{EVA planning and operations.} Apollo traverses were planned on Earth well in advance and bounded by how far the crew could walk back to the lunar module if the rover failed \citep{benjamin1969apollo,norcross2009ewt}. Analog campaigns built the ground side of exploration EVA: traverse tools in NASA's Exploration Ground Data Systems \citep{lee2013xgds}, science operations under latency in BASALT \citep{lim2019basalt,beaton2019}, and lunar EVA planning in the Joint EVA Test Team campaigns \citep{caswell2023jett3}. NASA's EVA Mission System Software estimates timelines and science coverage for Artemis; its developers describe it as ``empowering ground-based flight controllers'' \citep{miller2026emss}. Flight-operations work lists the constraints a surface traverse must respect \citep{caswell2025eva}, and the Artemis~III tenets bound walking EVAs to 2\,km from the lander \citep{kagey2023tenets}.
+
+\paragraph{Traverse planners for suited humans.} SEXTANT computes minimum-distance, minimum-time and minimum-energy traverses for suited astronauts and reports walk-back from any point \citep{johnson2010sextant,norheim2018sextant}. \Citet{penaasensio2024moonpath} find minimum-metabolic-workload paths at the lunar south pole, and \citet{broddrick2024} cast science-yield optimization as a mixed-integer linear program. These planners build on load-carriage metabolic models \citep{pandolf1977,santee2001} that NASA has adapted for suited traverse planning \citep{kim2024metabolic}, and on suited and partial-gravity locomotion data \citep{norcross2010level,norcross2010incline,carr2007framework,kluis2025}.
+
+\paragraph{Rover navigation and orienteering.} Planetary rovers plan on terrain cost maps, from Field D$^\ast$ on the Mars Exploration Rovers \citep{ferguson2006,carsten2009} and D$^\ast$ Lite re-planning \citep{koenig2002dstar} to Perseverance's enhanced autonomous navigation \citep{toupet2026enav} and learned heuristics \citep{daftry2022}. These planners have no metabolic budget and no walk home. Choosing stops within a time budget is the orienteering problem \citep{golden1987,vansteenwegen2011,gunawan2016}. Its exact dynamic program over subsets goes back to Bellman and to Held and Karp \citep{bellman1962,heldkarp1962}, and Pareto labels come from resource-constrained shortest paths \citep{feillet2004,irnich2005}. Explaining plans is the subject of explainable planning \citep{chakraborti2020}.
+
+\paragraph{Mars data, radiation and displays.} Mars Trek and MMGIS serve orbital and mission data \citep{marstrek,mmgis}. Curiosity's Radiation Assessment Detector (RAD) has measured the surface dose \citep{hassler2014}, its dependence on pressure and solar modulation \citep{guo2015}, and its reduction by nearby terrain \citep{guo2026}. \Citet{lowe2025nowcast} propose nowcasting solar energetic particle (SEP) events from the onboard dose rate. NASA's Joint Augmented Reality work is developing suit navigation displays and notes that ``a seamless suit-integrated AR solution does not yet exist'' \citep{miller2022ar}.
+
+\Cref{tab:related} summarizes our reading. \Marswalk's novelty lies in combining these elements into one offline system and in the checking and hand-off steps between them, not in any single algorithm.
+
+\DeclareRobustCommand{\capfull}{\tikz[baseline=-0.6ex]\fill[ink] (0,0) circle (2.3pt);}
+\DeclareRobustCommand{\cappart}{\tikz[baseline=-0.6ex]{\draw[ink, line width=0.55pt] (0,0) circle (2.3pt); \fill[ink] (0,0) -- (90:2.3pt) arc (90:270:2.3pt) -- cycle;}}
+\DeclareRobustCommand{\capnone}{\tikz[baseline=-0.6ex]\draw[ink, line width=0.5pt] (0,0) circle (2.3pt);}
+\begin{table*}[t]
+  \centering\footnotesize\renewcommand{\arraystretch}{1.05}
+  \caption{Capabilities against requirements R1--R5, in our reading of public sources (judgments, not measurements). \capfull\ documented; \cappart\ partly; \capnone\ not found in public sources, which does not mean absent. \Marswalk's explanations have not been evaluated with users, and its link-loss behaviour has been tested only over a simulated link.}
+  \label{tab:related}
+  \begin{tabular}{@{}l c c c c c c@{}}
+    \toprule
+    & R1 & R2 & \multicolumn{2}{c}{R3} & R4 & R5 \\
+    \cmidrule(lr){4-5}
+    Tool & Earth-independent & Hard constraints & Energy & Suit heat & Explains & Link-loss execution \\
+    \midrule
+    Mars Trek, MMGIS \citep{marstrek,mmgis} & \capnone & \capnone & \capnone & \capnone & \capnone & \capnone \\
+    EMSS traverse planning \citep{miller2026emss} & \capnone & \cappart & \capnone & \capnone & \capnone & \capnone \\
+    SEXTANT \citep{johnson2010sextant,norheim2018sextant} & \capnone & \cappart & \capfull & \cappart & \capnone & \capnone \\
+    Lunar metabolic paths \citep{penaasensio2024moonpath} & \capnone & \cappart & \capfull & \capnone & \capnone & \capnone \\
+    Science-yield MILP \citep{broddrick2024} & \capnone & \cappart & \capnone & \capnone & \capnone & \capnone \\
+    Rover planners \citep{carsten2009,toupet2026enav} & \capfull & \capfull & \capnone & \capnone & \capnone & \capfull \\
+    Joint AR displays \citep{miller2022ar} & \cappart & \capnone & \capnone & \capnone & \capnone & \cappart \\
+    \Marswalk & \capfull & \capfull & \capfull & \capfull & \cappart & \cappart \\
+    \bottomrule
+  \end{tabular}
+\end{table*}

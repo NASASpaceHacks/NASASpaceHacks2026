@@ -1,0 +1,189 @@
+[
+ {
+  "walk": "W01",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 41.11,
+    "limit": 10
+   },
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2010.8,
+    "limit": 2000
+   },
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 596.56,
+    "limit": 360
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 536.56,
+    "limit": 300
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 38.86,
+    "limit": 30
+   },
+   {
+    "rule": "daylight_min_sun_elev_deg",
+    "observed": -16.68,
+    "limit": 5
+   }
+  ],
+  "reasoning": "Worst values: out-of-LOS run 41.1 min (row 40, limit 10); slope 19.84 deg (limit 20); radius 2010.8 m (limit 2000); total EVA 596.6 min (limit 360); walk-back worst 536.6 min (limit 300); shelter 38.9 min (limit 30); min sun -16.68 deg (limit 5)."
+ },
+ {
+  "walk": "W02",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Worst values: out-of-LOS run 8.9 min (row 39, limit 10); slope 17.22 deg (limit 20); radius 762.0 m (limit 2000); total EVA 216.8 min (limit 360); walk-back worst 156.8 min (limit 300); shelter 24.3 min (limit 30); min sun 58.25 deg (limit 5). LOS run 8.9 is within 2 min of the limit; may be over-counted by at most one block, so still passes."
+ },
+ {
+  "walk": "W03",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Worst values: out-of-LOS run 1.1 min (row 88, limit 10); slope 13.49 deg (limit 20); radius 604.2 m (limit 2000); total EVA 162.5 min (limit 360); walk-back worst 102.5 min (limit 300); shelter 19.5 min (limit 30); min sun 58.25 deg (limit 5)."
+ },
+ {
+  "walk": "W04",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Worst values: out-of-LOS run 0.0 min (row 0, limit 10); slope 12.85 deg (limit 20); radius 215.2 m (limit 2000); total EVA 93.5 min (limit 360); walk-back worst 39.7 min (limit 300); shelter 6.6 min (limit 30); min sun 71.43 deg (limit 5)."
+ },
+ {
+  "walk": "W05",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 42.9,
+    "limit": 10
+   }
+  ],
+  "reasoning": "Worst values: out-of-LOS run 42.9 min (row 71, limit 10); slope 18.78 deg (limit 20); radius 718.9 m (limit 2000); total EVA 187.7 min (limit 360); walk-back worst 127.7 min (limit 300); shelter 23.2 min (limit 30); min sun 58.25 deg (limit 5)."
+ },
+ {
+  "walk": "W06",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Worst values: out-of-LOS run 0.0 min (row 0, limit 10); slope 19.92 deg (limit 20); radius 321.0 m (limit 2000); total EVA 110.3 min (limit 360); walk-back worst 50.9 min (limit 300); shelter 10.2 min (limit 30); min sun 69.50 deg (limit 5)."
+ },
+ {
+  "walk": "W07",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 47.79,
+    "limit": 10
+   },
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 658.98,
+    "limit": 360
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 598.98,
+    "limit": 300
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 85.76,
+    "limit": 30
+   },
+   {
+    "rule": "daylight_min_sun_elev_deg",
+    "observed": -30.22,
+    "limit": 5
+   }
+  ],
+  "reasoning": "Worst values: out-of-LOS run 47.8 min (row 20, limit 10); slope 19.64 deg (limit 20); radius 1712.1 m (limit 2000); total EVA 659.0 min (limit 360); walk-back worst 599.0 min (limit 300); shelter 85.8 min (limit 30); min sun -30.22 deg (limit 5)."
+ },
+ {
+  "walk": "W08",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Worst values: out-of-LOS run 0.0 min (row 0, limit 10); slope 13.41 deg (limit 20); radius 451.2 m (limit 2000); total EVA 131.7 min (limit 360); walk-back worst 71.7 min (limit 300); shelter 14.4 min (limit 30); min sun 13.82 deg (limit 5)."
+ },
+ {
+  "walk": "W09",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 161.82,
+    "limit": 10
+   },
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 552.35,
+    "limit": 360
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 492.35,
+    "limit": 300
+   },
+   {
+    "rule": "daylight_min_sun_elev_deg",
+    "observed": -6.86,
+    "limit": 5
+   }
+  ],
+  "reasoning": "Worst values: out-of-LOS run 161.8 min (row 27, limit 10); slope 19.92 deg (limit 20); radius 1380.2 m (limit 2000); total EVA 552.4 min (limit 360); walk-back worst 492.4 min (limit 300); shelter 29.1 min (limit 30); min sun -6.86 deg (limit 5)."
+ },
+ {
+  "walk": "W10",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Worst values: out-of-LOS run 1.7 min (row 24, limit 10); slope 15.87 deg (limit 20); radius 872.0 m (limit 2000); total EVA 233.0 min (limit 360); walk-back worst 173.0 min (limit 300); shelter 28.2 min (limit 30); min sun 58.25 deg (limit 5)."
+ },
+ {
+  "walk": "W11",
+  "verdict": "NO-GO",
+  "failing_rules": [
+   {
+    "rule": "los_gap_max_min",
+    "observed": 34.56,
+    "limit": 10
+   },
+   {
+    "rule": "walk_radius_max_m",
+    "observed": 2333.5,
+    "limit": 2000
+   },
+   {
+    "rule": "eva_duration_max_min",
+    "observed": 852.87,
+    "limit": 360
+   },
+   {
+    "rule": "walkback_speed_factor",
+    "observed": 792.87,
+    "limit": 300
+   },
+   {
+    "rule": "shelter_time_max_min",
+    "observed": 82.46,
+    "limit": 30
+   },
+   {
+    "rule": "daylight_min_sun_elev_deg",
+    "observed": -63.29,
+    "limit": 5
+   }
+  ],
+  "reasoning": "Worst values: out-of-LOS run 34.6 min (row 77, limit 10); slope 19.50 deg (limit 20); radius 2333.5 m (limit 2000); total EVA 852.9 min (limit 360); walk-back worst 792.9 min (limit 300); shelter 82.5 min (limit 30); min sun -63.29 deg (limit 5)."
+ },
+ {
+  "walk": "W12",
+  "verdict": "GO",
+  "failing_rules": [],
+  "reasoning": "Worst values: out-of-LOS run 1.5 min (row 79, limit 10); slope 18.82 deg (limit 20); radius 714.5 m (limit 2000); total EVA 204.9 min (limit 360); walk-back worst 144.9 min (limit 300); shelter 23.8 min (limit 30); min sun 58.25 deg (limit 5)."
+ }
+]

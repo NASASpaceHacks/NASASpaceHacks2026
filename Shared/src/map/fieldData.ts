@@ -306,19 +306,20 @@ export function isolines(
 export function maskPolygons(
   grid: Pick<GridSpec, 'w' | 'h' | 'cellM' | 'originX' | 'originY'>,
   mask: ArrayLike<number>,
-  opts: { downsample?: number; minAreaM2?: number } = {},
+  opts: { downsample?: number; minAreaM2?: number; minHoleM2?: number } = {},
 ): [number, number][][][] {
   const k = Math.max(1, Math.round(opts.downsample ?? 1));
   const ds = downsample(mask, grid.w, grid.h, k);
   const step = grid.cellM * k;
   const minArea = opts.minAreaM2 ?? step * step * 4;
+  const minHole = opts.minHoleM2 ?? minArea;
   const [mp] = contours().size([ds.w, ds.h]).smooth(true).thresholds([0.5])(Array.from(ds.data));
   const out: [number, number][][][] = [];
   for (const poly of mp?.coordinates ?? []) {
     const rings = poly.map((ring) => ring.map(([px, py]) => [grid.originX + px * step, grid.originY - py * step] as [number, number]));
     if (!rings[0] || Math.abs(ringArea(rings[0])) < minArea) continue;
     // Drop speckle holes too (small excluded islands inside the region).
-    out.push([rings[0], ...rings.slice(1).filter((h) => Math.abs(ringArea(h)) >= minArea)]);
+    out.push([rings[0], ...rings.slice(1).filter((h) => Math.abs(ringArea(h)) >= minHole)]);
   }
   return out;
 }

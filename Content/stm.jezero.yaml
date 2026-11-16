@@ -1,0 +1,104 @@
+# Marswalk Science Traceability Matrix (STM), Jezero crater western delta front + upper fan site (jezero-v1)
+# Format follows NASA STMs: Goal -> Objective -> Measurement / crew action -> Station.
+# Every station value (0-100) is a team-assigned priority derived from the objectives it serves
+# (weights below); it is NOT a NASA ranking. Facts are cited to NASA/JPL pages, Williams et al. (LPSC 2023)
+# and Herd et al. (PNAS 2025). AOI: 5 x 5 km centred 77.392 E, 18.466 N (planetocentric).
+version: 0
+status: "draft v0 (jezero-v1); needs review by the team science lead"
+scoring_rule: >
+  Values were assigned by judgment (draft v0, jezero-v1), guided by three factors: the weight of the
+  highest objective served, uniqueness (few other stations give the same measurement), and
+  crew-actionability (can a suited crew make the measurement in 10-35 min). No formula was fitted. The
+  science lead should re-score before the final pitch. This is a transparent team heuristic, not a
+  calibrated model.
+challenge_link: >
+  Second Marswalk site pack. Jezero adds delta and lake sedimentology, the organics / sulfate / carbonate
+  habitability context, and a real cached-sample depot (Three Forks) that a crew could revisit.
+
+goals:
+  - id: G1
+    statement: "Reconstruct how the Jezero delta was built and what it records about the ancient lake and the rivers that fed it."
+    sources:
+      - "Williams et al., LPSC 2023 (Delta Front Campaign overview): delta-front rocks are consistent with subaqueous deposition by broadly unconfined density currents in a distal deltaic setting; radar suggests the delta progrades over the crater floor. https://ntrs.nasa.gov/api/citations/20230000588/downloads/Williams%20et%20al_LPSC%202023%20Delta%20Front%20Overview%20abstract_v5.pdf"
+      - "NASA news release, 15 Sep 2022: the delta is a fan-shaped feature that formed about 3.5 billion years ago where a river met a lake. https://www.nasa.gov/news-release/nasas-perseverance-rover-investigates-geologically-rich-mars-terrain/"
+      - "NASA Perseverance blog, 21 Jun 2023: upper-fan conglomerates provide a window into the past (source terrains, transport, magnetic-field history). https://science.nasa.gov/blog/persevering-across-the-upper-fan-in-search-of-record-keeping-rocks/"
+  - id: G2
+    statement: "Characterize past habitability and the preservation context for organic matter and potential biosignatures (sulfates, carbonates, serpentine, organics)."
+    sources:
+      - "NASA news release, 15 Sep 2022: SHERLOC's most abundant organic detections to date at Wildcat Ridge, spatially correlated with sulfate minerals; a potential biosignature, not proof of life. https://www.nasa.gov/news-release/nasas-perseverance-rover-investigates-geologically-rich-mars-terrain/"
+      - "Herd et al. 2025, PNAS 122(2):e2404255121, doi:10.1073/pnas.2404255121: hydrated carbonates first detected at Amherst Point (Pelican Point); no carbonaceous Raman bands at light-toned sulfate-rich outcrops. https://pmc.ncbi.nlm.nih.gov/articles/PMC11745317/"
+  - id: G3
+    statement: "Document the sampled sites and the Three Forks depot so that the cached samples keep their field context for analysis and potential return (Mars Sample Return planning)."
+    sources:
+      - "NASA Three Forks depot map: 10 tubes dropped between sol 653 (21 Dec 2022) and sol 690 (28 Jan 2023), 5-15 m apart, as a backup. https://science.nasa.gov/resource/perseverances-three-forks-sample-depot-map/"
+      - "JPL news: depot holds rock cores, an atmospheric sample and a witness tube; designed for recovery by the NASA-ESA Mars Sample Return campaign. https://www.jpl.nasa.gov/news/nasas-perseverance-rover-completes-mars-sample-depot/"
+      - "NASA Mars rock samples list (sample names, sealing sols, depot vs rover). https://science.nasa.gov/mission/mars-2020-perseverance/mars-rock-samples/"
+      - "Williams et al., LPSC 2023: sample-pair strategy, each unique sample paired with a companion core from the same location so that two caches can be built. https://ntrs.nasa.gov/api/citations/20230000588/downloads/Williams%20et%20al_LPSC%202023%20Delta%20Front%20Overview%20abstract_v5.pdf"
+
+objectives:
+  - id: OBJ-1
+    goal: G1
+    weight: 90
+    statement: "Document the delta-front stratigraphy from the crater-floor contact up through the Hawksbill Gap and Cape Nukshak sections (bedding, grain size, sedimentary structures)."
+    rationale: "Delta-front rocks record density-current / turbidite deposition in a distal deltaic setting, and the crater floor/delta contact is poorly exposed under regolith (Williams et al., LPSC 2023); Hogwallow Flats siltstones/mudstones are interpreted as possible lacustrine deposits (Herd et al. 2025)."
+    measurements:
+      - { id: M1a, crew_action: "Photograph bedding and laminae with scale bar, heading and sun-angle metadata; trench where the contact is buried", instrument_analog: "Mastcam-Z / WATSON imaging", output: "Geotagged image set + measured section sketch" }
+      - { id: M1b, crew_action: "Hand-lens grain-size and sorting estimate on fresh or broken surfaces", instrument_analog: "WATSON close-up / SuperCam RMI", output: "Grain-size card per bed" }
+    stations: [JZ01, JZ02, JZ03, JZ04, JZ05, JZ06]
+  - id: OBJ-2
+    goal: G1
+    weight: 75
+    statement: "Record the upper-fan river deposits (sandstones and conglomerates): clast size, roundness and rock type, and layer geometry."
+    rationale: "Conglomerate grains record source-terrain geology, and their size and roundness record erosion and transport; the conglomerate test can help date when the magnetic field was active (NASA blog, 21 Jun 2023). Upper-fan cores are poorly lithified conglomerates and sandstones (Herd et al. 2025)."
+    measurements:
+      - { id: M2a, crew_action: "Clast census on a gridded card (size, roundness, rock type) at 1 m and 10 cm scale; mark oriented clasts", instrument_analog: "Mastcam-Z / WATSON mosaic", output: "Clast-count sheet + oriented-clast photos" }
+    stations: [JZ09, JZ10, JZ11]
+  - id: OBJ-3
+    goal: G2
+    weight: 85
+    statement: "Map aqueous-alteration minerals and textures (sulfates, carbonates, serpentine-like minerals, anhydrite veins, cements) that bear on habitability."
+    rationale: "Delta-front abrasions show carbonate and/or sulfate alteration minerals and anhydrite veins (Williams et al., LPSC 2023); samples record Fe-Mg carbonates, hydrated Mg/Fe sulfates, serpentine-like minerals, anhydrite veins and silica/sulfate/carbonate cements (Herd et al. 2025)."
+    measurements:
+      - { id: M3a, crew_action: "Image veins, coatings, nodules and cements at 1 m and 10 cm scale; note colour and cross-cutting relations", instrument_analog: "WATSON / Mastcam-Z", output: "Alteration-feature map" }
+      - { id: M3b, crew_action: "Hand-held spectrometer spot readings on abrasion patches and veins", instrument_analog: "SuperCam VISIR / PIXL / SHERLOC", output: "Spot spectra tagged to photos" }
+    stations: [JZ02, JZ03, JZ04, JZ05, JZ06, JZ09, JZ10, JZ11, JZ12]
+  - id: OBJ-4
+    goal: G2
+    weight: 95
+    statement: "Assess the organic-matter preservation context in fine-grained sulfate- and carbonate-bearing rocks, under contamination control."
+    rationale: "Wildcat Ridge gave the mission's most abundant organic detections, correlated with sulfates (NASA, 15 Sep 2022), but Herd et al. 2025 report no carbonaceous Raman bands at light-toned sulfate-rich outcrops and <0.1 wt% organics at Amherst Point, so the record is unresolved. Hidden Harbor (Yori Pass) is the lateral equivalent of Hogwallow Flats (Williams et al., LPSC 2023) and is a cross-check."
+    measurements:
+      - { id: M4a, crew_action: "UV-lamp fluorescence survey of abrasion patches and fresh surfaces; log glove and tool contact", instrument_analog: "SHERLOC (deep-UV) / WATSON", output: "Fluorescence photo set + contamination log" }
+    stations: [JZ04, JZ06, JZ12]
+  - id: OBJ-5
+    goal: G3
+    weight: 80
+    statement: "Re-document the cored and scooped sample sites and the Three Forks depot tubes, recording context, condition and precise positions."
+    rationale: "Samples were collected as pairs so two caches could be built (Williams et al., LPSC 2023); 10 tubes form the Three Forks backup depot (NASA depot map; JPL). Field context (core hole, workspace, outcrop) is what makes a returned sample interpretable (team judgment, not a sourced requirement)."
+    measurements:
+      - { id: M5a, crew_action: "Photograph core hole, tailings and workspace; record position and heading", instrument_analog: "WATSON / Hazcam workspace imaging", output: "Sample-site card" }
+      - { id: M5b, crew_action: "At the depot: locate each tube, photograph in place (no touching), note dust cover and any movement", instrument_analog: "Rover depot-check imaging", output: "Depot tube log" }
+      - { id: M5c, crew_action: "Scuff the megaripple and photograph crust and grain layering", instrument_analog: "Wheel scuff + WATSON", output: "Regolith profile photo" }
+    stations: [JZ03, JZ04, JZ05, JZ06, JZ07, JZ08, JZ09, JZ10, JZ11, JZ12]
+
+stations_summary:   # see stations.jezero.json for coordinates, dwell, sols and descriptions
+  JZ01: { value: 65, sol: 415, objectives: [OBJ-1] }
+  JZ02: { value: 70, sol: 452, objectives: [OBJ-1, OBJ-3] }
+  JZ03: { value: 80, sol: 490, objectives: [OBJ-1, OBJ-3, OBJ-5] }
+  JZ04: { value: 95, sol: 509, objectives: [OBJ-1, OBJ-3, OBJ-4, OBJ-5] }
+  JZ05: { value: 85, sol: 575, objectives: [OBJ-1, OBJ-3, OBJ-5] }
+  JZ06: { value: 80, sol: 623, objectives: [OBJ-1, OBJ-3, OBJ-4, OBJ-5] }
+  JZ07: { value: 60, sol: 634, objectives: [OBJ-5] }
+  JZ08: { value: 90, sol: 653, objectives: [OBJ-5] }
+  JZ09: { value: 75, sol: 749, objectives: [OBJ-2, OBJ-3, OBJ-5] }
+  JZ10: { value: 78, sol: 822, objectives: [OBJ-2, OBJ-3, OBJ-5] }
+  JZ11: { value: 68, sol: 882, objectives: [OBJ-2, OBJ-3, OBJ-5] }
+  JZ12: { value: 88, sol: 923, objectives: [OBJ-3, OBJ-4, OBJ-5] }
+
+caveats:
+  - "Station values are heuristic team priorities, not published NASA values; they must not be quoted as such."
+  - "Station coordinates are Perseverance end-of-drive localizations (M20_waypoints.json) for the sampling sol, i.e. the rover's parked position, accurate to roughly 10-20 m; they are not surveyed target positions."
+  - "Sample collection sols come from the sample designations in Herd et al. 2025 (e.g. M2020-490-11 = collected sol 490); NASA's sample list gives sealing sols, which differ for Mageik, Kukaklek, Otis Peak and Pilot Mountain."
+  - "Organics at Wildcat Ridge: NASA (2022) reported SHERLOC organic detections correlated with sulfates, while Herd et al. 2025 report no carbonaceous Raman bands at light-toned sulfate-rich outcrops. Treat the organic signal as unresolved."
+  - "Individual depot tube positions are not in the waypoint file; JZ08 uses the rover position on the first drop sol (653)."
+  - "A suited crew is not Perseverance: instrument analogs only show which rover measurement the crew action stands in for."

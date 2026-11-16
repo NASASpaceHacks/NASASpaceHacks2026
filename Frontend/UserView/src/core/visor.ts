@@ -43,7 +43,7 @@ import { isobands, downsample, demContours, type Iso } from './contours';
 import { headingCue, pickLandmark } from './cues';
 import { buildMockScenario, MockHabLink, nextVersion } from './mock';
 import { Checkpoint, type DynState } from './persist';
-import { crewTasks, galeStation, objectivesFor, type CrewTask } from './science';
+import { crewTasks, galeStation, loadSiteStm, objectivesFor, type CrewTask } from './science';
 import { RouteModel, routeShelter, shelterLabel } from './route';
 import { departNow, estimatedXY, newSim, rebaseSim, simTick, type SimState } from './sim';
 
@@ -57,6 +57,19 @@ export interface MapLayers {
 }
 
 const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+
+/**
+ * Optional position model (UserView_AR): owns the true vs. dead-reckoned position instead of the
+ * simulator's built-in drift. Called after every simulator step, before the safety core reads the estimate.
+ */
+export interface PositionModel {
+  /** Advance by dtRealS seconds of wall time (the simulator has already stepped). */
+  step(sim: SimState, route: RouteModel, dtRealS: number): void;
+  /** The position the helmet believes (projected metres). */
+  estimate(sim: SimState, route: RouteModel): [number, number];
+  /** True while the crew walks a local detour: the simulator holds along-route progress. */
+  holding(): boolean;
+}
 
 export class VisorController {
   readonly mode: 'mock' | 'live';
@@ -78,6 +91,8 @@ export class VisorController {
   private mockFirstPkg: PlanPackage | null = null;
 
   pkg: PlanPackage | null = null;
+  /** Optional external position model (see PositionModel); null = simulator drift. */
+  posModel: PositionModel | null = null;
   route: RouteModel | null = null;
   private core: SafetyCore | null = null;
   pending: PlanPackage | null = null;
@@ -227,6 +242,7 @@ export class VisorController {
       const r = await fetch(`/sitepacks/${siteId}/manifest.json`);
       if (!r.ok) throw new Error(`manifest ${r.status}`);
       const manifest = (await r.json()) as SitePackManifest;
+      await loadSiteStm(`/sitepacks/${siteId}`, siteId);
       this.setPack(manifest, `/sitepacks/${siteId}`, null);
       void this.loadDem(manifest);
     } catch (e) {
@@ -658,9 +674,13 @@ export class VisorController {
     return c < 0 ? NaN : this.dem[c];
   };
 
+  private estimateOf(sim: SimState, route: RouteModel): [number, number] {
+    return this.posModel ? this.posModel.estimate(sim, route) : estimatedXY(sim, route);
+  }
+
   private estCell(): number | null {
     if (!this.sim || !this.route || !this.grid) return null;
-    const [x, y] = estimatedXY(this.sim, this.route);
+    const [x, y] = this.estimateOf(this.sim, this.route);
     const c = xyToCell(this.grid, x, y);
     return c >= 0 ? c : this.route.cells[this.route.locate(this.sim.s)[0]];
   }
@@ -672,7 +692,8 @@ export class VisorController {
     const sim = this.sim, route = this.route;
     if (sim && route && this.core) {
       const heatAdvisory = sim.heatAvgW > HEAT_BUDGET_W;
-      const events = simTick(sim, route, dt, { elevAt: this.dem ? this.elevAt : undefined, heatAdvisory, returning: this.returnActive() });
+      const events = simTick(sim, route, dt, { elevAt: this.dem ? this.elevAt : undefined, heatAdvisory, returning: this.returnActive(), hold: this.posModel?.holding() ?? false });
+      this.posModel?.step(sim, route, dt);
       for (const e of events) {
         if (e.e === 'ARRIVED') this.toast('ok', `ARRIVED ${e.id} · POSITION FIX`);
         else if (e.e === 'DEPARTED') this.toast('info', `DEPARTED ${e.id}`);
@@ -877,7 +898,7 @@ export class VisorController {
     let comm: Snapshot['comm'] = { available: false, inLos: true, changeInMin: null };
 
     if (sim && route && g) {
-      est = estimatedXY(sim, route);
+      est = this.estimateOf(sim, route);
       offRouteM = route.nearest(est[0], est[1], sim.s, 120).d;
       const st = route.stops[sim.stopK];
       const habBingo = pkg?.bingo.find((b) => b.id === 'HAB');

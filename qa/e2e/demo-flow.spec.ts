@@ -3,19 +3,23 @@ import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * The live pitch demo, end to end, on the real gale-v1 site pack with the real engine:
- *   1 plan (rover-staged, OK) · 1b Hab-1 STAY IN explained → stage from PR-1 · 2 explain safe zone on
- *   the engine LOS field · 3 CONFIRM v1 (package size) · 4 visor verifies Ed25519, A → ACK · 5 sim walks,
- *   TELEM + plan vs actual · 6 ST04 station card with Curiosity photo · 7 SEP nowcast → replan → v2 →
- *   RETURN guidance · 8 drop link → AUTONOMOUS → restore → TELEM resync · 9 visor reload restores state ·
- *   10 credibility surfaces: space-weather tiers, rule evidence chips, Evidence panel + limitations.
- * Screenshots of each demo moment go to qa/screens/ (committed); timings to qa/screens/timings.json.
+ * The live pitch demo, end to end, on the real gale-v1 site pack with the real engine, driven through
+ * the redesigned habitat console (① Plan → ② Send → ③ EVA live; docs/designs/console-ux.md):
+ *   1 recommended plan on load, 0 clicks (rover-staged, GO) · 1b Hab-1 NO-GO explained → "Start from
+ *   rover instead" · 1c rover drag · calm map + Layers panel · 2 "Why this area?" on the engine LOS
+ *   field · 3 Review & send → Send to crew (package size) · 4 visor verifies Ed25519, A → ACK → EVA live
+ *   (≤ 3 clicks) · 5 sim walks, crew card + timeline NOW · 6 ST04 station card, margins over time ·
+ *   7 Radiation spike → v2 in 2 clicks → RETURN guidance · 8 drop link → AUTONOMOUS → restore → resync ·
+ *   9 visor reload restores state · 10 credibility in Details: space weather, rule evidence, Evidence panel.
+ * Console screenshots go to qa/screens/ux/, visor and evidence screenshots to qa/screens/; timings to
+ * qa/screens/timings.json (read by the console's Evidence panel).
  */
 
 const CONSOLE = 'http://localhost:15173';
 const VISOR = 'http://localhost:15174';
 const SCREENS = fileURLToPath(new URL('../screens/', import.meta.url));
-const VIEW = { width: 1600, height: 900 };
+const UX = `${SCREENS}ux/`;
+const VIEW = { width: 1440, height: 900 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Any = any;
@@ -28,8 +32,8 @@ const vis$ = <T,>(p: Page, fn: (s: Any) => T): Promise<T> =>
   p.evaluate(`(${fn.toString()})(window.__visorSnap())`) as Promise<T>;
 
 /** Screenshot with CSS animations settled (finite fades completed, blinking alerts at full contrast). */
-const shot = async (p: Page, name: string) => {
-  await p.screenshot({ path: `${SCREENS}${name}.png`, animations: 'disabled' });
+const shot = async (p: Page, path: string) => {
+  await p.screenshot({ path, animations: 'disabled' });
 };
 
 /** Wait until the console has finished a plan matching `pred` (evaluated in the page). */
@@ -37,16 +41,22 @@ const planReady = (p: Page, pred: string, timeout = 90_000) =>
   p.waitForFunction(`(() => { const s = window.marswalk && window.marswalk.state(); return !!s && s.planStatus === 'ready' && !s.dirty && (${pred}); })()`, null, { timeout });
 
 test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link ↔ visor', async ({ browser }) => {
-  mkdirSync(SCREENS, { recursive: true });
+  mkdirSync(UX, { recursive: true });
   const timings: Record<string, number | string> = {};
   const errors: string[] = [];
   const conCtx = await browser.newContext({ viewport: VIEW });
-  const visCtx = await browser.newContext({ viewport: VIEW });
+  const visCtx = await browser.newContext({ viewport: { width: 1600, height: 900 } });
   const con = await conCtx.newPage();
   const vis = await visCtx.newPage();
   for (const [name, p] of [['console', con], ['visor', vis]] as const) {
     p.on('pageerror', (e) => errors.push(`${name}: ${e.message}`));
   }
+  /** Officer clicks on the main path, counted against the spec's success criteria. */
+  let clicks = 0;
+  const click = async (testId: string) => {
+    clicks++;
+    await con.getByTestId(testId).click();
+  };
 
   await test.step('visor boots, links up and waits for a route', async () => {
     await vis.goto(`${VISOR}/?reset=1`);
@@ -55,50 +65,84 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
   });
 
   // ── 1 ────────────────────────────────────────────────────────────────────────────────────────────
-  await test.step('1. console generates an OK plan staged from PR-1 on gale-v1 (real engine)', async () => {
+  await test.step('1. the recommended plan appears on load with 0 clicks: GO, staged from PR-1 (real engine)', async () => {
     const t0 = Date.now();
     await con.goto(CONSOLE);
-    await planReady(con, `s.plan && s.evaBase === 'ROVER1'`);
+    const tLoad = Date.now();
+    await expect(con.getByTestId('verdict')).toBeVisible({ timeout: 90_000 });
+    timings.loadToVerdictMs = Date.now() - tLoad;
     timings.bootToFirstPlanMs = Date.now() - t0;
+    await planReady(con, `s.plan && s.evaBase === 'ROVER1'`);
+    expect(clicks).toBe(0);
+    console.log(`[1] verdict visible ${timings.loadToVerdictMs} ms after load, 0 clicks`);
+    expect(timings.loadToVerdictMs as number).toBeLessThanOrEqual(3_000); // success criterion: ≤ 3 s, 0 clicks
     const s = await con$(con, (s) => ({
-      source: s.sourceLabel, site: s.pack.manifest.id, base: s.evaBase, status: s.plan.status, order: s.plan.order,
+      source: s.sourceLabel, site: s.pack.manifest.id, base: s.evaBase, status: s.plan.status, order: s.plan.order, mode: s.uiMode,
       fields: s.fieldsSource, planner: s.plannerLabel, solveMs: s.plan.solveMs, binding: s.plan.binding?.text, notes: s.plan.notes,
-      durationMin: s.plan.totals.durationMin, value: s.plan.totals.scienceValue,
+      durationMin: s.plan.totals.durationMin, value: s.plan.totals.scienceValue, start: s.startLtstMin, scenario: s.pack.manifest.scenario.startLtstMin,
+      allOn: Object.values(s.stationOn).every(Boolean), overlays: s.overlays, vectors: s.vectors,
     }));
     console.log(`[1] ${s.status} from ${s.base}: ${s.order.join(' → ')} · value ${s.value} · ${Math.round(s.durationMin)} min · solve ${Math.round(s.solveMs)} ms · ${s.binding}`);
     expect(s.source).toBe('Hab server');
     expect(s.site).toBe('gale-v1');
-    expect(s.base).toBe('ROVER1'); // default EVA base = the pressurized rover
+    expect(s.mode).toBe('plan');
+    expect(s.base).toBe('ROVER1'); // recommended plan: base = the pressurized rover
+    expect(s.start).toBe(s.scenario); // … at the scenario start time
+    expect(s.allOn).toBe(true); // … with every station offered
     expect(s.status).toBe('OK');
     expect(s.order.length).toBeGreaterThanOrEqual(3);
     expect(s.fields).toBe('server');
     expect(s.planner).toMatch(/pandolf-santee-mars/);
     expect(s.notes.join(' ')).not.toMatch(/golden fixture|engine unavailable/);
+    // Verdict card: GO/CAUTION word, stops and duration, then the plain checklist.
+    await expect(con.getByTestId('verdict')).toHaveAttribute('data-verdict', /^(GO|CAUTION)$/);
+    await expect(con.getByTestId('verdict-headline')).toHaveText(new RegExp(`^${s.order.length} stops · \\d h \\d\\d min`));
+    for (const line of ['spare', 'weather', 'daylight', 'heat', 'limit']) await expect(con.locator(`[data-line="${line}"]`)).toBeVisible();
+    await expect(con.locator('[data-line="spare"]')).toContainText(/airlock at \+\d+:\d\d · latest safe return \+\d+:\d\d · .+ spare/);
+    await expect(con.locator('[data-line="limit"]')).toContainText(/^Limits: /);
+    // Calm default map: no shading, contours, hatching or value labels until the officer asks.
+    expect(s.overlays).toEqual([]);
+    expect(s.vectors).toMatchObject({ outline: true, route: true, stations: true, shelters: true, imagery: true, contours: false, keepouts: false, traverse: false, stationDetail: false });
+    // Timeline: one block per stop, a leave-by tick per stop, the deadline.
+    await expect(con.getByTestId('timeline')).toBeVisible();
+    await expect(con.getByTestId('stops-count')).toHaveText(`${s.order.length} of 12`);
     timings.planSolveMs = Math.round(s.solveMs);
     timings.planStations = s.order.length;
-    // Regenerate (G): plan → fields → zone, timed in the browser.
+    // Re-plan (G): plan → fields → zone, timed in the browser.
     const t1 = Date.now();
-    await con.getByRole('button', { name: /Generate plan/ }).click();
+    await con.keyboard.press('g');
     await planReady(con, `s.plan && s.plan.status === 'OK'`);
     timings.regenerateWallMs = Date.now() - t1;
-    await con.keyboard.press('z'); // zoom to the route
-    await con.waitForTimeout(900);
-    await shot(con, '01-plan-ok');
+    await con.waitForTimeout(700);
+    await shot(con, `${UX}01-plan-go.png`);
+    // Must still work at 1280 × 800: verdict and the primary action visible without scrolling.
+    await con.setViewportSize({ width: 1280, height: 800 });
+    await con.waitForTimeout(500);
+    await expect(con.getByTestId('verdict')).toBeInViewport();
+    await expect(con.getByTestId('review-send')).toBeInViewport();
+    await shot(con, `${UX}01-plan-go-1280.png`);
+    await con.setViewportSize(VIEW);
+    await con.waitForTimeout(300);
   });
 
-  await test.step('1b. from Hab-1: STAY IN with the physical reason; one click stages from PR-1', async () => {
+  await test.step('1b. from Hab-1: NO-GO with the physical reason in one sentence; Enter starts from the rover', async () => {
     await con.getByTestId('eva-base-HAB').click();
     await planReady(con, `s.evaBase === 'HAB' && s.plan && s.plan.status === 'STAY_IN'`);
     const card = con.getByTestId('stayin-card');
     await expect(card).toBeVisible();
-    await expect(card).toContainText('from Hab-1');
+    await expect(card).toHaveAttribute('data-verdict', 'NO-GO');
+    await expect(card).toContainText('No safe walk from Hab-1');
+    await expect(con.getByTestId('stayin-reason')).toContainText(/below Hab-1: the climb back costs ≈\d+ W against the suit's 352 W cooling limit/);
     await expect(con.getByTestId('stayin-binding')).toContainText('PR-1'); // engine: "staging from ROVER1 allows …", relabelled
-    await expect(con.getByTestId('stayin-why')).toContainText(/suit-heat budget/);
-    await expect(con.getByTestId('stage-from-rover')).toHaveText(/Stage from PR-1/);
-    console.log(`[1b] ${await con.getByTestId('stayin-why').textContent()}`);
+    await expect(con.getByTestId('stayin-why')).toContainText(/suit-heat budget/); // full physics behind "Show the physics"
+    await expect(con.getByTestId('stage-from-rover')).toHaveText(/Start from rover instead/);
+    await expect(con.getByTestId('review-send')).toHaveCount(0); // nothing to send from here
+    console.log(`[1b] ${await con.getByTestId('stayin-reason').textContent()}`);
     await con.waitForTimeout(400);
-    await shot(con, '02-hab-stay-in-explained');
-    await con.getByTestId('stage-from-rover').click();
+    await shot(con, `${UX}02-plan-nogo-hab.png`);
+    // Enter = the primary action of the current mode (here: start from the rover).
+    await con.evaluate(`document.activeElement && document.activeElement.blur()`);
+    await con.keyboard.press('Enter');
     await planReady(con, `s.evaBase === 'ROVER1' && s.plan && s.plan.status === 'OK'`);
   });
 
@@ -126,8 +170,21 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     expect(log).toMatch(/Replanned after rover move: \d+ stations from PR-1/);
   });
 
+  await test.step('1d. Layers: real data layers in groups; a layer shows its legend when on', async () => {
+    await con.getByTestId('layers-button').click();
+    await con.getByTestId('layer-shelter').getByRole('switch').click();
+    expect(await con$(con, (s) => s.overlays)).toEqual(['shelter']);
+    await expect(con.getByTestId('layer-shelter').getByTestId('layer-legend')).toContainText(/min/);
+    await con.waitForTimeout(500);
+    await shot(con, `${UX}03-layers-open.png`);
+    for (const l of ['Radio coverage (line of sight to Hab-1 / PR-1)', 'Slope', 'Walk-back time', 'Keep-out zones', 'Curiosity traverse']) await expect(con.getByTestId('layers-panel').getByText(l, { exact: true }).first()).toBeVisible();
+    await con.getByTestId('layer-shelter').getByRole('switch').click(); // back to the calm view
+    await con.keyboard.press('Escape');
+    expect(await con$(con, (s) => [s.overlays.length, s.layersOpen])).toEqual([0, false]);
+  });
+
   // ── 2 ────────────────────────────────────────────────────────────────────────────────────────────
-  await test.step('2. explain safe zone — the zone uses the engine LOS field from /api/fields/:reqHash/los', async () => {
+  await test.step('2. "Why this area?" — the explanation uses the engine LOS field from /api/fields/:reqHash/los', async () => {
     const r = (await con.evaluate(`(async () => {
       const s = window.marswalk.state();
       const res = await fetch('/api/fields/' + s.plan.reqHash + '/los');
@@ -147,25 +204,34 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     expect(r.zoneMismatch).toBe(0);
     expect(r.losSource).toBe('engine');
 
-    await con.getByRole('button', { name: /Explain safe zone/ }).click();
+    await con.getByTestId('why-area').click();
     await con.waitForFunction(`window.marswalk.state().explain.step === 5`, null, { timeout: 30_000 });
     expect(await con$(con, (s) => s.explain.detail)).toMatch(/Engine comm line of sight/);
     await con.waitForFunction(`window.marswalk.state().explain.step === 7`, null, { timeout: 30_000 });
     expect(await con$(con, (s) => s.explain.caption)).toMatch(/Route from PR-1/);
     await con.waitForTimeout(1900); // route draws itself inside the safe region
-    await shot(con, '03-safe-zone');
+    await shot(con, `${UX}03b-why-this-area.png`);
     await con.waitForFunction(`!window.marswalk.state().explain.running`, null, { timeout: 15_000 });
   });
 
   // ── 3 / 4 ────────────────────────────────────────────────────────────────────────────────────────
   let tConfirm = 0;
-  await test.step('3. CONFIRM pushes route v1; the package size is shown', async () => {
-    await con.getByRole('button', { name: /Review v1/ }).click();
+  await test.step('3. Review & send → the crew brief → Send to crew pushes route v1 (package size shown)', async () => {
+    clicks = 0;
+    await click('review-send');
+    const brief = con.getByTestId('crew-brief');
+    await expect(brief).toBeVisible();
+    expect(await con$(con, (s) => s.uiMode)).toBe('send');
     await expect(con.getByTestId('review-route')).toHaveText(/^PR-1 → .+ → PR-1$/);
+    await expect(con.getByTestId('watch-list').locator('li')).toHaveCount(3);
+    await expect(brief.getByText(/Leave by/).first()).toBeVisible();
+    await expect(con.getByTestId('package-size')).toContainText(/Route package ≈[\d.]+ KB · fits/);
+    await con.waitForTimeout(500);
+    await shot(con, `${UX}04-send-brief.png`);
     tConfirm = Date.now();
-    await con.getByRole('button', { name: /Confirm & push v1/ }).click();
-    await expect(con.getByTestId('route-sent').or(con.getByTestId('route-acked'))).toBeVisible();
-    await expect(con.getByText(/Route package [\d.]+ KB/)).toBeVisible();
+    await click('send-to-crew');
+    await expect(con.getByTestId('route-sent').or(con.getByTestId('route-acked')).first()).toBeVisible();
+    await expect(con.getByTestId('package-size')).toContainText(/Route package [\d.]+ KB · fits/);
     const route = await con$(con, (s) => s.route);
     console.log(`[3] v${route.seq} pushed · ${route.bytes} B${route.estimated ? ' (estimate)' : ''}`);
     expect(route.seq).toBe(1);
@@ -173,44 +239,54 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     expect(route.bytes).toBeGreaterThan(500);
     expect(route.bytes).toBeLessThanOrEqual(25_000);
     timings.packageBytes = route.bytes;
-    await con.waitForTimeout(700); // confirm bar slide-in
-    await shot(con, '04-confirm');
   });
 
-  await test.step('4. visor receives v1 and verifies the signature; A → ACK on the console', async () => {
+  await test.step('4. visor receives v1 and verifies the signature; A → "Accepted by EV1" → EVA live (≤ 3 clicks)', async () => {
     await expect(vis.getByText('ED25519 ✓ VERIFIED').first()).toBeVisible();
     timings.confirmToVisorVerifiedMs = Date.now() - tConfirm;
     await expect(vis.getByText(/^PR-1\s+›\s+ST\d\d.*›\s+PR-1$/)).toBeVisible();
-    await shot(vis, '04b-visor-new-route');
+    await shot(vis, `${SCREENS}04b-visor-new-route.png`);
     const tA = Date.now();
+    clicks++; // the visor's A
     await vis.keyboard.press('a');
-    await expect(con.getByTestId('route-acked')).toBeVisible();
+    await expect(con.getByTestId('route-acked').first()).toContainText('Accepted by EV1');
     timings.acceptToAckMs = Date.now() - tA;
     timings.confirmToAckMs = Date.now() - tConfirm;
     expect(await vis$(vis, (s) => [s.seq, s.display, s.homeName])).toEqual([1, 'NAV', 'PR-1']);
+    await expect.poll(() => con$(con, (s) => s.uiMode), { timeout: 6_000 }).toBe('live'); // straight into EVA live
+    console.log(`[4] plan → crew acceptance in ${clicks} clicks`);
+    expect(clicks).toBeLessThanOrEqual(3); // success criterion
+    timings.planToAcceptClicks = clicks;
   });
 
   // ── 5 ────────────────────────────────────────────────────────────────────────────────────────────
   let firstStop = '';
-  await test.step('5. the visor sim walks; TELEM reaches the console', async () => {
+  await test.step('5. the visor sim walks (Simulation menu); the crew card and timeline NOW follow it', async () => {
     firstStop = await con$(con, (s) => s.plan.order[0]);
-    await con.getByRole('tab', { name: /Live/ }).click();
+    await con.getByTestId('sim-menu').click();
     await con.getByRole('button', { name: '30×' }).click();
     const t0 = Date.now();
-    await con.getByRole('button', { name: 'Run astronaut' }).click();
+    await con.getByTestId('sim-run').click();
     await con.waitForFunction(`window.marswalk.state().telem.length >= 3`, null, { timeout: 30_000 });
     timings.runToTelemMs = Date.now() - t0;
+    await con.keyboard.press('Escape');
     await expect(con.getByTestId('telemetry')).toBeVisible();
+    await expect(con.getByTestId('crew-status')).toHaveText(/^(On plan|\d+ min (ahead|behind)|Tracking)$/);
+    await expect(con.getByTestId('crew-next')).toContainText(/^Next: /);
+    for (const k of ['spare', 'shelter', 'o2', 'heat', 'link']) await expect(con.locator(`[data-testid="telemetry"] [data-key="${k}"]`)).toBeVisible();
+    await expect(con.getByTestId('timeline-now')).toBeVisible();
+    await expect(con.getByTestId('timeline-delta')).toContainText(/NOW \+\d+:\d\d · /);
     const v = await vis$(vis, (s) => ({ display: s.display, next: s.next?.id, t: s.t }));
     console.log(`[5] TELEM flowing after ${timings.runToTelemMs} ms · visor ${v.display} → ${v.next} at T+${v.t.toFixed(1)} min`);
     expect(v.display).toBe('NAV');
     expect(v.next).toBe(firstStop);
-    await shot(vis, '05-visor-nav');
+    await shot(vis, `${SCREENS}05-visor-nav.png`);
   });
 
-  await test.step('5b. space weather in three labelled tiers: ENLIL forecast go/no-go, light-delayed alert, onboard nowcast', async () => {
+  await test.step('5b. Details → Space weather: three labelled tiers (ENLIL forecast, light-delayed alert, onboard nowcast)', async () => {
+    await con.getByTestId('open-details').click();
+    await con.getByTestId('details-tab-weather').click();
     const forecast = con.getByTestId('tier-forecast');
-    await forecast.scrollIntoViewIfNeeded();
     await expect(forecast).toContainText(/WSA-ENLIL/);
     await expect(con.getByTestId('forecast-status')).toHaveText(/^(Go|Caution)$/i);
     await expect(con.getByTestId('forecast-verdict')).toContainText(/±24 h of the EVA start/);
@@ -223,12 +299,12 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     await expect(con.getByTestId('tier-nowcast')).toContainText(/only tier that orders return now/i);
     timings.lightTimeMin = lt;
     console.log(`[5b] forecast ${await con.getByTestId('forecast-status').textContent()} · light time ${lt} min`);
-    await con.waitForTimeout(300);
-    await shot(con, '10-space-weather');
+    await con.keyboard.press('Escape');
+    await expect(con.getByTestId('details')).toBeHidden();
   });
 
   // ── 6 ────────────────────────────────────────────────────────────────────────────────────────────
-  await test.step('6. arrival at the first station: science + Curiosity photo; plan vs actual on the burndowns', async () => {
+  await test.step('6. arrival at the first station: science + Curiosity photo; margins over time, plan vs actual', async () => {
     await expect.poll(() => vis$(vis, (s) => s.display), { timeout: 90_000, intervals: [200] }).toBe('STATION');
     await con.evaluate(`window.marswalk.actions.setSim({ speed: 5 })`); // linger at the station
     const st = await vis$(vis, (s) => s.station);
@@ -240,12 +316,24 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     await expect(img).toBeVisible();
     await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth)).toBeGreaterThan(100);
     await expect.poll(() => vis$(vis, (s) => s.toasts.length), { timeout: 10_000 }).toBe(0); // arrival toast clears
-    await shot(vis, '06-station');
+    await shot(vis, `${SCREENS}06-station.png`);
+    await expect(con.getByTestId('crew-next')).toContainText(new RegExp(`Leave ${firstStop} at \\d\\d:\\d\\d`));
+    await con.waitForTimeout(600);
+    await shot(con, `${UX}05-eva-live.png`);
+    // In EVA live the crew status, next event and biggest risk are readable without scrolling (also at 1280 × 800).
+    await con.setViewportSize({ width: 1280, height: 800 });
+    await con.waitForTimeout(500);
+    for (const id of ['crew-status', 'crew-next', 'crew-risk', 'action-dock']) await expect(con.getByTestId(id)).toBeInViewport();
+    await shot(con, `${UX}05-eva-live-1280.png`);
+    await con.setViewportSize(VIEW);
+    await con.waitForTimeout(300);
 
-    await con.getByRole('tab', { name: /Burndowns/ }).click();
+    await con.getByTestId('open-details').click();
+    await con.getByTestId('details-tab-margins').click();
     await expect(con.getByTestId('burndown-met')).toBeVisible();
     await expect.poll(async () => Number(await con.getByTestId('burndown-heat').getAttribute('data-actual-points'))).toBeGreaterThan(3);
-    await shot(con, '06b-burndowns-plan-vs-actual');
+    await shot(con, `${UX}07b-details-margins.png`);
+    await con.keyboard.press('Escape');
 
     // Plan vs actual: the visor sim uses the engine's metabolic power and heat governor, so its TELEM
     // tracks the plan's burndown (heat average) instead of a constant placeholder.
@@ -270,10 +358,11 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
   });
 
   // ── 7 ────────────────────────────────────────────────────────────────────────────────────────────
-  await test.step('7. SEP nowcast → replan from the crew position in < 1 s → v2 → visor RETURN guidance', async () => {
-    await con.getByRole('tab', { name: /Live/ }).click();
+  await test.step('7. Radiation spike → engine return route as a change → Send to crew (2 clicks) → v2 → RETURN guidance', async () => {
+    clicks = 0;
     const t0 = Date.now();
-    await con.getByTestId('sep-nowcast').click(); // nowcast tier: onboard dose rate +25 %
+    await click('action-sep'); // nowcast tier: onboard dose rate +25 %
+    await expect(con.getByTestId('action-sheet')).toBeVisible();
     await con.waitForFunction(`(() => { const s = window.marswalk.state(); return !s.busyEvent && s.planStatus === 'ready' && s.plan && /SEP/.test(s.plan.binding ? s.plan.binding.text : ''); })()`, null, { timeout: 15_000 });
     timings.sepReplanWallMs = Date.now() - t0;
     const p = await con$(con, (s) => ({ status: s.plan.status, solveMs: s.plan.solveMs, from: s.plan.segments[0]?.from, to: s.plan.segments[s.plan.segments.length - 1]?.to, binding: s.plan.binding.text }));
@@ -283,32 +372,40 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     expect(p.from).toBe('HERE');
     expect(p.solveMs).toBeLessThan(1000);
     expect(timings.sepReplanWallMs as number).toBeLessThan(1500);
-    // The hab warns the crew at once (ALERT, from: 'hab'), before v2 is even confirmed.
+    // The hab warns the crew at once (ALERT, from: 'hab'), before v2 is even sent.
     await expect(vis.getByText('RETURN NOW', { exact: true }).first()).toBeVisible();
     await expect(vis.getByText(/HAB ALERT · SEP NOWCAST/)).toBeVisible();
+    await expect(con.getByTestId('sheet-change')).toContainText(/Return to (PR-1|Hab-1) now · \d+ min/);
+    await expect.poll(() => con$(con, (s) => s.alerts.some((a: { title: string }) => /radiation spike/i.test(a.title))), { timeout: 5_000 }).toBe(true); // alert banner queue
+    await expect(con.getByRole('alert').first()).toBeVisible();
+    await con.waitForTimeout(400);
+    await shot(con, `${UX}06-emergency-sheet.png`);
 
-    await con.getByRole('button', { name: /Review v2/ }).click();
-    await expect(con.getByTestId('review-route')).toHaveText(/^EV1 → (PR-1|Hab-1)$/);
     const t1 = Date.now();
-    await con.getByRole('button', { name: /Confirm & push v2/ }).click();
+    await click('sheet-send');
     await expect(vis.getByText('NEW ROUTE').first()).toBeVisible();
     await expect(vis.getByText('ED25519 ✓ VERIFIED').first()).toBeVisible();
     await expect(vis.getByText(/^HERE\s+›\s+(PR-1|HAB-1)$/)).toBeVisible();
+    expect(clicks).toBe(2); // success criterion: emergency → new route sent in 2 clicks
+    timings.emergencyClicks = clicks;
     await vis.keyboard.press('a');
-    await expect(con.getByTestId('route-acked')).toContainText('v2');
+    await expect(con.getByTestId('route-acked').first()).toContainText('v2');
     timings.confirmV2ToAckMs = Date.now() - t1;
     await expect(vis.getByText('RETURN NOW', { exact: true }).first()).toBeVisible();
     await expect(vis.getByText(/Distance to (PR-1|HAB-1) along confirmed route/i)).toBeVisible();
     const v = await vis$(vis, (s) => ({ seq: s.seq, display: s.display, target: s.ret?.target }));
     expect(v.seq).toBe(2);
     expect(v.display).toBe('RETURN_NOW');
+    await expect(con.getByTestId('action-sheet')).toBeHidden({ timeout: 6_000 });
+    await expect(con.getByTestId('crew-status')).toContainText(/Returning to (PR-1|Hab-1)/);
     await con.evaluate(`window.marswalk.actions.setSim({ speed: 10 })`);
     await vis.waitForTimeout(1200);
-    await shot(vis, '07-sep-replan');
+    await shot(vis, `${SCREENS}07-sep-replan.png`);
   });
 
   // ── 8 ────────────────────────────────────────────────────────────────────────────────────────────
-  await test.step('8. drop link → visor AUTONOMOUS within ~3 s and keeps guiding; restore → TELEM resync', async () => {
+  await test.step('8. drop link (Simulation menu) → visor AUTONOMOUS within ~3 s and keeps guiding; restore → resync', async () => {
+    await con.getByTestId('sim-menu').click();
     const t0 = Date.now();
     await con.getByRole('button', { name: 'Drop link' }).click();
     await expect(vis.getByText(/LINK LOST — AUTONOMOUS/).first()).toBeVisible({ timeout: 8_000 });
@@ -321,7 +418,9 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     expect(v.t).toBeGreaterThan(simT1); // still walking and guiding on board
     expect(v.display).toBe('RETURN_NOW');
     await expect.poll(() => con$(con, (s) => s.link), { timeout: 10_000 }).toBe('down');
-    await shot(vis, '08-autonomous');
+    await expect(con.getByTestId('crew-link')).toHaveAttribute('data-link', 'down');
+    await expect(con.getByRole('alert').filter({ hasText: 'Crew link lost' })).toBeVisible();
+    await shot(vis, `${SCREENS}08-autonomous.png`);
 
     const lastT = await con$(con, (s) => s.telem[s.telem.length - 1].t);
     await vis.waitForTimeout(2500); // let a few TELEM queue up on board
@@ -335,6 +434,7 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     console.log(`[8] AUTONOMOUS after ${timings.dropToAutonomousMs} ms · resync ${timings.restoreToResyncMs} ms · ${backfill} queued TELEM back-filled`);
     expect(backfill).toBeGreaterThan(0);
     await expect.poll(() => vis$(vis, (s) => [s.autonomous, s.outbox]), { timeout: 10_000 }).toEqual([false, 0]);
+    await con.keyboard.press('Escape');
   });
 
   // ── 9 ────────────────────────────────────────────────────────────────────────────────────────────
@@ -351,21 +451,25 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     expect(after.t).toBeGreaterThanOrEqual(before.t - 0.5);
     expect(after.display).toBe(before.display);
     timings.visorRestoreMs = Math.round(after.ms);
-    await shot(vis, '09-warm-restart');
+    await shot(vis, `${SCREENS}09-warm-restart.png`);
   });
 
   // ── 10 ───────────────────────────────────────────────────────────────────────────────────────────
-  await test.step('10. credibility: rule evidence chips, Evidence panel (V1, V2, V7, live timings) and limitations', async () => {
-    await con.getByRole('tab', { name: /Plan/ }).click();
+  await test.step('10. credibility in Details: rule evidence chips, Evidence panel (V1, V2, V7, live timings), limitations', async () => {
+    await con.evaluate(`window.marswalk.actions.setSim({ running: false })`);
+    await con.evaluate(`window.marswalk.actions.ackAllAlerts()`);
+    await con.getByTestId('open-details').click();
+    await con.getByTestId('details-tab-rules').click();
     const rules = con.getByTestId('rules');
-    await rules.scrollIntoViewIfNeeded();
     const chips = await rules.locator('[data-evidence]').evaluateAll((els) => els.map((e) => e.getAttribute('data-evidence')));
     const expected = await con$(con, (s) => s.rules.filter((r: { evidence?: string }) => r.evidence).map((r: { evidence: string }) => r.evidence));
     expect(chips).toEqual(expected);
     expect(new Set(chips).size).toBeGreaterThanOrEqual(3);
     await expect(con.getByTestId('evidence-legend').first()).toContainText(/Measured.*Analog.*NASA requirement.*Simulated.*Team assumption/);
-    await con.waitForTimeout(300);
-    await shot(con, '11-rules-evidence');
+    await con.waitForTimeout(400);
+    await shot(con, `${UX}07-details-drawer.png`);
+    // Everything that used to sit on screen is still one click away in Details.
+    for (const t of ['report', 'margins', 'weather', 'science', 'sources', 'log']) await expect(con.getByTestId(`details-tab-${t}`)).toBeVisible();
 
     await con.keyboard.press('e');
     const panel = con.getByTestId('evidence-panel');
@@ -381,14 +485,16 @@ test('Marswalk demo flow on gale-v1 (real engine): hab console ↔ surface link 
     await expect.poll(() => fig.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth)).toBeGreaterThan(500);
     expect(await panel.textContent()).not.toMatch(/\bvalidated?\b/i); // wording: reproduces / calibrated
     await con.waitForTimeout(400);
-    await shot(con, '12-evidence');
+    await shot(con, `${SCREENS}12-evidence.png`);
     await con.getByTestId('evidence-limitations').scrollIntoViewIfNeeded();
     await expect(con.getByTestId('limitations').locator('li')).toHaveCount(7);
     await expect(con.getByTestId('limitations')).toContainText(/fail closed/);
     await con.waitForTimeout(300);
-    await shot(con, '13-limitations');
+    await shot(con, `${SCREENS}13-limitations.png`);
     await con.keyboard.press('Escape');
     await expect(panel).toBeHidden();
+    await con.keyboard.press('Escape');
+    await expect(con.getByTestId('details')).toBeHidden();
   });
 
   timings.runUtc = new Date().toISOString();

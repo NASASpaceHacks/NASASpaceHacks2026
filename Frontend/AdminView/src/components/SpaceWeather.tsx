@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { fireEvent } from '../actions';
+import { closeDetails, fireEvent, openSheet } from '../actions';
 import { useConsole } from '../store';
 import { fmtLtst, marsTime } from '../lib/marsclock';
 import {
@@ -19,8 +19,8 @@ import { Badge, Button, Tip, cx } from './ui';
 
 /** Lead time shrinks tier by tier: days (forecast) → minutes (alert) → now (nowcast). */
 function Tier({ n, name, lead, tone, right, children, testId }: { n: number; name: string; lead: string; tone: 'cyan' | 'amber' | 'red'; right?: ReactNode; children: ReactNode; testId: string }) {
-  const rule = { cyan: 'before:bg-cyan', amber: 'before:bg-amber', red: 'before:bg-red' }[tone];
-  const ink = { cyan: 'text-cyan', amber: 'text-amber', red: 'text-red' }[tone];
+  const rule = { cyan: 'before:bg-ok', amber: 'before:bg-caution', red: 'before:bg-red' }[tone];
+  const ink = { cyan: 'text-ok', amber: 'text-caution', red: 'text-red' }[tone];
   return (
     <div data-testid={testId} className={cx('relative rounded-[3px] border border-line bg-sunk/50 py-2.5 pl-3.5 pr-3 before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:rounded-l-[3px]', rule)}>
       <div className="flex items-center gap-2">
@@ -37,9 +37,9 @@ function Tier({ n, name, lead, tone, right, children, testId }: { n: number; nam
 function RunRow({ r, evaMs, hit }: { r: EnlilRun; evaMs: number; hit: boolean }) {
   const dH = (r.arrivalMs - evaMs) / 3_600_000;
   return (
-    <div className={cx('grid grid-cols-[1fr_52px_auto] items-center gap-2 border-b border-line/50 py-1 last:border-0', hit && 'text-amber')}>
+    <div className={cx('grid grid-cols-[1fr_52px_auto] items-center gap-2 border-b border-line/50 py-1 last:border-0', hit && 'text-caution')}>
       <div className="min-w-0">
-        <div className={cx('num text-[11px]', hit ? 'text-amber' : 'text-ink-2')}>{fmtUtc(r.arrivalMs)}</div>
+        <div className={cx('num text-[11px]', hit ? 'text-caution' : 'text-ink-2')}>{fmtUtc(r.arrivalMs)}</div>
         <div className="truncate text-[10px] text-dim">
           {r.glancing ? 'glancing blow' : 'direct hit listed'}
           {r.speedKmS !== null ? ` · ${Math.round(r.speedKmS)} km/s` : ''}
@@ -47,8 +47,8 @@ function RunRow({ r, evaMs, hit }: { r: EnlilRun; evaMs: number; hit: boolean })
           {r.copies && r.copies > 1 ? ` · listed ×${r.copies}` : ''}
         </div>
       </div>
-      <span className={cx('num text-right text-[10.5px]', hit ? 'text-amber' : 'text-mute')}>{fmtOffsetH(dH)}</span>
-      <a href={r.url} target="_blank" rel="noreferrer" className="text-[10px] text-cyan hover:underline" title={`${r.id} on CCMC DONKI`}>DONKI ↗</a>
+      <span className={cx('num text-right text-[10.5px]', hit ? 'text-caution' : 'text-mute')}>{fmtOffsetH(dH)}</span>
+      <a href={r.url} target="_blank" rel="noreferrer" className="text-[10px] text-ok hover:underline" title={`${r.id} on CCMC DONKI`}>DONKI ↗</a>
     </div>
   );
 }
@@ -79,8 +79,8 @@ function Forecast({ now }: { now: number }) {
           <span className="label !text-[9px]">Planned EVA start (demo)</span>
           <span className="num text-[11.5px] text-ink">{fmtUtc(evaMs, true)}</span>
         </div>
-        <div className="mt-0.5 text-[10px] text-dim">next {fmtLtst(start)} LTST at Gale, from today&apos;s real date</div>
-        <div data-testid="forecast-verdict" className={cx('mt-1.5 text-[11px] leading-snug', chk.status === 'CAUTION' ? 'text-amber' : 'text-ink-2')}>
+        <div className="mt-0.5 text-[10px] text-dim">next {fmtLtst(start)} Mars local time at Gale, from today&apos;s real date</div>
+        <div data-testid="forecast-verdict" className={cx('mt-1.5 text-[11px] leading-snug', chk.status === 'CAUTION' ? 'text-caution' : 'text-ink-2')}>
           {chk.status === 'NO_DATA'
             ? 'No ENLIL runs in the site pack.'
             : chk.status === 'CAUTION'
@@ -92,7 +92,7 @@ function Forecast({ now }: { now: number }) {
         {shown.map((r) => <RunRow key={r.id} r={r} evaMs={evaMs} hit={chk.hits.includes(r)} />)}
       </div>
       <div className="mt-1.5 flex items-center justify-between gap-2">
-        <button onClick={() => setAll((v) => !v)} className="text-[10.5px] text-cyan hover:underline">
+        <button onClick={() => setAll((v) => !v)} className="text-[10.5px] text-ok hover:underline">
           {all ? 'Show the 3 nearest' : `Show all ${runs.length}${runs.length < allRuns.length ? ' distinct' : ''} runs`}
         </button>
         <span className="num text-[10px] text-dim">fetched {fmtUtc(fetched)}</span>
@@ -129,12 +129,12 @@ function Alert() {
         <div className="mt-2">
           {list.map((f) => (
             <div key={f.id} className="grid grid-cols-[44px_1fr_auto] items-center gap-2 border-b border-line/50 py-1 last:border-0">
-              <span className="num text-[11px] text-amber">{f.cls ?? 'FLR'}</span>
+              <span className="num text-[11px] text-caution">{f.cls ?? 'FLR'}</span>
               <span className="min-w-0 truncate text-[10.5px] text-ink-2" title={f.note}>
                 <span className="num">{fmtUtc(f.startMs)}</span>
                 {f.where ? <span className="text-dim"> · {f.where}</span> : null}
               </span>
-              <a href={f.url} target="_blank" rel="noreferrer" className="text-[10px] text-cyan hover:underline">DONKI ↗</a>
+              <a href={f.url} target="_blank" rel="noreferrer" className="text-[10px] text-ok hover:underline">DONKI ↗</a>
             </div>
           ))}
           <div className="mt-1 text-[10px] text-dim">Flares are observed from Earth orbit. Whether they matter at Mars depends on heliolongitude.</div>
@@ -148,9 +148,12 @@ function Nowcast() {
   const busy = useConsole((s) => s.busyEvent);
   const shelterMax = useConsole((s) => s.rules.find((r) => r.id === 'shelter_time_max_min')?.value ?? 30);
   return (
-    <Tier n={3} name="Nowcast" lead="now, measured on site" tone="red" testId="tier-nowcast">
-      <Button data-testid="sep-nowcast" variant="danger" className="w-full" onClick={() => void fireEvent({ type: 'SEP_NOWCAST', leadMin: shelterMax }, 'SEP nowcast: onboard dose rate +25 %')} disabled={!!busy}>
-        {busy === 'SEP_NOWCAST' ? 'Replanning…' : 'Dose rate +25 % · SEP nowcast'}
+    <Tier n={3} name="Nowcast (radiation storm, SEP)" lead="now, measured on site" tone="red" testId="tier-nowcast">
+      <Button data-testid="sep-nowcast" variant="danger" className="w-full" onClick={() => {
+        if (useConsole.getState().uiMode === 'live') { closeDetails(); openSheet('sep'); }
+        else void fireEvent({ type: 'SEP_NOWCAST', leadMin: shelterMax }, 'SEP nowcast: onboard dose rate +25 %');
+      }} disabled={!!busy}>
+        {busy === 'SEP_NOWCAST' ? 'Re-planning…' : 'Radiation spike on board · dose rate +25 %'}
       </Button>
       <div className="mt-2 text-[11px] leading-snug text-ink-2">
         The only tier that orders <span className="text-red">return now</span>: it is measured on site, with no light delay. The hab alerts the visor at once and replans from EV1&apos;s position to shelter within {shelterMax} min.

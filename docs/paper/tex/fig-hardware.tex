@@ -1,0 +1,70 @@
+% Suit hardware concept (team concept study), redrawn: (a) helmet optics, (b) localization without GPS, (c) suit compute, radio and power.
+% Solid cyan boxes run in the software today with simulated sensor inputs; dashed boxes are hardware concept.
+\begin{tikzpicture}[x=1mm, y=1mm, font=\rmfamily\fontsize{6}{7}\selectfont,
+  impl/.style={draw=accent, line width=0.6pt, fill=accent!8, rounded corners=1.5pt, align=center, inner sep=2.2pt,
+               execute at begin node={\hyphenpenalty=10000\linespread{0.95}\selectfont}},
+  conc/.style={draw=ink!55, dashed, line width=0.55pt, fill=white, rounded corners=1.5pt, align=center, inner sep=2.2pt,
+               execute at begin node={\hyphenpenalty=10000\linespread{0.95}\selectfont}},
+  arr/.style={-{Stealth[length=3.2pt]}, line width=0.5pt, draw=ink!65},
+  lab/.style={font=\rmfamily\fontsize{6}{7}\selectfont, text=ink!75, fill=white, inner sep=0.8pt},
+  ptitle/.style={font=\rmfamily\bfseries\scriptsize, text=ink, anchor=west},
+  note/.style={font=\rmfamily\itshape\fontsize{6}{7}\selectfont, text=muted, anchor=west},
+]
+\newcommand{\bx}[2]{{\scriptsize\textbf{#1}}\\[0.6pt]#2}
+% ===================== (a) helmet optics =====================
+\node[ptitle] at (0,101) {(a) Monocular AR helmet optics};
+\draw[ink!35, dashed, line width=0.5pt] (40,82) ellipse (41 and 15.5);
+\node[note] at (24,96) {pressurized helmet envelope};
+\node[conc, text width=21mm] (lcos) at (14,84) {\bx{LCoS light engine}{illumination, microdisplay, projection and collimation}};
+\node[conc, text width=23mm] (wg) at (45,84) {\bx{Reflective waveguide}{coupling, internal reflection, partially reflective out-coupler}};
+\draw[ink!70, fill=paper3, line width=0.5pt] (72,84) ellipse (4 and 3);
+\fill[ink!85] (73,84) circle (1.6);
+\node[font=\rmfamily\bfseries\fontsize{6}{7}\selectfont, text=ink] at (72,78.4) {eye};
+\draw[arr] (lcos) -- node[lab, above=1pt] {pixels} (wg);
+\draw[arr] (wg) -- node[lab, above=1pt] {virtual image} (67.6,84);
+\draw[arr, ink!45] (86,88.5) -- node[lab, above=0.5pt, pos=0.35] {terrain view} (76.2,85.2);
+\node[conc, text width=27mm] (dif) at (17,67) {\bx{Display interface}{wired video from the suit computer, helmet-safe routing}};
+\node[conc, text width=29mm] (oc) at (56,67) {\bx{Optical constraints}{eye relief, eyebox, bright sunlight, field of regard, fogging}};
+\draw[arr] (dif.north) -- (dif.north |- lcos.south);
+\draw[arr] (oc.north) ++(8,0) -- (72,80.8);
+
+% ===================== (c) suit compute, radio, power =====================
+\node[ptitle] at (91,101) {(c) Suit compute, radio and power};
+\node[conc, text width=17mm] (sens) at (101,88) {\bx{IMUs, cameras}{sensor streams}};
+\node[conc, text width=30mm, minimum height=15mm] (soc) at (131,86.5) {\bx{Embedded CPU/GPU}{dead reckoning and fusion, periodic map matching, route tracking, HUD graphics, telemetry}};
+\node[conc, text width=15mm] (hud) at (163,88) {\bx{HUD driver}{video to the waveguide}};
+\node[conc, text width=17mm] (wd) at (101,74) {\bx{Watchdog}{reset, fault inhibit}};
+\node[conc, text width=19mm] (pwr) at (102,59.5) {\bx{Suit power tap}{protection, DC/DC}};
+\node[conc, text width=24mm] (mem) at (131,59.5) {\bx{RAM and flash}{route, map tiles, telemetry queue, logs}};
+\node[conc, text width=20mm] (rad) at (159,59.5) {\bx{Radio}{antenna, link supervision}};
+\draw[arr] (sens) -- (soc.west |- sens);
+\draw[arr] (soc.east |- hud) -- (hud);
+\draw[arr] (wd.east) -- ([yshift=-4mm]soc.west);
+\draw[arr] (pwr.north) -- ([xshift=-10mm]soc.south);
+\draw[arr, {Stealth[length=3.2pt]}-{Stealth[length=3.2pt]}] (mem.north) -- (soc.south);
+\draw[arr, {Stealth[length=3.2pt]}-{Stealth[length=3.2pt]}] (rad.north) -- ([xshift=10mm]soc.south);
+\draw[arr] ([xshift=-3mm]rad.north east) -- ++(0,6) node[lab, above=0pt] {to habitat};
+\node[note] at (91,51) {navigation and HUD stay local; the habitat supervises but is not in the control loop};
+
+% ===================== (b) localization =====================
+\draw[rule, line width=0.4pt] (0,47.5) -- (177,47.5);
+\node[ptitle] at (0,44) {(b) Localization without GPS or a magnetic compass};
+\node[conc, text width=21mm] (imu) at (12,33) {\bx{Boot IMUs}{6-axis, one per boot}};
+\node[conc, text width=29mm] (pdr) at (49,33) {\bx{Pedestrian dead reckoning}{steps, stride, heading; zero-velocity updates at foot contact}};
+\node[conc, text width=21mm] (cam) at (12,15) {\bx{Stereo cameras}{terrain imagery}};
+\node[conc, text width=29mm] (vo) at (49,15) {\bx{Visual processing}{visual odometry; periodic matching to preloaded orbital imagery}};
+\node[impl, text width=28mm] (fix) at (78,4.5) {\bx{Fixes and heading}{station arrival, landmark or rover ranging; Sun azimuth}};
+\node[impl, text width=29mm, minimum height=21mm] (est) at (107,24) {\bx{Position estimate}{today: simulated drift and scripted fixes, with uncertainty; with hardware: fuse sensors, reject inconsistent fixes}};
+\node[impl, text width=33mm, minimum height=21mm] (out) at (158,24) {\bx{Navigator and safety core}{route cue and uncertainty on screen; walk-back and shelter margins; off route $>$25\,m for 3\,s $\rightarrow$ local A$^\ast$; telemetry to the habitat}};
+\draw[arr] (imu) -- node[lab, above=1pt] {inertial} (pdr);
+\draw[arr] (cam) -- node[lab, above=1pt] {imagery} (vo);
+\draw[arr] (pdr.east) -- node[lab, above=1pt] {high rate} ([yshift=5mm]est.west);
+\draw[arr] (vo.east) -- node[lab, below=1pt] {when trusted} ([yshift=-5mm]est.west);
+\draw[arr] (fix.east) -| (est.south);
+\draw[arr] (est) -- node[lab, above=1pt] {pose and covariance} (out);
+% legend
+\node[impl, minimum width=5mm, minimum height=2.6mm, inner sep=0pt] at (129,4.5) {};
+\node[note] at (132.5,4.5) {runs in the software today (simulated inputs)};
+\node[conc, minimum width=5mm, minimum height=2.6mm, inner sep=0pt] at (129,-0.5) {};
+\node[note] at (132.5,-0.5) {hardware concept, not yet built};
+\end{tikzpicture}

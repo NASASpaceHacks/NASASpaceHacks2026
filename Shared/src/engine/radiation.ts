@@ -7,16 +7,23 @@
  *   Martian year: 2012–2014", arXiv:1507.03473.
  * Pressure with elevation: P = P_ref · exp(−(z − z_ref)/H), scale height H = 11.1 km rounded to
  *   11 km (NSSDC Mars Fact Sheet, https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html).
- *   P_ref = 750 Pa at z_ref = −4500 m is a TEAM ASSUMPTION (order of the REMS pressures measured on
- *   the Gale floor; the seasonal cycle is not modelled). Φ = 600 MV default is also an assumption.
+ *   P_ref = 910 Pa at z_ref = −4500 m: MEASURED by Curiosity REMS at Ls ≈ 240 (the scenario season), sols 130–170
+ *   on the Gale floor near −4500 m (PDS mslrem_1001; Validation/v5_rad_dose). The seasonal cycle is not modelled
+ *   (year-1 mean 857 Pa). Φ = 600 MV is an ASSUMPTION: with measured pressure it reproduces the year-1 mean
+ *   measured RAD dose within 4 % (198.8 vs 207.8 µGy/day), but the measured dose at this season spans
+ *   167–296 µGy/day across the solar cycle (V5), so treat route doses as indicative to about ±30 %.
  * Dose equivalent: × 3.05 (Hassler et al. 2014, Science 343:1244797: 0.21 ± 0.04 mGy/d →
  *   0.64 ± 0.12 mSv/d on the surface, i.e. mean quality factor ≈ 3.05).
- * Terrain shielding (optional `skyview` raster = visible-sky fraction 0–1):
- *   S = 1 − 0.85·blockedFraction. Guo et al. 2026 (JGR-Planets) report RAD dose ratios of ~0.7–1.0
- *   under partial sky obstruction; the 0.85 coefficient is indicative. Terrain REDUCES dose
- *   somewhat — it is never a shelter; SEP response always means returning to a pressurized shelter.
+ * Terrain shielding (optional `skyview` raster = visible-sky fraction 0–1, built by Pipeline/mwpipe/skyview.py):
+ *   Guo et al. 2026 (JGR Planets, doi:10.1029/2026JE009704) two-term model, as reproduced in Validation/v1_shielding:
+ *   D(B) = (1 − f)(1 − w·B) + f(1 + B), B = obstructed fraction of the sky, f = 0.21 flat-terrain (albedo) share,
+ *   w = 1.377 sky weighting (both from the paper's tables, not fitted to RAD). D(0) = 1, and D is linear in B with
+ *   slope (1 − f)·w − f ≈ 0.88. Terrain REDUCES dose somewhat (RAD saw at most 19 %) — it is never a shelter;
+ *   SEP response always means returning to a pressurized shelter. Indicative.
  */
-export const DOSE_P_REF_PA = 750;
+export const SHIELD_F_ALBEDO = 0.21;
+export const SHIELD_W_SKY = 1.377;
+export const DOSE_P_REF_PA = 910;
 export const DOSE_Z_REF_M = -4500;
 export const MARS_SCALE_HEIGHT_M = 11000;
 export const PHI_DEFAULT_MV = 600;
@@ -34,8 +41,9 @@ export function doseRateUGyPerDay(pPa: number, phiMV = PHI_DEFAULT_MV): number {
 /** Terrain shielding factor from the visible-sky fraction (1 = open sky). Indicative. */
 export function skyShieldFactor(skyview: number | undefined): number {
   if (skyview === undefined || !(skyview === skyview)) return 1;
-  const blocked = Math.min(1, Math.max(0, 1 - skyview));
-  return 1 - 0.85 * blocked;
+  const B = Math.min(1, Math.max(0, 1 - skyview));
+  const D = (1 - SHIELD_F_ALBEDO) * (1 - SHIELD_W_SKY * B) + SHIELD_F_ALBEDO * (1 + B);
+  return Math.min(1, Math.max(0, D));
 }
 
 /** Dose-equivalent rate (µSv per Earth minute) at elevation z, with optional sky-view fraction. */

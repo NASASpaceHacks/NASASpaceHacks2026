@@ -28,6 +28,7 @@ Backend/var/
 
 # Test artifacts
 qa/test-results/
+qa/test-results-ux/
 qa/playwright-report/
 Research/bench/results/*.tmp
 
@@ -43,3 +44,14 @@ Frontend/*/docs/*.png
 
 # e2e screenshots: only curated ones are committed (git add -f)
 qa/screens/*.png
+qa/screens/ux/*.png
+qa/screens/ux2/*.png
+qa/screens/ux3/*.png
+qa/screens/ux4/*.png
+!SitePacks/*/context/
+qa/screens/ux5/*.png
+qa/screens/ux6/*.png
+qa/screens/sites/*.png
+
+# V5 RAD/REMS downloads (re-created by Validation/v5_rad_dose/fetch.py)
+Validation/v5_rad_dose/data/

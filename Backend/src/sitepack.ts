@@ -83,14 +83,28 @@ export async function loadSitePackSource(sitePacksDir: string, requested: string
   }
 }
 
-export async function listSitePacks(sitePacksDir: string, active: PackSource): Promise<{ id: string; name: string; source: 'disk' | 'mock' }[]> {
-  const out: { id: string; name: string; source: 'disk' | 'mock' }[] = [];
+export interface SitePackListing {
+  id: string;
+  name: string;
+  centerLonLat: [number, number];
+  /** manifest parses and the required rasters (dem, slope) are on disk. */
+  available: boolean;
+  source: 'disk' | 'mock';
+}
+
+/** Every `SitePacks/<id>/manifest.json` (re-scanned on each call, so a pack added later shows up). */
+export async function listSitePacks(sitePacksDir: string, active: PackSource): Promise<SitePackListing[]> {
+  const out: SitePackListing[] = [];
   try {
     for (const ent of await readdir(sitePacksDir, { withFileTypes: true })) {
-      if (!ent.isDirectory()) continue;
+      if (!ent.isDirectory() && !ent.isSymbolicLink()) continue;
       try {
-        const m = JSON.parse(await readFile(join(sitePacksDir, ent.name, 'manifest.json'), 'utf8')) as { name?: string };
-        out.push({ id: ent.name, name: m.name ?? ent.name, source: 'disk' });
+        const dir = join(sitePacksDir, ent.name);
+        const m = JSON.parse(await readFile(join(dir, 'manifest.json'), 'utf8')) as Partial<SitePackManifest>;
+        const c = m.grid?.centerLonLat;
+        const need = Object.values(m.rasters ?? {}).filter((l) => l.id === 'dem' || l.id === 'slope');
+        const available = !!m.grid?.w && !!c && need.length === 2 && need.every((l) => existsSync(join(dir, l.file)));
+        out.push({ id: ent.name, name: m.name ?? ent.name, centerLonLat: (c ?? [0, 0]) as [number, number], available, source: 'disk' });
       } catch {
         /* not a pack */
       }
@@ -98,6 +112,8 @@ export async function listSitePacks(sitePacksDir: string, active: PackSource): P
   } catch {
     /* no SitePacks dir */
   }
-  if (active.source === 'mock') out.unshift({ id: active.id, name: active.pack.manifest.name, source: 'mock' });
-  return out;
+  if (active.source === 'mock') {
+    out.unshift({ id: active.id, name: active.pack.manifest.name, centerLonLat: active.pack.manifest.grid.centerLonLat as [number, number], available: true, source: 'mock' });
+  }
+  return out.sort((a, b) => a.id.localeCompare(b.id));
 }

@@ -150,7 +150,7 @@ export function safeZoneStyle(
   const active: ExpressionValue = ['any', ...exclusions.map(([e, i]) => ['all', e, ['==', v('act'), i]] as ExpressionValue)];
   const veil = colors.veil ?? [8, 9, 12, 0.58];
   const safe = colors.safe ?? [79, 209, 224, 0.12];
-  const hot = colors.active ?? [242, 181, 68, 0.5];
+  const hot = colors.active ?? [255, 59, 48, 0.5]; // the rule being explained: red (no amber in this product)
   return {
     variables: { ...SAFE_ZONE_OPEN, ...vars } as unknown as Record<string, number>,
     color: [

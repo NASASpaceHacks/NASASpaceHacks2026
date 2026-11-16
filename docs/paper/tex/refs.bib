@@ -1,0 +1,969 @@
+% Marswalk reference list. Verified 2026-11-15 against Crossref / NTRS API / PubMed / DataCite / publisher pages.
+% Entries marked "PARTIAL" in refs-notes.md have a stated caveat. No DOI below was invented.
+
+%% ---------- 1. Mission architecture and need ----------
+@techreport{drake2009dra5,
+  author      = {{Mars Architecture Steering Group}},
+  title       = {Human Exploration of {Mars} Design Reference Architecture 5.0},
+  institution = {{NASA} Johnson Space Center},
+  type        = {{NASA} Special Publication},
+  number      = {NASA/SP-2009-566},
+  year        = {2009},
+  month       = jul,
+  note        = {B. G. Drake, editor},
+  url         = {https://www.nasa.gov/pdf/373665main_NASA-SP-2009-566.pdf},
+  urldate     = {2026-11-15}
+}
+@techreport{drake2014dra5add2,
+  author      = {Drake, B. G. and Watts, K. D.},
+  title       = {Human Exploration of {Mars} Design Reference Architecture 5.0, Addendum \#2},
+  institution = {{NASA} Johnson Space Center},
+  type        = {{NASA} Special Publication},
+  number      = {NASA/SP-2009-566-ADD2},
+  year        = {2014},
+  month       = mar,
+  url         = {https://ntrs.nasa.gov/citations/20160003093},
+  urldate     = {2026-11-15}
+}
+@techreport{coan2020conops,
+  author      = {Coan, D.},
+  title       = {Exploration {EVA} System Concept of Operations},
+  institution = {{NASA} Johnson Space Center},
+  type        = {Technical Report},
+  number      = {EVA-EXP-0042 Rev.~B},
+  year        = {2020},
+  month       = oct,
+  url         = {https://ntrs.nasa.gov/citations/20205008200},
+  urldate     = {2026-11-15}
+}
+@misc{mary2024surface,
+  author       = {Mary, N. A.},
+  title        = {Surface {EVA} Architectural Drivers},
+  howpublished = {NASA white paper, The Aerospace Corporation},
+  year         = {2024},
+  url          = {https://ntrs.nasa.gov/citations/20230014957},
+  urldate      = {2026-11-15}
+}
+@inproceedings{elston2026review,
+  author    = {Elston, J. T. and Keller, J. R. and Miller, M. J. and others},
+  title     = {Review of Advanced Informatics and Display Systems for Extravehicular Activity Operations},
+  booktitle = {2026 {IEEE} Aerospace Conference (47th)},
+  year      = {2026},
+  url       = {https://ntrs.nasa.gov/citations/20250011652},
+  urldate   = {2026-11-15}
+}
+@inproceedings{miller2026emss,
+  author    = {Miller, M. and Charney, D. and Feist, B. and others},
+  title     = {Continuing Development and Enabling of Exploration Mission Systems Software},
+  booktitle = {2026 {IEEE} Aerospace Conference (47th)},
+  year      = {2026},
+  note      = {Presentation},
+  url       = {https://ntrs.nasa.gov/citations/20260001893},
+  urldate   = {2026-11-15}
+}
+@inproceedings{miller2023internal,
+  author    = {Miller, M. J. and Petro, N. E. and Lawrence, S. J.},
+  title     = {{Artemis} Internal Science Team Update: Data and Software Development},
+  booktitle = {54th Lunar and Planetary Science Conference},
+  year      = {2023},
+  url       = {https://ntrs.nasa.gov/citations/20230000186},
+  urldate   = {2026-11-15}
+}
+@inproceedings{miller2022ar,
+  author    = {Miller, M. J. and Welsh, D. and Krygier, B. and Noyes, M. and Mann, K. and Mitra, P. and others},
+  title     = {Realizing a Spacesuit Compatible Augmented Reality System to Meet the Work Needs of Future Human Spaceflight Exploration},
+  booktitle = {{AIAA} {ASCEND} 2022},
+  year      = {2022},
+  url       = {https://ntrs.nasa.gov/citations/20220013671},
+  urldate   = {2026-11-15}
+}
+@inproceedings{ogilvie2026marsmass,
+  author    = {Ogilvie, R. and Swartout, B. and Hoffmann, B. and McFarland, S. and Hickox, L.},
+  title     = {{Mars} Spacesuit Mass Requirements},
+  booktitle = {55th International Conference on Environmental Systems ({ICES})},
+  year      = {2026},
+  note      = {Presentation, paper no.\ ICES-2026-127},
+  url       = {https://ntrs.nasa.gov/citations/20260005410},
+  urldate   = {2026-11-15}
+}
+@inproceedings{ogilvie2026plss,
+  author    = {Ogilvie, R. and Chullen, C. and Barrett, L. and Oliver, M. and Conger, B.},
+  title     = {{Mars} Portable Life Support System Status and Plan},
+  booktitle = {55th International Conference on Environmental Systems ({ICES})},
+  year      = {2026},
+  note      = {Paper no.\ ICES-2026-126},
+  url       = {https://ntrs.nasa.gov/citations/20260003024},
+  urldate   = {2026-11-15}
+}
+@inproceedings{lobmeyer2025mxplss,
+  author    = {Lobmeyer, D. M. and Oliver, M. and Quick, E. J. and others},
+  title     = {{Martian} Exploration Portable Life Support System Schematic Study},
+  booktitle = {54th International Conference on Environmental Systems ({ICES})},
+  year      = {2025},
+  note      = {Paper no.\ ICES-2025-90},
+  url       = {https://ntrs.nasa.gov/citations/20250003716},
+  urldate   = {2026-11-15}
+}
+@techreport{dunn2022evidence,
+  author      = {Dunn, J. and Benson, E. and Norcross, J. and Newby, N.},
+  title       = {Evidence Report: Risk of Injury and Compromised Performance due to {EVA} Operations},
+  institution = {{NASA} Johnson Space Center},
+  year        = {2022},
+  month       = mar,
+  url         = {https://ntrs.nasa.gov/citations/20220004017},
+  urldate     = {2026-11-15}
+}
+@inproceedings{caswell2025eva,
+  author    = {Caswell, T. E. and Kostak, C. and Young, K. E.},
+  title     = {{EVA} Development in Exploration-Driven Human Spaceflight},
+  booktitle = {{AIAA} {ASCEND} 2025},
+  year      = {2025},
+  url       = {https://ntrs.nasa.gov/citations/20250006063},
+  urldate   = {2026-11-15}
+}
+@misc{kagey2023tenets,
+  author       = {Kagey, J. L.},
+  title        = {Tenets of Lunar {EVAs} for {Artemis}~{III}},
+  howpublished = {{NASA} technical document},
+  year         = {2023},
+  url          = {https://ntrs.nasa.gov/citations/20230008183},
+  urldate      = {2026-11-15}
+}
+@inproceedings{mcbrayer2022comms,
+  author    = {McBrayer, K. T. and Chai, P. R. and Judd, E. L.},
+  title     = {Communication Delays, Disruptions, and Blackouts for Crewed {Mars} Missions},
+  booktitle = {{AIAA} {ASCEND} 2022},
+  year      = {2022},
+  url       = {https://ntrs.nasa.gov/citations/20220013418},
+  urldate   = {2026-11-15}
+}
+@inproceedings{kim2024metabolic,
+  author    = {Kim, K. J. and Hoffmann, B. and Estep, P. and Marshall, K. and Buckland, D.},
+  title     = {Improving Metabolic Workload Estimation Accuracy for Planning and Analyzing Exploration Traverses},
+  booktitle = {46th Annual International Conference of the {IEEE} Engineering in Medicine and Biology Society ({EMBC})},
+  year      = {2024},
+  url       = {https://ntrs.nasa.gov/citations/20240001423},
+  urldate   = {2026-11-15}
+}
+@techreport{nasa2023radbrief,
+  author      = {{NASA Office of the Chief Health and Medical Officer}},
+  title       = {{NASA-STD-3001} Technical Brief: Design for Ionizing Radiation Protection},
+  institution = {{NASA}},
+  number      = {OCHMO-TB-020 Rev.~E},
+  year        = {2023},
+  url         = {https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf},
+  urldate     = {2026-11-15}
+}
+@inproceedings{caswell2023jett3,
+  author    = {Caswell, T. E. and Young, K. E. and Coan, D. and Graff, T. G. and Lindsey, T. and Tejral, Z. and others},
+  title     = {{JETT3}: A Holistic, Integrated Analog for {Artemis} Lunar Surface Exploration},
+  booktitle = {54th Lunar and Planetary Science Conference},
+  year      = {2023},
+  url       = {https://ntrs.nasa.gov/citations/20230000146},
+  urldate   = {2026-11-15}
+}
+@inproceedings{bussey2016landing,
+  author    = {Bussey, B. and Hoffman, S. J.},
+  title     = {Human {Mars} Landing Site and Impacts on {Mars} Surface Operations},
+  booktitle = {2016 {IEEE} Aerospace Conference},
+  year      = {2016},
+  note      = {JSC-CN-35508},
+  url       = {https://ntrs.nasa.gov/citations/20160002370},
+  urldate   = {2026-11-15}
+}
+@misc{bue2013hofi,
+  author       = {Bue, G. and Trevino, L. and Tsioulos, G. and Mitchell, K. and Settles, J.},
+  title        = {Hollow-Fiber Spacesuit Water Membrane Evaporator},
+  howpublished = {{NASA} Tech Briefs, MSC-24849-1},
+  year         = {2013},
+  month        = jul,
+  url          = {https://ntrs.nasa.gov/citations/20130014146},
+  urldate      = {2026-11-15}
+}
+
+%% ---------- 2. Locomotion and suit physiology ----------
+@article{pandolf1977,
+  author  = {Pandolf, K. B. and Givoni, B. and Goldman, R. F.},
+  title   = {Predicting energy expenditure with loads while standing or walking very slowly},
+  journal = {Journal of Applied Physiology},
+  volume  = {43},
+  number  = {4},
+  pages   = {577--581},
+  year    = {1977},
+  doi     = {10.1152/jappl.1977.43.4.577}
+}
+@article{santee2001,
+  author  = {Santee, W. R. and Allison, W. F. and Blanchard, L. A. and Small, M. G.},
+  title   = {A proposed model for load carriage on sloped terrain},
+  journal = {Aviation, Space, and Environmental Medicine},
+  volume  = {72},
+  number  = {6},
+  pages   = {562--566},
+  year    = {2001},
+  note    = {PMID 11396562},
+  url     = {https://pubmed.ncbi.nlm.nih.gov/11396562/},
+  urldate = {2026-11-15}
+}
+@article{santee2003,
+  author  = {Santee, W. R. and Small, M. G. and Blanchard, L. A.},
+  title   = {Application of Energy Cost Algorithms for Load Carriage to Field Data},
+  journal = {Journal of the Human-Environment System},
+  volume  = {6},
+  number  = {2},
+  pages   = {69--76},
+  year    = {2003},
+  doi     = {10.1618/jhes.6.69}
+}
+@techreport{norcross2009ewt,
+  author      = {Norcross, J. R. and Lee, L. R. and Clowers, K. G. and others},
+  title       = {Feasibility of Performing a Suited 10-km Ambulation on the {Moon}: Final Report of the {EVA} Walkback Test ({EWT})},
+  institution = {{NASA} Johnson Space Center},
+  type        = {{NASA} Technical Publication},
+  number      = {NASA/TP-2009-214796},
+  year        = {2009},
+  month       = oct,
+  url         = {https://www.lpi.usra.edu/lunar/artemis/NorcrossEtAl_NASA-TP-2009-214796_EVA%20Walkback%20Test.pdf},
+  urldate     = {2026-11-15}
+}
+@techreport{norcross2010level,
+  author      = {Norcross, J. R. and Clowers, K. G. and Clark, T. and others},
+  title       = {Metabolic Costs and Biomechanics of Level Ambulation in a Planetary Suit},
+  institution = {{NASA} Johnson Space Center},
+  type        = {{NASA} Technical Publication},
+  number      = {NASA/TP-2010-216115},
+  year        = {2010},
+  month       = feb,
+  url         = {https://www.lpi.usra.edu/lunar/artemis/NorcrossEtAl_NASA-TP-2010-216115_PlanetarySuitMetabolicCosts.pdf},
+  urldate     = {2026-11-15}
+}
+@techreport{norcross2010incline,
+  author      = {Norcross, J. R. and Clowers, K. G. and Clark, T. and others},
+  title       = {Metabolic Costs and Biomechanics of Inclined Ambulation and Exploration Tasks in a Planetary Suit},
+  institution = {{NASA} Johnson Space Center},
+  type        = {{NASA} Technical Publication},
+  number      = {NASA/TP-2010-216125},
+  year        = {2010},
+  month       = jun,
+  url         = {https://ntrs.nasa.gov/citations/20110003409},
+  urldate     = {2026-11-15}
+}
+@article{carr2007framework,
+  author  = {Carr, C. E. and Newman, D. J.},
+  title   = {Space Suit Bioenergetics: Framework and Analysis of Unsuited and Suited Activity},
+  journal = {Aviation, Space, and Environmental Medicine},
+  volume  = {78},
+  number  = {11},
+  pages   = {1013--1022},
+  year    = {2007},
+  doi     = {10.3357/ASEM.1952.2007}
+}
+@article{kluis2025,
+  author  = {Kluis, L. and Wynn, C. and Kennedy, D. and Diaz-Artiles, A.},
+  title   = {Characterization of the effects of sex, speed, and incline on metabolic rate during partial gravity ambulation},
+  journal = {Journal of Applied Physiology},
+  volume  = {139},
+  number  = {3},
+  pages   = {787--796},
+  year    = {2025},
+  doi     = {10.1152/japplphysiol.00627.2024}
+}
+@article{minetti2002,
+  author  = {Minetti, A. E. and Moia, C. and Roi, G. S. and Susta, D. and Ferretti, G.},
+  title   = {Energy cost of walking and running at extreme uphill and downhill slopes},
+  journal = {Journal of Applied Physiology},
+  volume  = {93},
+  number  = {3},
+  pages   = {1039--1046},
+  year    = {2002},
+  doi     = {10.1152/japplphysiol.01177.2001}
+}
+
+%% ---------- 3. Radiation and space weather ----------
+@article{hassler2014,
+  author  = {Hassler, D. M. and Zeitlin, C. and Wimmer-Schweingruber, R. F. and Ehresmann, B. and others},
+  title   = {{Mars}' Surface Radiation Environment Measured with the {Mars Science Laboratory}'s {Curiosity} Rover},
+  journal = {Science},
+  volume  = {343},
+  number  = {6169},
+  pages   = {1244797},
+  year    = {2014},
+  doi     = {10.1126/science.1244797}
+}
+@article{hassler2012,
+  author  = {Hassler, D. M. and Zeitlin, C. and Wimmer-Schweingruber, R. F. and B{\"o}ttcher, S. and others},
+  title   = {The Radiation Assessment Detector ({RAD}) Investigation},
+  journal = {Space Science Reviews},
+  volume  = {170},
+  number  = {1--4},
+  pages   = {503--558},
+  year    = {2012},
+  doi     = {10.1007/s11214-012-9913-1}
+}
+@article{guo2015,
+  author  = {Guo, J. and Zeitlin, C. and Wimmer-Schweingruber, R. F. and Rafkin, S. and others},
+  title   = {Modeling the Variations of Dose Rate Measured by {RAD} during the First {MSL} Martian Year: 2012--2014},
+  journal = {The Astrophysical Journal},
+  volume  = {810},
+  number  = {1},
+  pages   = {24},
+  year    = {2015},
+  doi     = {10.1088/0004-637X/810/1/24}
+}
+@article{guo2026,
+  author  = {Guo, J. and Tian, C. and Charpentier, G. and Wimmer-Schweingruber, R. F. and others},
+  title   = {Influence of {Mars} Topography on Radiation Dose Detected by the {Mars Science Laboratory} and Assessment of {Mars} Surface Albedo Radiation},
+  journal = {Journal of Geophysical Research: Planets},
+  volume  = {131},
+  number  = {4},
+  pages   = {e2026JE009704},
+  year    = {2026},
+  doi     = {10.1029/2026JE009704}
+}
+@article{zeitlin2013,
+  author  = {Zeitlin, C. and Hassler, D. M. and Cucinotta, F. A. and Ehresmann, B. and others},
+  title   = {Measurements of Energetic Particle Radiation in Transit to {Mars} on the {Mars Science Laboratory}},
+  journal = {Science},
+  volume  = {340},
+  number  = {6136},
+  pages   = {1080--1084},
+  year    = {2013},
+  doi     = {10.1126/science.1235989}
+}
+@article{odstrcil2003,
+  author  = {Odstr{\v{c}}il, D.},
+  title   = {Modeling 3-{D} solar wind structure},
+  journal = {Advances in Space Research},
+  volume  = {32},
+  number  = {4},
+  pages   = {497--506},
+  year    = {2003},
+  doi     = {10.1016/S0273-1177(03)00332-6}
+}
+@article{arge2000,
+  author  = {Arge, C. N. and Pizzo, V. J.},
+  title   = {Improvement in the prediction of solar wind conditions using near-real time solar magnetic field updates},
+  journal = {Journal of Geophysical Research: Space Physics},
+  volume  = {105},
+  number  = {A5},
+  pages   = {10465--10479},
+  year    = {2000},
+  doi     = {10.1029/1999JA000262}
+}
+@misc{donki,
+  author       = {{NASA Community Coordinated Modeling Center}},
+  title        = {Space Weather Database of Notifications, Knowledge, Information ({DONKI})},
+  howpublished = {Web service},
+  year         = {2026},
+  note         = {Accessed 15 November 2026},
+  url          = {https://ccmc.gsfc.nasa.gov/tools/DONKI/},
+  urldate      = {2026-11-15}
+}
+
+%% ---------- 4. Data and instruments ----------
+@article{mcewen2007,
+  author  = {McEwen, A. S. and Eliason, E. M. and Bergstrom, J. W. and Bridges, N. T. and others},
+  title   = {{Mars Reconnaissance Orbiter}'s High Resolution Imaging Science Experiment ({HiRISE})},
+  journal = {Journal of Geophysical Research: Planets},
+  volume  = {112},
+  number  = {E5},
+  pages   = {E05S02},
+  year    = {2007},
+  doi     = {10.1029/2005JE002605}
+}
+@article{malin2007,
+  author  = {Malin, M. C. and Bell, J. F. and Cantor, B. A. and Caplinger, M. A. and others},
+  title   = {Context Camera Investigation on board the {Mars Reconnaissance Orbiter}},
+  journal = {Journal of Geophysical Research: Planets},
+  volume  = {112},
+  number  = {E5},
+  pages   = {E05S04},
+  year    = {2007},
+  doi     = {10.1029/2006JE002808}
+}
+@article{jaumann2007,
+  author  = {Jaumann, R. and Neukum, G. and Behnke, T. and Duxbury, T. C. and others},
+  title   = {The high-resolution stereo camera ({HRSC}) experiment on {Mars Express}: Instrument aspects and experiment conduct from interplanetary cruise through the nominal mission},
+  journal = {Planetary and Space Science},
+  volume  = {55},
+  number  = {7--8},
+  pages   = {928--952},
+  year    = {2007},
+  doi     = {10.1016/j.pss.2006.12.003}
+}
+@article{gwinner2016,
+  author  = {Gwinner, K. and Jaumann, R. and Hauber, E. and Hoffmann, H. and others},
+  title   = {The High Resolution Stereo Camera ({HRSC}) of {Mars Express} and its approach to science analysis and mapping for {Mars} and its satellites},
+  journal = {Planetary and Space Science},
+  volume  = {126},
+  pages   = {93--138},
+  year    = {2016},
+  doi     = {10.1016/j.pss.2016.02.014}
+}
+@article{smith2001,
+  author  = {Smith, D. E. and Zuber, M. T. and Frey, H. V. and Garvin, J. B. and others},
+  title   = {{Mars Orbiter Laser Altimeter}: Experiment summary after the first year of global mapping of {Mars}},
+  journal = {Journal of Geophysical Research: Planets},
+  volume  = {106},
+  number  = {E10},
+  pages   = {23689--23722},
+  year    = {2001},
+  doi     = {10.1029/2000JE001364}
+}
+@article{christensen2004,
+  author  = {Christensen, P. R. and Jakosky, B. M. and Kieffer, H. H. and Malin, M. C. and others},
+  title   = {The Thermal Emission Imaging System ({THEMIS}) for the {Mars} 2001 {Odyssey} Mission},
+  journal = {Space Science Reviews},
+  volume  = {110},
+  number  = {1--2},
+  pages   = {85--130},
+  year    = {2004},
+  doi     = {10.1023/B:SPAC.0000021008.16305.94}
+}
+@article{fergason2006,
+  author  = {Fergason, R. L. and Christensen, P. R. and Kieffer, H. H.},
+  title   = {High-resolution thermal inertia derived from the {Thermal Emission Imaging System} ({THEMIS}): Thermal model and applications},
+  journal = {Journal of Geophysical Research: Planets},
+  volume  = {111},
+  number  = {E12},
+  year    = {2006},
+  doi     = {10.1029/2006JE002735}
+}
+@article{murchie2007,
+  author  = {Murchie, S. and Arvidson, R. and Bedini, P. and Beisser, K. and others},
+  title   = {Compact Reconnaissance Imaging Spectrometer for {Mars} ({CRISM}) on {Mars Reconnaissance Orbiter} ({MRO})},
+  journal = {Journal of Geophysical Research: Planets},
+  volume  = {112},
+  number  = {E5},
+  pages   = {E05S03},
+  year    = {2007},
+  doi     = {10.1029/2006JE002682}
+}
+@article{viviano2014,
+  author  = {Viviano-Beck, C. E. and Seelos, F. P. and Murchie, S. L. and Kahn, E. G. and others},
+  title   = {Revised {CRISM} spectral parameters and summary products based on the currently detected mineral diversity on {Mars}},
+  journal = {Journal of Geophysical Research: Planets},
+  volume  = {119},
+  number  = {6},
+  pages   = {1403--1431},
+  year    = {2014},
+  doi     = {10.1002/2014JE004627}
+}
+@article{seelos2024,
+  author  = {Seelos, F. P. and Seelos, K. D. and Murchie, S. L. and Novak, M. A. M. and others},
+  title   = {The {CRISM} investigation in {Mars} orbit: Overview, history, and delivered data products},
+  journal = {Icarus},
+  volume  = {419},
+  pages   = {115612},
+  year    = {2024},
+  doi     = {10.1016/j.icarus.2023.115612}
+}
+@article{grotzinger2012,
+  author  = {Grotzinger, J. P. and Crisp, J. and Vasavada, A. R. and Anderson, R. C. and others},
+  title   = {{Mars Science Laboratory} Mission and Science Investigation},
+  journal = {Space Science Reviews},
+  volume  = {170},
+  number  = {1--4},
+  pages   = {5--56},
+  year    = {2012},
+  doi     = {10.1007/s11214-012-9892-2}
+}
+@article{gomezelvira2012,
+  author  = {G{\'o}mez-Elvira, J. and Armiens, C. and Casta{\~n}er, L. and Dom{\'i}nguez, M. and others},
+  title   = {{REMS}: The Environmental Sensor Suite for the {Mars Science Laboratory} Rover},
+  journal = {Space Science Reviews},
+  volume  = {170},
+  number  = {1--4},
+  pages   = {583--640},
+  year    = {2012},
+  doi     = {10.1007/s11214-012-9921-1}
+}
+@article{malin2017,
+  author  = {Malin, M. C. and Ravine, M. A. and Caplinger, M. A. and Ghaemi, F. T. and others},
+  title   = {The {Mars Science Laboratory} ({MSL}) Mast cameras and Descent imager: Investigation and instrument descriptions},
+  journal = {Earth and Space Science},
+  volume  = {4},
+  number  = {8},
+  pages   = {506--539},
+  year    = {2017},
+  doi     = {10.1002/2016EA000252}
+}
+@article{maki2012,
+  author  = {Maki, J. and Thiessen, D. and Pourangi, A. and Kobzeff, P. and others},
+  title   = {The {Mars Science Laboratory} Engineering Cameras},
+  journal = {Space Science Reviews},
+  volume  = {170},
+  number  = {1--4},
+  pages   = {77--93},
+  year    = {2012},
+  doi     = {10.1007/s11214-012-9882-4}
+}
+@article{rodriguezmanfredi2021,
+  author  = {Rodriguez-Manfredi, J. A. and de la Torre Ju{\'a}rez, M. and Alonso, A. and Ap{\'e}stigue, V. and others},
+  title   = {The {Mars} Environmental Dynamics Analyzer, {MEDA}. A Suite of Environmental Sensors for the {Mars} 2020 Mission},
+  journal = {Space Science Reviews},
+  volume  = {217},
+  number  = {3},
+  pages   = {48},
+  year    = {2021},
+  doi     = {10.1007/s11214-021-00816-9}
+}
+@article{farley2020,
+  author  = {Farley, K. A. and Williford, K. H. and Stack, K. M. and Bhartia, R. and others},
+  title   = {{Mars} 2020 Mission Overview},
+  journal = {Space Science Reviews},
+  volume  = {216},
+  number  = {8},
+  pages   = {142},
+  year    = {2020},
+  doi     = {10.1007/s11214-020-00762-y}
+}
+@misc{siebach2025boxwork,
+  author       = {Siebach, K. L. and Seeger, C. and Mondro, C. A. and others},
+  title        = {Curiosity's Investigation of the Distinctive ``Boxwork'' Interval in {Gale} Crater, {Mars}},
+  howpublished = {Conference abstract 237-8, GSA Connects 2025, 22 October 2025},
+  year         = {2025},
+  url          = {https://gsameetings.secure-platform.com/connects25/solicitations/103002/sessiongallery/schedule/items/95386/application/10634},
+  urldate      = {2026-11-15}
+}
+@misc{thompson2025boxwork,
+  author       = {Thompson, L.},
+  title        = {{Curiosity} Blog, Sols 4649--4654: Ridges, Hollows and Nodules, Oh My},
+  howpublished = {{NASA} Science, Curiosity mission blog},
+  year         = {2025},
+  month        = sep,
+  url          = {https://science.nasa.gov/blog/curiosity-blog-sols-4649-4654-ridges-hollows-and-nodules-oh-my},
+  urldate      = {2026-11-15}
+}
+@misc{parker2016galedem,
+  author       = {Parker, T. and Calef, III, F. J.},
+  title        = {{MSL} {Gale} Merged {DEM} 1\,m (edition v3, \texttt{MSL\_Gale\_DEM\_Mosaic\_1m})},
+  howpublished = {{PDS} Annex, {USGS} Astrogeology Science Center},
+  year         = {2016},
+  month        = oct,
+  url          = {https://astrogeology.usgs.gov/search/map/mars_msl_gale_merged_dem_1m},
+  urldate      = {2026-11-15}
+}
+@misc{fergason2020trn,
+  author       = {Fergason, R. L. and Galuszka, D. M. and Hare, T. M. and Mayer, D. P. and Redding, B. L.},
+  title        = {{Mars} 2020 Terrain Relative Navigation {HiRISE} {DTM} Mosaic},
+  howpublished = {Raster dataset, {U.S.} Geological Survey},
+  year         = {2020},
+  doi          = {10.5066/P9REJ9JN},
+  url          = {https://doi.org/10.5066/P9REJ9JN},
+  urldate      = {2026-11-15}
+}
+@misc{mmgis,
+  author       = {{NASA AMMOS}},
+  title        = {Multi-Mission Geographic Information System ({MMGIS})},
+  howpublished = {Open-source software},
+  year         = {2026},
+  note         = {Accessed 15 November 2026},
+  url          = {https://nasa-ammos.github.io/MMGIS/},
+  urldate      = {2026-11-15}
+}
+@misc{marstrek,
+  author       = {{NASA Jet Propulsion Laboratory}},
+  title        = {{Mars Trek}},
+  howpublished = {Web portal},
+  year         = {2026},
+  note         = {Accessed 15 November 2026},
+  url          = {https://trek.nasa.gov/mars/},
+  urldate      = {2026-11-15}
+}
+@article{allison2000,
+  author  = {Allison, M. and McEwen, M.},
+  title   = {A post-{Pathfinder} evaluation of areocentric solar coordinates with improved timing recipes for {Mars} seasonal/diurnal climate studies},
+  journal = {Planetary and Space Science},
+  volume  = {48},
+  number  = {2--3},
+  pages   = {215--235},
+  year    = {2000},
+  doi     = {10.1016/S0032-0633(99)00092-6}
+}
+@article{allison1997,
+  author  = {Allison, M.},
+  title   = {Accurate analytic representations of solar time and seasons on {Mars} with applications to the {Pathfinder/Surveyor} missions},
+  journal = {Geophysical Research Letters},
+  volume  = {24},
+  number  = {16},
+  pages   = {1967--1970},
+  year    = {1997},
+  doi     = {10.1029/97GL01950}
+}
+@misc{mars24,
+  author       = {{NASA Goddard Institute for Space Studies}},
+  title        = {{Mars24} Sunclock: Time on {Mars}},
+  howpublished = {Web tool},
+  year         = {2026},
+  note         = {Accessed 15 November 2026},
+  url          = {https://www.giss.nasa.gov/tools/mars24/},
+  urldate      = {2026-11-15}
+}
+@article{archinal2018,
+  author  = {Archinal, B. A. and Acton, C. H. and A'Hearn, M. F. and Conrad, A. and others},
+  title   = {Report of the {IAU} Working Group on Cartographic Coordinates and Rotational Elements: 2015},
+  journal = {Celestial Mechanics and Dynamical Astronomy},
+  volume  = {130},
+  number  = {3},
+  pages   = {22},
+  year    = {2018},
+  doi     = {10.1007/s10569-017-9805-5}
+}
+
+%% ---------- 5. Algorithms ----------
+@article{dijkstra1959,
+  author  = {Dijkstra, E. W.},
+  title   = {A note on two problems in connexion with graphs},
+  journal = {Numerische Mathematik},
+  volume  = {1},
+  number  = {1},
+  pages   = {269--271},
+  year    = {1959},
+  doi     = {10.1007/BF01386390}
+}
+@article{hart1968,
+  author  = {Hart, P. E. and Nilsson, N. J. and Raphael, B.},
+  title   = {A Formal Basis for the Heuristic Determination of Minimum Cost Paths},
+  journal = {{IEEE} Transactions on Systems Science and Cybernetics},
+  volume  = {4},
+  number  = {2},
+  pages   = {100--107},
+  year    = {1968},
+  doi     = {10.1109/TSSC.1968.300136}
+}
+@article{dial1969,
+  author  = {Dial, R. B.},
+  title   = {Algorithm 360: Shortest-path forest with topological ordering [{H}]},
+  journal = {Communications of the {ACM}},
+  volume  = {12},
+  number  = {11},
+  pages   = {632--633},
+  year    = {1969},
+  doi     = {10.1145/363269.363610}
+}
+@article{bellman1962,
+  author  = {Bellman, R.},
+  title   = {Dynamic Programming Treatment of the Travelling Salesman Problem},
+  journal = {Journal of the {ACM}},
+  volume  = {9},
+  number  = {1},
+  pages   = {61--63},
+  year    = {1962},
+  doi     = {10.1145/321105.321111}
+}
+@article{heldkarp1962,
+  author  = {Held, M. and Karp, R. M.},
+  title   = {A Dynamic Programming Approach to Sequencing Problems},
+  journal = {Journal of the Society for Industrial and Applied Mathematics},
+  volume  = {10},
+  number  = {1},
+  pages   = {196--210},
+  year    = {1962},
+  doi     = {10.1137/0110015}
+}
+@article{golden1987,
+  author  = {Golden, B. L. and Levy, L. and Vohra, R.},
+  title   = {The orienteering problem},
+  journal = {Naval Research Logistics},
+  volume  = {34},
+  number  = {3},
+  pages   = {307--318},
+  year    = {1987},
+  doi     = {10.1002/1520-6750(198706)34:3<307::AID-NAV3220340302>3.0.CO;2-D}
+}
+@article{vansteenwegen2011,
+  author  = {Vansteenwegen, P. and Souffriau, W. and Van Oudheusden, D.},
+  title   = {The orienteering problem: A survey},
+  journal = {European Journal of Operational Research},
+  volume  = {209},
+  number  = {1},
+  pages   = {1--10},
+  year    = {2011},
+  doi     = {10.1016/j.ejor.2010.03.045}
+}
+@article{ferguson2006,
+  author  = {Ferguson, D. and Stentz, A.},
+  title   = {Using interpolation to improve path planning: The {Field D*} algorithm},
+  journal = {Journal of Field Robotics},
+  volume  = {23},
+  number  = {2},
+  pages   = {79--101},
+  year    = {2006},
+  doi     = {10.1002/rob.20109}
+}
+@inproceedings{koenig2002dstar,
+  author    = {Koenig, S. and Likhachev, M.},
+  title     = {{D*} {Lite}},
+  booktitle = {Proceedings of the 18th National Conference on Artificial Intelligence ({AAAI}-02)},
+  pages     = {476--483},
+  year      = {2002},
+  url       = {https://aaai.org/papers/00476-aaai02-072-d-lite/},
+  urldate   = {2026-11-15}
+}
+@article{carsten2009,
+  author  = {Carsten, J. and Rankin, A. and Ferguson, D. and Stentz, A.},
+  title   = {Global planning on the {Mars Exploration Rovers}: Software integration and surface testing},
+  journal = {Journal of Field Robotics},
+  volume  = {26},
+  number  = {4},
+  pages   = {337--357},
+  year    = {2009},
+  doi     = {10.1002/rob.20287}
+}
+@article{toupet2026enav,
+  author  = {Toupet, O. and Ono, M. and Del Sesto, T. and Maimone, M. and McHenry, M. and others},
+  title   = {Enhanced Autonomous Navigation on the {Perseverance} {Mars} Rover},
+  journal = {{IEEE} Transactions on Field Robotics},
+  volume  = {3},
+  pages   = {83--124},
+  year    = {2026},
+  doi     = {10.1109/TFR.2025.3636366}
+}
+@article{daftry2022,
+  author  = {Daftry, S. and Abcouwer, N. and Del Sesto, T. and Venkatraman, S. and others},
+  title   = {{MLNav}: Learning to Safely Navigate on {Martian} Terrains},
+  journal = {{IEEE} Robotics and Automation Letters},
+  volume  = {7},
+  number  = {2},
+  pages   = {5461--5468},
+  year    = {2022},
+  doi     = {10.1109/LRA.2022.3156654}
+}
+@article{fink2019,
+  author  = {Fink, W. and Baker, V. R. and Brooks, A. J.-W. and Flammia, M. and others},
+  title   = {Globally optimal rover traverse planning in 3{D} using {Dijkstra}'s algorithm for multi-objective deployment scenarios},
+  journal = {Planetary and Space Science},
+  volume  = {179},
+  pages   = {104707},
+  year    = {2019},
+  doi     = {10.1016/j.pss.2019.104707}
+}
+@article{bernstein2012,
+  author  = {Bernstein, D. J. and Duif, N. and Lange, T. and Schwabe, P. and Yang, B.-Y.},
+  title   = {High-speed high-security signatures},
+  journal = {Journal of Cryptographic Engineering},
+  volume  = {2},
+  number  = {2},
+  pages   = {77--89},
+  year    = {2012},
+  doi     = {10.1007/s13389-012-0027-1}
+}
+@techreport{rfc8032,
+  author      = {Josefsson, S. and Liusvaara, I.},
+  title       = {Edwards-Curve Digital Signature Algorithm ({EdDSA})},
+  institution = {Internet Engineering Task Force},
+  type        = {{RFC}},
+  number      = {8032},
+  year        = {2017},
+  doi         = {10.17487/RFC8032},
+  url         = {https://www.rfc-editor.org/info/rfc8032}
+}
+@techreport{rfc8949,
+  author      = {Bormann, C. and Hoffman, P.},
+  title       = {Concise Binary Object Representation ({CBOR})},
+  institution = {Internet Engineering Task Force},
+  type        = {{RFC}},
+  number      = {8949},
+  year        = {2020},
+  doi         = {10.17487/RFC8949},
+  url         = {https://www.rfc-editor.org/info/rfc8949}
+}
+
+%% ---------- 6. Related EVA planning and analogs ----------
+@inproceedings{johnson2010sextant,
+  author    = {Johnson, A. W. and Hoffman, J. A. and Newman, D. J. and Mazarico, E. M. and Zuber, M. T.},
+  title     = {An Integrated Traverse Planner and Analysis Tool for Planetary Exploration},
+  booktitle = {{AIAA} {SPACE} 2010 Conference \& Exposition},
+  year      = {2010},
+  doi       = {10.2514/6.2010-8829}
+}
+@inproceedings{norheim2018sextant,
+  author    = {Norheim, J. and Hoffman, J. and Newman, D. and others},
+  title     = {Architecture of a surface exploration traverse analysis and navigational tool},
+  booktitle = {2018 {IEEE} Aerospace Conference},
+  pages     = {1--11},
+  year      = {2018},
+  doi       = {10.1109/AERO.2018.8396510}
+}
+@article{penaasensio2024moonpath,
+  author  = {Pe{\~n}a-Asensio, E. and Sutherland, J. and Tripathi, P. and others},
+  title   = {Automated astronaut traverses with minimum metabolic workload: Accessing permanently shadowed regions near the lunar south pole},
+  journal = {Acta Astronautica},
+  volume  = {214},
+  pages   = {324--342},
+  year    = {2024},
+  doi     = {10.1016/j.actaastro.2023.10.010}
+}
+@article{lim2019basalt,
+  author  = {Lim, D. S. S. and Abercromby, A. F. J. and Kobs Nawotniak, S. E. and Lees, D. S. and others},
+  title   = {The {BASALT} Research Program: Designing and Developing Mission Elements in Support of Human Scientific Exploration of {Mars}},
+  journal = {Astrobiology},
+  volume  = {19},
+  number  = {3},
+  pages   = {245--259},
+  year    = {2019},
+  doi     = {10.1089/ast.2018.1869}
+}
+@article{beaton2019,
+  author  = {Beaton, K. H. and Chappell, S. P. and Abercromby, A. F. J. and Miller, M. J. and others},
+  title   = {Using Science-Driven Analog Research to Investigate Extravehicular Activity Science Operations Concepts and Capabilities for Human Planetary Exploration},
+  journal = {Astrobiology},
+  volume  = {19},
+  number  = {3},
+  pages   = {300--320},
+  year    = {2019},
+  doi     = {10.1089/ast.2018.1861}
+}
+@inproceedings{broddrick2024,
+  author    = {Broddrick, J. T. and Achilles, C. E. and Banks, M. E. and Charney, D. W. and Denevi, B. W. and Edgar, L. A. and others},
+  title     = {An Optimization Approach to Support Science Decision Making for Lunar Surface Exploration},
+  booktitle = {55th Lunar and Planetary Science Conference},
+  year      = {2024},
+  url       = {https://ntrs.nasa.gov/citations/20240000165},
+  urldate   = {2026-11-15}
+}
+@article{lee2013xgds,
+  author  = {Lee, S. Y. and Lees, D. and Cohen, T. and others},
+  title   = {Reusable science tools for analog exploration missions: {xGDS} Web Tools, {VERVE}, and {Gigapan Voyage}},
+  journal = {Acta Astronautica},
+  volume  = {90},
+  number  = {2},
+  pages   = {268--288},
+  year    = {2013},
+  doi     = {10.1016/j.actaastro.2012.01.002}
+}
+@techreport{benjamin1969apollo,
+  author      = {Benjamin, P. and Bottomley, T. A. and Head, J. W. and Yates, M. T.},
+  title       = {Evaluation of Mobility Modes on Lunar Exploration Traverses: {Marius Hills}, {Copernicus Peaks}, and {Hadley Apennines} Missions},
+  institution = {Bellcomm, Inc.},
+  type        = {{NASA} Contractor Report},
+  number      = {NASA-CR-108134},
+  year        = {1969},
+  url         = {https://ntrs.nasa.gov/citations/19700009560},
+  urldate     = {2026-11-15}
+}
+
+%% ---------- Added by the lead author during drafting (checked 2026-11-15) ----------
+@techreport{drake2009dra5add,
+  author      = {{Mars Architecture Steering Group}},
+  title       = {Human Exploration of {Mars} Design Reference Architecture 5.0, Addendum},
+  institution = {{NASA} Johnson Space Center},
+  type        = {{NASA} Special Publication},
+  number      = {NASA/SP-2009-566-ADD},
+  year        = {2009},
+  month       = jul,
+  note        = {B. G. Drake, editor}
+}
+@misc{lowe2025nowcast,
+  author       = {L{\"o}we, J. L. and Khaksarighiri, S. and Wimmer-Schweingruber, R. F. and others},
+  title        = {Nowcasting Solar Energetic Particle Events for {Mars} Missions},
+  howpublished = {arXiv preprint arXiv:2502.02469 [physics.space-ph]},
+  year         = {2025},
+  doi          = {10.48550/arXiv.2502.02469},
+  url          = {https://doi.org/10.48550/arXiv.2502.02469}
+}
+@article{horn1981hill,
+  author  = {Horn, B. K. P.},
+  title   = {Hill Shading and the Reflectance Map},
+  journal = {Proceedings of the {IEEE}},
+  volume  = {69},
+  number  = {1},
+  pages   = {14--47},
+  year    = {1981},
+  doi     = {10.1109/PROC.1981.11918}
+}
+@misc{standish_approx,
+  author       = {Standish, E. M.},
+  title        = {Keplerian Elements for Approximate Positions of the Major Planets},
+  howpublished = {{JPL} Solar System Dynamics},
+  year         = {2006},
+  note         = {Accessed 15 November 2026},
+  url          = {https://ssd.jpl.nasa.gov/planets/approx_pos.html},
+  urldate      = {2026-11-15}
+}
+@misc{marswalkconcept2026,
+  author       = {{Team NASASpaceHacks}},
+  title        = {{Marswalk} Suit Navigation: Astronaut Augmented-Reality Navigation System, Technical Proof of Concept},
+  howpublished = {Pre-prototype feasibility assessment, project repository},
+  year         = {2026},
+  month        = nov,
+  url          = {https://github.com/NASASpaceHacks/NASASpaceHacks2026}
+}
+@article{ehresmann2021,
+  author  = {Ehresmann, B. and Hassler, D. M. and Zeitlin, C. and others},
+  title   = {Natural Radiation Shielding on {Mars} Measured With the {MSL/RAD} Instrument},
+  journal = {Journal of Geophysical Research: Planets},
+  volume  = {126},
+  number  = {8},
+  pages   = {e2021JE006851},
+  year    = {2021},
+  doi     = {10.1029/2021JE006851}
+}
+
+@article{feillet2004,
+  author  = {Feillet, D. and Dejax, P. and Gendreau, M. and Gueguen, C.},
+  title   = {An Exact Algorithm for the Elementary Shortest Path Problem with Resource Constraints: Application to Some Vehicle Routing Problems},
+  journal = {Networks},
+  volume  = {44},
+  number  = {3},
+  pages   = {216--229},
+  year    = {2004},
+  doi     = {10.1002/net.20033}
+}
+@incollection{irnich2005,
+  author    = {Irnich, S. and Desaulniers, G.},
+  title     = {Shortest Path Problems with Resource Constraints},
+  booktitle = {Column Generation},
+  editor    = {Desaulniers, G. and Desrosiers, J. and Solomon, M. M.},
+  publisher = {Springer},
+  address   = {Boston, MA},
+  pages     = {33--65},
+  year      = {2005},
+  doi       = {10.1007/0-387-25486-2_2}
+}
+@inproceedings{chakraborti2020,
+  author    = {Chakraborti, T. and Sreedharan, S. and Kambhampati, S.},
+  title     = {The Emerging Landscape of Explainable Automated Planning \& Decision Making},
+  booktitle = {Proceedings of the Twenty-Ninth International Joint Conference on Artificial Intelligence ({IJCAI-20})},
+  pages     = {4803--4811},
+  year      = {2020},
+  doi       = {10.24963/ijcai.2020/669}
+}
+@article{gunawan2016,
+  author  = {Gunawan, A. and Lau, H. C. and Vansteenwegen, P.},
+  title   = {Orienteering Problem: A Survey of Recent Variants, Solution Approaches and Applications},
+  journal = {European Journal of Operational Research},
+  volume  = {255},
+  number  = {2},
+  pages   = {315--332},
+  year    = {2016},
+  doi     = {10.1016/j.ejor.2016.04.059}
+}
+@incollection{waligora1975,
+  author    = {Waligora, J. M. and Horrigan, D. J.},
+  title     = {Metabolism and Heat Dissipation during {Apollo} {EVA} Periods},
+  booktitle = {Biomedical Results of {Apollo}},
+  editor    = {Johnston, R. S. and Dietlein, L. F. and Berry, C. A.},
+  publisher = {{NASA}},
+  number    = {NASA SP-368},
+  year      = {1975},
+  url       = {https://ntrs.nasa.gov/citations/19760005584}
+}
+
+@inproceedings{smith2026jointar,
+  author    = {Smith, A. and Nandwani, S. and Nakushian, A. and others},
+  title     = {Examination of the Joint Augmented Reality ({AR}) Navigation System for Lunar Surface Operations},
+  booktitle = {2026 {IEEE} Aerospace Conference},
+  year      = {2026},
+  url       = {https://ntrs.nasa.gov/citations/20250011653}
+}
+@article{yamagishi2022pdr,
+  author  = {Yamagishi, S. and Jing, L.},
+  title   = {Pedestrian Dead Reckoning with Low-Cost Foot-Mounted {IMU} Sensor},
+  journal = {Micromachines},
+  volume  = {13},
+  number  = {4},
+  pages   = {610},
+  year    = {2022},
+  doi     = {10.3390/mi13040610}
+}

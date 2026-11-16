@@ -13,13 +13,12 @@ export interface Ramp {
 }
 
 export const MAP_COLORS = {
-  ochre: '#C8763A',
-  amber: '#F2B544',
-  cyan: '#4FD1E0',
-  red: '#FF5A4E',
+  magenta: '#ff2bd6',
+  cyan: '#00e5ff',
+  red: '#ff3b30',
   ink: '#0B0D10',
-  paper: '#E9E4D8',
-  muted: '#9A9CA3',
+  paper: '#e9edf2',
+  muted: '#9aa3ad',
 } as const;
 
 /** Minutes-to-safety ramp (short = bright cyan, near the limit = deep blue). Values in minutes. */
@@ -34,39 +33,87 @@ export const TIME_RAMP: Ramp = {
   ],
 };
 
-/** Slope (deg): transparent on gentle ground, amber at the metabolic-data edge, red above the hard limit. */
+/** Slope (deg): transparent on gentle ground, white at the metabolic-data edge, red above the hard limit. */
 export const SLOPE_RAMP: Ramp = {
   id: 'slope',
   stops: [
-    [0, [242, 181, 68, 0]],
-    [8, [242, 181, 68, 0]],
-    [16.7, [242, 181, 68, 0.42]],
-    [19.99, [242, 150, 60, 0.55]],
+    [0, [255, 255, 255, 0]],
+    [8, [255, 255, 255, 0]],
+    [16.7, [255, 255, 255, 0.35]],
+    [19.99, [255, 255, 255, 0.5]],
     [20, [255, 90, 78, 0.55]],
     [35, [255, 90, 78, 0.8]],
   ],
 };
 
-/** Round-trip minutes outside hab line of sight: 0 = in LOS (cyan wash), longer gaps = deeper shadow. */
+/**
+ * Radio shadow: round-trip minutes outside hab / rover line of sight. 0 = in contact = fully transparent
+ * (no tint); anything out of contact gets a red-violet tint that deepens with the length of the gap.
+ */
 export const LOS_RAMP: Ramp = {
   id: 'los',
   stops: [
-    [0, [79, 209, 224, 0.2]],
-    [0.01, [8, 10, 16, 0.32]],
-    [10, [8, 10, 16, 0.62]],
-    [30, [8, 10, 16, 0.78]],
+    [0, [110, 30, 170, 0]],
+    [0.01, [110, 30, 170, 0.3]],
+    [10, [140, 24, 150, 0.45]],
+    [30, [170, 20, 120, 0.6]],
   ],
 };
 
-/** Thermal inertia (J m⁻² K⁻¹ s⁻½), viridis reversed: loose sand (low TI) = yellow, bedrock = violet. */
+/** Thermal inertia (J m⁻² K⁻¹ s⁻½), viridis reversed: loose sand (low TI) = pale blue, bedrock = violet. */
 export const TI_RAMP: Ramp = {
   id: 'ti',
   stops: [
-    [50, [253, 231, 37, 0.62]],
+    [50, [190, 220, 255, 0.55]],
     [150, [94, 201, 98, 0.5]],
     [250, [33, 145, 140, 0.42]],
     [400, [59, 82, 139, 0.36]],
     [700, [68, 1, 84, 0.42]],
+  ],
+};
+
+/**
+ * CRISM polyhydrated-sulfate parameter (SINDEX2, unitless index). Weak signal = clear, stronger = indigo -> violet -> lavender.
+ * Not red (danger) and no yellow/orange; lightness rises with the signal. Stops sit on this AOI's range (about 0.002-0.010).
+ */
+export const CRISM_RAMP: Ramp = {
+  id: 'crism',
+  stops: [
+    // Transparent up to the AOI median (0.0055), so only above-median sulfate signal tints the map;
+    // 0.0077 = 85th percentile ("strong" in the station cards), 0.0104 = 99th.
+    [0.0055, [96, 70, 190, 0]],
+    [0.0066, [118, 84, 214, 0.35]],
+    [0.0077, [176, 142, 242, 0.55]],
+    [0.0104, [236, 226, 255, 0.75]],
+  ],
+};
+
+/**
+ * Elevation overlay between `lo` and `hi` metres: deep blue (low) → blue → cyan → white (high).
+ * No yellow/orange (the console's palette reserves warm colours); lightness rises monotonically.
+ */
+export function elevationRamp(lo: number, hi: number): Ramp {
+  const at = (t: number) => lo + (hi - lo) * t;
+  return {
+    id: 'elevation',
+    stops: [
+      [at(0), [18, 28, 92, 0.62]],
+      [at(0.35), [36, 104, 206, 0.55]],
+      [at(0.7), [110, 214, 240, 0.5]],
+      [at(1), [255, 255, 255, 0.58]],
+    ],
+  };
+}
+
+/** Surface roughness (m, std-dev of detrended 1 m heights per 5 m cell): smooth = clear, rough = pale blue → white. */
+export const ROUGH_RAMP: Ramp = {
+  id: 'rough',
+  stops: [
+    [0, [150, 175, 255, 0]],
+    [0.03, [150, 175, 255, 0]],
+    [0.08, [130, 165, 255, 0.38]],
+    [0.2, [195, 212, 255, 0.62]],
+    [0.5, [255, 255, 255, 0.85]],
   ],
 };
 

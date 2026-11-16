@@ -1,0 +1,87 @@
+\documentclass[10pt,twocolumn]{article}
+\input{preamble}
+\graphicspath{{../figs/}}
+
+% ---------- Authors: edit this block to finalise the author list ----------
+\newcommand{\PaperAuthors}{%
+  \begin{tabular}{@{}c@{\hspace{2.2em}}c@{\hspace{2.2em}}c@{}}
+    Kumar Sashank Ghanta & Ivan Chen & George Postica \\[-1pt]
+    {\footnotesize\color{muted}\href{mailto:kumarsashank2003@gmail.com}{kumarsashank2003@gmail.com}} &
+    {\footnotesize\color{muted}\href{mailto:ivanchen858@gmail.com}{ivanchen858@gmail.com}} &
+    {\footnotesize\color{muted}\href{mailto:georgepostica7@gmail.com}{georgepostica7@gmail.com}} \\[5pt]
+  \end{tabular}\\
+  \begin{tabular}{@{}c@{\hspace{2.2em}}c@{}}
+    Mirim Yu & Michelle Wang \\[-1pt]
+    {\footnotesize\color{muted}\href{mailto:firepunch119@gmail.com}{firepunch119@gmail.com}} &
+    {\footnotesize\color{muted}\href{mailto:michelle.wang.cs@gmail.com}{michelle.wang.cs@gmail.com}} \\
+  \end{tabular}}
+\newcommand{\PaperAffiliation}{Team NASASpaceHacks \textperiodcentered{} NASA International Space Apps Challenge 2026 \textperiodcentered{} Toronto, Canada}
+\newcommand{\PaperRepo}{\url{https://github.com/NASASpaceHacks/NASASpaceHacks2026}}
+
+\hypersetup{pdftitle={Marswalk: Earth-Independent Planning and Guidance for Walking EVAs on Mars}, pdfauthor={Kumar Sashank Ghanta, Ivan Chen, George Postica, Mirim Yu, Michelle Wang}, pdfkeywords={Mars, extravehicular activity, EVA planning, traverse planning, route planning, orienteering, metabolic cost, space suit, autonomy, HiRISE, Curiosity, Gale crater}}
+
+\begin{document}
+\thispagestyle{plain}
+
+\twocolumn[{%
+\begin{center}
+  {\sffamily\small\color{muted} Research paper \textperiodcentered{} NASA Space Apps Challenge 2026: Interplanetary Survival Guide, Martian Map\par}
+  \vspace{10pt}
+  {\LARGE\bfseries\color{ink} Marswalk: Earth-Independent Planning and\\[3pt] Guidance for Walking EVAs on Mars\par}
+  \vspace{12pt}
+  {\large \PaperAuthors\par}
+  \vspace{4pt}
+  {\small\color{muted} \PaperAffiliation\par}
+  \vspace{2pt}
+  {\small \PaperRepo\par}
+  \vspace{2pt}
+  {\small\color{muted} 15 November 2026\par}
+\end{center}
+
+\vspace{6pt}
+\noindent\begin{minipage}{\textwidth}
+\setlength{\parindent}{0pt}
+\begin{center}\begin{minipage}{0.92\textwidth}
+\small
+\textbf{Abstract.} Astronauts on Mars will have to plan and carry out their own walks outside, because Earth cannot help in real time. Two gaps stand in the way. First, extravehicular activities (EVAs) are routed from Earth today. From Mars, asking a question and hearing back takes up to 44 minutes, contact is lost for weeks around solar conjunction, and an onboard solar-storm alarm leaves only about 30 minutes to reach shelter, so Earth is too slow for an emergency. Second, the route planners that already run on Mars are built for rovers. They model wheels and slopes, not a suited human's oxygen time, suit heat or walk back to shelter. We present \Marswalk, which plans human routes on Mars itself, in milliseconds, with no Earth in the loop. In the habitat, it plans walks on a terrain model fused from NASA and ESA orbital and rover data and checks every plan against twelve sourced EVA constraints, including suit heat, walk-back time, time to shelter and radio contact. A separate simulator re-checks each plan, and the engine explains its verdict. A signed route of about 11\,kB goes to the astronaut's phone AR navigator, which estimates position without GPS (in simulation today), re-routes locally and keeps guiding when the link drops. A suit hardware concept adds boot-mounted inertial sensors, camera-to-orbital-map matching and a helmet waveguide display. At Gale crater, a slope-only planner broke at least one constraint in 199 of 200 simulated walks. \Marswalk re-plans mid-walk in a median of 8.3\,ms on a laptop, and its walking model has a 10.6\% mean error against NASA suited-walking data at 0.22--0.32\,$g$. An independently written checker agreed with its verdicts on 23 of 24 walks, and staging from a pressurized rover turned an infeasible habitat walk into a six-stop plan. \Marswalk is a research prototype tested in simulation.
+
+\vspace{5pt}
+\textbf{Keywords:} Mars; extravehicular activity; traverse planning; crew autonomy; suit thermal limits; GPS-free navigation; augmented reality; Gale crater.
+\end{minipage}\end{center}
+\end{minipage}
+\vspace{4pt}
+\vspace{10pt}
+}]
+
+\input{v2-1-intro}
+\input{v2-2-related}
+\input{v2-3-system}
+\input{v2-4-data}
+\input{v2-5-engine}
+\input{v2-6-interfaces}
+\input{v2-7-eval}
+\input{v2-8-discussion}
+
+\appendix
+\input{appendix-v2}
+
+\section*{Use of AI}
+\addcontentsline{toc}{section}{Use of AI}
+The problem, concept, system architecture and scope are the team's. Most of the software was written with Claude Code (Anthropic) coding agents under the team's direction and review, and AI assistance was used in drafting this paper; the team is responsible for its content. No AI model takes part in any safety decision in \Marswalk: routes are produced by the deterministic engine described in \cref{sec:engine}. AI-written code was reviewed by the team and is exercised by the unit, property and end-to-end tests and the independent checker reported here. Blind AI judges were used only as one of three checks of the engine's verdicts (\cref{sec:eval-crosscheck}); they belong to the same model family as the coding agents, which limits their independence. No AI-generated imagery appears in the system or in this paper; all images are NASA data or screenshots of the software.
+
+\section*{Data and code availability}
+The source code, site-pack manifests with product identifiers and SHA-256 digests, the check scripts and their results (in the \code{Validation/} directory), and the benchmark harness are available at \PaperRepo{} under the Apache-2.0 license. Site-pack rasters (about 58\,MB for Gale) are rebuilt from public sources by the included pipeline. Commands: \code{pnpm demo} (full system), \code{pnpm ci} (type check and unit tests), \code{pnpm e2e} (end-to-end test), \code{pnpm bench} (planner benchmark); the model and impact checks V1--V5 are under \code{Validation/}.
+
+\section*{Data credits}
+HiRISE: NASA/JPL-Caltech/University of Arizona. CTX, Mastcam: NASA/JPL-Caltech/MSSS. Navcam, Curiosity and Perseverance traverses: NASA/JPL-Caltech. HRSC: ESA/DLR/FU Berlin. THEMIS: NASA/JPL-Caltech/Arizona State University. CRISM: NASA/JPL-Caltech/JHU-APL. MOLA: NASA/GSFC. Gale merged DEM and Mars 2020 TRN products: USGS Astrogeology Science Center. RAD and REMS data: NASA Planetary Data System. Space-weather forecasts: NASA Community Coordinated Modeling Center (DONKI). Mars24: NASA Goddard Institute for Space Studies. This work is not endorsed by NASA.
+
+\section*{Competing interests and funding}
+The authors declare no competing interests. This work received no funding.
+
+\section*{Acknowledgments}
+We thank the organizers and mentors of the NASA International Space Apps Challenge Toronto local event, and the instrument and operations teams whose public data made this work possible.
+
+\bibliographystyle{unsrtnat}
+\bibliography{refs}
+
+\end{document}

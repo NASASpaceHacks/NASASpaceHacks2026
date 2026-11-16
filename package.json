@@ -15,11 +15,13 @@
     "dev:backend": "pnpm --filter ./Backend dev",
     "dev:admin": "pnpm --filter ./Frontend/AdminView dev",
     "dev:visor": "pnpm --filter ./Frontend/UserView dev",
+    "dev:ar": "pnpm --filter ./Frontend/UserView_AR dev",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "vitest run",
     "ci": "pnpm typecheck && vitest run",
     "bench": "tsx Research/bench/run.ts",
     "e2e": "playwright test -c qa/playwright.config.ts",
+    "test:ux": "playwright test -c qa/playwright.interactions.config.ts",
     "sitepack": "Pipeline/.venv/bin/python Pipeline/build_sitepack.py"
   },
   "devDependencies": {

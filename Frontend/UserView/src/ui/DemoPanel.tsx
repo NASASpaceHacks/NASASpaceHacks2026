@@ -47,7 +47,7 @@ export function DemoPanel({ s, ctl }: { s: Snapshot; ctl: VisorController }) {
                   </span>
                   <span style={{ fontFamily: 'var(--font-ui)', fontWeight: 700, fontSize: 25, color: 'var(--w)', flex: 1 }}>{r.label}</span>
                   {r.value && (
-                    <span className="num" style={{ fontSize: 26, color: r.on ? 'var(--a)' : 'var(--c)' }}>
+                    <span className="num" style={{ fontSize: 26, color: r.on ? 'var(--k)' : 'var(--c)' }}>
                       {r.value}
                     </span>
                   )}

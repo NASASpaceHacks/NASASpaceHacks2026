@@ -69,6 +69,37 @@ export interface SimEnv {
   elevAt?: (x: number, y: number) => number;
   heatAdvisory: boolean;
   returning: boolean;
+  /**
+   * Crew is walking a local detour off this route (UserView_AR position model): time, O₂ and heat run at
+   * walking power, but along-route progress holds until the detour rejoins the route.
+   */
+  hold?: boolean;
+}
+
+/**
+ * Hold in place along the route while the crew walks elsewhere (a detour): heat accrues at walking power,
+ * and the engine heat governor still inserts rests (sim.resting = true → the detour walker stands still).
+ */
+function holdWalking(sim: SimState, route: RouteModel, dt: number) {
+  const [i] = route.locate(sim.s);
+  const P = route.edgeP[i];
+  if ((sim.restLeftS ?? 0) <= 0) {
+    const rest = restNeeded(sim.heatAvgW, 1, P, HP); // rest before the next minute of walking
+    if (rest > 0) sim.restLeftS = rest * 60;
+  }
+  if ((sim.restLeftS ?? 0) > 0) {
+    const r = Math.min(dt, sim.restLeftS!);
+    sim.metW = REST_W;
+    sim.resting = true;
+    accumulateHeat(sim, REST_W, r);
+    sim.restLeftS = sim.restLeftS! - r;
+    sim.restMin = (sim.restMin ?? 0) + r / 60;
+    dt -= r;
+    if (dt <= 1e-6) return;
+  }
+  sim.metW = P;
+  sim.resting = false;
+  accumulateHeat(sim, P, dt);
 }
 
 /** mulberry32 step with explicit state (keeps SimState serialisable). */
@@ -260,6 +291,10 @@ export function simTick(sim: SimState, route: RouteModel, dtRealS: number, env: 
       break;
     }
     case 'WALK': {
+      if (env.hold) {
+        holdWalking(sim, route, dt);
+        break;
+      }
       const st = route.stops[sim.stopK];
       const target = st ? st.s : route.length;
       const left = walk(sim, route, target, 1, dt, pace);
@@ -291,6 +326,10 @@ export function simTick(sim: SimState, route: RouteModel, dtRealS: number, env: 
       break;
     }
     case 'RETURN': {
+      if (env.hold) {
+        holdWalking(sim, route, dt);
+        break;
+      }
       const target = sim.returnDir > 0 ? route.length : 0;
       walk(sim, route, target, sim.returnDir, dt, pace);
       sim.headingDeg = route.bearingAt(sim.s, sim.returnDir);

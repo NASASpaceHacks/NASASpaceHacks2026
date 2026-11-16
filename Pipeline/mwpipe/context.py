@@ -1,4 +1,6 @@
-"""Stage 3 — thermal inertia, landmarks, Curiosity images, REMS weather, DONKI space weather."""
+"""Stage 3 — thermal inertia, landmarks, rover images, rover weather (REMS / MEDA), DONKI space weather.
+
+gale-v1 uses the Curiosity code paths below; sites with cfg rover='m20' use mwpipe/m20.py for images and MEDA."""
 from __future__ import annotations
 
 import io
@@ -37,7 +39,7 @@ def build_ti(site: Site, pack: Path, m: dict) -> dict:
     if not cache.exists():
         xc, yc = MARS_R * math.radians(site.lon), MARS_R * math.radians(site.lat)
         half = 4000.0
-        with rasterio.open("/vsicurl/" + THEMIS_URL) as src:
+        with rasterio.open("/vsicurl/" + site.opt("themis_url", THEMIS_URL)) as src:
             # ISIS SimpleCylindrical, CenterLongitude 0, x = R_eq·lon, y = R_eq·lat (planetocentric) — same form as the DEM source.
             win = from_bounds(xc - half, yc - half, xc + half, yc + half, src.transform).round_offsets().round_lengths()
             arr = src.read(1, window=win)
@@ -60,8 +62,8 @@ def build_ti(site: Site, pack: Path, m: dict) -> dict:
         "scale": 0.1, "offset": 0, "nodata": 65535, "unit": "J m⁻² K⁻¹ s⁻½", "indicative": True,
         "provenance": [{
             "mission": "2001 Mars Odyssey", "instrument": "THEMIS (Thermal Emission Imaging System), IR band 9 (12.57 µm)",
-            "product": "THEMIS_TI_Mosaic_Quant_30S120E_100mpp.cub (quantitative global thermal-inertia mosaic, 32-bit)",
-            "url": THEMIS_URL, "license": "Public domain (NASA / ASU / USGS Astrogeology)",
+            "product": site.opt("themis_url", THEMIS_URL).rsplit("/", 1)[-1] + " (quantitative global thermal-inertia mosaic, 32-bit)",
+            "url": site.opt("themis_url", THEMIS_URL), "license": "Public domain (NASA / ASU / USGS Astrogeology)",
             "citation": "THEMIS quantitative thermal inertia global mosaic, 100 m/px (USGS Astrogeology). Method: Fergason, Christensen & "
                         "Kieffer (2006), JGR 111, E12004, doi:10.1029/2006JE002735; mosaicking: Edwards et al. (2011), JGR 116, "
                         "E10008, doi:10.1029/2010JE003755.",
@@ -130,7 +132,7 @@ def build_landmarks(site: Site, pack: Path, m: dict) -> dict:
                     "elevM": round(float(dem[r, c]), 1), "informal": True})
 
     # 2) Named features from the Content gazetteer that fall inside the grid (orientation features only).
-    if GAZETTEER.exists():
+    if site.opt("gazetteer", True) and GAZETTEER.exists():
         skip = ("drill", "rover position", "float rock", "target")
         seen: list[tuple[float, float]] = []
         for f in json.loads(GAZETTEER.read_text()).get("features", []):
@@ -146,7 +148,18 @@ def build_landmarks(site: Site, pack: Path, m: dict) -> dict:
             out.append({"id": f"GZ-{slug}", "name": f["name"], "x": round(x, 2), "y": round(y, 2),
                         "elevM": round(float(dem[r, c]), 1), "informal": bool(f.get("informal", True))})
 
-    # 3) Far heading cue: Aeolis Mons (IAU name). Summit = highest MOLA sample within 0.45° of the gazetteer point
+    # 3) Far heading cues. Sites can list their own (real positions, e.g. a rover waypoint) in cfg far_landmarks.
+    if site.opt("far_landmarks") is not None:
+        for f in site.opt("far_landmarks"):
+            x, y = (float(v) for v in site.fwd(f["lon"], f["lat"]))
+            out.append({"id": f["id"], "name": f["name"], "x": round(x, 1), "y": round(y, 1), "elevM": f["elevM"],
+                        "informal": f["informal"]})
+            print(f"  far landmark {f['id']}: {math.hypot(x - site.fwd(site.lon, site.lat)[0], y - site.fwd(site.lon, site.lat)[1]) / 1000:.1f} km "
+                  "from AOI centre", flush=True)
+        m["landmarks"] = out
+        print(f"  landmarks: {len(out)} ({len(chosen)} DEM knobs)", flush=True)
+        return m
+    # Gale: Aeolis Mons (IAU name). Summit = highest MOLA sample within 0.45° of the gazetteer point
     #    (the maximum is stable from 0.3° to 0.45°; Gale's rim is > 1° away, so it cannot be picked up).
     try:
         lon, lat, z = _mola_peak(137.85, -5.08)
@@ -260,6 +273,9 @@ def _pick_image(stops: list[tuple[dict, list[int]]]):
 def build_images(site: Site, pack: Path, m: dict) -> dict:
     from PIL import Image  # noqa: F401
     from .siting import link_station_images
+    if site.opt("rover") == "m20":
+        from . import m20
+        return m20.build_images(site, pack, m)
 
     wpf = pack / "traverse_waypoints.json"
     wps = [w for w in json.loads(wpf.read_text())["waypoints"] if w["cell"] >= 0]
@@ -321,6 +337,10 @@ def build_images(site: Site, pack: Path, m: dict) -> dict:
 
 # ───────────────────────────── conditions ─────────────────────────────
 
+class _SkipRems(Exception):
+    """Site uses another rover weather feed."""
+
+
 def _num(v):
     try:
         return float(v)
@@ -335,7 +355,17 @@ def _str(v):
 def build_conditions(site: Site, pack: Path, m: dict) -> dict:
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     cond = {"fetchedUtc": now}
+    if site.opt("weather") == "meda":
+        from . import m20
+        try:
+            cond["rems"] = m20.fetch_meda()
+            print(f"  MEDA: {len(cond['rems'])} sols with data ({', '.join(f'{s['sol']} {s['terrestrialDate']}' for s in cond['rems'])}); "
+                  "the outreach feed stopped updating in 2024", flush=True)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ! MEDA failed: {e}")
     try:
+        if site.opt("weather") == "meda":
+            raise _SkipRems()
         d = http_get(REMS_URL, timeout=90).json()
         sols = sorted(d["soles"], key=lambda s: int(s["sol"]), reverse=True)[:30]
         cond["rems"] = [{
@@ -346,6 +376,8 @@ def build_conditions(site: Site, pack: Path, m: dict) -> dict:
             "uvIndex": _str(s.get("local_uv_irradiance_index")), "sunrise": _str(s.get("sunrise")), "sunset": _str(s.get("sunset")),
         } for s in sols]
         print(f"  REMS: {len(cond['rems'])} sols ({cond['rems'][-1]['sol']}–{cond['rems'][0]['sol']})", flush=True)
+    except _SkipRems:
+        pass
     except Exception as e:  # noqa: BLE001
         print(f"  ! REMS failed: {e}")
         if m["conditions"].get("rems"):

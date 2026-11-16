@@ -2,7 +2,8 @@
  * Suit heat governor.
  *
  * Constraint: rolling average metabolic power ≤ heat_avg_max_w (352 W: future suits sized for
- * 1200 BTU/h average, NASA ICES-2026-127; SWME rejects ~370 W in Mars conditions, NTRS 20130014146).
+ * 1200 BTU/h average, NASA ICES-2026-127; a 2013 hollow-fiber SWME prototype is packaged for 370 W in a Mars environment, NASA Tech Brief
+ * MSC-24849-1 / NTRS 20130014146; SWME at Mars pressure still needs testing, ICES-2026-126).
  *
  * WINDOW = 30 MIN. The rolling average is implemented as a first-order leaky integrator (exponential
  * moving average, time constant τ = 30 min): dH/dt = (P − H)/τ. It is the "leaky bucket" form of a

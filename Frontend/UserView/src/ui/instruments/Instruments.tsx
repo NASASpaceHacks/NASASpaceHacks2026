@@ -21,7 +21,7 @@ export function BearingDial({
   rel,
   steer,
   size = 300,
-  color = 'var(--a)',
+  color = 'var(--c)',
   dim = false,
 }: {
   rel: number | null;
@@ -91,7 +91,7 @@ export function ArcGauge({
   max,
   label,
   unit,
-  amberBelow,
+  cautionBelow,
   redBelow,
   limitAt,
   size = 230,
@@ -102,7 +102,7 @@ export function ArcGauge({
   max: number;
   label: string;
   unit: string;
-  amberBelow: number;
+  cautionBelow: number;
   redBelow: number;
   limitAt?: number;
   size?: number;
@@ -122,8 +122,8 @@ export function ArcGauge({
     return `M ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1}`;
   };
   const bad = v !== null && (invert ? v > redBelow : v <= redBelow);
-  const warn = v !== null && (invert ? v > amberBelow : v < amberBelow);
-  const col = v === null ? 'var(--g3)' : bad ? 'var(--r)' : warn ? 'var(--a)' : 'var(--g)';
+  const warn = v !== null && (invert ? v > cautionBelow : v < cautionBelow);
+  const col = v === null ? 'var(--g3)' : bad ? 'var(--r)' : warn ? 'var(--k)' : 'var(--g)';
   const ticks = [];
   for (let i = 0; i <= 8; i++) {
     const deg = start + (sweep * i) / 8;
@@ -140,7 +140,7 @@ export function ArcGauge({
       {frac > 0.004 && <path d={arc(0, frac)} fill="none" stroke={col} strokeWidth={16} style={{ transition: 'stroke 0.4s' }} />}
       {ticks}
       {lim && lim2 && <line x1={lim[0]} y1={lim[1]} x2={lim2[0]} y2={lim2[1]} stroke="var(--r)" strokeWidth={5} />}
-      <text x={c} y={c + 22} textAnchor="middle" fill={v === null ? 'var(--g3)' : bad ? 'var(--r)' : warn ? 'var(--a)' : 'var(--w)'} fontSize={shown.length > 3 ? 56 : 72} className="num">
+      <text x={c} y={c + 22} textAnchor="middle" fill={v === null ? 'var(--g3)' : bad ? 'var(--r)' : warn ? 'var(--k)' : 'var(--w)'} fontSize={shown.length > 3 ? 56 : 72} className="num">
         {shown}
       </text>
       <text x={c} y={c + 58} textAnchor="middle" fill="var(--g2)" fontSize={22} className="lbl">
@@ -175,15 +175,15 @@ export function ClockCue({ rel, kind, size = 120 }: { rel: number; kind: 'sun' |
         <g style={{ transform: `rotate(${a}deg)`, transformOrigin: `${c}px ${c}px`, transition: 'transform 0.4s linear' }}>
           {kind === 'sun' ? (
             <g>
-              <circle cx={c} cy={c - g} r={10} fill="var(--a)" />
+              <circle cx={c} cy={c - g} r={10} fill="var(--k)" />
               {Array.from({ length: 8 }, (_, k) => {
                 const [x1, y1] = [c + 14 * Math.sin(k * 45 * D2R), c - g - 14 * Math.cos(k * 45 * D2R)];
                 const [x2, y2] = [c + 20 * Math.sin(k * 45 * D2R), c - g - 20 * Math.cos(k * 45 * D2R)];
-                return <line key={k} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--a)" strokeWidth={3} />;
+                return <line key={k} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--k)" strokeWidth={3} />;
               })}
             </g>
           ) : (
-            <path d={`M ${c - 16} ${c - g + 10} L ${c - 4} ${c - g - 12} L ${c + 3} ${c - g - 2} L ${c + 8} ${c - g - 8} L ${c + 17} ${c - g + 10} Z`} fill="var(--a)" />
+            <path d={`M ${c - 16} ${c - g + 10} L ${c - 4} ${c - g - 12} L ${c + 3} ${c - g - 2} L ${c + 8} ${c - g - 8} L ${c + 17} ${c - g + 10} Z`} fill="var(--k)" />
           )}
         </g>
       )}

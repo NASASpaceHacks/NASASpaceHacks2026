@@ -100,7 +100,7 @@ export function App({ ctl }: { ctl: VisorController }) {
     <div className="viewport">
       <div className="stage" style={{ transform: `translate(-50%, -50%) scale(${scale})${s.mirror ? ' scaleX(-1)' : ''}` }}>
         <TopBar s={s} />
-        <div className="absolute" style={{ left: 16, top: 104, width: MAP_W, height: MAP_H, outline: s.autonomous ? '3px solid var(--a)' : '2px solid var(--line)', overflow: 'hidden' }}>
+        <div className="absolute" style={{ left: 16, top: 104, width: MAP_W, height: MAP_H, outline: s.autonomous ? '3px solid var(--k)' : '2px solid var(--line)', overflow: 'hidden' }}>
           <MapPane ctl={ctl} />
           <MapLegend s={s} />
           <WaitingOverlay s={s} />

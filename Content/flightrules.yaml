@@ -76,7 +76,7 @@ rules:
     assumption: false
     citation: "Onboard dose-rate nowcast gives ≥30 min warning before peak SEP dose (arXiv:2502.02469); DRA 5.0 Addendum (NASA SP-2009-566-ADD): return crews to shelter on warning."
   - id: los_gap_max_min
-    label: "Max time without habitat line-of-sight"
+    label: "Max time out of radio contact (habitat or rover relay)"
     value: 10
     unit: "min"
     hard: true
@@ -98,7 +98,7 @@ rules:
     hard: true
     enabled_default: true
     assumption: false
-    citation: "Future suits sized for 1200 BTU/h (352 W) average (NASA ICES-2026-127); SWME heat rejection 370 W in Mars conditions vs 810 W in vacuum (NTRS 20130014146)."
+    citation: "Future suits sized for 1200 BTU/h (352 W) average (NASA ICES-2026-127). A 2013 hollow-fiber SWME prototype is packaged to reject 810 W in vacuum and 370 W in a Mars environment (NASA Tech Brief MSC-24849-1, NTRS 20130014146); SWME use at Mars pressure still needs testing (ICES-2026-126, NTRS 20260003024)."
   - id: walk_radius_max_m
     label: "Max distance from habitat (walking)"
     value: 2000

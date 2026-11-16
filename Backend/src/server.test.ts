@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 import {
+  DEFAULT_ROUTE_PREFS,
   encodeRaster,
   goldenPlanRequest,
   mockSitePack,
@@ -10,6 +11,7 @@ import {
   type LoadedSitePack,
   type PlanPackage,
   type PlanResult,
+  ROUTE_PRESETS,
   type Telem,
 } from '@mw/shared/contracts';
 import { connectWebSocketLink, verifyPackage, type ConfirmResponse, type HabState, type HealthResponse, type Link } from '@mw/shared/link';
@@ -302,6 +304,26 @@ describe('hab server API (e2e on an ephemeral port)', () => {
     } else {
       expect(c.status).toBe(409); // STAY_IN: nothing to push
     }
+  });
+
+  it('route priorities reach the engine: validated, hashed, never sharing a cached plan', async () => {
+    const hab = await start({ sitePack: 'small', useWorker: false });
+    const health = (await api<HealthResponse>(hab, '/api/health')).json;
+    if (!health.engine.plan) return;
+    const req = goldenPlanRequest(SMALL);
+    const radio = ROUTE_PRESETS.find((p) => p.id === 'radio')!.prefs;
+    const plain = await api<PlanResult>(hab, '/api/plan', req);
+    const def = await api<PlanResult>(hab, '/api/plan', { ...req, prefs: DEFAULT_ROUTE_PREFS });
+    const pri = await api<PlanResult>(hab, '/api/plan', { ...req, prefs: radio });
+    expect([plain.status, def.status, pri.status]).toEqual([200, 200, 200]);
+    expect(def.json.reqHash).toBe(plain.json.reqHash); // default priorities = no priorities
+    expect(pri.json.reqHash).not.toBe(plain.json.reqHash);
+    expect(pri.json.notes.some((n) => n.startsWith('Route priorities (radio)'))).toBe(true); // prefs survived the schema
+    expect(plain.json.notes.some((n) => n.startsWith('Route priorities'))).toBe(false);
+    const other = await api<PlanResult>(hab, '/api/plan', { ...req, prefs: { ...radio, radio: 0.7 } });
+    expect(other.json.reqHash).not.toBe(pri.json.reqHash);
+    const bad = await api<{ error: string }>(hab, '/api/plan', { ...req, prefs: { ...radio, slope: 2 } });
+    expect(bad.status).toBe(400);
   });
 
   it('replays the event log on restart: route, seq and parent chain survive a crash', async () => {

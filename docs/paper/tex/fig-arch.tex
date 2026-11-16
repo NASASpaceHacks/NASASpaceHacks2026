@@ -1,0 +1,80 @@
+% Illustrated system architecture: asynchronous with Earth, heavy in the habitat, light on the helmet.
+\begin{tikzpicture}[x=1mm, y=1mm, font=\rmfamily\scriptsize,
+  callout/.style={draw=ink!55, line width=0.45pt, rounded corners=1.5pt, fill=white, align=left, inner sep=3pt,
+                  execute at begin node={\hyphenpenalty=10000}},
+  tag/.style={font=\rmfamily\itshape\footnotesize, text=muted},
+  line/.style={draw=ink!70, line width=0.5pt},
+]
+% ---------------- ground and panels ----------------
+\fill[paper3, rounded corners=3pt] (0,10) rectangle (37,78);
+\fill[surface] (41,10) -- (41,21) .. controls (60,22.5) and (75,20.5) .. (95,21.3) .. controls (115,22.2) and (135,20.4) .. (165,21.6) -- (165,10) -- cycle;
+\draw[surfaceline, line width=0.6pt] (41,21) .. controls (60,22.5) and (75,20.5) .. (95,21.3) .. controls (115,22.2) and (135,20.4) .. (165,21.6);
+\draw[ink!30, dashed, line width=0.5pt] (39,12) -- (39,78);
+\node[font=\rmfamily\bfseries\footnotesize, text=ink, anchor=north west] at (1.5,77) {Earth};
+\node[font=\rmfamily\bfseries\footnotesize, text=ink, anchor=north west] at (41.5,77) {Mars surface \textnormal{\color{muted}(local radio only, no internet)}};
+
+% ---------------- Earth ----------------
+\shade[ball color=earth!80!white] (18.5,47) circle (8);
+\fill[land, opacity=0.85] (14.5,50.5) .. controls (17,53) and (20.5,52) .. (21,49.5) .. controls (21.5,47) and (18,46.5) .. (16.5,47.5) .. controls (15,48.5) and (13.5,49) .. (14.5,50.5) -- cycle;
+\fill[land, opacity=0.85] (19.5,43.5) .. controls (21.5,44) and (23,42.5) .. (22,41) .. controls (21,40) and (19,41.5) .. (19.5,43.5) -- cycle;
+\node[callout, text width=31mm, anchor=north] at (18.5,36) {\textbf{Ground support} (optional)\\ space-weather forecasts, science backroom, plan and log archive};
+
+% ---------------- habitat ----------------
+\begin{scope}[shift={(66,21.6)}]
+  \fill[white] (-10,0) rectangle (10,9);
+  \draw[line, fill=white] (-10,0) -- (-10,9) arc (180:0:10 and 4.5) -- (10,0);
+  \draw[line] (-10,0) -- (10,0);
+  \foreach \x in {-6,-1,4} \draw[ink!60, fill=paper2] (\x,4.6) circle (1.15);
+  \draw[ink!60, fill=paper2, rounded corners=0.5pt] (-2.2,0) rectangle (2.2,3);
+  \draw[line, line width=0.7pt] (7,11) -- (7,22);
+  \draw[line, fill=white] (5.6,22) -- (8.4,22) -- (7,24) -- cycle;
+  \coordinate (habmast) at (7,23);
+\end{scope}
+\node[font=\rmfamily\scriptsize, text=ink, align=center] at (66,15.6) {\textbf{Hab-1}\\ \textit{\color{muted}server, console}};
+
+% ---------------- rover ----------------
+\begin{scope}[shift={(104,21.9)}]
+  \draw[line, fill=white] (-11,2) -- (-11,7.5) -- (6,7.5) -- (10.5,4) -- (10.5,2) -- cycle;
+  \draw[ink!60, fill=paper2] (5,6.5) -- (8.2,4.2) -- (8.2,6.5) -- cycle;
+  \foreach \x in {-7,0,7} {\fill[white] (\x,1.6) circle (2.3); \draw[line] (\x,1.6) circle (2.3); \fill[ink!60] (\x,1.6) circle (0.6);}
+  \draw[line, line width=0.7pt] (-6,7.5) -- (-6,17);
+  \draw[line, fill=white] (-7.2,17) -- (-4.8,17) -- (-6,18.8) -- cycle;
+  \coordinate (rovmast) at (-6,18);
+\end{scope}
+\node[font=\rmfamily\scriptsize, text=ink, align=center] at (104,15.6) {\textbf{PR-1}\\ \textit{\color{muted}mobile base, relay}};
+
+% ---------------- astronaut with phone ----------------
+\begin{scope}[shift={(141,21.4)}]
+  \draw[line, fill=paper3, rounded corners=0.8pt] (-6,8.5) rectangle (-3.2,16);
+  \draw[line, fill=white, rounded corners=1.6pt] (-3.6,8) rectangle (3.4,16.6);
+  \draw[ink!75, line width=1.6pt, line cap=round] (-1.6,8.2) -- (-2.4,0.6);
+  \draw[ink!75, line width=1.6pt, line cap=round] (1.4,8.2) -- (2.6,0.6);
+  \draw[line, fill=white] (0,19.6) circle (3.3);
+  \fill[accent!35] (0.9,19.6) ellipse (2.0 and 1.7);
+  \draw[ink!75, line width=1.3pt, line cap=round] (2.9,14.6) -- (6.2,15.9);
+  \draw[line, fill=ink!85, rounded corners=0.6pt, rotate around={-12:(7.4,16.6)}] (6.1,13.6) rectangle (8.7,19.4);
+  \fill[accent!70, rotate around={-12:(7.4,16.6)}] (6.5,14.3) rectangle (8.3,18.7);
+  \coordinate (crew) at (2,23.5);
+\end{scope}
+\node[font=\rmfamily\scriptsize, text=ink, align=center] at (141,15.6) {\textbf{EV crew}\\ \textit{\color{muted}suit, phone navigator}};
+
+% ---------------- links ----------------
+\draw[accent, line width=0.9pt, -{Stealth[length=5pt]}] ($(habmast)+(1,0.8)$) .. controls (95,60) and (122,58) .. ($(crew)+(-1.2,2)$)
+  node[pos=0.5, above=1pt, font=\rmfamily\scriptsize, text=accent] {signed route package, ${\approx}$11\,kB};
+\draw[ink!55, line width=0.6pt, -{Stealth[length=4pt]}] ($(crew)+(-1.8,0.4)$) .. controls (120,50) and (97,51) .. ($(habmast)+(1.4,-0.6)$)
+  node[pos=0.5, below=2pt, font=\rmfamily\scriptsize, text=ink!80] {telemetry, acknowledgements, crew requests};
+\draw[ink!45, line width=0.5pt, densely dotted] (rovmast) -- ($(habmast)+(0.4,-1)$);
+\draw[ink!45, line width=0.5pt, densely dotted] (rovmast) -- ($(crew)+(-2.5,-1.5)$);
+\node[font=\rmfamily\itshape\scriptsize, text=muted, anchor=south] at ($(rovmast)+(0,0.6)$) {relay};
+\draw[ink!45, line width=0.6pt, dashed, {Stealth[length=4pt]}-{Stealth[length=4pt]}] (27.2,48.5) .. controls (40,52) and (56,50.5) .. ($(habmast)+(-1.2,0.4)$)
+  node[pos=0.4, below=1.5pt, align=center, font=\rmfamily\scriptsize, text=ink!80] {delayed bundles\\ 3--22\,min};
+
+% ---------------- callouts ----------------
+\node[callout, text width=40mm, anchor=north] at (66,73) {\textbf{Habitat server and console}\\ route engine, safety fields, separate simulator; Ed25519 signing key; event log for crash recovery; the IV crewmember plans, reviews and sends};
+\node[callout, text width=37mm, anchor=north] at (144,73) {\textbf{Phone AR navigator}\\ verifies the route with a 32-byte key; onboard safety core; dead reckoning and local re-route; autonomous on link loss};
+
+% ---------------- design taglines ----------------
+\node[tag] at (18.5,5) {asynchronous with Earth};
+\node[tag] at (66,5) {heavy in the habitat};
+\node[tag] at (141,5) {light on the helmet};
+\end{tikzpicture}

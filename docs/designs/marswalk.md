@@ -107,7 +107,7 @@
 - **Edge cost**:
   - Pandolf + Santee (NASA JSC, NTRS 20240001423), gravity terms ×0.38, suit treated as load. Calibrated on Norcross IST-2 0.12–0.32 g; 0.38 g labelled an extrapolation.
   - η from THEMIS TI.
-  - **Heat governor** (352 W suit design average; SWME 370 W at Mars) + leaky-bucket rests.
+  - **Heat governor** (352 W suit design average, NASA ICES-2026-127; a 2013 hollow-fiber SWME prototype is packaged for 370 W in a Mars environment, NTRS 20130014146) + leaky-bucket rests.
 - **Fields**: W (contingency walkback, k_c = 0.5), S (multi-source shelter time: hab + rover + caches), O, LOS viewshed.
 - **Stations** (≤15): pairwise matrix + **exact bitmask DP** (<150 ms) with walkback pruning → the top 20 subsets go through a **time-stepped simulator** (daylight, LOS gap, heat, SEP lead, keep-outs). "Stay in hab" is always feasible.
 - **Outputs**: binding constraint, dropped reasons, leaderboard, bingo times, burndowns. Replan <1 s.

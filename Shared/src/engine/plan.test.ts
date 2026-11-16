@@ -1,69 +1,11 @@
 import fc from 'fast-check';
-import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { decodeRaster, goldenPlanRequest, mockSitePack, type SitePackManifest } from '../contracts';
-import { cellDistM } from '../contracts/grid';
+import { goldenPlanRequest, mockSitePack } from '../contracts';
 import { DEFAULT_RULES } from '../contracts/rules';
 import type { LoadedSitePack } from '../contracts/sitepack';
-import type { PlanRequest, PlanResult, Rule, RuleId } from '../contracts/types';
-import { computeFields, plan, stageFromShelter } from './index';
-
-const HARD_CHECKED: RuleId[] = ['slope_max_deg', 'walk_radius_max_m', 'shelter_time_max_min', 'walkback_speed_factor', 'los_gap_max_min',
-  'daylight_min_sun_elev_deg', 'heat_avg_max_w', 'eva_duration_max_min'];
-
-const ruleOf = (rules: Rule[], id: RuleId) => rules.find((r) => r.id === id)!;
-const enforced = (rules: Rule[], id: RuleId) => ruleOf(rules, id).enabled && ruleOf(rules, id).hard;
-const strip = (r: PlanResult) => ({ ...r, solveMs: 0 });
-
-/**
- * Independent re-verification of an OK plan against the request (does not trust the plan's checks).
- */
-function verifyOk(pack: LoadedSitePack, req: PlanRequest, res: PlanResult): void {
-  const g = pack.manifest.grid;
-  const f = computeFields(pack, req);
-  const rules = req.rules;
-  // every reported check passes
-  for (const s of res.segments) for (const c of s.checks) {
-    expect(c.pass, `${s.from}->${s.to} ${c.rule} worst ${c.worst} limit ${c.limit}`).toBe(true);
-    expect(c.margin).toBeGreaterThanOrEqual(-1e-9);
-  }
-  for (const id of HARD_CHECKED) if (enforced(rules, id) && res.segments.length) expect(res.margins[id], id).toBeDefined();
-  // route geometry: contiguous, 8-connected, from the start to the hab, never on blocked cells
-  const start = req.resume?.cell ?? req.hab;
-  expect(res.segments[0].cells[0]).toBe(start);
-  expect(res.segments.at(-1)!.cells.at(-1)).toBe(req.hab);
-  for (let i = 0; i < res.segments.length; i++) {
-    const cells = res.segments[i].cells;
-    if (i > 0) expect(cells[0]).toBe(res.segments[i - 1].cells.at(-1));
-    for (let k = 0; k < cells.length; k++) {
-      const c = cells[k];
-      if (c !== start) expect(f.blocked[c], `blocked cell ${c}`).toBe(0);
-      if (enforced(rules, 'walk_radius_max_m')) expect(cellDistM(g, req.hab, c)).toBeLessThanOrEqual(ruleOf(rules, 'walk_radius_max_m').value + 1e-6);
-      if (enforced(rules, 'shelter_time_max_min') && c !== start) expect(f.shelterMin[c]).toBeLessThanOrEqual(ruleOf(rules, 'shelter_time_max_min').value + 1e-6);
-      if (k > 0) {
-        const p = cells[k - 1];
-        expect(Math.max(Math.abs(Math.floor(c / g.w) - Math.floor(p / g.w)), Math.abs((c % g.w) - (p % g.w)))).toBe(1);
-      }
-    }
-  }
-  // stops: in order, dwell honoured, visited stations excluded
-  expect(res.stops.map((s) => s.id)).toEqual(res.order);
-  for (const s of res.stops) {
-    const st = req.stations.find((x) => x.id === s.id)!;
-    expect(s.departMin - s.arriveMin).toBeGreaterThanOrEqual(st.dwellMin - 1e-9);
-    expect(req.resume?.visited ?? []).not.toContain(s.id);
-  }
-  // EVA duration, burndown-level walkback / heat / daylight
-  const cut = (req.events ?? []).reduce((a, e) => a + (e.t === 'EVA_CUT' ? e.min : 0), 0);
-  expect(res.totals.durationMin).toBeLessThanOrEqual(ruleOf(rules, 'eva_duration_max_min').value - cut + 1e-6);
-  for (const b of res.burndown) {
-    if (enforced(rules, 'walkback_speed_factor')) expect(b.walkbackMarginMin).toBeGreaterThanOrEqual(-1e-6);
-    if (enforced(rules, 'heat_avg_max_w')) expect(b.heatAvgW).toBeLessThanOrEqual(ruleOf(rules, 'heat_avg_max_w').value + 1e-6);
-    if (enforced(rules, 'daylight_min_sun_elev_deg')) expect(b.sunElevDeg).toBeGreaterThanOrEqual(ruleOf(rules, 'daylight_min_sun_elev_deg').value - 1e-6);
-  }
-  // bingo: latest departures are not earlier than the planned departures
-  for (const s of res.stops) expect(res.bingo.find((b) => b.id === s.id)!.tMin).toBeGreaterThanOrEqual(s.departMin - 1e-6);
-}
+import type { PlanRequest } from '../contracts/types';
+import { evaluateOrder, plan, stageFromShelter } from './index';
+import { loadSitePackFromDisk, sitePackOnDisk, strip, verifyOk } from './verifyPlan.testutil';
 
 describe('plan() on the 1000×1000 mock (5 km × 5 km at 5 m)', () => {
   const pack = mockSitePack(412, 1000);
@@ -168,19 +110,8 @@ describe('regression: mockSitePack(412, 600)', () => {
 
 // ─────────────────────────── real data: SitePacks/gale-v1 (skipped when not built) ───────────────────────────
 
-const GALE = new URL('../../../SitePacks/gale-v1/', import.meta.url);
-function loadGale(): LoadedSitePack {
-  const manifest = JSON.parse(readFileSync(new URL('manifest.json', GALE), 'utf8')) as SitePackManifest;
-  const rasters: Record<string, Float32Array> = {};
-  for (const l of Object.values(manifest.rasters)) {
-    const b = readFileSync(new URL(l.file, GALE));
-    rasters[l.id] = decodeRaster(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer, l);
-  }
-  return { manifest, rasters, base: GALE.pathname };
-}
-
-describe.skipIf(!existsSync(new URL('manifest.json', GALE)) || !existsSync(new URL('dem.bin', GALE)))('regression: SitePacks/gale-v1 (real Gale DEM)', () => {
-  const pack = loadGale();
+describe.skipIf(!sitePackOnDisk('gale-v1'))('regression: SitePacks/gale-v1 (real Gale DEM)', () => {
+  const pack = loadSitePackFromDisk('gale-v1');
   const req = goldenPlanRequest(pack);
   it('default request (EVA from Hab-1): any OK plan is verified, every drop is explained, ST12 is never selected', () => {
     const r = plan(pack, req);
@@ -226,6 +157,7 @@ describe('property: every OK plan satisfies every hard rule (1,000 random small 
     let ok = 0;
     const maybe = <T,>(arb: fc.Arbitrary<T>, pct: number): fc.Arbitrary<T | undefined> =>
       fc.oneof({ weight: 100 - pct, arbitrary: fc.constant(undefined) }, { weight: pct, arbitrary: arb });
+    const unit = fc.oneof(fc.constant(0), fc.double({ min: 0, max: 1, noNaN: true }));
     fc.assert(
       fc.property(
         fc.record({
@@ -244,6 +176,8 @@ describe('property: every OK plan satisfies every hard rule (1,000 random small 
           resume: maybe(fc.record({ cellFrac: fc.double({ min: 0, max: 1, noNaN: true }), elapsed: fc.double({ min: 0, max: 250, noNaN: true }), o2: fc.double({ min: 0, max: 90, noNaN: true }), nVisited: fc.nat(4) }), 20),
           sep: maybe(fc.double({ min: 1, max: 60, noNaN: true }), 8),
           astar: fc.boolean(),
+          // operator route priorities (any weights must leave every OK plan safe)
+          prefs: maybe(fc.record({ distance: unit, slope: unit, rough: unit, thermal: unit, radio: unit, science: unit }), 50),
         }),
         (p) => {
           const pack = packFor(p.seed, p.size, p.cellM);
@@ -264,7 +198,7 @@ describe('property: every OK plan satisfies every hard rule (1,000 random small 
           if (p.cut !== undefined) events.push({ t: 'EVA_CUT', min: p.cut });
           if (p.hazard) events.push({ t: 'HAZARD', cells: p.hazard.map((x) => x % n).filter((c) => c !== base.hab) });
           if (p.sep !== undefined) events.push({ t: 'SEP_NOWCAST', leadMin: p.sep });
-          const req: PlanRequest = { ...base, rules, events, startLtstMin: p.startH * 60, planner: p.astar ? { pathSearch: 'astar', costModel: 'pandolf-santee-mars' } : undefined };
+          const req: PlanRequest = { ...base, rules, events, startLtstMin: p.startH * 60, planner: p.astar ? { pathSearch: 'astar', costModel: 'pandolf-santee-mars' } : undefined, prefs: p.prefs };
           if (p.resume) {
             const cell = Math.min(n - 1, Math.floor(p.resume.cellFrac * n));
             req.resume = { cell, elapsedMin: p.resume.elapsed, o2UsedPct: p.resume.o2, visited: base.stations.slice(0, p.resume.nVisited).map((s) => s.id) };
@@ -288,4 +222,22 @@ describe('property: every OK plan satisfies every hard rule (1,000 random small 
     console.log(`property: ${ok} OK plans of 1000 cases, all independently verified`);
     expect(ok).toBeGreaterThan(150); // the property is not vacuous
   }, 600_000);
+});
+
+describe('evaluateOrder', () => {
+  const pack = mockSitePack(412, 600);
+  const req = goldenPlanRequest(pack);
+  const res = plan(pack, req);
+  it('agrees with plan(): the planned order passes, with the same science value', () => {
+    expect(res.status).toBe('OK');
+    const ev = evaluateOrder(pack, req, res.order);
+    expect(ev.pass).toBe(true);
+    expect(ev.scienceValue).toBe(res.totals.scienceValue);
+    expect(ev.durationMin).toBeCloseTo(res.totals.durationMin, 6);
+  });
+  it('flags a fixed order that breaks a hard rule (all stations in one EVA)', () => {
+    const ev = evaluateOrder(pack, req, req.stations.map((s) => s.id));
+    expect(ev.pass).toBe(false);
+    expect(ev.failures.length > 0 || !!ev.reason).toBe(true);
+  });
 });

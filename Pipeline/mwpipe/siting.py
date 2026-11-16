@@ -30,6 +30,11 @@ PLUME_CITE = ("Hoffman et al., First Landing Site/Exploration Zone Workshop (NTR
 STATIONS_JSON = REPO_DIR / "Content" / "stations.gale.json"
 
 
+def stations_json(site: Site) -> Path:
+    """Content station list for the site (gale-v1: Content/stations.gale.json)."""
+    return REPO_DIR / "Content" / site.opt("stations_file", "stations.gale.json")
+
+
 def load_terrain(site: Site, pack: Path, m: dict):
     dem = read_raster(pack, m["rasters"]["dem"]).reshape(site.h, site.w)
     slope = read_raster(pack, m["rasters"]["slope"]).reshape(site.h, site.w)
@@ -112,9 +117,9 @@ def build_siting(site: Site, pack: Path, m: dict) -> dict:
     dh = np.hypot(rows - hr, cols - hc) * site.cell_m
     wps = _aoi_waypoints(pack)
     wrc = np.array([[w["cell"] // W, w["cell"] % W] for w in wps]) if wps else np.array([[hr, hc]])
-    if STATIONS_JSON.exists():
+    if stations_json(site).exists():
         st_rc = []
-        for s in json.loads(STATIONS_JSON.read_text()):
+        for s in json.loads(stations_json(site).read_text()):
             x, y = site.fwd(s["lon"], s["lat"])
             cell = site.xy_to_cell(x, y)
             if cell >= 0:
@@ -214,8 +219,9 @@ def build_stations(site: Site, pack: Path, m: dict) -> dict:
     hr, hc = divmod(hab["cell"], site.w)
     walk = walkable_component(slope, (hr, hc))
     out = []
-    if STATIONS_JSON.exists():
-        src = json.loads(STATIONS_JSON.read_text())
+    sj = stations_json(site)
+    if sj.exists():
+        src = json.loads(sj.read_text())
         items = src["stations"] if isinstance(src, dict) else src
         for s in items:
             x, y = site.fwd(s["lon"], s["lat"])
@@ -239,7 +245,7 @@ def build_stations(site: Site, pack: Path, m: dict) -> dict:
             if ko:
                 print(f"  ! station {s['id']} lies inside keep-out {ko} (kept; the engine will report it unreachable)")
             out.append(st)
-        print(f"  stations: {len(out)} from {STATIONS_JSON.relative_to(REPO_DIR)}")
+        print(f"  stations: {len(out)} from {sj.relative_to(REPO_DIR)}")
     else:
         # PLACEHOLDERS on Curiosity end-of-drive positions (real places the rover stopped), spread by farthest-point sampling.
         wps = _aoi_waypoints(pack)
@@ -271,7 +277,26 @@ def build_stations(site: Site, pack: Path, m: dict) -> dict:
         print(f"  stations: Content/stations.gale.json not found → {len(out)} PLACEHOLDER stations on Curiosity stops")
     m["stations"] = out
     link_station_images(m)
+    _copy_stm(site, pack, m)
     return m
+
+
+def _copy_stm(site: Site, pack: Path, m: dict) -> None:
+    """Ship the site's science traceability matrix (Content/stm*.json) as <pack>/stm.json, pinned by sha256."""
+    import shutil
+    src = REPO_DIR / "Content" / site.opt("stm_file", "stm.json")
+    if not src.exists():
+        return
+    ids = {s["id"] for s in m["stations"]}
+    stm = json.loads(src.read_text())
+    missing = sorted({sid for o in stm.get("objectives", []) for sid in o.get("stations", [])} - ids)
+    if missing:
+        print(f"  ! STM references stations not in the pack: {missing}")
+    shutil.copyfile(src, pack / "stm.json")
+    extra = m.setdefault("_extraFiles", [])
+    if "stm.json" not in extra:
+        extra.append("stm.json")
+    print(f"  stm.json ← Content/{src.name} ({len(stm.get('objectives', []))} objectives)")
 
 
 def link_station_images(m: dict, radius_m: float = 60.0) -> None:

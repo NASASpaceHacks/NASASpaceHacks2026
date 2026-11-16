@@ -9,11 +9,11 @@ export type EvidenceClass = NonNullable<Rule['evidence']>;
  * worth. Shown on every flight rule so a reviewer can see at a glance what is measured and what is ours.
  */
 export const EVIDENCE: Record<EvidenceClass, { name: string; long: string; chip: string }> = {
-  M: { name: 'Measured', long: 'Measured: flight or laboratory data.', chip: 'border-cyan/70 bg-cyan/15 text-cyan' },
-  A: { name: 'Analog', long: 'Analog or flight experience (Apollo, ISS, field analog campaigns).', chip: 'border-cyan/40 text-cyan/90' },
+  M: { name: 'Measured', long: 'Measured: flight or laboratory data.', chip: 'border-ok/70 bg-ok/15 text-ok' },
+  A: { name: 'Analog', long: 'Analog or flight experience (Apollo, ISS, field analog campaigns).', chip: 'border-ok/40 text-ok/90' },
   D: { name: 'NASA requirement', long: 'NASA design requirement, or derived from NASA documents.', chip: 'border-ink-2/50 text-ink' },
   S: { name: 'Simulated', long: 'Simulated: model output, not measured.', chip: 'border-dashed border-mute/70 text-mute' },
-  E: { name: 'Team assumption', long: 'Team engineering assumption: a design parameter we chose.', chip: 'border-ochre/60 bg-ochre/10 text-ochre' },
+  E: { name: 'Team assumption', long: 'Team engineering assumption: a design parameter we chose.', chip: 'border-mute/60 bg-mute/10 text-mute' },
 };
 
 export const EVIDENCE_ORDER: EvidenceClass[] = ['M', 'A', 'D', 'S', 'E'];

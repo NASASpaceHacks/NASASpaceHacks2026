@@ -1,5 +1,5 @@
 // Hab server entry: Hono HTTP API + ws surface link (/link) + event log + site-pack static serving.
-// Env: PORT (8787), SITEPACK (gale-v1; mock pack if missing), MARSWALK_PATH_SEARCH, MARSWALK_COST_MODEL, MARSWALK_ENGINE, MARSWALK_VAR_DIR.
+// Env: PORT (8787), MARSWALK_SITEPACKS_DIR, SITEPACK (gale-v1; mock pack if missing), MARSWALK_PATH_SEARCH, MARSWALK_COST_MODEL, MARSWALK_ENGINE, MARSWALK_VAR_DIR.
 import { createHabServer } from './server';
 
 const port = Number(process.env.PORT ?? 8787);
@@ -7,7 +7,9 @@ const port = Number(process.env.PORT ?? 8787);
 const engine = process.env.MARSWALK_ENGINE as 'auto' | 'golden-plan' | 'fallback' | undefined;
 // MARSWALK_VAR_DIR: runtime state (signing key, event log). The e2e suite points it at a fresh dir.
 const varDir = process.env.MARSWALK_VAR_DIR || undefined;
-const hab = await createHabServer({ port, engine, varDir });
+// MARSWALK_SITEPACKS_DIR: where SitePacks/<id>/manifest.json are discovered (default: repo SitePacks).
+const sitePacksDir = process.env.MARSWALK_SITEPACKS_DIR || undefined;
+const hab = await createHabServer({ port, engine, varDir, sitePacksDir });
 
 let stopping = false;
 const stop = async (sig: string) => {

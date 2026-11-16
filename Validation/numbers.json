@@ -105,5 +105,199 @@
   "logo_mape_pct": 26.8,
   "notes": "Pandolf+Santee x g-ratio vs IST-2 Mark III suited VO2 (digitized Fig. 36 trend lines, Norcross 2010), 5 gravities x 4 grades, subject mass 80.7 kg, suit 121 kg, speed 0.765 m/s (paper range 0.56-0.97). Model underpredicts at 0.12-0.17 g (measured VO2 has a gravity-independent floor) and is within about +-14% at 0.22-0.32 g. 0.38 g is an extrapolation beyond the 0.32 g maximum; no data there."
  },
- "generatedUtc": "2026-11-14T18:47:26Z"
+ "v3": {
+  "scenarios": 200,
+  "scienceRatioMean": 1,
+  "scienceRatioMedian": 1,
+  "pctMarswalkBetter": 0,
+  "pctMarswalkEqualToNearestFirst": 100,
+  "pctNaiveUnsafe": 99.5,
+  "pctNaiveUnsafeEdge": 75,
+  "ruleViolationCounts": {
+   "walk_radius_max_m": 158,
+   "walkback_speed_factor": 182,
+   "shelter_time_max_min": 182,
+   "los_gap_max_min": 187,
+   "daylight_min_sun_elev_deg": 169,
+   "eva_duration_max_min": 182,
+   "slope_max_deg": 150,
+   "unsafe_edge_grade_gt_20deg": 150
+  },
+  "planP50Ms": 37.9,
+  "planP95Ms": 73.8,
+  "replanP50Ms": 8.3,
+  "replanP95Ms": 19.8,
+  "oversubscribed": {
+   "scenarios": 200,
+   "candidates": 12,
+   "availableMinRange": [
+    120,
+    240
+   ],
+   "meanValueA": 382.1,
+   "meanValueB": 366.1,
+   "scienceRatioMean": 1.05,
+   "scienceRatioMedian": 1.011,
+   "scienceRatioMax": 1.306,
+   "pctAGreater": 62.5,
+   "pctEqual": 37.5,
+   "pctBGreater": 0,
+   "meanStationsA": 4.79,
+   "meanStationsB": 4.64,
+   "meanEvaMinA": 196.9,
+   "meanEvaMinB": 185.2,
+   "solveMsA_p50": 106.6,
+   "solveMsA_p95": 113.1,
+   "byBucket": {
+    "120-160": {
+     "n": 65,
+     "ratioMean": 1.06,
+     "ratioMedian": 1,
+     "pctAGreater": 46.2,
+     "pctEqual": 53.8,
+     "pctBGreater": 0
+    },
+    "160-200": {
+     "n": 72,
+     "ratioMean": 1.037,
+     "ratioMedian": 1,
+     "pctAGreater": 44.4,
+     "pctEqual": 55.6,
+     "pctBGreater": 0
+    },
+    "200-240": {
+     "n": 63,
+     "ratioMean": 1.053,
+     "ratioMedian": 1.038,
+     "pctAGreater": 100,
+     "pctEqual": 0,
+     "pctBGreater": 0
+    }
+   },
+   "notes": "All 12 stations, base PR-1, available EVA time 120-240 min via EVA_CUT (330 - available), 200 seeded scenarios. B = nearest-first with the same hard-rule checker. Science values are the team STM heuristic; single site; B is a generous but not the only human baseline."
+  },
+  "hab1": {
+   "scenarios": 60,
+   "stayIn": 60,
+   "pctNaiveUnsafe": 100
+  },
+  "manualPlanningRef": "no published figure found for hours of manual EVA traverse planning per EVA; only lead times (D-RATS 2010 planning began ~12 months before the field test; BASALT traverse targets were chosen months ahead from satellite imagery)",
+  "notes": "gale-v1 real DEM, base PR-1, 200 seeded scenarios (3-6 of 12 stations, start 08:00-11:00 LTST, sol 412 with assumed Ls 240). Nearest-first WITH the same safety check selected exactly the same station set as Marswalk in every scenario (ratio 1.0): in this tight-limit site the safety rules, not the stop-order optimisation, decide the outcome. The naive slope-only plan visits ALL requested targets and breaks >=1 hard rule in 99.5% of scenarios. Science values are the team STM heuristic. See v3_impact/README.md."
+ },
+ "v5": {
+  "rad_sols_sampled": 131,
+  "year1_sols_with_pressure": 29,
+  "year1_paired_obs": 268,
+  "sep_flagged_sols": [
+   340,
+   370,
+   390,
+   420,
+   630,
+   680,
+   690,
+   3280
+  ],
+  "measured_E_uGy_day_year1": 207.8,
+  "measured_B_uGy_day_year1": 215.9,
+  "measured_mean_pressure_pa": 856.6,
+  "modelled_E_uGy_day_at_measured_P": 198.8,
+  "bias_uGy_day": -9.0,
+  "kappa_E_measured": -0.066,
+  "kappa_E_se": 0.006,
+  "kappa_E_guo2015": -0.13,
+  "kappa_E_rafkin2014": -0.116,
+  "ls240_pressure_pa": 910.0,
+  "ls240_pressure_range_pa": [
+   888.0,
+   925.0
+  ],
+  "ls240_E_uGy_day": 210.1,
+  "model_P_ref_pa": 750,
+  "phi_implied_year1_MV": 518.0,
+  "phi_implied_ls240_MV": 435.0,
+  "ls240_all_years": [
+   {
+    "my_index": 0,
+    "n_sols": 5,
+    "sol_range": [
+     130,
+     170
+    ],
+    "E_median_uGy_day": 210.0,
+    "B_median_uGy_day": 219.0,
+    "assumed_P_pa": 910,
+    "model_E_at_910Pa_phi600": 191.9,
+    "phi_implied_at_910Pa_MV": 436.0,
+    "sols_used": [
+     130,
+     140,
+     150,
+     160,
+     170
+    ]
+   },
+   {
+    "my_index": 2,
+    "n_sols": 3,
+    "sol_range": [
+     1480,
+     1506
+    ],
+    "E_median_uGy_day": 265.0,
+    "B_median_uGy_day": 256.6,
+    "assumed_P_pa": 910,
+    "model_E_at_910Pa_phi600": 191.9,
+    "phi_implied_at_910Pa_MV": -65.0,
+    "sols_used": [
+     1480,
+     1500,
+     1506
+    ]
+   },
+   {
+    "my_index": 3,
+    "n_sols": 1,
+    "sol_range": [
+     2140,
+     2140
+    ],
+    "E_median_uGy_day": 296.1,
+    "B_median_uGy_day": 274.6,
+    "assumed_P_pa": 910,
+    "model_E_at_910Pa_phi600": 191.9,
+    "phi_implied_at_910Pa_MV": -348.0,
+    "sols_used": [
+     2140
+    ]
+   },
+   {
+    "my_index": 6,
+    "n_sols": 1,
+    "sol_range": [
+     4180,
+     4180
+    ],
+    "E_median_uGy_day": 167.4,
+    "B_median_uGy_day": 173.8,
+    "assumed_P_pa": 910,
+    "model_E_at_910Pa_phi600": 191.9,
+    "phi_implied_at_910Pa_MV": 823.0,
+    "sols_used": [
+     4180
+    ]
+   }
+  ],
+  "notes": "Compares (does not validate) the radiation.ts Guo-2015-form dose model with measured MSL RAD absorbed dose (PDS PPI RDR, detector E plastic = like-for-like; B silicon is ~4% higher) and REMS pressure for 131 sampled sols. Measured diurnal barometric coefficient is about half the published values (timing stamps in the RDR are unreliable). P_ref 750 Pa is ~160 Pa below the Ls 240 REMS mean; dose depends strongly on solar-cycle epoch (E 167-296 uGy/day at Ls 240 across 2012-2024). One rover, one site; see v5_rad_dose/README.md."
+ },
+ "v4": {
+  "walks": 24,
+  "engine_vs_ai_verdict": 23,
+  "engine_vs_independent_verdict": 23,
+  "engine_nogo": 12,
+  "failing_rule_named_by_ai": 11,
+  "failing_rule_named_by_independent": 7,
+  "notes": "24 single-destination walks on gale-v1 (12 GO, 12 NO-GO by the engine). Independent Python checker (own slope, edge grade, ray line-of-sight, radius, simple time model; no engine code) and blind Claude AI judges (read only the rules + per-step evidence packets; engine verdicts hidden). AI judges use packet values that include engine-derived per-step times (incl. heat rests), line of sight and shelter minutes, so they verify rule application, not the underlying models; the independent checker verifies geometry and line of sight independently. Re-run after the radio-relay fix (every masted shelter relays). The single disagreement (W02) is a safe-side engine NO-GO: the engine judged its heat-aware route (radio gap 0.22 min over the limit) while the shortest-time path in the packet passes; the engine does not yet try alternative paths before NO-GO. See v4_crosscheck/README.md."
+ },
+ "generatedUtc": "2026-11-15T03:39:26Z"
 }

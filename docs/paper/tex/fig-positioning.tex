@@ -1,0 +1,78 @@
+% Suit hardware concept (a) and GPS-free localization pipeline (b). Solid = runs in software today (simulated inputs); dashed = hardware concept.
+\begin{tikzpicture}[x=1mm, y=1mm, font=\rmfamily\scriptsize,
+  impl/.style={draw=accent, line width=0.6pt, fill=accent!8, rounded corners=1.5pt, align=center, inner sep=2.6pt,
+               execute at begin node={\hyphenpenalty=10000}},
+  conc/.style={draw=ink!55, dashed, line width=0.55pt, fill=white, rounded corners=1.5pt, align=center, inner sep=2.6pt,
+               execute at begin node={\hyphenpenalty=10000}},
+  arr/.style={-{Stealth[length=3.6pt]}, line width=0.55pt, draw=ink!65},
+  lbl/.style={font=\rmfamily\scriptsize, text=ink, align=left},
+  ptitle/.style={font=\rmfamily\bfseries\footnotesize, text=ink, anchor=west},
+  line/.style={draw=ink!70, line width=0.5pt},
+]
+% ================= (a) suit hardware placement =================
+\node[ptitle] at (0,72) {(a) Suit hardware concept};
+\begin{scope}[shift={(30,10)}]
+  % backpack
+  \draw[line, fill=paper3, rounded corners=1pt] (-11,26) rectangle (-6.5,44);
+  % torso
+  \draw[line, fill=white, rounded corners=2.5pt] (-7,24) rectangle (7,46);
+  % arms
+  \draw[ink!70, line width=2.6pt, line cap=round] (-7,43) -- (-12,30);
+  \draw[ink!70, line width=2.6pt, line cap=round] (7,43) -- (12,30);
+  % legs
+  \draw[ink!70, line width=3pt, line cap=round] (-3.5,24.5) -- (-4.5,6);
+  \draw[ink!70, line width=3pt, line cap=round] (3.5,24.5) -- (4.5,6);
+  % boots with IMUs
+  \draw[line, fill=white, rounded corners=1pt] (-8.5,2.5) rectangle (-1.5,6.5);
+  \draw[line, fill=white, rounded corners=1pt] (1.5,2.5) rectangle (8.5,6.5);
+  \fill[accent!70] (-6.2,3.6) rectangle (-3.8,5.4);
+  \fill[accent!70] (3.8,3.6) rectangle (6.2,5.4);
+  % helmet, visor, HUD, cameras
+  \draw[line, fill=white] (0,53) circle (7);
+  \fill[accent!18] (1.5,53) ellipse (4.6 and 3.6);
+  \draw[accent, line width=1.1pt] (3.9,55.3) -- (3.9,50.7);
+  \draw[line, fill=ink!80] (-2.6,59.4) rectangle (2.6,61.4);
+  \fill[white] (-1.4,60.4) circle (0.55); \fill[white] (1.4,60.4) circle (0.55);
+  % chest computer
+  \draw[line, fill=accent!8, rounded corners=0.8pt] (-4.5,33) rectangle (4.5,40.5);
+  \node[font=\rmfamily\tiny, align=center] at (0,36.7) {nav\\[-1pt]SoC};
+  % antenna
+  \draw[line, line width=0.7pt] (-8.8,44) -- (-8.8,50.5);
+  \fill[ink!70] (-8.8,50.8) circle (0.7);
+  \foreach \r in {2.6,4.6} \draw[ink!45, line width=0.5pt] ([shift={(-8.8,50.8)}]110:\r) arc (110:160:\r);
+\end{scope}
+% leader labels for (a)
+\node[lbl, anchor=west] (lhud) at (45,64) {monocular LCoS waveguide\\HUD in the helmet};
+\draw[ink!50, line width=0.4pt] (33.9,63.3) -- (lhud.west);
+\node[lbl, anchor=west] (lcam) at (45,73.5) {stereo cameras};
+\draw[ink!50, line width=0.4pt] (32.6,70.4) -- (lcam.west);
+\node[lbl, anchor=west] (lsoc) at (45,46.5) {suit navigation computer:\\route, orbital map tiles,\\radio, watchdog};
+\draw[ink!50, line width=0.4pt] (34.5,46.8) -- (lsoc.west);
+\node[lbl, anchor=west] (limu) at (45,15) {6-axis IMU on each boot\\(zero-velocity updates)};
+\draw[ink!50, line width=0.4pt] (36.2,14.6) -- (limu.west);
+\node[lbl, anchor=east] (lrf) at (14,66) {2-way radio:\\route down,\\position up};
+\draw[ink!50, line width=0.4pt] (17.5,61.5) -- (lrf.east);
+
+% ================= (b) localization and fusion =================
+\node[ptitle] at (78,72) {(b) Localization without GPS or a magnetic compass};
+\node[conc, text width=24mm] (imu) at (92,60) {\textbf{Boot IMUs}\\accelerometers, gyroscopes};
+\node[conc, text width=30mm] (pdr) at (124,60) {\textbf{Pedestrian dead reckoning}\\steps, stride, heading; zero-velocity updates at foot contact};
+\node[conc, text width=24mm] (cam) at (92,41) {\textbf{Stereo cameras}\\terrain imagery};
+\node[conc, text width=30mm] (vo) at (124,41) {\textbf{Visual odometry} and periodic matching to preloaded orbital imagery};
+\node[impl, text width=30mm] (fix) at (124,23) {\textbf{Fixes and heading}\\station arrival, landmark or rover ranging every 10\,min; Sun azimuth};
+\node[impl, text width=27mm, minimum height=24mm] (est) at (160,47) {\textbf{Navigation state estimator}\\fuses accepted measurements, rejects inconsistent fixes;\\position + uncertainty\\(drift 2\,m/min)};
+\node[impl, text width=27mm] (out) at (160,16) {\textbf{Navigator}\\route cue, uncertainty, safety-core margins; off route $>$25\,m $\rightarrow$ local A$^\ast$};
+\draw[arr] (imu) -- (pdr);
+\draw[arr] (cam) -- (vo);
+\draw[arr] (pdr.east) -- node[above, sloped, font=\rmfamily\tiny, text=ink!80] {high rate} (est.north west |- pdr.east);
+\draw[arr] (vo.east) -- node[above, font=\rmfamily\tiny, text=ink!80] {absolute fix} (est.west |- vo.east);
+\draw[arr] (fix.east) -| (est.south);
+\draw[arr] (est.south east) ++(-3,0) -- ++(0,-2.5) -| ([xshift=10mm]out.north west);
+\draw[arr] ([xshift=-6mm]est.south) -- ([xshift=-6mm]est.south |- out.north);
+
+% legend
+\node[impl, minimum width=6mm, minimum height=3mm, inner sep=0pt] (l1) at (80,6) {};
+\node[lbl, anchor=west] at (83.5,6) {runs in the software today, with simulated sensor inputs};
+\node[conc, minimum width=6mm, minimum height=3mm, inner sep=0pt] (l2) at (80,1) {};
+\node[lbl, anchor=west] at (83.5,1) {hardware concept, not yet built};
+\end{tikzpicture}

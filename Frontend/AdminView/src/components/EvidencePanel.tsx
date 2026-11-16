@@ -30,7 +30,7 @@ const f = (v: Num, d = 1) => (v === undefined || !Number.isFinite(v) ? '—' : v
 function Big({ value, unit, label, sub, tone = 'ink' }: { value: ReactNode; unit?: string; label: string; sub?: ReactNode; tone?: 'ink' | 'cyan' | 'amber' }) {
   return (
     <div className="min-w-0">
-      <div className={cx('num text-[26px] leading-none', tone === 'cyan' ? 'text-cyan' : tone === 'amber' ? 'text-amber' : 'text-ink')}>
+      <div className={cx('num text-[26px] leading-none', tone === 'cyan' ? 'text-ok' : tone === 'amber' ? 'text-caution' : 'text-ink')}>
         {value}
         {unit && <span className="ml-1 text-[12px] text-mute">{unit}</span>}
       </div>
@@ -44,9 +44,9 @@ function Card({ id, tag, title, verb, children, className, source }: { id: strin
   return (
     <section data-testid={`evidence-${id}`} className={cx('flex min-w-0 flex-col rounded-[4px] border border-line bg-panel p-4', className)}>
       <div className="flex items-center gap-2">
-        <span className="num rounded-[2px] border border-amber/50 bg-amber/10 px-1.5 text-[10.5px] text-amber">{tag}</span>
+        <span className="num rounded-[2px] border border-caution/50 bg-caution/10 px-1.5 text-[10.5px] text-caution">{tag}</span>
         <span className="font-display text-[12px] uppercase tracking-[0.14em] text-ink">{title}</span>
-        <span className="ml-auto font-display text-[9.5px] uppercase tracking-[0.14em] text-cyan">{verb}</span>
+        <span className="ml-auto font-display text-[9.5px] uppercase tracking-[0.14em] text-ok">{verb}</span>
       </div>
       <div className="mt-3 flex min-h-0 flex-1 flex-col">{children}</div>
       <div className="mt-3 border-t border-line/70 pt-2 text-[10px] leading-snug text-dim">{source}</div>
@@ -58,7 +58,7 @@ function Card({ id, tag, title, verb, children, className, source }: { id: strin
 function Plate({ src, alt, caption }: { src: string; alt: string; caption: string }) {
   return (
     <figure className="m-0">
-      <a href={src} target="_blank" rel="noreferrer" title="Open full size" className="block overflow-hidden rounded-[3px] bg-white p-1.5 ring-1 ring-line transition-shadow hover:ring-amber/60">
+      <a href={src} target="_blank" rel="noreferrer" title="Open full size" className="block overflow-hidden rounded-[3px] bg-white p-1.5 ring-1 ring-line transition-shadow hover:ring-cyan/60">
         <img src={src} alt={alt} className="block h-auto w-full" />
       </a>
       <figcaption className="mt-1.5 text-[10px] leading-snug text-dim">{caption}</figcaption>
@@ -143,11 +143,11 @@ function V7Card() {
             const v = r.static.violations + r.hazard.violations;
             return (
               <tr key={`${r.planner}-${r.costModel}`} className="border-t border-line/60 text-[11px]">
-                <td className="py-1 text-ink-2">{r.planner}{r.star ? <span className="ml-1 text-amber">★</span> : null}</td>
+                <td className="py-1 text-ink-2">{r.planner}{r.star ? <span className="ml-1 text-caution">★</span> : null}</td>
                 <td className="py-1 text-mute">{r.costModel === 'ref-slope' ? 'slope only' : r.costModel}</td>
                 <td className="num py-1 text-right text-ink-2">{f(r.static.meanGapPct, 2)}</td>
                 <td className="num py-1 text-right text-ink-2">{f(r.static.msP50, 0)}</td>
-                <td className={cx('num py-1 text-right', v ? 'text-red' : 'text-cyan')}>{v}</td>
+                <td className={cx('num py-1 text-right', v ? 'text-red' : 'text-ok')}>{v}</td>
               </tr>
             );
           })}
@@ -167,7 +167,7 @@ function Meter({ label, value, max, text, sub, tone = 'cyan' }: { label: string;
         <span className="num text-[12px] text-ink">{text}</span>
       </div>
       <div className="mt-1 h-[5px] overflow-hidden rounded-[1px] bg-sunk ring-1 ring-line">
-        <div className={cx('h-full', tone === 'amber' ? 'bg-amber' : 'bg-cyan')} style={{ width: `${frac * 100}%` }} />
+        <div className={cx('h-full', tone === 'amber' ? 'bg-caution' : 'bg-ok')} style={{ width: `${frac * 100}%` }} />
       </div>
       {sub && <div className="mt-0.5 text-[10px] text-dim">{sub}</div>}
     </div>
@@ -223,7 +223,7 @@ export function EvidencePanel() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-6 backdrop-blur-[2px]"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-6"
           onClick={() => set({ evidence: 'closed' })}
         >
           <motion.div
@@ -234,7 +234,7 @@ export function EvidencePanel() {
             animate={{ y: 0, scale: 1 }}
             exit={{ y: 12, scale: 0.99 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="flex max-h-full w-[min(1280px,100%)] flex-col overflow-hidden rounded-[5px] border border-line-2 bg-bg shadow-[0_24px_64px_rgba(0,0,0,0.6)]"
+            className="flex max-h-full w-[min(1280px,100%)] flex-col overflow-hidden rounded-[5px] border border-line-2 bg-bg"
             onClick={(e) => e.stopPropagation()}
           >
             <header className="flex shrink-0 items-center gap-4 border-b border-line bg-panel px-5 py-3">
@@ -258,9 +258,9 @@ export function EvidencePanel() {
                   <LiveCard />
                 </div>
                 <div ref={limRef} className="scroll-mt-4">
-                  <section data-testid="evidence-limitations" className="rounded-[4px] border border-ochre/40 bg-panel p-4">
+                  <section data-testid="evidence-limitations" className="rounded-[4px] border border-mute/40 bg-panel p-4">
                     <div className="flex flex-wrap items-center gap-3">
-                      <span className="font-display text-[12px] uppercase tracking-[0.14em] text-ochre">Limitations &amp; assumptions</span>
+                      <span className="font-display text-[12px] uppercase tracking-[0.14em] text-mute">Limitations &amp; assumptions</span>
                       <span className="ml-auto"><EvidenceLegend compact /></span>
                     </div>
                     <div className="mt-3.5">

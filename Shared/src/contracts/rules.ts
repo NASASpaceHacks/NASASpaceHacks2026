@@ -83,7 +83,7 @@ export const DEFAULT_RULES: Rule[] = [
   {
     id: 'los_gap_max_min',
     evidence: 'E',
-    label: 'Max time without habitat line-of-sight',
+    label: 'Max time out of radio contact (habitat or rover relay)',
     value: 10,
     unit: 'min',
     hard: true,
@@ -112,7 +112,7 @@ export const DEFAULT_RULES: Rule[] = [
     hard: true,
     enabled: true,
     citation:
-      'Future suits sized for 1200 BTU/h (352 W) average (NASA ICES-2026-127); SWME heat rejection 370 W in Mars conditions vs 810 W in vacuum (NTRS 20130014146).',
+      'Future suits sized for 1200 BTU/h (352 W) average (NASA ICES-2026-127). A 2013 hollow-fiber SWME prototype is packaged to reject 810 W in vacuum and 370 W in a Mars environment (NASA Tech Brief MSC-24849-1, NTRS 20130014146); SWME use at Mars pressure still needs testing (ICES-2026-126, NTRS 20260003024).',
   },
   {
     id: 'walk_radius_max_m',
